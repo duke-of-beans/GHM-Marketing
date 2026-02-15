@@ -1,0 +1,405 @@
+// GHM Marketing Dashboard - Complete Database Schema
+// Source of truth: blueprints/02_DATABASE_SCHEMA.md
+// 12 tables, all relations, indexes, and enums
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  master
+  sales
+}
+
+enum LeadStatus {
+  available
+  scheduled
+  contacted
+  follow_up
+  paperwork
+  won
+  lost_rejection
+  lost_deferred
+}
+
+enum PricingModel {
+  one_time
+  monthly
+  annual
+}
+
+// ============================================================================
+// TABLE 1: users
+// ============================================================================
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         UserRole  @default(sales)
+  territoryId  Int?      @map("territory_id")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastLogin    DateTime? @map("last_login")
+
+  // Relations
+  territory      Territory?      @relation(fields: [territoryId], references: [id], onDelete: SetNull)
+  assignedLeads  Lead[]          @relation("AssignedTo")
+  notes          Note[]
+  leadHistory    LeadHistory[]
+  workOrders     WorkOrder[]
+  stageMetrics   StageMetrics[]
+  repPerformance RepPerformance[]
+
+  @@index([territoryId])
+  @@map("users")
+}
+
+// ============================================================================
+// TABLE 2: territories
+// ============================================================================
+
+model Territory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cities    String[]
+  zipCodes  String[] @map("zip_codes")
+  states    String[]
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  users        User[]
+  leads        Lead[]
+  stageMetrics StageMetrics[]
+
+  @@map("territories")
+}
+
+// ============================================================================
+// TABLE 3: lead_sources
+// ============================================================================
+
+model LeadSource {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String?  // 'organic', 'paid', 'referral', 'scrape'
+  costPerLead Decimal? @map("cost_per_lead") @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  leads Lead[]
+
+  @@map("lead_sources")
+}
+
+// ============================================================================
+// TABLE 4: leads (Core)
+// ============================================================================
+
+model Lead {
+  id           Int    @id @default(autoincrement())
+
+  // Business Info
+  businessName String @map("business_name")
+  website      String?
+  phone        String
+  email        String?
+  address      String?
+  city         String
+  state        String
+  zipCode      String @map("zip_code")
+
+  // Assignment
+  territoryId  Int?       @map("territory_id")
+  assignedTo   Int?       @map("assigned_to")
+  leadSourceId Int?       @map("lead_source_id")
+
+  // Status Tracking
+  status          LeadStatus @default(available)
+  statusChangedAt DateTime   @default(now()) @map("status_changed_at")
+
+  // SEO Metrics (denormalized from competitive_intel for fast queries)
+  domainRating Int?     @map("domain_rating")
+  currentRank  Int?     @map("current_rank")
+  reviewCount  Int?     @map("review_count")
+  reviewAvg    Decimal? @map("review_avg") @db.Decimal(3, 2)
+
+  // Competitive Intel flags
+  intelLastUpdated  DateTime? @map("intel_last_updated")
+  intelNeedsRefresh Boolean   @default(false) @map("intel_needs_refresh")
+
+  // Deal Value (calculated by trigger on deal_products changes)
+  dealValueTotal   Decimal @default(0) @map("deal_value_total") @db.Decimal(10, 2)
+  dealValueOneTime Decimal @default(0) @map("deal_value_one_time") @db.Decimal(10, 2)
+  dealValueMonthly Decimal @default(0) @map("deal_value_monthly") @db.Decimal(10, 2)
+  dealValueAnnual  Decimal @default(0) @map("deal_value_annual") @db.Decimal(10, 2)
+  mrr              Decimal @default(0) @db.Decimal(10, 2)
+  arr              Decimal @default(0) @db.Decimal(10, 2)
+  ltvEstimated     Decimal @default(0) @map("ltv_estimated") @db.Decimal(10, 2)
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  territory        Territory?        @relation(fields: [territoryId], references: [id], onDelete: SetNull)
+  assignedUser     User?             @relation("AssignedTo", fields: [assignedTo], references: [id], onDelete: SetNull)
+  leadSource       LeadSource?       @relation(fields: [leadSourceId], references: [id], onDelete: SetNull)
+  notes            Note[]
+  leadHistory      LeadHistory[]
+  competitiveIntel CompetitiveIntel?
+  dealProducts     DealProduct[]
+  workOrders       WorkOrder[]
+
+  @@index([territoryId])
+  @@index([assignedTo])
+  @@index([status])
+  @@index([city, zipCode])
+  @@index([leadSourceId])
+  @@index([phone])
+  @@index([territoryId, status])
+  @@index([assignedTo, status])
+  @@map("leads")
+}
+
+// ============================================================================
+// TABLE 5: notes
+// ============================================================================
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  leadId    Int      @map("lead_id")
+  userId    Int      @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("notes")
+}
+
+// ============================================================================
+// TABLE 6: lead_history (Audit Trail)
+// ============================================================================
+
+model LeadHistory {
+  id                  Int         @id @default(autoincrement())
+  leadId              Int         @map("lead_id")
+  userId              Int?        @map("user_id")
+  oldStatus           LeadStatus? @map("old_status")
+  newStatus           LeadStatus  @map("new_status")
+  timeInPreviousStage Int?        @map("time_in_previous_stage") // Seconds
+  notes               String?
+  changedAt           DateTime    @default(now()) @map("changed_at")
+
+  // Relations
+  lead Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([changedAt(sort: Desc)])
+  @@map("lead_history")
+}
+
+// ============================================================================
+// TABLE 7: competitive_intel
+// ============================================================================
+
+model CompetitiveIntel {
+  id     Int @id @default(autoincrement())
+  leadId Int @unique @map("lead_id")
+
+  // Current Status
+  domainRating     Int?     @map("domain_rating")
+  currentRank      Int?     @map("current_rank")
+  backlinks        Int?
+  reviewCount      Int?     @map("review_count")
+  reviewAvg        Decimal? @map("review_avg") @db.Decimal(3, 2)
+  siteSpeedMobile  Int?     @map("site_speed_mobile")
+  siteSpeedDesktop Int?     @map("site_speed_desktop")
+
+  // Competitors (Top 3 as JSON)
+  competitors Json? // [{name, url, DR, rank, backlinks, reviews}]
+
+  // Gaps (vs top competitor)
+  drGap           Int?  @map("dr_gap")
+  backlinkGap     Int?  @map("backlink_gap")
+  reviewGap       Int?  @map("review_gap")
+  speedGapMobile  Int?  @map("speed_gap_mobile")
+  speedGapDesktop Int?  @map("speed_gap_desktop")
+  keywordGaps     Json? @map("keyword_gaps")
+
+  // Recommended Path
+  recommendedPackage   String? @map("recommended_package")
+  estimatedTimeToRank1 Int?    @map("estimated_time_to_rank_1") // Months
+
+  // Metadata
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+  apiCosts  Decimal  @default(0.03) @map("api_costs") @db.Decimal(10, 4)
+
+  // Relations
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([fetchedAt(sort: Desc)])
+  @@map("competitive_intel")
+}
+
+// ============================================================================
+// TABLE 8: products (Service Catalog)
+// ============================================================================
+
+model Product {
+  id           Int          @id @default(autoincrement())
+  name         String
+  description  String?
+  sku          String       @unique
+  category     String?
+  price        Decimal      @db.Decimal(10, 2)
+  pricingModel PricingModel @map("pricing_model")
+  isActive     Boolean      @default(true) @map("is_active")
+  displayOrder Int          @default(0) @map("display_order")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  dealProducts DealProduct[]
+
+  @@index([isActive])
+  @@index([category])
+  @@map("products")
+}
+
+// ============================================================================
+// TABLE 9: deal_products
+// ============================================================================
+
+model DealProduct {
+  id              Int      @id @default(autoincrement())
+  leadId          Int      @map("lead_id")
+  productId       Int      @map("product_id")
+  quantity        Int      @default(1)
+  priceAtSale     Decimal  @map("price_at_sale") @db.Decimal(10, 2)
+  discountPercent Decimal  @default(0) @map("discount_percent") @db.Decimal(5, 2)
+  finalPrice      Decimal  @map("final_price") @db.Decimal(10, 2)
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  lead    Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([leadId])
+  @@index([productId])
+  @@map("deal_products")
+}
+
+// ============================================================================
+// TABLE 10: work_orders
+// ============================================================================
+
+model WorkOrder {
+  id                    Int       @id @default(autoincrement())
+  leadId                Int       @map("lead_id")
+  userId                Int?      @map("user_id")
+  executiveSummary      String?   @map("executive_summary")
+  phasedRecommendations Json?     @map("phased_recommendations")
+  pricingBreakdown      Json?     @map("pricing_breakdown")
+  pdfUrl                String?   @map("pdf_url")
+  fileSize              Int?      @map("file_size")
+  sentViaEmail          Boolean   @default(false) @map("sent_via_email")
+  emailSentAt           DateTime? @map("email_sent_at")
+  viewedAt              DateTime? @map("viewed_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([sentViaEmail])
+  @@map("work_orders")
+}
+
+// ============================================================================
+// TABLE 11: stage_metrics
+// ============================================================================
+
+model StageMetrics {
+  id             Int      @id @default(autoincrement())
+  stage          String
+  territoryId    Int?     @map("territory_id")
+  userId         Int?     @map("user_id")
+  date           DateTime @db.Date
+  leadsCount     Int      @default(0) @map("leads_count")
+  leadsEntered   Int      @default(0) @map("leads_entered")
+  leadsExited    Int      @default(0) @map("leads_exited")
+  conversionRate Decimal? @map("conversion_rate") @db.Decimal(5, 2)
+  avgTimeInStage Int?     @map("avg_time_in_stage") // Seconds
+  calculatedAt   DateTime @default(now()) @map("calculated_at")
+
+  // Relations
+  territory Territory? @relation(fields: [territoryId], references: [id], onDelete: Cascade)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([date(sort: Desc)])
+  @@index([stage])
+  @@index([territoryId])
+  @@index([userId])
+  @@map("stage_metrics")
+}
+
+// ============================================================================
+// TABLE 12: rep_performance
+// ============================================================================
+
+model RepPerformance {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  date            DateTime @db.Date
+  period          String   // 'daily', 'weekly', 'monthly'
+  leadsAssigned   Int      @default(0) @map("leads_assigned")
+  leadsContacted  Int      @default(0) @map("leads_contacted")
+  leadsWon        Int      @default(0) @map("leads_won")
+  leadsLost       Int      @default(0) @map("leads_lost")
+  conversionRate  Decimal? @map("conversion_rate") @db.Decimal(5, 2)
+  totalRevenue    Decimal  @default(0) @map("total_revenue") @db.Decimal(10, 2)
+  mrrAdded        Decimal  @default(0) @map("mrr_added") @db.Decimal(10, 2)
+  arrAdded        Decimal  @default(0) @map("arr_added") @db.Decimal(10, 2)
+  ltvAdded        Decimal  @default(0) @map("ltv_added") @db.Decimal(10, 2)
+  avgDealSize     Decimal? @map("avg_deal_size") @db.Decimal(10, 2)
+  notesAdded      Int      @default(0) @map("notes_added")
+  workOrdersSent  Int      @default(0) @map("work_orders_sent")
+  avgResponseTime Int?     @map("avg_response_time") // Seconds
+  calculatedAt    DateTime @default(now()) @map("calculated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, period])
+  @@index([userId])
+  @@index([date(sort: Desc)])
+  @@index([period])
+  @@map("rep_performance")
+}
