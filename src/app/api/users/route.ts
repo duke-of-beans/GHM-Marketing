@@ -32,7 +32,7 @@ export async function GET() {
       isActive: true,
       _count: { select: { assignedLeads: true } },
     },
-    orderBy: { name: "asc" },
+    orderBy: [{ role: "asc" }, { name: "asc" }],
   });
 
   return NextResponse.json({ success: true, data: users });
