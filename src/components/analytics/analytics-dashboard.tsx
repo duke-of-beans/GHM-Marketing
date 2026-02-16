@@ -290,7 +290,7 @@ function calculateMetrics(data: AnalyticsData) {
   // Lead sources
   const sourceMap = new Map<string, number>();
   leads.forEach((l) => {
-    const source = l.source || "unknown";
+    const source = l.leadSource?.name || "unknown";
     sourceMap.set(source, (sourceMap.get(source) || 0) + 1);
   });
   const sources = Array.from(sourceMap.entries()).map(([source, count]) => ({

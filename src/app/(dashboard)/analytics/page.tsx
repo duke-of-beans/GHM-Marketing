@@ -11,9 +11,12 @@ export default async function AnalyticsPage() {
       select: {
         id: true,
         status: true,
-        source: true,
         createdAt: true,
-        qualificationScore: true,
+        leadSource: {
+          select: {
+            name: true,
+          },
+        },
       },
     }),
     prisma.clientProfile.findMany({
