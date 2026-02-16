@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import { ScanHistory } from "./scan-history";
+import { ClientReportsTab } from "./reports/client-reports-tab";
 
 // ============================================================================
 // TYPES
@@ -615,18 +616,15 @@ export function ClientProfile({
 
         {/* TAB 5: REPORTS */}
         <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground">
-                Report generation will be available after the first competitive scan
-                produces data. Reports auto-generate from scan results, completed tasks,
-                and competitive deltas.
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Report types: Monthly Client · Competitive Intelligence · Internal Performance · Upsell Opportunities
-              </p>
-            </CardContent>
-          </Card>
+          <ClientReportsTab
+            clientId={client.id}
+            reports={client.reports.map((r) => ({
+              ...r,
+              periodStart: new Date(r.periodStart),
+              periodEnd: new Date(r.periodEnd),
+              createdAt: new Date(r.createdAt),
+            }))}
+          />
         </TabsContent>
       </Tabs>
     </div>

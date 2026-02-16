@@ -37,13 +37,13 @@ export function DashboardNav({ user }: { user: NavUser }) {
     <>
       {/* Desktop sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 border-r bg-gray-50/50 p-4">
-        <div className="mb-6">
+        <div className="mb-3">
           <Image
             src="/logo.png"
             alt="GHM Digital Marketing"
-            width={140}
-            height={46}
-            className="mb-2"
+            width={180}
+            height={59}
+            className="mb-1"
             priority
           />
           <p className="text-xs text-muted-foreground">{user.name}</p>
