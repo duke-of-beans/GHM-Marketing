@@ -59,7 +59,7 @@ export default async function MasterDashboard() {
     <div className="space-y-6 pb-20 md:pb-0">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Welcome back, {user.name}</p>
+        <p className="text-sm text-muted-foreground">Welcome back, {user.name.split(' ')[0]}</p>
       </div>
 
       {/* Top metrics row */}
