@@ -259,9 +259,9 @@ export async function bulkCreateLeads(leads: BulkLeadInput[]) {
       suppressionSignal: lead.suppressionSignal || null,
       pitchAngle: lead.pitchAngle || null,
       reviewCount: lead.reviewCount ?? null,
-      reviewAvg: lead.reviewAvg ?? null,
+      reviewAvg: lead.reviewAvg != null ? new Prisma.Decimal(lead.reviewAvg) : null,
       wealthScore: lead.wealthScore || null,
-      distanceFromMetro: lead.distanceFromMetro ?? null,
+      distanceFromMetro: lead.distanceFromMetro != null ? new Prisma.Decimal(lead.distanceFromMetro) : null,
     };
   });
 

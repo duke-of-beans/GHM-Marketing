@@ -341,6 +341,9 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
+  console.log(`Import: ${rawRows.length} rows parsed, ${validLeads.length} valid, ${errors.length} errors`);
+  if (errors.length > 0) console.log("First errors:", errors.slice(0, 5));
+
   try {
     const result = await bulkCreateLeads(validLeads);
 
@@ -358,7 +361,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: "Database error during import",
-      details: { message: message.slice(0, 500), leadCount: validLeads.length, sampleLead: validLeads[0] },
+      details: {
+        message: message.slice(0, 2000),
+        leadCount: validLeads.length,
+        validationErrorCount: errors.length,
+        firstErrors: errors.slice(0, 5),
+        sampleLead: validLeads[0],
+      },
     }, { status: 500 });
   }
 }
