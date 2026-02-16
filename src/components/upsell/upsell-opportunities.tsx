@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, X, Eye, DollarSign } from "lucide-react";
+import { TrendingUp, X, Eye, DollarSign, Mail } from "lucide-react";
 
 type Opportunity = {
   id?: number;
@@ -29,6 +29,7 @@ export function UpsellOpportunities({
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectedOpps, setDetectedOpps] = useState<Opportunity[]>(opportunities);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [emailingId, setEmailingId] = useState<number | null>(null);
 
   const handleDetect = async () => {
     setIsDetecting(true);
@@ -86,6 +87,32 @@ export function UpsellOpportunities({
       console.error("Failed to dismiss opportunity:", error);
     } finally {
       setProcessingId(null);
+    }
+  };
+
+  const handleEmailUpsell = async (oppId: number) => {
+    if (!oppId) return;
+    
+    setEmailingId(oppId);
+    try {
+      const response = await fetch("/api/email/send-upsell", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ opportunityId: oppId }),
+      });
+
+      if (response.ok) {
+        alert("Upsell notification sent successfully!");
+        setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
+        window.location.reload();
+      } else {
+        alert("Failed to send notification");
+      }
+    } catch (error) {
+      console.error("Failed to send upsell email:", error);
+      alert("Failed to send notification");
+    } finally {
+      setEmailingId(null);
     }
   };
 
@@ -185,16 +212,25 @@ export function UpsellOpportunities({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDismiss(opp.id!)}
-                    disabled={processingId === opp.id}
+                    disabled={processingId === opp.id || emailingId === opp.id}
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 )}
                 <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => opp.id && handleEmailUpsell(opp.id)}
+                  disabled={!opp.id || processingId === opp.id || emailingId === opp.id}
+                >
+                  <Mail className="h-4 w-4 mr-1" />
+                  {emailingId === opp.id ? "Sending..." : "Email"}
+                </Button>
+                <Button
                   variant="default"
                   size="sm"
                   onClick={() => opp.id && handlePresent(opp.id)}
-                  disabled={!opp.id || processingId === opp.id}
+                  disabled={!opp.id || processingId === opp.id || emailingId === opp.id}
                 >
                   <DollarSign className="h-4 w-4 mr-1" />
                   {processingId === opp.id ? "Processing..." : "Present"}

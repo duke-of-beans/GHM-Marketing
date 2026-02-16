@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Eye } from "lucide-react";
+import { FileText, Eye, Mail } from "lucide-react";
 import { ReportPreviewModal } from "./report-preview-modal";
 
 type Report = {
@@ -20,6 +20,7 @@ type Report = {
 export function ReportsList({ reports, clientId }: { reports: Report[]; clientId: number }) {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [sendingEmail, setSendingEmail] = useState<number | null>(null);
 
   const handleViewReport = async (report: Report) => {
     // Generate HTML from stored content
@@ -37,6 +38,29 @@ export function ReportsList({ reports, clientId }: { reports: Report[]; clientId
       }
     } catch (error) {
       console.error("Failed to load report:", error);
+    }
+  };
+
+  const handleEmailReport = async (reportId: number) => {
+    setSendingEmail(reportId);
+    try {
+      const response = await fetch("/api/email/send-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportId }),
+      });
+
+      if (response.ok) {
+        alert("Report sent successfully!");
+        window.location.reload(); // Refresh to update "sent" status
+      } else {
+        alert("Failed to send report");
+      }
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      alert("Failed to send report");
+    } finally {
+      setSendingEmail(null);
     }
   };
 
@@ -78,14 +102,27 @@ export function ReportsList({ reports, clientId }: { reports: Report[]; clientId
                 <span className="text-xs text-muted-foreground">
                   Generated {new Date(report.createdAt).toLocaleDateString()}
                 </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleViewReport(report)}
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  View
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleViewReport(report)}
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    View
+                  </Button>
+                  {!report.sentToClient && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleEmailReport(report.id)}
+                      disabled={sendingEmail === report.id}
+                    >
+                      <Mail className="h-4 w-4 mr-1" />
+                      {sendingEmail === report.id ? "Sending..." : "Email Client"}
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
