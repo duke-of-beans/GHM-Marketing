@@ -73,12 +73,12 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
     const scan = await prisma.competitiveScan.create({
       data: {
         clientId,
-        clientData: fetchResult.clientData as Prisma.InputJsonValue,
-        competitors: fetchResult.competitors as Prisma.InputJsonValue,
-        deltas: deltas as Prisma.InputJsonValue,
-        alerts: alerts as Prisma.InputJsonValue,
+        clientData: fetchResult.clientData as unknown as Prisma.InputJsonValue,
+        competitors: fetchResult.competitors as unknown as Prisma.InputJsonValue,
+        deltas: deltas as unknown as Prisma.InputJsonValue,
+        alerts: alerts as unknown as Prisma.InputJsonValue,
         healthScore,
-        apiCosts: fetchResult.apiCosts as Prisma.InputJsonValue,
+        apiCosts: fetchResult.apiCosts as unknown as Prisma.InputJsonValue,
         status: 'complete',
       },
     });
