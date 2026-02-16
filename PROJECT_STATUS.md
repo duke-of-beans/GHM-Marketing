@@ -66,6 +66,7 @@ src/
 │   └── ui/              # shadcn/ui primitives
 ├── lib/
 │   ├── auth/            # NextAuth config, session helpers, RBAC
+│   ├── competitive-scan/ # Phase 2: Competitive scan engine (COMPLETE)
 │   ├── db/              # Prisma query modules (leads.ts, clients.ts)
 │   ├── email/           # Nodemailer work order delivery
 │   ├── enrichment/      # API clients: outscraper, ahrefs, pagespeed
@@ -92,16 +93,64 @@ src/
 - Note system with pinned client standards
 - Error boundaries on client pages
 
-## What's Next — Phase 2: Competitive Scan Engine
+## Phase 2: Competitive Scan Engine ✅ COMPLETE
 
-The scan infrastructure (database tables, API routes shell) exists. The engine itself needs to be built:
+Complete competitive scanning system that monitors client performance vs competitors and auto-generates improvement tasks.
 
-1. **Scan Executor** — background job that runs scans on schedule per client's `scanFrequency` (weekly/biweekly/monthly)
-2. **Data Fetcher** — reuses enrichment APIs (Outscraper, Ahrefs, PageSpeed) to pull fresh metrics for client + their tracked competitors
-3. **Delta Calculator** — compares current scan vs previous scan, identifies gaps between client and competitors
-4. **Alert Generator** — flags significant changes (competitor gained keywords, client lost rankings, review count dropped)
-5. **Task Auto-Creator** — converts competitive gaps into actionable tasks in `client_tasks` with source="competitive-scan"
-6. **Health Score Updater** — recalculates client health score from scan data
+**Built Components:**
+
+1. **Data Fetcher** (`src/lib/competitive-scan/data-fetcher.ts`)
+   - Fetches fresh metrics for client + competitors from existing APIs
+   - Outscraper: GMB reviews, ratings
+   - Ahrefs: domain rating, backlinks, organic traffic
+   - PageSpeed: mobile/desktop performance scores
+   - Returns structured ClientData + CompetitorData with API cost tracking
+
+2. **Delta Calculator** (`src/lib/competitive-scan/delta-calculator.ts`)
+   - Compares current scan vs previous scan (historical deltas)
+   - Calculates competitive gaps (client vs each competitor)
+   - Identifies position changes (improved/declined/new/lost rankings)
+   - Returns comprehensive Deltas object with percent changes
+
+3. **Alert Generator** (`src/lib/competitive-scan/alert-generator.ts`)
+   - Transforms deltas into actionable alerts
+   - Severity levels: critical/warning/info
+   - Alert types: ranking_drop, competitor_gain, review_decline, gap_widening, etc.
+   - Includes task suggestions with category/priority for actionable alerts
+
+4. **Task Auto-Creator** (`src/lib/competitive-scan/task-creator.ts`)
+   - Converts actionable alerts into ClientTask records
+   - Links tasks to scan for traceability
+   - Auto-assigns category (link-building, review-mgmt, content, technical-seo)
+   - Sets priority and status=queued
+
+5. **Health Score Calculator** (`src/lib/competitive-scan/health-score.ts`)
+   - Calculates 0-100 health score from scan data
+   - Weighted components: domain authority (20%), reviews (20%), site speed (15%), momentum (25%), competitive position (20%)
+   - Updates ClientProfile.healthScore
+
+6. **Scan Executor** (`src/lib/competitive-scan/executor.ts`)
+   - Orchestrates full scan workflow
+   - Single scan: `executeScan({ clientId })`
+   - Batch scan: `executeBatchScan({ clientIds, includeDue })`
+   - Updates nextScanAt based on scanFrequency
+   - Returns success/failure with detailed metrics
+
+**API Endpoint:**
+- `POST /api/scans/execute` - Trigger scans manually or on schedule
+- Auth: master role required
+- Params: `{ clientId }` or `{ clientIds }` or `{ scanDue: true }`
+
+**Documentation:**
+- Schema reference: `docs/COMPETITIVE_SCAN_SCHEMA.md`
+- TypeScript types: `src/types/competitive-scan.ts`
+- Main export: `src/lib/competitive-scan/index.ts`
+
+**Next Steps:**
+- Add cron job or background worker to run scans automatically
+- Build UI for scan history visualization on client scorecard tab
+- Add keyword tracking integration (currently placeholder)
+- Add email notifications for critical alerts
 
 ## Environment
 
@@ -115,6 +164,9 @@ The scan infrastructure (database tables, API routes shell) exists. The engine i
 | Purpose | File |
 |---------|------|
 | Database schema | `prisma/schema.prisma` |
+| Competitive scan types | `src/types/competitive-scan.ts` |
+| Competitive scan engine | `src/lib/competitive-scan/` |
+| Scan API endpoint | `src/app/api/scans/execute/route.ts` |
 | Lead status config | `src/types/index.ts` |
 | Lead queries + won trigger | `src/lib/db/leads.ts` |
 | Client queries + creation | `src/lib/db/clients.ts` |

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import { ScanHistory } from "./scan-history";
 
 // ============================================================================
 // TYPES
@@ -330,73 +331,7 @@ export function ClientProfile({
 
         {/* TAB 1: COMPETITIVE SCORECARD */}
         <TabsContent value="scorecard" className="space-y-4">
-          {client.scans.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <p className="text-muted-foreground">
-                  No competitive scans yet. The first scan will run automatically
-                  based on the client&apos;s scan schedule ({client.scanFrequency}),
-                  or you can trigger one manually.
-                </p>
-                <Button className="mt-4" variant="outline" disabled>
-                  Run Scan Now (Coming Soon)
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    Latest Scan — {formatDate(client.scans[0].scanDate)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Health Score: {client.scans[0].healthScore} ·{" "}
-                    {(client.scans[0].alerts as unknown[])?.length || 0} alerts generated
-                  </p>
-                  <pre className="mt-3 text-xs bg-muted p-3 rounded overflow-x-auto max-h-96">
-                    {JSON.stringify(client.scans[0].clientData, null, 2)}
-                  </pre>
-                </CardContent>
-              </Card>
-
-              {/* Competitors tracked */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Tracked Competitors</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {client.competitors.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No competitors tracked yet.
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {client.competitors.map((comp) => (
-                        <div
-                          key={comp.id}
-                          className="flex items-center justify-between py-2 border-b last:border-0"
-                        >
-                          <div>
-                            <p className="font-medium text-sm">
-                              {comp.businessName}
-                            </p>
-                            {comp.domain && (
-                              <p className="text-xs text-muted-foreground">
-                                {comp.domain}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </>
-          )}
+          <ScanHistory clientId={client.id} />
         </TabsContent>
 
         {/* TAB 2: TASK BOARD */}

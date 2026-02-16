@@ -1,7 +1,3 @@
-// GHM Marketing Dashboard - Complete Database Schema
-// Source of truth: blueprints/02_DATABASE_SCHEMA.md
-// 21 tables (12 original + 9 expansion), all relations, indexes, and enums
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,170 +8,104 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ============================================================================
-// ENUMS
-// ============================================================================
-
-enum UserRole {
-  master
-  sales
-}
-
-enum LeadStatus {
-  available
-  scheduled
-  contacted
-  follow_up
-  paperwork
-  won
-  lost_rejection
-  lost_deferred
-}
-
-enum PricingModel {
-  one_time
-  monthly
-  annual
-}
-
-// ============================================================================
-// TABLE 1: users
-// ============================================================================
-
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  name         String
-  role         UserRole  @default(sales)
-  territoryId  Int?      @map("territory_id")
-  isActive     Boolean   @default(true) @map("is_active")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  lastLogin    DateTime? @map("last_login")
-
-  // Relations
-  territory      Territory?      @relation(fields: [territoryId], references: [id], onDelete: SetNull)
-  assignedLeads  Lead[]          @relation("AssignedTo")
-  notes          Note[]
-  leadHistory    LeadHistory[]
-  workOrders     WorkOrder[]
-  stageMetrics   StageMetrics[]
-  repPerformance RepPerformance[]
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  passwordHash   String           @map("password_hash")
+  name           String
+  role           UserRole         @default(sales)
+  territoryId    Int?             @map("territory_id")
+  isActive       Boolean          @default(true) @map("is_active")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  lastLogin      DateTime?        @map("last_login")
   clientNotes    ClientNote[]
+  leadHistory    LeadHistory[]
+  assignedLeads  Lead[]           @relation("AssignedTo")
+  notes          Note[]
+  repPerformance RepPerformance[]
+  stageMetrics   StageMetrics[]
+  territory      Territory?       @relation(fields: [territoryId], references: [id])
+  workOrders     WorkOrder[]
 
   @@index([territoryId])
   @@map("users")
 }
 
-// ============================================================================
-// TABLE 2: territories
-// ============================================================================
-
 model Territory {
-  id        Int      @id @default(autoincrement())
-  name      String
-  cities    String[]
-  zipCodes  String[] @map("zip_codes")
-  states    String[]
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  users        User[]
+  id           Int            @id @default(autoincrement())
+  name         String
+  cities       String[]
+  zipCodes     String[]       @map("zip_codes")
+  states       String[]
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
   leads        Lead[]
   stageMetrics StageMetrics[]
+  users        User[]
 
   @@map("territories")
 }
 
-// ============================================================================
-// TABLE 3: lead_sources
-// ============================================================================
-
 model LeadSource {
   id          Int      @id @default(autoincrement())
   name        String
-  type        String?  // 'organic', 'paid', 'referral', 'scrape'
+  type        String?
   costPerLead Decimal? @map("cost_per_lead") @db.Decimal(10, 2)
   createdAt   DateTime @default(now()) @map("created_at")
-
-  // Relations
-  leads Lead[]
+  leads       Lead[]
 
   @@map("lead_sources")
 }
 
-// ============================================================================
-// TABLE 4: leads (Core)
-// ============================================================================
-
 model Lead {
-  id           Int    @id @default(autoincrement())
-
-  // Business Info
-  businessName String @map("business_name")
-  website      String?
-  phone        String
-  email        String?
-  address      String?
-  city         String
-  state        String
-  zipCode      String @map("zip_code")
-
-  // Assignment
-  territoryId  Int?       @map("territory_id")
-  assignedTo   Int?       @map("assigned_to")
-  leadSourceId Int?       @map("lead_source_id")
-
-  // Status Tracking
-  status          LeadStatus @default(available)
-  statusChangedAt DateTime   @default(now()) @map("status_changed_at")
-
-  // SEO Metrics (denormalized from competitive_intel for fast queries)
-  domainRating Int?     @map("domain_rating")
-  currentRank  Int?     @map("current_rank")
-  reviewCount  Int?     @map("review_count")
-  reviewAvg    Decimal? @map("review_avg") @db.Decimal(3, 2)
-
-  // Lead Gen Scoring (from lead gen machine)
-  priorityTier      String?  @map("priority_tier")
-  impactScore       Int?     @map("impact_score")
-  closeScore        Int?     @map("close_score")
-  marketType        String?  @map("market_type")
-  suppressionSignal String?  @map("suppression_signal")
-  pitchAngle        String?  @map("pitch_angle")
-  wealthScore       String?  @map("wealth_score")
-  distanceFromMetro Decimal? @map("distance_from_metro") @db.Decimal(6, 1)
-
-  // Competitive Intel flags
-  intelLastUpdated  DateTime? @map("intel_last_updated")
-  intelNeedsRefresh Boolean   @default(false) @map("intel_needs_refresh")
-
-  // Deal Value (calculated by trigger on deal_products changes)
-  dealValueTotal   Decimal @default(0) @map("deal_value_total") @db.Decimal(10, 2)
-  dealValueOneTime Decimal @default(0) @map("deal_value_one_time") @db.Decimal(10, 2)
-  dealValueMonthly Decimal @default(0) @map("deal_value_monthly") @db.Decimal(10, 2)
-  dealValueAnnual  Decimal @default(0) @map("deal_value_annual") @db.Decimal(10, 2)
-  mrr              Decimal @default(0) @db.Decimal(10, 2)
-  arr              Decimal @default(0) @db.Decimal(10, 2)
-  ltvEstimated     Decimal @default(0) @map("ltv_estimated") @db.Decimal(10, 2)
-
-  // Timestamps
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  territory        Territory?        @relation(fields: [territoryId], references: [id], onDelete: SetNull)
-  assignedUser     User?             @relation("AssignedTo", fields: [assignedTo], references: [id], onDelete: SetNull)
-  leadSource       LeadSource?       @relation(fields: [leadSourceId], references: [id], onDelete: SetNull)
-  notes            Note[]
-  leadHistory      LeadHistory[]
-  competitiveIntel CompetitiveIntel?
-  dealProducts     DealProduct[]
-  workOrders       WorkOrder[]
-  clientProfile    ClientProfile?
+  id                Int               @id @default(autoincrement())
+  businessName      String            @map("business_name")
+  website           String?
+  phone             String
+  email             String?
+  address           String?
+  city              String
+  state             String
+  zipCode           String            @map("zip_code")
+  territoryId       Int?              @map("territory_id")
+  assignedTo        Int?              @map("assigned_to")
+  leadSourceId      Int?              @map("lead_source_id")
+  status            LeadStatus        @default(available)
+  statusChangedAt   DateTime          @default(now()) @map("status_changed_at")
+  domainRating      Int?              @map("domain_rating")
+  currentRank       Int?              @map("current_rank")
+  reviewCount       Int?              @map("review_count")
+  reviewAvg         Decimal?          @map("review_avg") @db.Decimal(3, 2)
+  intelLastUpdated  DateTime?         @map("intel_last_updated")
+  intelNeedsRefresh Boolean           @default(false) @map("intel_needs_refresh")
+  dealValueTotal    Decimal           @default(0) @map("deal_value_total") @db.Decimal(10, 2)
+  dealValueOneTime  Decimal           @default(0) @map("deal_value_one_time") @db.Decimal(10, 2)
+  dealValueMonthly  Decimal           @default(0) @map("deal_value_monthly") @db.Decimal(10, 2)
+  dealValueAnnual   Decimal           @default(0) @map("deal_value_annual") @db.Decimal(10, 2)
+  mrr               Decimal           @default(0) @db.Decimal(10, 2)
+  arr               Decimal           @default(0) @db.Decimal(10, 2)
+  ltvEstimated      Decimal           @default(0) @map("ltv_estimated") @db.Decimal(10, 2)
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  closeScore        Int?              @map("close_score")
+  distanceFromMetro Decimal?          @map("distance_from_metro") @db.Decimal(6, 1)
+  impactScore       Int?              @map("impact_score")
+  marketType        String?           @map("market_type")
+  pitchAngle        String?           @map("pitch_angle")
+  priorityTier      String?           @map("priority_tier")
+  suppressionSignal String?           @map("suppression_signal")
+  wealthScore       String?           @map("wealth_score")
+  clientProfile     ClientProfile?
+  competitiveIntel  CompetitiveIntel?
+  dealProducts      DealProduct[]
+  leadHistory       LeadHistory[]
+  assignedUser      User?             @relation("AssignedTo", fields: [assignedTo], references: [id])
+  leadSource        LeadSource?       @relation(fields: [leadSourceId], references: [id])
+  territory         Territory?        @relation(fields: [territoryId], references: [id])
+  notes             Note[]
+  workOrders        WorkOrder[]
 
   @@index([territoryId])
   @@index([assignedTo])
@@ -188,10 +118,6 @@ model Lead {
   @@map("leads")
 }
 
-// ============================================================================
-// TABLE 5: notes
-// ============================================================================
-
 model Note {
   id        Int      @id @default(autoincrement())
   leadId    Int      @map("lead_id")
@@ -199,10 +125,8 @@ model Note {
   content   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id])
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([leadId])
   @@index([userId])
@@ -210,23 +134,17 @@ model Note {
   @@map("notes")
 }
 
-// ============================================================================
-// TABLE 6: lead_history (Audit Trail)
-// ============================================================================
-
 model LeadHistory {
   id                  Int         @id @default(autoincrement())
   leadId              Int         @map("lead_id")
   userId              Int?        @map("user_id")
   oldStatus           LeadStatus? @map("old_status")
   newStatus           LeadStatus  @map("new_status")
-  timeInPreviousStage Int?        @map("time_in_previous_stage") // Seconds
+  timeInPreviousStage Int?        @map("time_in_previous_stage")
   notes               String?
   changedAt           DateTime    @default(now()) @map("changed_at")
-
-  // Relations
-  lead Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  lead                Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user                User?       @relation(fields: [userId], references: [id])
 
   @@index([leadId])
   @@index([userId])
@@ -234,77 +152,51 @@ model LeadHistory {
   @@map("lead_history")
 }
 
-// ============================================================================
-// TABLE 7: competitive_intel
-// ============================================================================
-
 model CompetitiveIntel {
-  id     Int @id @default(autoincrement())
-  leadId Int @unique @map("lead_id")
-
-  // Current Status
-  domainRating     Int?     @map("domain_rating")
-  currentRank      Int?     @map("current_rank")
-  backlinks        Int?
-  reviewCount      Int?     @map("review_count")
-  reviewAvg        Decimal? @map("review_avg") @db.Decimal(3, 2)
-  siteSpeedMobile  Int?     @map("site_speed_mobile")
-  siteSpeedDesktop Int?     @map("site_speed_desktop")
-
-  // Competitors (Top 3 as JSON)
-  competitors Json? // [{name, url, DR, rank, backlinks, reviews}]
-
-  // Gaps (vs top competitor)
-  drGap           Int?  @map("dr_gap")
-  backlinkGap     Int?  @map("backlink_gap")
-  reviewGap       Int?  @map("review_gap")
-  speedGapMobile  Int?  @map("speed_gap_mobile")
-  speedGapDesktop Int?  @map("speed_gap_desktop")
-  keywordGaps     Json? @map("keyword_gaps")
-
-  // Recommended Path
-  recommendedPackage   String? @map("recommended_package")
-  estimatedTimeToRank1 Int?    @map("estimated_time_to_rank_1") // Months
-
-  // Metadata
-  fetchedAt DateTime @default(now()) @map("fetched_at")
-  apiCosts  Decimal  @default(0.03) @map("api_costs") @db.Decimal(10, 4)
-
-  // Relations
-  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  id                   Int      @id @default(autoincrement())
+  leadId               Int      @unique @map("lead_id")
+  domainRating         Int?     @map("domain_rating")
+  currentRank          Int?     @map("current_rank")
+  backlinks            Int?
+  reviewCount          Int?     @map("review_count")
+  reviewAvg            Decimal? @map("review_avg") @db.Decimal(3, 2)
+  siteSpeedMobile      Int?     @map("site_speed_mobile")
+  siteSpeedDesktop     Int?     @map("site_speed_desktop")
+  competitors          Json?
+  drGap                Int?     @map("dr_gap")
+  backlinkGap          Int?     @map("backlink_gap")
+  reviewGap            Int?     @map("review_gap")
+  speedGapMobile       Int?     @map("speed_gap_mobile")
+  speedGapDesktop      Int?     @map("speed_gap_desktop")
+  keywordGaps          Json?    @map("keyword_gaps")
+  recommendedPackage   String?  @map("recommended_package")
+  estimatedTimeToRank1 Int?     @map("estimated_time_to_rank_1")
+  fetchedAt            DateTime @default(now()) @map("fetched_at")
+  apiCosts             Decimal  @default(0.03) @map("api_costs") @db.Decimal(10, 4)
+  lead                 Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([fetchedAt(sort: Desc)])
   @@map("competitive_intel")
 }
 
-// ============================================================================
-// TABLE 8: products (Service Catalog)
-// ============================================================================
-
 model Product {
-  id           Int          @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   description  String?
-  sku          String       @unique
+  sku          String        @unique
   category     String?
-  price        Decimal      @db.Decimal(10, 2)
-  pricingModel PricingModel @map("pricing_model")
-  isActive     Boolean      @default(true) @map("is_active")
-  displayOrder Int          @default(0) @map("display_order")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
-
-  // Relations
+  price        Decimal       @db.Decimal(10, 2)
+  pricingModel PricingModel  @map("pricing_model")
+  isActive     Boolean       @default(true) @map("is_active")
+  displayOrder Int           @default(0) @map("display_order")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   dealProducts DealProduct[]
 
   @@index([isActive])
   @@index([category])
   @@map("products")
 }
-
-// ============================================================================
-// TABLE 9: deal_products
-// ============================================================================
 
 model DealProduct {
   id              Int      @id @default(autoincrement())
@@ -316,19 +208,13 @@ model DealProduct {
   finalPrice      Decimal  @map("final_price") @db.Decimal(10, 2)
   notes           String?
   createdAt       DateTime @default(now()) @map("created_at")
-
-  // Relations
-  lead    Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  lead            Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  product         Product  @relation(fields: [productId], references: [id])
 
   @@index([leadId])
   @@index([productId])
   @@map("deal_products")
 }
-
-// ============================================================================
-// TABLE 10: work_orders
-// ============================================================================
 
 model WorkOrder {
   id                    Int       @id @default(autoincrement())
@@ -343,10 +229,8 @@ model WorkOrder {
   emailSentAt           DateTime? @map("email_sent_at")
   viewedAt              DateTime? @map("viewed_at")
   createdAt             DateTime  @default(now()) @map("created_at")
-
-  // Relations
-  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  lead                  Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user                  User?     @relation(fields: [userId], references: [id])
 
   @@index([leadId])
   @@index([userId])
@@ -354,26 +238,20 @@ model WorkOrder {
   @@map("work_orders")
 }
 
-// ============================================================================
-// TABLE 11: stage_metrics
-// ============================================================================
-
 model StageMetrics {
-  id             Int      @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   stage          String
-  territoryId    Int?     @map("territory_id")
-  userId         Int?     @map("user_id")
-  date           DateTime @db.Date
-  leadsCount     Int      @default(0) @map("leads_count")
-  leadsEntered   Int      @default(0) @map("leads_entered")
-  leadsExited    Int      @default(0) @map("leads_exited")
-  conversionRate Decimal? @map("conversion_rate") @db.Decimal(5, 2)
-  avgTimeInStage Int?     @map("avg_time_in_stage") // Seconds
-  calculatedAt   DateTime @default(now()) @map("calculated_at")
-
-  // Relations
-  territory Territory? @relation(fields: [territoryId], references: [id], onDelete: Cascade)
-  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  territoryId    Int?       @map("territory_id")
+  userId         Int?       @map("user_id")
+  date           DateTime   @db.Date
+  leadsCount     Int        @default(0) @map("leads_count")
+  leadsEntered   Int        @default(0) @map("leads_entered")
+  leadsExited    Int        @default(0) @map("leads_exited")
+  conversionRate Decimal?   @map("conversion_rate") @db.Decimal(5, 2)
+  avgTimeInStage Int?       @map("avg_time_in_stage")
+  calculatedAt   DateTime   @default(now()) @map("calculated_at")
+  territory      Territory? @relation(fields: [territoryId], references: [id], onDelete: Cascade)
+  user           User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([date(sort: Desc)])
   @@index([stage])
@@ -382,15 +260,11 @@ model StageMetrics {
   @@map("stage_metrics")
 }
 
-// ============================================================================
-// TABLE 12: rep_performance
-// ============================================================================
-
 model RepPerformance {
   id              Int      @id @default(autoincrement())
   userId          Int      @map("user_id")
   date            DateTime @db.Date
-  period          String   // 'daily', 'weekly', 'monthly'
+  period          String
   leadsAssigned   Int      @default(0) @map("leads_assigned")
   leadsContacted  Int      @default(0) @map("leads_contacted")
   leadsWon        Int      @default(0) @map("leads_won")
@@ -403,11 +277,9 @@ model RepPerformance {
   avgDealSize     Decimal? @map("avg_deal_size") @db.Decimal(10, 2)
   notesAdded      Int      @default(0) @map("notes_added")
   workOrdersSent  Int      @default(0) @map("work_orders_sent")
-  avgResponseTime Int?     @map("avg_response_time") // Seconds
+  avgResponseTime Int?     @map("avg_response_time")
   calculatedAt    DateTime @default(now()) @map("calculated_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date, period])
   @@index([userId])
@@ -416,101 +288,93 @@ model RepPerformance {
   @@map("rep_performance")
 }
 
-// ============================================================================
-// BACK CYCLE: Client Service Delivery (Blueprint 11)
-// ============================================================================
-
 model ClientProfile {
-  id              Int       @id @default(autoincrement())
-  leadId          Int       @unique @map("lead_id")
-  businessName    String    @map("business_name")
-  retainerAmount  Decimal   @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
-  healthScore     Int       @default(50) @map("health_score")
-  scanFrequency   String    @default("biweekly") @map("scan_frequency")
-  voiceProfileId  String?   @map("voice_profile_id")
-  status          String    @default("active")
-  onboardedAt     DateTime  @default(now()) @map("onboarded_at")
-  lastScanAt      DateTime? @map("last_scan_at")
-  nextScanAt      DateTime? @map("next_scan_at")
-
-  lead        Lead               @relation(fields: [leadId], references: [id])
-  competitors ClientCompetitor[]
-  domains     ClientDomain[]
-  tasks       ClientTask[]
-  notes       ClientNote[]
-  scans       CompetitiveScan[]
-  reports     ClientReport[]
+  id             Int                @id @default(autoincrement())
+  leadId         Int                @unique @map("lead_id")
+  businessName   String             @map("business_name")
+  retainerAmount Decimal            @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
+  healthScore    Int                @default(50) @map("health_score")
+  scanFrequency  String             @default("biweekly") @map("scan_frequency")
+  voiceProfileId String?            @map("voice_profile_id")
+  status         String             @default("active")
+  onboardedAt    DateTime           @default(now()) @map("onboarded_at")
+  lastScanAt     DateTime?          @map("last_scan_at")
+  nextScanAt     DateTime?          @map("next_scan_at")
+  competitors    ClientCompetitor[]
+  domains        ClientDomain[]
+  notes          ClientNote[]
+  lead           Lead               @relation(fields: [leadId], references: [id])
+  reports        ClientReport[]
+  tasks          ClientTask[]
+  scans          CompetitiveScan[]
 
   @@map("client_profiles")
 }
 
 model ClientCompetitor {
-  id            Int      @id @default(autoincrement())
-  clientId      Int      @map("client_id")
-  businessName  String   @map("business_name")
+  id            Int           @id @default(autoincrement())
+  clientId      Int           @map("client_id")
+  businessName  String        @map("business_name")
   domain        String?
-  googlePlaceId String?  @map("google_place_id")
-  isActive      Boolean  @default(true) @map("is_active")
-  addedAt       DateTime @default(now()) @map("added_at")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  googlePlaceId String?       @map("google_place_id")
+  isActive      Boolean       @default(true) @map("is_active")
+  addedAt       DateTime      @default(now()) @map("added_at")
+  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@map("client_competitors")
 }
 
 model ClientDomain {
-  id              Int       @id @default(autoincrement())
-  clientId        Int       @map("client_id")
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @map("client_id")
   domain          String
-  type            String    // main-site | satellite | landing-page
-  hosting         String    // vercel | wordpress | other
-  wpUrl           String?   @map("wp_url")
-  wpUsername      String?   @map("wp_username")
-  wpAppPassword   String?   @map("wp_app_password")
-  vercelProjectId String?   @map("vercel_project_id")
-  githubRepo      String?   @map("github_repo")
-  templateUsed    String?   @map("template_used")
-  ownershipType   String    @default("ghm") @map("ownership_type")
-  dnsVerified     Boolean   @default(false) @map("dns_verified")
-  sslActive       Boolean   @default(false) @map("ssl_active")
-  contentCount    Int       @default(0) @map("content_count")
-  lastDeployedAt  DateTime? @map("last_deployed_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type            String
+  hosting         String
+  wpUrl           String?       @map("wp_url")
+  wpUsername      String?       @map("wp_username")
+  wpAppPassword   String?       @map("wp_app_password")
+  vercelProjectId String?       @map("vercel_project_id")
+  githubRepo      String?       @map("github_repo")
+  templateUsed    String?       @map("template_used")
+  ownershipType   String        @default("ghm") @map("ownership_type")
+  dnsVerified     Boolean       @default(false) @map("dns_verified")
+  sslActive       Boolean       @default(false) @map("ssl_active")
+  contentCount    Int           @default(0) @map("content_count")
+  lastDeployedAt  DateTime?     @map("last_deployed_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@map("client_domains")
 }
 
 model ClientTask {
-  id              Int       @id @default(autoincrement())
-  clientId        Int       @map("client_id")
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @map("client_id")
   title           String
   description     String?
-  category        String    // site-build | content | technical-seo | link-building | review-mgmt | competitive-response
-  priority        String    @default("P3")
-  status          String    @default("queued") // queued | in-progress | in-review | approved | deployed | measured | dismissed
-  source          String    @default("manual") // competitive-scan | manual | sentry-recommendation | upsell
-  assignedTo      String?   @map("assigned_to")
-  targetKeywords  Json?     @map("target_keywords")
-  competitorRef   String?   @map("competitor_ref")
-  contentBrief    Json?     @map("content_brief")
-  draftContent    String?   @map("draft_content")
-  approvedContent String?   @map("approved_content")
-  deployedUrl     String?   @map("deployed_url")
-  outcomeMetrics  Json?     @map("outcome_metrics")
-  dueDate         DateTime? @map("due_date")
-  scanId          Int?      @map("scan_id")
-  domainId        Int?      @map("domain_id")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deployedAt      DateTime? @map("deployed_at")
-  measuredAt      DateTime? @map("measured_at")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  notes  ClientNote[]
+  category        String
+  priority        String        @default("P3")
+  status          String        @default("queued")
+  source          String        @default("manual")
+  assignedTo      String?       @map("assigned_to")
+  targetKeywords  Json?         @map("target_keywords")
+  competitorRef   String?       @map("competitor_ref")
+  contentBrief    Json?         @map("content_brief")
+  draftContent    String?       @map("draft_content")
+  approvedContent String?       @map("approved_content")
+  deployedUrl     String?       @map("deployed_url")
+  outcomeMetrics  Json?         @map("outcome_metrics")
+  dueDate         DateTime?     @map("due_date")
+  scanId          Int?          @map("scan_id")
+  domainId        Int?          @map("domain_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  deployedAt      DateTime?     @map("deployed_at")
+  measuredAt      DateTime?     @map("measured_at")
+  notes           ClientNote[]
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, status])
   @@index([clientId, category])
@@ -519,20 +383,19 @@ model ClientTask {
 }
 
 model ClientNote {
-  id        Int      @id @default(autoincrement())
-  clientId  Int      @map("client_id")
-  taskId    Int?     @map("task_id")
-  authorId  Int      @map("author_id")
-  type      String   // standard | task-note | contact-log
+  id        Int           @id @default(autoincrement())
+  clientId  Int           @map("client_id")
+  taskId    Int?          @map("task_id")
+  authorId  Int           @map("author_id")
+  type      String
   content   String
-  isPinned  Boolean  @default(false) @map("is_pinned")
+  isPinned  Boolean       @default(false) @map("is_pinned")
   tags      Json?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  task   ClientTask?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
-  author User          @relation(fields: [authorId], references: [id])
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  author    User          @relation(fields: [authorId], references: [id])
+  client    ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  task      ClientTask?   @relation(fields: [taskId], references: [id])
 
   @@index([clientId, type])
   @@index([clientId, isPinned])
@@ -541,43 +404,37 @@ model ClientNote {
 }
 
 model CompetitiveScan {
-  id          Int      @id @default(autoincrement())
-  clientId    Int      @map("client_id")
-  scanDate    DateTime @default(now()) @map("scan_date")
-  clientData  Json     @map("client_data")
+  id          Int           @id @default(autoincrement())
+  clientId    Int           @map("client_id")
+  scanDate    DateTime      @default(now()) @map("scan_date")
+  clientData  Json          @map("client_data")
   competitors Json
   deltas      Json
   alerts      Json
-  healthScore Int      @map("health_score")
-  apiCosts    Json?    @map("api_costs")
-  status      String   @default("complete")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  healthScore Int           @map("health_score")
+  apiCosts    Json?         @map("api_costs")
+  status      String        @default("complete")
+  client      ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, scanDate(sort: Desc)])
   @@map("competitive_scans")
 }
 
 model ClientReport {
-  id           Int      @id @default(autoincrement())
-  clientId     Int      @map("client_id")
-  type         String   // monthly | competitive | internal | upsell
-  periodStart  DateTime @map("period_start")
-  periodEnd    DateTime @map("period_end")
+  id           Int           @id @default(autoincrement())
+  clientId     Int           @map("client_id")
+  type         String
+  periodStart  DateTime      @map("period_start")
+  periodEnd    DateTime      @map("period_end")
   content      Json
-  pdfUrl       String?  @map("pdf_url")
-  sentToClient Boolean  @default(false) @map("sent_to_client")
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pdfUrl       String?       @map("pdf_url")
+  sentToClient Boolean       @default(false) @map("sent_to_client")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  client       ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, type])
   @@map("client_reports")
 }
-
-// ============================================================================
-// FRONT CYCLE: Lead Discovery (Blueprint 10)
-// ============================================================================
 
 model DiscoveryRun {
   id           Int      @id @default(autoincrement())
@@ -602,4 +459,26 @@ model LocationPreset {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("location_presets")
+}
+
+enum UserRole {
+  master
+  sales
+}
+
+enum LeadStatus {
+  available
+  scheduled
+  contacted
+  follow_up
+  paperwork
+  won
+  lost_rejection
+  lost_deferred
+}
+
+enum PricingModel {
+  one_time
+  monthly
+  annual
 }

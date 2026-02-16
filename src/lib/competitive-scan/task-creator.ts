@@ -1,0 +1,68 @@
+/**
+ * Competitive Scan Task Auto-Creator
+ * 
+ * Converts actionable alerts into ClientTask records.
+ * Links tasks back to the scan for traceability.
+ */
+
+import type { Alert, Alerts } from '@/types/competitive-scan';
+import { prisma } from '@/lib/db';
+
+// ============================================================================
+// Task Category Mapping
+// ============================================================================
+
+// Maps alert categories to ClientTask categories
+const CATEGORY_MAP: Record<string, string> = {
+  'link-building': 'link-building',
+  'review-mgmt': 'review-mgmt',
+  'technical-seo': 'technical-seo',
+  'content': 'content',
+  'competitive-response': 'competitive-response',
+} as const;
+
+// ============================================================================
+// Core Task Creator
+// ============================================================================
+
+interface CreateTasksParams {
+  clientId: number;
+  scanId: number;
+  alerts: Alerts;
+}
+
+interface CreateTasksResult {
+  created: number;
+  tasks: Array<{ id: number; title: string }>;
+  errors: string[];
+}
+
+export async function createTasksFromAlerts(
+  params: CreateTasksParams
+): Promise<CreateTasksResult> {
+  const { clientId, scanId, alerts } = params;
+  
+  const created: Array<{ id: number; title: string }> = [];
+  const errors: string[] = [];
+ = [
+    `**Alert:** ${alert.message}`,
+    '',
+    `**Details:**`,
+    `- Metric: ${alert.metric}`,
+    `- Change: ${alert.delta > 0 ? '+' : ''}${alert.delta}`,
+  ];
+  
+  if (alert.competitor) {
+    parts.push(`- Competitor: ${alert.competitor}`);
+  }
+  
+  if (alert.keyword) {
+    parts.push(`- Keyword: ${alert.keyword}`);
+  }
+  
+  parts.push('');
+  parts.push(`**Recommended Action:**`);
+  parts.push(alert.taskSuggestion?.description || 'Review and address this competitive gap.');
+  
+  return parts.join('\n');
+}
