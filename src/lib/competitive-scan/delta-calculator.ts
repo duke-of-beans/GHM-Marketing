@@ -64,7 +64,7 @@ export async function calculateDeltas(params: CalculateDeltasParams): Promise<De
   
   // Calculate vs_previous deltas
   const vs_previous = previousScan
-    ? calculateHistoricalDeltas(previousScan.clientData as ClientData, currentClientData)
+    ? calculateHistoricalDeltas(previousScan.clientData as unknown as ClientData, currentClientData)
     : null;
   
   // Calculate vs_competitors gaps
@@ -73,7 +73,7 @@ export async function calculateDeltas(params: CalculateDeltasParams): Promise<De
   // Calculate position changes (for rankings)
   const position_changes = previousScan
     ? calculatePositionChanges(
-        (previousScan.clientData as ClientData).rankings,
+        (previousScan.clientData as unknown as ClientData).rankings,
         currentClientData.rankings
       )
     : undefined;
