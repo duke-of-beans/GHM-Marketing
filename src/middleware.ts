@@ -1,15 +1,15 @@
-export { auth as middleware } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth/auth.config";
+
+export default NextAuth(authConfig).auth;
 
 export const config = {
   matcher: [
-    // Match all dashboard routes
     "/master/:path*",
     "/sales/:path*",
     "/leads/:path*",
     "/reports/:path*",
-    // Match login (for redirect if already authenticated)
     "/login",
-    // Match API routes (except auth)
     "/api/((?!auth).*)",
   ],
 };
