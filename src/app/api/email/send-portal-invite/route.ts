@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
-    if (!client.lead?.email) {
+    if (!client.lead.email) {
       return NextResponse.json(
-        { error: "Client email not configured" },
+        { error: "Client has no email address" },
         { status: 400 }
       );
     }
@@ -51,13 +51,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Build portal URL
+    // Generate portal URL
     const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL}/portal?token=${portalToken}`;
 
     // Send email
     const result = await sendPortalInvite({
       to: client.lead.email,
-      clientName: client.businessName,
+      clientName: client.lead.businessName,
       portalUrl,
     });
 
@@ -70,14 +70,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Portal invite sent successfully",
       emailId: result.id,
       portalUrl,
+      message: "Portal invite sent successfully",
     });
   } catch (error) {
     console.error("Failed to send portal invite:", error);
     return NextResponse.json(
-      { error: "Failed to send email" },
+      { error: "Failed to send email", details: (error as Error).message },
       { status: 500 }
     );
   }

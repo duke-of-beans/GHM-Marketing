@@ -37,20 +37,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Report not found" }, { status: 404 });
     }
 
-    if (!report.client.lead?.email) {
+    if (!report.client.lead.email) {
       return NextResponse.json(
-        { error: "Client email not configured" },
+        { error: "Client has no email address" },
         { status: 400 }
       );
     }
 
-    // Generate report URL (assuming we have a download endpoint)
+    // Generate report URL (would be actual download/view link in production)
     const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/${reportId}/download`;
 
     // Send email
     const result = await sendReportEmail({
       to: report.client.lead.email,
-      clientName: report.client.businessName,
+      clientName: report.client.lead.businessName,
       reportType: report.type,
       reportUrl,
       periodStart: report.periodStart,
@@ -64,24 +64,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update report to mark as sent
+    // Mark report as sent
     await prisma.clientReport.update({
       where: { id: reportId },
       data: {
-        // Note: You may want to add a sentAt field to the schema
-        // sentAt: new Date(),
+        sentAt: new Date(),
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Report email sent successfully",
       emailId: result.id,
+      message: "Report email sent successfully",
     });
   } catch (error) {
     console.error("Failed to send report email:", error);
     return NextResponse.json(
-      { error: "Failed to send email" },
+      { error: "Failed to send email", details: (error as Error).message },
       { status: 500 }
     );
   }

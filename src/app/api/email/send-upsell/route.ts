@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!opportunity.client.lead?.email) {
+    if (!opportunity.client.lead.email) {
       return NextResponse.json(
-        { error: "Client email not configured" },
+        { error: "Client has no email address" },
         { status: 400 }
       );
     }
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     // Send email
     const result = await sendUpsellNotification({
       to: opportunity.client.lead.email,
-      clientName: opportunity.client.businessName,
+      clientName: opportunity.client.lead.businessName,
       productName: opportunity.product.name,
       opportunityScore: opportunity.opportunityScore,
       projectedMrr: Number(opportunity.projectedMrr),
@@ -72,15 +72,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Update opportunity status (if not already presented)
+    if (opportunity.status === "detected") {
+      await prisma.upsellOpportunity.update({
+        where: { id: opportunityId },
+        data: {
+          status: "presented",
+          presentedAt: new Date(),
+        },
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Upsell notification sent successfully",
       emailId: result.id,
+      message: "Upsell notification sent successfully",
     });
   } catch (error) {
     console.error("Failed to send upsell email:", error);
     return NextResponse.json(
-      { error: "Failed to send email" },
+      { error: "Failed to send email", details: (error as Error).message },
       { status: 500 }
     );
   }
