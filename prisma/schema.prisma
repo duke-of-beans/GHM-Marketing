@@ -1,6 +1,6 @@
 // GHM Marketing Dashboard - Complete Database Schema
 // Source of truth: blueprints/02_DATABASE_SCHEMA.md
-// 12 tables, all relations, indexes, and enums
+// 21 tables (12 original + 9 expansion), all relations, indexes, and enums
 
 generator client {
   provider = "prisma-client-js"
@@ -62,6 +62,7 @@ model User {
   workOrders     WorkOrder[]
   stageMetrics   StageMetrics[]
   repPerformance RepPerformance[]
+  clientNotes    ClientNote[]
 
   @@index([territoryId])
   @@map("users")
@@ -174,6 +175,7 @@ model Lead {
   competitiveIntel CompetitiveIntel?
   dealProducts     DealProduct[]
   workOrders       WorkOrder[]
+  clientProfile    ClientProfile?
 
   @@index([territoryId])
   @@index([assignedTo])
@@ -412,4 +414,192 @@ model RepPerformance {
   @@index([date(sort: Desc)])
   @@index([period])
   @@map("rep_performance")
+}
+
+// ============================================================================
+// BACK CYCLE: Client Service Delivery (Blueprint 11)
+// ============================================================================
+
+model ClientProfile {
+  id              Int       @id @default(autoincrement())
+  leadId          Int       @unique @map("lead_id")
+  businessName    String    @map("business_name")
+  retainerAmount  Decimal   @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
+  healthScore     Int       @default(50) @map("health_score")
+  scanFrequency   String    @default("biweekly") @map("scan_frequency")
+  voiceProfileId  String?   @map("voice_profile_id")
+  status          String    @default("active")
+  onboardedAt     DateTime  @default(now()) @map("onboarded_at")
+  lastScanAt      DateTime? @map("last_scan_at")
+  nextScanAt      DateTime? @map("next_scan_at")
+
+  lead        Lead               @relation(fields: [leadId], references: [id])
+  competitors ClientCompetitor[]
+  domains     ClientDomain[]
+  tasks       ClientTask[]
+  notes       ClientNote[]
+  scans       CompetitiveScan[]
+  reports     ClientReport[]
+
+  @@map("client_profiles")
+}
+
+model ClientCompetitor {
+  id            Int      @id @default(autoincrement())
+  clientId      Int      @map("client_id")
+  businessName  String   @map("business_name")
+  domain        String?
+  googlePlaceId String?  @map("google_place_id")
+  isActive      Boolean  @default(true) @map("is_active")
+  addedAt       DateTime @default(now()) @map("added_at")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map("client_competitors")
+}
+
+model ClientDomain {
+  id              Int       @id @default(autoincrement())
+  clientId        Int       @map("client_id")
+  domain          String
+  type            String    // main-site | satellite | landing-page
+  hosting         String    // vercel | wordpress | other
+  wpUrl           String?   @map("wp_url")
+  wpUsername      String?   @map("wp_username")
+  wpAppPassword   String?   @map("wp_app_password")
+  vercelProjectId String?   @map("vercel_project_id")
+  githubRepo      String?   @map("github_repo")
+  templateUsed    String?   @map("template_used")
+  ownershipType   String    @default("ghm") @map("ownership_type")
+  dnsVerified     Boolean   @default(false) @map("dns_verified")
+  sslActive       Boolean   @default(false) @map("ssl_active")
+  contentCount    Int       @default(0) @map("content_count")
+  lastDeployedAt  DateTime? @map("last_deployed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map("client_domains")
+}
+
+model ClientTask {
+  id              Int       @id @default(autoincrement())
+  clientId        Int       @map("client_id")
+  title           String
+  description     String?
+  category        String    // site-build | content | technical-seo | link-building | review-mgmt | competitive-response
+  priority        String    @default("P3")
+  status          String    @default("queued") // queued | in-progress | in-review | approved | deployed | measured | dismissed
+  source          String    @default("manual") // competitive-scan | manual | sentry-recommendation | upsell
+  assignedTo      String?   @map("assigned_to")
+  targetKeywords  Json?     @map("target_keywords")
+  competitorRef   String?   @map("competitor_ref")
+  contentBrief    Json?     @map("content_brief")
+  draftContent    String?   @map("draft_content")
+  approvedContent String?   @map("approved_content")
+  deployedUrl     String?   @map("deployed_url")
+  outcomeMetrics  Json?     @map("outcome_metrics")
+  dueDate         DateTime? @map("due_date")
+  scanId          Int?      @map("scan_id")
+  domainId        Int?      @map("domain_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deployedAt      DateTime? @map("deployed_at")
+  measuredAt      DateTime? @map("measured_at")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  notes  ClientNote[]
+
+  @@index([clientId, status])
+  @@index([clientId, category])
+  @@index([clientId, priority])
+  @@map("client_tasks")
+}
+
+model ClientNote {
+  id        Int      @id @default(autoincrement())
+  clientId  Int      @map("client_id")
+  taskId    Int?     @map("task_id")
+  authorId  Int      @map("author_id")
+  type      String   // standard | task-note | contact-log
+  content   String
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  tags      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  task   ClientTask?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  author User          @relation(fields: [authorId], references: [id])
+
+  @@index([clientId, type])
+  @@index([clientId, isPinned])
+  @@index([taskId])
+  @@map("client_notes")
+}
+
+model CompetitiveScan {
+  id          Int      @id @default(autoincrement())
+  clientId    Int      @map("client_id")
+  scanDate    DateTime @default(now()) @map("scan_date")
+  clientData  Json     @map("client_data")
+  competitors Json
+  deltas      Json
+  alerts      Json
+  healthScore Int      @map("health_score")
+  apiCosts    Json?    @map("api_costs")
+  status      String   @default("complete")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, scanDate(sort: Desc)])
+  @@map("competitive_scans")
+}
+
+model ClientReport {
+  id           Int      @id @default(autoincrement())
+  clientId     Int      @map("client_id")
+  type         String   // monthly | competitive | internal | upsell
+  periodStart  DateTime @map("period_start")
+  periodEnd    DateTime @map("period_end")
+  content      Json
+  pdfUrl       String?  @map("pdf_url")
+  sentToClient Boolean  @default(false) @map("sent_to_client")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, type])
+  @@map("client_reports")
+}
+
+// ============================================================================
+// FRONT CYCLE: Lead Discovery (Blueprint 10)
+// ============================================================================
+
+model DiscoveryRun {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  vertical     String
+  locations    Json
+  filters      Json
+  resultsCount Int      @map("results_count")
+  pushedCount  Int      @default(0) @map("pushed_count")
+  resultsCache Json?    @map("results_cache")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("discovery_runs")
+}
+
+model LocationPreset {
+  id        Int      @id @default(autoincrement())
+  name      String
+  locations Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("location_presets")
 }

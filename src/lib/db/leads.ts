@@ -3,6 +3,7 @@ import { Prisma, LeadStatus } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
 import type { LeadFilterInput } from "@/lib/validations";
+import { createClientFromWonLead } from "@/lib/db/clients";
 
 // ============================================================================
 // Lead Queries (Territory-Scoped)
@@ -93,7 +94,7 @@ export async function updateLeadStatus(
   if (!lead) return null;
 
   // Update status (trigger handles history logging)
-  return prisma.lead.update({
+  const updated = await prisma.lead.update({
     where: { id: leadId },
     data: {
       status: newStatus,
@@ -105,6 +106,18 @@ export async function updateLeadStatus(
     },
     include: leadInclude,
   });
+
+  // Back Cycle trigger: auto-create client profile when lead is won
+  if (newStatus === "won") {
+    try {
+      await createClientFromWonLead(leadId);
+    } catch (err) {
+      // Log but don't fail the status update — client can be created manually
+      console.error(`[BackCycle] Failed to auto-create client for lead ${leadId}:`, err);
+    }
+  }
+
+  return updated;
 }
 
 // ============================================================================

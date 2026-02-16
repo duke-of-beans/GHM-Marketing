@@ -15,6 +15,7 @@ type NavUser = {
 const masterLinks = [
   { href: "/master", label: "Dashboard", icon: "📊" },
   { href: "/leads", label: "Leads", icon: "👥" },
+  { href: "/clients", label: "Clients", icon: "🏢" },
   { href: "/analytics", label: "Analytics", icon: "📈" },
   { href: "/products", label: "Products", icon: "📦" },
   { href: "/territories", label: "Territories", icon: "🗺️" },
