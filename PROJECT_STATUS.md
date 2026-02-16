@@ -1,11 +1,111 @@
 # GHM Marketing Dashboard - Project Status
 
-**Last Updated:** February 16, 2026 - 10:45 AM PST
+**Last Updated:** February 16, 2026 - 11:20 AM PST
 
-## 🎉 PHASE 4 COMPLETE - CLIENT-FACING REPORTS DEPLOYED
+## 🚀 PHASE 5 IN PROGRESS - UPSELL DETECTION ENGINE
 
-### Current Status: **LIVE IN PRODUCTION**
+### Current Status: **CODE COMPLETE - AWAITING DATABASE MIGRATION**
 Production URL: https://ghm-marketing-davids-projects-b0509900.vercel.app
+
+---
+
+## ⚠️ Phase 5: Upsell Detection System (95% COMPLETE)
+
+**Status:** Code complete, pending database migration  
+**Target Completion:** February 16, 2026
+
+### Features Implemented:
+
+1. **Upsell Detection Engine** ✅
+   - Intelligent gap-to-product matching (9 gap categories)
+   - Opportunity scoring algorithm (0-100 scale)
+   - ROI projection calculations (assumes 30% improvement)
+   - Deduplication by product (keeps highest score)
+   - Categorizes scan alerts into actionable gaps
+
+2. **Database Schema** ✅
+   - UpsellOpportunity model with full lifecycle tracking
+   - Relations to ClientProfile, Product, CompetitiveScan
+   - Status tracking (detected → presented → accepted/rejected)
+   - Projected MRR and ROI fields
+   - Timestamps for presented/responded actions
+
+3. **Detection API** ✅
+   - `/api/upsell/detect` - Analyzes scans and detects opportunities
+   - `/api/upsell/[id]/present` - Marks as presented + creates client note
+   - `/api/upsell/[id]/dismiss` - Marks as dismissed
+   - Auto-saves high-value opportunities
+
+4. **Scorecard Integration** ✅
+   - UpsellOpportunities component on client scorecard tab
+   - Color-coded cards (red/orange/yellow by score)
+   - Top 5 opportunities display
+   - Present/Dismiss action buttons
+   - MRR and ROI projections visible
+
+5. **Gap-to-Product Mapping** ✅
+   ```
+   content-gap → Content Marketing Package
+   technical-seo → Technical SEO Audit
+   link-building → Link Building Campaign
+   review-management → Reputation Management
+   competitor-outranking → Competitive Analysis
+   keyword-ranking → SEO Package
+   local-search → Local SEO / GMB Optimization
+   mobile-performance → Performance Optimization
+   page-speed → Technical SEO
+   ```
+
+### Pending:
+
+🔴 **BLOCKER:** Database migration required
+- Schema changes pushed to GitHub (commit `ceb8c97`)
+- Prisma version conflict prevents local migration
+- **Solution:** Vercel will auto-migrate on next deployment
+
+### Complete Workflow:
+```
+Scan Completes → Alerts Generated → Detection Engine Runs
+→ Categorizes Gaps → Matches to Products → Calculates Scores
+→ Projects ROI → Saves Opportunities → Displays on Scorecard
+→ User Clicks "Present" → Creates Client Note → Tracks Status
+```
+
+### Files Created:
+- `src/lib/upsell/detector.ts` (268 lines)
+- `src/app/api/upsell/detect/route.ts` (42 lines)
+- `src/app/api/upsell/[id]/present/route.ts` (44 lines)
+- `src/app/api/upsell/[id]/dismiss/route.ts` (32 lines)
+- `src/components/upsell/upsell-opportunities.tsx` (205 lines)
+- `docs/PHASE_5_IN_PROGRESS.md` (338 lines)
+
+### Files Modified:
+- `prisma/schema.prisma` - Added UpsellOpportunity model
+- `src/lib/db/clients.ts` - Added upsellOpportunities to getClient()
+- `src/components/clients/profile.tsx` - Integrated component
+- `src/app/(dashboard)/clients/[id]/page.tsx` - Added serialization
+
+**Total:** 639 lines + schema changes
+
+### Migration SQL (Will Run Automatically on Vercel):
+```sql
+CREATE TABLE "upsell_opportunities" (
+  "id" SERIAL PRIMARY KEY,
+  "client_id" INTEGER NOT NULL REFERENCES "client_profiles"("id"),
+  "product_id" INTEGER NOT NULL REFERENCES "products"("id"),
+  "scan_id" INTEGER REFERENCES "competitive_scans"("id"),
+  "status" TEXT NOT NULL DEFAULT 'detected',
+  "opportunity_score" INTEGER NOT NULL,
+  "gap_category" TEXT NOT NULL,
+  "reasoning" TEXT NOT NULL,
+  "projected_mrr" DECIMAL(10,2) NOT NULL,
+  "projected_roi" DECIMAL(5,2),
+  "presented_at" TIMESTAMP,
+  "responded_at" TIMESTAMP,
+  "response" TEXT,
+  "detected_at" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
 
 ---
 
