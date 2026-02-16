@@ -369,12 +369,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error("Import error:", message);
+    console.error("Import error:", message.slice(-1000));
     return NextResponse.json({
       success: false,
       error: "Database error during import",
       details: {
-        message: message.slice(0, 2000),
+        message: message.slice(-1500),
         leadCount: validLeads.length,
         validationErrorCount: errors.length,
         firstErrors: errors.slice(0, 5),
