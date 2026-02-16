@@ -6,6 +6,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 
 const updateUserSchema = z.object({
+  email: z.string().email().optional(),
   name: z.string().min(1).max(100).optional(),
   role: z.enum(["master", "sales"]).optional(),
   territoryId: z.number().int().positive().nullable().optional(),
@@ -43,6 +44,22 @@ export async function PATCH(
   }
 
   const updateData: Record<string, unknown> = {};
+  if (parsed.data.email !== undefined) updateData.email = parsed.data.email;
+
+  // Check for email conflict
+  if (updateData.email) {
+    const existing = await prisma.user.findFirst({
+      where: { email: updateData.email as string, id: { not: userId } },
+      select: { id: true },
+    });
+    if (existing) {
+      return NextResponse.json(
+        { success: false, error: "Email already in use" },
+        { status: 409 }
+      );
+    }
+  }
+
   if (parsed.data.name !== undefined) updateData.name = parsed.data.name;
   if (parsed.data.role !== undefined) updateData.role = parsed.data.role;
   if (parsed.data.territoryId !== undefined) updateData.territoryId = parsed.data.territoryId;

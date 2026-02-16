@@ -86,8 +86,11 @@ export default function TeamPage() {
       if (!editingId) {
         payload.email = form.email;
         payload.password = form.password;
-      } else if (form.password) {
-        payload.password = form.password;
+      } else {
+        payload.email = form.email;
+        if (form.password) {
+          payload.password = form.password;
+        }
       }
 
       const res = await fetch(url, {
@@ -189,6 +192,16 @@ export default function TeamPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="john@ghmmarketing.com"
+                />
+              </div>
+            )}
+            {editingId && (
+              <div>
+                <label className="text-sm text-muted-foreground">Email</label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
             )}
