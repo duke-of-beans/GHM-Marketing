@@ -28,6 +28,7 @@ export function UpsellOpportunities({
 }) {
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectedOpps, setDetectedOpps] = useState<Opportunity[]>(opportunities);
+  const [processingId, setProcessingId] = useState<number | null>(null);
 
   const handleDetect = async () => {
     setIsDetecting(true);
@@ -46,6 +47,45 @@ export function UpsellOpportunities({
       console.error("Failed to detect opportunities:", error);
     } finally {
       setIsDetecting(false);
+    }
+  };
+
+  const handlePresent = async (oppId: number) => {
+    if (!oppId) return;
+    
+    setProcessingId(oppId);
+    try {
+      const response = await fetch(`/api/upsell/${oppId}/present`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
+        window.location.reload(); // Refresh to update notes
+      }
+    } catch (error) {
+      console.error("Failed to present opportunity:", error);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDismiss = async (oppId: number) => {
+    if (!oppId) return;
+    
+    setProcessingId(oppId);
+    try {
+      const response = await fetch(`/api/upsell/${oppId}/dismiss`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
+      }
+    } catch (error) {
+      console.error("Failed to dismiss opportunity:", error);
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -140,13 +180,24 @@ export function UpsellOpportunities({
                 )}
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Eye className="h-4 w-4 mr-1" />
-                  View Product
-                </Button>
-                <Button variant="default" size="sm">
+                {opp.id && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDismiss(opp.id!)}
+                    disabled={processingId === opp.id}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => opp.id && handlePresent(opp.id)}
+                  disabled={!opp.id || processingId === opp.id}
+                >
                   <DollarSign className="h-4 w-4 mr-1" />
-                  Present
+                  {processingId === opp.id ? "Processing..." : "Present"}
                 </Button>
               </div>
             </div>

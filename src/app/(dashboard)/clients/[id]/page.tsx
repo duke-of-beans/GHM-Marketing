@@ -27,6 +27,7 @@ export default async function ClientDetailPage({
   serialized.notes = serialized.notes || [];
   serialized.scans = serialized.scans || [];
   serialized.reports = serialized.reports || [];
+  serialized.upsellOpportunities = serialized.upsellOpportunities || [];
 
   return (
     <div className="space-y-4 pb-20 md:pb-0">

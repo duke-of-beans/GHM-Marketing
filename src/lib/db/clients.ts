@@ -104,6 +104,22 @@ export async function getClient(id: number) {
         orderBy: { createdAt: "desc" },
         take: 10,
       },
+      upsellOpportunities: {
+        where: { status: { in: ["detected", "presented"] } },
+        orderBy: { opportunityScore: "desc" },
+        take: 10,
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              category: true,
+              price: true,
+              pricingModel: true,
+            },
+          },
+        },
+      },
     },
   });
 }

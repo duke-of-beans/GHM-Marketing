@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import { ScanHistory } from "./scan-history";
 import { ClientReportsTab } from "./reports/client-reports-tab";
+import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 
 // ============================================================================
 // TYPES
@@ -332,6 +333,21 @@ export function ClientProfile({
 
         {/* TAB 1: COMPETITIVE SCORECARD */}
         <TabsContent value="scorecard" className="space-y-4">
+          <UpsellOpportunities
+            clientId={client.id}
+            opportunities={(client.upsellOpportunities || []).map((opp: any) => ({
+              id: opp.id,
+              productId: opp.productId,
+              productName: opp.product.name,
+              category: opp.product.category || "general",
+              gapCategory: opp.gapCategory,
+              opportunityScore: opp.opportunityScore,
+              reasoning: opp.reasoning,
+              projectedMrr: Number(opp.projectedMrr),
+              projectedRoi: opp.projectedRoi ? Number(opp.projectedRoi) : null,
+              status: opp.status,
+            }))}
+          />
           <ScanHistory clientId={client.id} />
         </TabsContent>
 
