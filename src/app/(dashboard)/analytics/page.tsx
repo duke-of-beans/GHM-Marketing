@@ -25,7 +25,7 @@ export default async function AnalyticsPage() {
         retainerAmount: true,
         healthScore: true,
         status: true,
-        createdAt: true,
+        onboardedAt: true,
         lead: {
           select: {
             createdAt: true,

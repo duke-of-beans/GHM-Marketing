@@ -233,7 +233,7 @@ function calculateMetrics(data: AnalyticsData) {
   const now = new Date();
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const clientsLastMonth = clients.filter(
-    (c) => new Date(c.createdAt) <= lastMonth && c.status === "active"
+    (c) => new Date(c.onboardedAt) <= lastMonth && c.status === "active"
   );
   const mrrLastMonth = clientsLastMonth.reduce(
     (sum, c) => sum + Number(c.retainerAmount || 0),
