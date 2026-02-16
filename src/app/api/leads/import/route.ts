@@ -341,14 +341,24 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  const result = await bulkCreateLeads(validLeads);
+  try {
+    const result = await bulkCreateLeads(validLeads);
 
-  return NextResponse.json({
-    success: true,
-    data: {
-      ...result,
-      columnsMapped: Object.fromEntries(Object.entries(headerMap)),
-      validationErrors: errors.slice(0, 20),
-    },
-  });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...result,
+        columnsMapped: Object.fromEntries(Object.entries(headerMap)),
+        validationErrors: errors.slice(0, 20),
+      },
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Import error:", message);
+    return NextResponse.json({
+      success: false,
+      error: "Database error during import",
+      details: { message: message.slice(0, 500), leadCount: validLeads.length, sampleLead: validLeads[0] },
+    }, { status: 500 });
+  }
 }

@@ -68,6 +68,9 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
         onComplete();
       } else {
         toast.error(data.error || "Import failed");
+        if (data.details) {
+          console.error("Import error details:", data.details);
+        }
         if (data.details?.errors) {
           setResult({
             total: 0,
@@ -78,7 +81,8 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("Upload error:", err);
       toast.error("Upload failed — check your connection");
     } finally {
       setUploading(false);
