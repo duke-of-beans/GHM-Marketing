@@ -101,7 +101,7 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
     
     // Step 7: Update client profile
     console.log(`[Scan ${clientId}] Updating client profile...`);
-    const nextScanDate = calculateNextScanDate(clientId);
+    const nextScanDate = await calculateNextScanDate(clientId);
     await prisma.clientProfile.update({
       where: { id: clientId },
       data: {
