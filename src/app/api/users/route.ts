@@ -10,7 +10,7 @@ const createUserSchema = z.object({
   name: z.string().min(1).max(100),
   password: z.string().min(8),
   role: z.enum(["master", "sales"]),
-  territoryId: z.number().int().positive().optional(),
+  territoryId: z.number().int().positive().optional().nullable(),
 });
 
 export async function GET() {
