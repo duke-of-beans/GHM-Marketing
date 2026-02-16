@@ -113,6 +113,23 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
     
     console.log(`[Scan ${clientId}] Complete! Health: ${healthScore}, Alerts: ${alerts.critical.length + alerts.warning.length + alerts.info.length}, Tasks: ${tasksCreated}`);
     
+    // Step 8: Run upsell detection after scan
+    console.log(`[Scan ${clientId}] Running upsell detection...`);
+    try {
+      const { detectUpsellOpportunities, saveUpsellOpportunities } = await import("@/lib/upsell/detector");
+      const opportunities = await detectUpsellOpportunities(clientId, scan.id);
+      
+      // Auto-save high-value opportunities (score >= 80)
+      const highValueOpps = opportunities.filter((opp) => opp.opportunityScore >= 80);
+      if (highValueOpps.length > 0) {
+        await saveUpsellOpportunities(clientId, scan.id, highValueOpps);
+        console.log(`[Scan ${clientId}] Detected ${highValueOpps.length} high-value upsell opportunities`);
+      }
+    } catch (upsellError) {
+      console.error(`[Scan ${clientId}] Upsell detection failed:`, upsellError);
+      // Don't fail the scan if upsell detection fails
+    }
+    
     return {
       success: true,
       scanId: scan.id,
