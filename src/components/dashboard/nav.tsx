@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -36,8 +37,15 @@ export function DashboardNav({ user }: { user: NavUser }) {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 border-r bg-gray-50/50 p-4">
         <div className="mb-6">
-          <h1 className="text-lg font-bold text-primary">GHM Marketing</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">{user.name}</p>
+          <Image
+            src="/logo.png"
+            alt="GHM Digital Marketing"
+            width={140}
+            height={46}
+            className="mb-2"
+            priority
+          />
+          <p className="text-xs text-muted-foreground">{user.name}</p>
         </div>
 
         <nav className="flex-1 space-y-1">
