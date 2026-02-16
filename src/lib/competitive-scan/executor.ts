@@ -17,7 +17,6 @@ import { calculateDeltas } from './delta-calculator';
 import { generateAlerts } from './alert-generator';
 import { createTasksFromAlerts } from './task-creator';
 import { calculateHealthScore } from './health-score';
-import type { CompetitiveScan } from '@prisma/client';
 
 // ============================================================================
 // Scan Execution
@@ -74,12 +73,12 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
     const scan = await prisma.competitiveScan.create({
       data: {
         clientId,
-        clientData: fetchResult.clientData as any,
-        competitors: fetchResult.competitors as any,
-        deltas: deltas as any,
-        alerts: alerts as any,
+        clientData: fetchResult.clientData as Record<string, unknown>,
+        competitors: fetchResult.competitors as Record<string, unknown>,
+        deltas: deltas as Record<string, unknown>,
+        alerts: alerts as Record<string, unknown>,
         healthScore,
-        apiCosts: fetchResult.apiCosts as any,
+        apiCosts: fetchResult.apiCosts as Record<string, unknown>,
         status: 'complete',
       },
     });

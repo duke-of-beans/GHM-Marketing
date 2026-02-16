@@ -5,7 +5,7 @@
  * Returns structured ClientData and CompetitorData for scan storage.
  */
 
-import type { ClientData, CompetitorData, Competitors, ApiCosts } from '@/types/competitive-scan';
+import type { ClientData, Competitors, ApiCosts } from '@/types/competitive-scan';
 import { prisma } from '@/lib/db';
 
 // ============================================================================
@@ -34,7 +34,7 @@ async function fetchKeywordRankings(domain: string, keywords: string[]) {
     // Match tracked keywords with API results
     const rankings: Record<string, number> = {};
     keywords.forEach(keyword => {
-      const match = data.keywords?.find((k: any) => 
+      const match = data.keywords?.find((k: { keyword?: string; position?: number }) => 
         k.keyword?.toLowerCase() === keyword.toLowerCase()
       );
       if (match?.position) {
@@ -62,7 +62,7 @@ async function getClientKeywords(clientId: number): Promise<string[]> {
     },
   });
   
-  const intel = client?.lead.competitiveIntel as any;
+  const intel = client?.lead.competitiveIntel as { trackedKeywords?: string[] } | null;
   if (intel?.trackedKeywords && Array.isArray(intel.trackedKeywords)) {
     return intel.trackedKeywords;
   }

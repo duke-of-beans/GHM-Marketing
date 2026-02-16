@@ -7,7 +7,6 @@
 
 import type {
   ClientData,
-  CompetitorData,
   Competitors,
   Deltas,
   MetricDelta,
