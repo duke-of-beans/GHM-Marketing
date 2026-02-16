@@ -180,18 +180,19 @@ model CompetitiveIntel {
 }
 
 model Product {
-  id           Int           @id @default(autoincrement())
-  name         String
-  description  String?
-  sku          String        @unique
-  category     String?
-  price        Decimal       @db.Decimal(10, 2)
-  pricingModel PricingModel  @map("pricing_model")
-  isActive     Boolean       @default(true) @map("is_active")
-  displayOrder Int           @default(0) @map("display_order")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  dealProducts DealProduct[]
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  description         String?
+  sku                 String               @unique
+  category            String?
+  price               Decimal              @db.Decimal(10, 2)
+  pricingModel        PricingModel         @map("pricing_model")
+  isActive            Boolean              @default(true) @map("is_active")
+  displayOrder        Int                  @default(0) @map("display_order")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  dealProducts        DealProduct[]
+  upsellOpportunities UpsellOpportunity[]
 
   @@index([isActive])
   @@index([category])
@@ -292,21 +293,22 @@ model ClientProfile {
   id             Int                @id @default(autoincrement())
   leadId         Int                @unique @map("lead_id")
   businessName   String             @map("business_name")
-  retainerAmount Decimal            @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
-  healthScore    Int                @default(50) @map("health_score")
-  scanFrequency  String             @default("biweekly") @map("scan_frequency")
-  voiceProfileId String?            @map("voice_profile_id")
-  status         String             @default("active")
-  onboardedAt    DateTime           @default(now()) @map("onboarded_at")
-  lastScanAt     DateTime?          @map("last_scan_at")
-  nextScanAt     DateTime?          @map("next_scan_at")
-  competitors    ClientCompetitor[]
-  domains        ClientDomain[]
-  notes          ClientNote[]
-  lead           Lead               @relation(fields: [leadId], references: [id])
-  reports        ClientReport[]
-  tasks          ClientTask[]
-  scans          CompetitiveScan[]
+  retainerAmount      Decimal              @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
+  healthScore         Int                  @default(50) @map("health_score")
+  scanFrequency       String               @default("biweekly") @map("scan_frequency")
+  voiceProfileId      String?              @map("voice_profile_id")
+  status              String               @default("active")
+  onboardedAt         DateTime             @default(now()) @map("onboarded_at")
+  lastScanAt          DateTime?            @map("last_scan_at")
+  nextScanAt          DateTime?            @map("next_scan_at")
+  competitors         ClientCompetitor[]
+  domains             ClientDomain[]
+  notes               ClientNote[]
+  lead                Lead                 @relation(fields: [leadId], references: [id])
+  reports             ClientReport[]
+  tasks               ClientTask[]
+  scans               CompetitiveScan[]
+  upsellOpportunities UpsellOpportunity[]
 
   @@map("client_profiles")
 }
@@ -404,17 +406,18 @@ model ClientNote {
 }
 
 model CompetitiveScan {
-  id          Int           @id @default(autoincrement())
-  clientId    Int           @map("client_id")
-  scanDate    DateTime      @default(now()) @map("scan_date")
-  clientData  Json          @map("client_data")
-  competitors Json
-  deltas      Json
-  alerts      Json
-  healthScore Int           @map("health_score")
-  apiCosts    Json?         @map("api_costs")
-  status      String        @default("complete")
-  client      ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id                  Int                  @id @default(autoincrement())
+  clientId            Int                  @map("client_id")
+  scanDate            DateTime             @default(now()) @map("scan_date")
+  clientData          Json                 @map("client_data")
+  competitors         Json
+  deltas              Json
+  alerts              Json
+  healthScore         Int                  @map("health_score")
+  apiCosts            Json?                @map("api_costs")
+  status              String               @default("complete")
+  client              ClientProfile        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  upsellOpportunities UpsellOpportunity[]
 
   @@index([clientId, scanDate(sort: Desc)])
   @@map("competitive_scans")
@@ -459,6 +462,31 @@ model LocationPreset {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("location_presets")
+}
+
+model UpsellOpportunity {
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @map("client_id")
+  productId       Int           @map("product_id")
+  scanId          Int?          @map("scan_id")
+  status          String        @default("detected")
+  opportunityScore Int          @map("opportunity_score")
+  gapCategory     String        @map("gap_category")
+  reasoning       String
+  projectedMrr    Decimal       @map("projected_mrr") @db.Decimal(10, 2)
+  projectedRoi    Decimal?      @map("projected_roi") @db.Decimal(5, 2)
+  presentedAt     DateTime?     @map("presented_at")
+  respondedAt     DateTime?     @map("responded_at")
+  response        String?
+  detectedAt      DateTime      @default(now()) @map("detected_at")
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id])
+  scan            CompetitiveScan? @relation(fields: [scanId], references: [id])
+
+  @@index([clientId, status])
+  @@index([status])
+  @@index([opportunityScore(sort: Desc)])
+  @@map("upsell_opportunities")
 }
 
 enum UserRole {
