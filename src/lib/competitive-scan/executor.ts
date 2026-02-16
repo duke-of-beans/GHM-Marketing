@@ -11,7 +11,7 @@
  * 7. Update client profile
  */
 
-import { prisma } from '@/lib/db';
+import { prisma, Prisma } from '@/lib/db';
 import { fetchScanData } from './data-fetcher';
 import { calculateDeltas } from './delta-calculator';
 import { generateAlerts } from './alert-generator';
@@ -73,12 +73,12 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
     const scan = await prisma.competitiveScan.create({
       data: {
         clientId,
-        clientData: fetchResult.clientData as Record<string, unknown>,
-        competitors: fetchResult.competitors as Record<string, unknown>,
-        deltas: deltas as Record<string, unknown>,
-        alerts: alerts as Record<string, unknown>,
+        clientData: fetchResult.clientData as Prisma.InputJsonValue,
+        competitors: fetchResult.competitors as Prisma.InputJsonValue,
+        deltas: deltas as Prisma.InputJsonValue,
+        alerts: alerts as Prisma.InputJsonValue,
         healthScore,
-        apiCosts: fetchResult.apiCosts as Record<string, unknown>,
+        apiCosts: fetchResult.apiCosts as Prisma.InputJsonValue,
         status: 'complete',
       },
     });
@@ -111,13 +111,13 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
       },
     });
     
-    console.log(`[Scan ${clientId}] Complete! Health: ${healthScore}, Alerts: ${alerts.length}, Tasks: ${tasksCreated}`);
+    console.log(`[Scan ${clientId}] Complete! Health: ${healthScore}, Alerts: ${alerts.critical.length + alerts.warning.length + alerts.info.length}, Tasks: ${tasksCreated}`);
     
     return {
       success: true,
       scanId: scan.id,
       healthScore,
-      alertsGenerated: alerts.length,
+      alertsGenerated: alerts.critical.length + alerts.warning.length + alerts.info.length,
       tasksCreated,
       errors,
     };
