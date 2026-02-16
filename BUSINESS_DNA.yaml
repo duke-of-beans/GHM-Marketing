@@ -1,0 +1,77 @@
+# GHM Digital Marketing — Business DNA
+# This file defines the business identity and strategic context for AI assistants.
+
+identity:
+  name: GHM Digital Marketing
+  type: SEO & digital marketing agency
+  owner: David Kirsch
+  role: Founder / Operations
+  entity_status: active
+
+service_model:
+  core_offering: Local SEO services for small/medium businesses
+  delivery: Monthly retainer (recurring revenue)
+  pricing_models:
+    - monthly_recurring (MRR)
+    - annual_contract (ARR)
+    - one_time_setup
+  target_market: Local businesses (contractors, medical, legal, restaurants, etc.)
+  geographic_focus: US-based, territory-organized
+
+revenue_mechanics:
+  acquisition: Territory-based lead gen → enrichment → sales pipeline → close
+  retention: Competitive monitoring → content production → reporting → upsell
+  key_metrics:
+    - MRR / ARR / LTV per client
+    - Client health score (competitive position)
+    - Pipeline conversion rate
+    - Territory coverage
+
+team_structure:
+  roles:
+    master: Full access, all territories, admin controls
+    rep: Territory-scoped, own leads/clients only
+  hierarchy: Master → Rep (territory-assigned)
+
+technology:
+  platform: GHM Dashboard (Next.js 14 / Vercel / PostgreSQL)
+  repo: duke-of-beans/GHM-Marketing
+  path: D:\Work\SEO-Services\ghm-dashboard
+  status_file: PROJECT_STATUS.md
+
+operational_cycles:
+  front_cycle:
+    name: Sales Pipeline
+    purpose: Lead acquisition through deal close
+    stages: Available → Scheduled → Contacted → Follow Up → Paperwork → Won
+    tools: Kanban board, enrichment APIs, work order generation
+    
+  back_cycle:
+    name: Client Service Delivery
+    purpose: Post-sale competitive monitoring, content production, reporting
+    stages: Onboard → Monitor → Produce → Report → Upsell
+    tools: Competitive scan engine, task workflow, client portal
+    
+  bridge: Won-lead trigger auto-creates client profile (front → back handoff)
+
+competitive_advantages:
+  - Competitive intelligence as a service (not just SEO work)
+  - Automated gap detection → task generation (scan-driven workflow)
+  - Health score tracking gives clients visible ROI
+  - Territory model scales with rep hiring
+
+strategic_priorities:
+  current: Build competitive scan engine (back cycle phase 2)
+  next:
+    - Content review queue (editor workflow)
+    - Client-facing reports (monthly PDF)
+    - Upsell detection from scan data
+  future:
+    - Discovery engine (automated lead sourcing)
+    - Voice profile system (brand-consistent content)
+    - Client portal (self-service reporting)
+
+naming_conventions:
+  project_reference: "GHM Dashboard"
+  business_reference: "GHM Digital Marketing"
+  internal_shorthand: "GHM"
