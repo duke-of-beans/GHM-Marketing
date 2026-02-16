@@ -22,6 +22,34 @@ const CATEGORY_MAP: Record<string, string> = {
 } as const;
 
 // ============================================================================
+// Helper: Build Content Brief from Alert
+// ============================================================================
+
+function buildContentBrief(alert: Alert): string {
+  const parts = [
+    `**Alert:** ${alert.message}`,
+    '',
+    `**Details:**`,
+    `- Metric: ${alert.metric}`,
+    `- Change: ${alert.delta > 0 ? '+' : ''}${alert.delta}`,
+  ];
+  
+  if (alert.competitor) {
+    parts.push(`- Competitor: ${alert.competitor}`);
+  }
+  
+  if (alert.keyword) {
+    parts.push(`- Keyword: ${alert.keyword}`);
+  }
+  
+  parts.push('');
+  parts.push(`**Recommended Action:**`);
+  parts.push(alert.taskSuggestion?.description || 'Review and address this competitive gap.');
+  
+  return parts.join('\n');
+}
+
+// ============================================================================
 // Core Task Creator
 // ============================================================================
 
@@ -44,25 +72,44 @@ export async function createTasksFromAlerts(
   
   const created: Array<{ id: number; title: string }> = [];
   const errors: string[] = [];
- = [
-    `**Alert:** ${alert.message}`,
-    '',
-    `**Details:**`,
-    `- Metric: ${alert.metric}`,
-    `- Change: ${alert.delta > 0 ? '+' : ''}${alert.delta}`,
-  ];
   
-  if (alert.competitor) {
-    parts.push(`- Competitor: ${alert.competitor}`);
+  // Collect all actionable alerts
+  const actionableAlerts: Alert[] = [];
+  
+  for (const severityGroup of [alerts.critical, alerts.warning, alerts.info]) {
+    for (const alert of severityGroup) {
+      if (alert.actionable && alert.taskSuggestion) {
+        actionableAlerts.push(alert);
+      }
+    }
   }
   
-  if (alert.keyword) {
-    parts.push(`- Keyword: ${alert.keyword}`);
+  // Create task for each actionable alert
+  for (const alert of actionableAlerts) {
+    try {
+      const task = await prisma.clientTask.create({
+        data: {
+          clientId,
+          scanId,
+          title: alert.taskSuggestion!.title,
+          category: CATEGORY_MAP[alert.taskSuggestion!.category] || 'competitive-response',
+          priority: alert.severity === 'critical' ? 'high' : alert.severity === 'warning' ? 'medium' : 'low',
+          status: 'todo',
+          contentBrief: buildContentBrief(alert),
+          targetKeywords: alert.keyword ? [alert.keyword] : [],
+          competitorRef: alert.competitor || null,
+        },
+      });
+      
+      created.push({ id: task.id, title: task.title });
+    } catch (error) {
+      errors.push(`Failed to create task for alert: ${alert.message} - ${String(error)}`);
+    }
   }
   
-  parts.push('');
-  parts.push(`**Recommended Action:**`);
-  parts.push(alert.taskSuggestion?.description || 'Review and address this competitive gap.');
-  
-  return parts.join('\n');
+  return {
+    created: created.length,
+    tasks: created,
+    errors,
+  };
 }
