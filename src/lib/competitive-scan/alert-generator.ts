@@ -44,30 +44,35 @@ const THRESHOLDS = {
 // ============================================================================
 
 export function generateAlerts(deltas: Deltas): Alerts {
-  const alerts: Alerts = [];
+  const allAlerts: Alert[] = [];
   
   // Generate alerts from historical changes (vs_previous)
   if (deltas.vs_previous) {
-    alerts.push(...generateHistoricalAlerts(deltas.vs_previous));
+    allAlerts.push(...generateHistoricalAlerts(deltas.vs_previous));
   }
   
   // Generate alerts from competitive gaps (vs_competitors)
-  alerts.push(...generateCompetitiveAlerts(deltas.vs_competitors));
+  allAlerts.push(...generateCompetitiveAlerts(deltas.vs_competitors));
   
   // Generate alerts from position changes (rankings)
   if (deltas.position_changes) {
-    alerts.push(...generatePositionAlerts(deltas.position_changes));
+    allAlerts.push(...generatePositionAlerts(deltas.position_changes));
   }
   
-  return alerts;
+  // Group alerts by severity
+  return {
+    critical: allAlerts.filter(a => a.severity === 'critical'),
+    warning: allAlerts.filter(a => a.severity === 'warning'),
+    info: allAlerts.filter(a => a.severity === 'info'),
+  };
 }
 
 // ============================================================================
 // Historical Change Alerts
 // ============================================================================
 
-function generateHistoricalAlerts(vs_previous: NonNullable<Deltas['vs_previous']>): Alerts {
-  const alerts: Alerts = [];
+function generateHistoricalAlerts(vs_previous: NonNullable<Deltas['vs_previous']>): Alert[] {
+  const alerts: Alert[] = [];
   
   // Domain Rating changes
   if (vs_previous.domainRating) {
@@ -155,8 +160,8 @@ function generateHistoricalAlerts(vs_previous: NonNullable<Deltas['vs_previous']
 // Competitive Gap Alerts
 // ============================================================================
 
-function generateCompetitiveAlerts(vs_competitors: Deltas['vs_competitors']): Alerts {
-  const alerts: Alerts = [];
+function generateCompetitiveAlerts(vs_competitors: Deltas['vs_competitors']): Alert[] {
+  const alerts: Alert[] = [];
   
   Object.entries(vs_competitors).forEach(([compName, gaps]) => {
     // Review gap alerts
@@ -228,8 +233,8 @@ function generateCompetitiveAlerts(vs_competitors: Deltas['vs_competitors']): Al
 // ============================================================================
 
 
-function generatePositionAlerts(changes: NonNullable<Deltas['position_changes']>): Alerts {
-  const alerts: Alerts = [];
+function generatePositionAlerts(changes: NonNullable<Deltas['position_changes']>): Alert[] {
+  const alerts: Alert[] = [];
   
   // Alert on new rankings (positive)
   if (changes.new_rankings.length > 0) {

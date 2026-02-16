@@ -127,7 +127,11 @@ export interface Alert {
   taskSuggestion?: TaskSuggestion;
 }
 
-export type Alerts = Alert[];
+export interface Alerts {
+  critical: Alert[];
+  warning: Alert[];
+  info: Alert[];
+}
 
 // ============================================================================
 // API Costs
