@@ -27,7 +27,7 @@ export default async function LeadsPage() {
       _count: { select: { notes: true } },
     },
     orderBy: { updatedAt: "desc" },
-    take: 200, // Kanban cap for performance
+    take: 500, // Kanban cap for performance
   });
 
   // Serialize Prisma Decimals to plain numbers for client

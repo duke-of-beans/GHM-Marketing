@@ -353,14 +353,7 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  console.log(`Import: ${rawRows.length} rows parsed, ${validLeads.length} valid, ${errors.length} errors`);
-  if (errors.length > 0) console.log("First errors:", errors.slice(0, 5));
-
   try {
-    // Test single insert first to catch schema mismatches
-    const testLead = validLeads[0];
-    console.log("Test lead sample:", JSON.stringify(testLead));
-    
     const result = await bulkCreateLeads(validLeads);
 
     return NextResponse.json({
