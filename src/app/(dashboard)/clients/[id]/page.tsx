@@ -11,9 +11,22 @@ export default async function ClientDetailPage({
 }) {
   await requireMaster();
   const { id } = await params;
-  const client = await getClient(parseInt(id));
+  const clientId = parseInt(id);
+  if (isNaN(clientId)) notFound();
 
+  const client = await getClient(clientId);
   if (!client) notFound();
+
+  // Serialize Prisma types (Decimal, Date) and ensure safe defaults
+  const serialized = JSON.parse(JSON.stringify(client));
+
+  // Guard: ensure required arrays exist (defensive against partial data)
+  serialized.competitors = serialized.competitors || [];
+  serialized.domains = serialized.domains || [];
+  serialized.tasks = serialized.tasks || [];
+  serialized.notes = serialized.notes || [];
+  serialized.scans = serialized.scans || [];
+  serialized.reports = serialized.reports || [];
 
   return (
     <div className="space-y-4 pb-20 md:pb-0">
@@ -24,7 +37,7 @@ export default async function ClientDetailPage({
         <span>/</span>
         <span className="text-foreground">{client.businessName}</span>
       </div>
-      <ClientProfile client={JSON.parse(JSON.stringify(client))} />
+      <ClientProfile client={serialized} />
     </div>
   );
 }

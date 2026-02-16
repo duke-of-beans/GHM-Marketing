@@ -18,6 +18,9 @@ import { LeadCard } from "./lead-card";
 import type { LeadStatus } from "@prisma/client";
 import { toast } from "sonner";
 
+// Kanban shows active pipeline + "Won" as the finish line
+const KANBAN_STATUSES: LeadStatus[] = [...ACTIVE_STATUSES, "won"];
+
 type KanbanLead = {
   id: number;
   businessName: string;
@@ -91,7 +94,9 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
         }
 
         toast.success(
-          `${lead.businessName} → ${LEAD_STATUS_CONFIG[newStatus].label}`
+          newStatus === "won"
+            ? `🎉 ${lead.businessName} won! Client profile created.`
+            : `${lead.businessName} → ${LEAD_STATUS_CONFIG[newStatus].label}`
         );
       } catch {
         // Revert on failure
@@ -107,7 +112,7 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
   );
 
   // Group leads by status
-  const columns = ACTIVE_STATUSES.map((status) => ({
+  const columns = KANBAN_STATUSES.map((status) => ({
     status,
     config: LEAD_STATUS_CONFIG[status],
     leads: leads.filter((l) => l.status === status),

@@ -7,11 +7,11 @@ export default async function LeadsPage() {
   const user = await getCurrentUser();
   const baseFilter = territoryFilter(user);
 
-  // Fetch leads in active pipeline stages for Kanban
+  // Fetch leads in active pipeline stages + recently won for Kanban
   const leads = await prisma.lead.findMany({
     where: {
       ...baseFilter,
-      status: { in: [...ACTIVE_STATUSES] },
+      status: { in: [...ACTIVE_STATUSES, "won"] },
     },
     select: {
       id: true,
