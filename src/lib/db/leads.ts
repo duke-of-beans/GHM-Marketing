@@ -117,6 +117,18 @@ export async function updateLeadStatus(
     }
   }
 
+  // Back Cycle reverse: deactivate client profile if lead leaves "won"
+  if (lead.status === "won" && newStatus !== "won") {
+    try {
+      await prisma.clientProfile.updateMany({
+        where: { leadId, status: "active" },
+        data: { status: "cancelled" },
+      });
+    } catch (err) {
+      console.error(`[BackCycle] Failed to deactivate client for lead ${leadId}:`, err);
+    }
+  }
+
   return updated;
 }
 

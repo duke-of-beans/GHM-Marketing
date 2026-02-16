@@ -122,7 +122,16 @@ export async function createClientFromWonLead(leadId: number) {
   });
 
   if (!lead) throw new Error(`Lead ${leadId} not found`);
-  if (lead.clientProfile) return lead.clientProfile; // Already exists
+  if (lead.clientProfile) {
+    // Reactivate if previously cancelled
+    if (lead.clientProfile.status !== "active") {
+      return prisma.clientProfile.update({
+        where: { id: lead.clientProfile.id },
+        data: { status: "active" },
+      });
+    }
+    return lead.clientProfile;
+  }
 
   // Extract competitors from existing intel
   const competitors =
