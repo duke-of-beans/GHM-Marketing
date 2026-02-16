@@ -14,7 +14,7 @@ async function main() {
     create: {
       email: "david@ghmmarketing.com",
       passwordHash: masterPassword,
-      name: "David Katz",
+      name: "David Kirsch",
       role: "master",
     },
   });
