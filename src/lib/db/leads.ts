@@ -184,6 +184,17 @@ export type BulkLeadInput = {
   email?: string;
   address?: string;
   leadSourceId?: number;
+  // Scoring fields
+  priorityTier?: string;
+  impactScore?: number;
+  closeScore?: number;
+  marketType?: string;
+  suppressionSignal?: string;
+  pitchAngle?: string;
+  reviewCount?: number;
+  reviewAvg?: number;
+  wealthScore?: string;
+  distanceFromMetro?: number;
 };
 
 export async function bulkCreateLeads(leads: BulkLeadInput[]) {
@@ -196,21 +207,37 @@ export async function bulkCreateLeads(leads: BulkLeadInput[]) {
   // Build territory lookup maps
   const cityMap = new Map<string, number>();
   const zipMap = new Map<string, number>();
+  const stateMap = new Map<string, number>();
+  let nationalTerritoryId: number | null = null;
+
   for (const t of territories) {
+    // National territory: states = ["ALL"]
+    if (t.states.includes("ALL")) {
+      nationalTerritoryId = t.id;
+    }
+    // State-level territories (states set, no cities/zips)
+    if (t.cities.length === 0 && t.zipCodes.length === 0 && !t.states.includes("ALL")) {
+      for (const state of t.states) {
+        stateMap.set(state.toUpperCase(), t.id);
+      }
+    }
+    // City-level
     for (const city of t.cities) {
       cityMap.set(city.toLowerCase(), t.id);
     }
+    // Zip-level
     for (const zip of t.zipCodes) {
       zipMap.set(zip, t.id);
     }
   }
 
-  // Assign territories in application code
+  // Assign territories: zip > city > state > national (most specific wins)
   const leadsWithTerritory = leads.map((lead) => {
     const territoryId =
-      cityMap.get(lead.city.toLowerCase()) ??
       zipMap.get(lead.zipCode) ??
-      null;
+      cityMap.get(lead.city.toLowerCase()) ??
+      stateMap.get(lead.state.toUpperCase()) ??
+      nationalTerritoryId;
 
     return {
       businessName: lead.businessName,
@@ -224,6 +251,17 @@ export async function bulkCreateLeads(leads: BulkLeadInput[]) {
       leadSourceId: lead.leadSourceId || null,
       territoryId,
       status: "available" as LeadStatus,
+      // Scoring fields
+      priorityTier: lead.priorityTier || null,
+      impactScore: lead.impactScore ?? null,
+      closeScore: lead.closeScore ?? null,
+      marketType: lead.marketType || null,
+      suppressionSignal: lead.suppressionSignal || null,
+      pitchAngle: lead.pitchAngle || null,
+      reviewCount: lead.reviewCount ?? null,
+      reviewAvg: lead.reviewAvg ?? null,
+      wealthScore: lead.wealthScore || null,
+      distanceFromMetro: lead.distanceFromMetro ?? null,
     };
   });
 

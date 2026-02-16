@@ -33,12 +33,13 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
-      if (!selected.name.endsWith(".csv")) {
-        toast.error("Please select a CSV file");
+      const ext = selected.name.split(".").pop()?.toLowerCase();
+      if (!["csv", "xlsx", "xls"].includes(ext || "")) {
+        toast.error("Please select a CSV or Excel file");
         return;
       }
-      if (selected.size > 5 * 1024 * 1024) {
-        toast.error("File too large (max 5MB)");
+      if (selected.size > 10 * 1024 * 1024) {
+        toast.error("File too large (max 10MB)");
         return;
       }
       setFile(selected);
@@ -94,20 +95,22 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
     <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          Import CSV
+          Import Leads
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Import Leads from CSV</DialogTitle>
+          <DialogTitle>Import Leads</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
           {/* File requirements */}
           <div className="text-sm text-muted-foreground space-y-1">
-            <p>Required columns: business_name, phone, city, state, zip_code</p>
-            <p>Optional: website, email, address</p>
-            <p>Max 500 leads per import, 5MB file limit</p>
+            <p>Accepts CSV or Excel (.xlsx) files</p>
+            <p>Auto-detects columns: Business Name, Phone, Address, etc.</p>
+            <p>Addresses are auto-parsed into City / State / Zip</p>
+            <p>Scoring data (Impact Score, Priority Tier, etc.) preserved</p>
+            <p>Max 1,000 leads per import, 10MB file limit</p>
           </div>
 
           {/* File input */}
@@ -115,7 +118,7 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv"
+              accept=".csv,.xlsx,.xls"
               onChange={handleFileSelect}
               className="hidden"
             />

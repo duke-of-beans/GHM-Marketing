@@ -138,6 +138,16 @@ model Lead {
   reviewCount  Int?     @map("review_count")
   reviewAvg    Decimal? @map("review_avg") @db.Decimal(3, 2)
 
+  // Lead Gen Scoring (from lead gen machine)
+  priorityTier      String?  @map("priority_tier")
+  impactScore       Int?     @map("impact_score")
+  closeScore        Int?     @map("close_score")
+  marketType        String?  @map("market_type")
+  suppressionSignal String?  @map("suppression_signal")
+  pitchAngle        String?  @map("pitch_angle")
+  wealthScore       String?  @map("wealth_score")
+  distanceFromMetro Decimal? @map("distance_from_metro") @db.Decimal(6, 1)
+
   // Competitive Intel flags
   intelLastUpdated  DateTime? @map("intel_last_updated")
   intelNeedsRefresh Boolean   @default(false) @map("intel_needs_refresh")
