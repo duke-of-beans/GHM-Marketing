@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, Download } from "lucide-react";
+import { FileText } from "lucide-react";
 import { ReportPreviewModal } from "./report-preview-modal";
 
 export function GenerateReportButton({ clientId }: { clientId: number }) {

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { ReviewQueue } from "@/components/review/review-queue";
 
 export default async function ReviewPage() {
-  const user = await requireMaster();
+  await requireMaster();
 
   // Get all tasks in review status
   const tasksInReview = await prisma.clientTask.findMany({

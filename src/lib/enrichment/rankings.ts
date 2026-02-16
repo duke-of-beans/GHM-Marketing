@@ -5,8 +5,6 @@
  * Tracks position changes for client's target keywords.
  */
 
-import type { ClientData } from '@/types/competitive-scan';
-
 // ============================================================================
 // Types
 // ============================================================================

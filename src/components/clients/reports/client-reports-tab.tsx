@@ -32,7 +32,7 @@ export function ClientReportsTab({
         <GenerateReportButton clientId={clientId} />
       </div>
 
-      <ReportsList reports={reports} clientId={clientId} />
+      <ReportsList reports={reports} />
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { requireMaster } from "@/lib/auth/session";
 import { detectUpsellOpportunities, saveUpsellOpportunities } from "@/lib/upsell/detector";
 

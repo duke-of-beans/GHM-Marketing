@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, X, Eye, DollarSign, Mail } from "lucide-react";
+import { TrendingUp, X, DollarSign, Mail } from "lucide-react";
 
 type Opportunity = {
   id?: number;

@@ -17,7 +17,7 @@ type Report = {
   content: any;
 };
 
-export function ReportsList({ reports, clientId }: { reports: Report[]; clientId: number }) {
+export function ReportsList({ reports }: { reports: Report[] }) {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [sendingEmail, setSendingEmail] = useState<number | null>(null);
@@ -70,7 +70,7 @@ export function ReportsList({ reports, clientId }: { reports: Report[]; clientId
         <CardContent className="py-12 text-center text-muted-foreground">
           <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>No reports generated yet</p>
-          <p className="text-sm mt-2">Use the "Generate Report" button to create one</p>
+          <p className="text-sm mt-2">Use the &ldquo;Generate Report&rdquo; button to create one</p>
         </CardContent>
       </Card>
     );

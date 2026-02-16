@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReviewTaskModal } from "./review-task-modal";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 type Task = {
   id: number;

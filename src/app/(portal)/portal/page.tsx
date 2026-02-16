@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ClientPortalDashboard } from "@/components/portal/client-portal-dashboard";
 
