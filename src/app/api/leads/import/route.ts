@@ -231,8 +231,20 @@ export async function POST(request: NextRequest) {
   if (isXLSX) {
     const buffer = await file.arrayBuffer();
     const wb = XLSX.read(buffer, { type: "array" });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws);
+    // Pick the sheet with the most data rows
+    let bestSheet = wb.Sheets[wb.SheetNames[0]];
+    let bestCount = 0;
+    let bestName = wb.SheetNames[0];
+    for (const name of wb.SheetNames) {
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(wb.Sheets[name]);
+      if (rows.length > bestCount) {
+        bestCount = rows.length;
+        bestSheet = wb.Sheets[name];
+        bestName = name;
+      }
+    }
+    console.log(`XLSX: Using sheet "${bestName}" with ${bestCount} rows (of ${wb.SheetNames.length} sheets)`);
+    const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(bestSheet);
     rawRows = json;
     headers = json.length > 0 ? Object.keys(json[0]) : [];
   } else {
