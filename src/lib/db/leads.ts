@@ -169,7 +169,7 @@ export async function getDashboardMetrics(user: SessionUser) {
     prisma.lead.count({ 
       where: { 
         ...baseFilter,
-        status: { notIn: ["won", "lost"] }
+        status: { notIn: ["won", "lost_rejection", "lost_deferred"] }
       } 
     }),
     prisma.lead.count({
