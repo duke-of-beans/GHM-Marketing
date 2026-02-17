@@ -14,7 +14,7 @@ import {
 import { Loader2 } from 'lucide-react'
 
 interface SocialMediaGeneratorProps {
-  clientId: string
+  clientId: number
   onSuccess?: () => void
 }
 

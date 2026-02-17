@@ -12,7 +12,7 @@ import { Loader2, Sparkles } from "lucide-react";
 
 interface BlogGeneratorProps {
   clientId: number;
-  industry: string;
+  industry?: string;
   onGenerated?: () => void;
 }
 

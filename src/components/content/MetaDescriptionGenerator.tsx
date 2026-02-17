@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Loader2, Copy, Check } from 'lucide-react'
 
 interface MetaDescriptionGeneratorProps {
-  clientId: string
+  clientId: number
   onSuccess?: () => void
 }
 

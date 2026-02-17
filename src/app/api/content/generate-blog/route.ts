@@ -12,9 +12,9 @@ export async function POST(request: NextRequest) {
     const { clientId, industry, keywords, tone, wordCount } = body;
 
     // Validate required fields
-    if (!clientId || !industry || !keywords || keywords.length === 0) {
+    if (!clientId || !keywords || keywords.length === 0) {
       return NextResponse.json(
-        { error: 'Missing required fields: clientId, industry, keywords' },
+        { error: 'Missing required fields: clientId, keywords' },
         { status: 400 }
       );
     }
@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
     const targetWordCount = wordCount || 1200;
     const postTone = tone || 'professional';
     const keywordList = Array.isArray(keywords) ? keywords.join(', ') : keywords;
+    const businessIndustry = industry || 'their industry';
 
-    const prompt = `You are an SEO content specialist writing a blog post for ${client.businessName}, a business in the ${industry} industry.
+    const prompt = `You are an SEO content specialist writing a blog post for ${client.businessName}, a business in ${businessIndustry}.
 
 Create an engaging, SEO-optimized blog post with the following specifications:
 

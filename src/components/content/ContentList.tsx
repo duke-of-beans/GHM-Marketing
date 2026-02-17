@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 
 interface ContentListProps {
-  clientId: string
+  clientId: number
   refreshTrigger?: number
 }
 

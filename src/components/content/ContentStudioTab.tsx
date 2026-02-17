@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BlogGeneratorForm } from './BlogGeneratorForm'
+import { BlogGenerator } from '../clients/content/blog-generator'
 import { SocialMediaGenerator } from './SocialMediaGenerator'
 import { MetaDescriptionGenerator } from './MetaDescriptionGenerator'
 import { ContentList } from './ContentList'
 
 interface ContentStudioTabProps {
-  clientId: string
+  clientId: number
 }
 
 export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
@@ -44,9 +44,9 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <BlogGeneratorForm
+                <BlogGenerator
                   clientId={clientId}
-                  onSuccess={handleContentGenerated}
+                  onGenerated={handleContentGenerated}
                 />
               </CardContent>
             </Card>
