@@ -1,4 +1,4 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { getDashboardMetrics, getFunnelStats } from "@/lib/db/leads";
 import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
@@ -9,7 +9,7 @@ import { CompanyProfitabilityWidget } from "@/components/payments/company-profit
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 
 export default async function MasterDashboard() {
-  const user = await requireMaster();
+  const user = await requirePermission("view_analytics");
 
   const [metrics, funnelStats, repData] = await Promise.all([
     getDashboardMetrics(user),

@@ -1,9 +1,9 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { ProductCatalog } from "@/components/products/product-catalog";
 
 export default async function ProductsPage() {
-  await requireMaster();
+  await requirePermission("manage_products");
 
   const products = await prisma.product.findMany({
     orderBy: [

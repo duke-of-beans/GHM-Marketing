@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
+import type { UserPermissions } from "@/lib/auth/permissions";
 import { HelpMenu } from "@/components/onboarding/help-menu";
 import { BugReportButton } from "@/components/bug-report/BugReportButton";
 
@@ -15,28 +16,55 @@ type NavUser = {
   role: UserRole;
 };
 
-const masterLinks = [
-  { href: "/master", label: "Dashboard", icon: "📊" },
-  { href: "/discovery", label: "Find Leads", icon: "🔍" },
-  { href: "/leads", label: "Sales Pipeline", icon: "👥" },
-  { href: "/clients", label: "Client Portfolio", icon: "🏢" },
-  { href: "/review", label: "Content Review", icon: "✍️" },
-  { href: "/analytics", label: "Analytics", icon: "📈" },
-  { href: "/products", label: "Service Catalog", icon: "📦" },
-  { href: "/territories", label: "Territories", icon: "🗺️" },
-  { href: "/team", label: "Team", icon: "🧑‍💼" },
-  { href: "/bugs", label: "Bug Reports", icon: "🐛" },
-  { href: "/settings", label: "Settings", icon: "⚙️" },
+type NavLink = {
+  href: string;
+  label: string;
+  icon: string;
+  permission?: keyof UserPermissions; // Optional permission required to see this link
+};
+
+const allLinks: NavLink[] = [
+  { href: "/master", label: "Dashboard", icon: "📊", permission: "view_analytics" },
+  { href: "/sales", label: "Dashboard", icon: "📊" }, // Sales dashboard (no permission needed)
+  { href: "/discovery", label: "Find Leads", icon: "🔍", permission: "view_all_leads" },
+  { href: "/leads", label: "Sales Pipeline", icon: "👥", permission: "manage_leads" },
+  { href: "/clients", label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
+  { href: "/review", label: "Content Review", icon: "✍️", permission: "manage_clients" },
+  { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
+  { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
+  { href: "/territories", label: "Territories", icon: "🗺️", permission: "manage_territories" },
+  { href: "/team", label: "Team", icon: "🧑‍💼", permission: "manage_team" },
+  { href: "/bugs", label: "Bug Reports", icon: "🐛" }, // Available to all
+  { href: "/settings", label: "Settings", icon: "⚙️", permission: "manage_settings" },
 ];
 
-const salesLinks = [
-  { href: "/sales", label: "Dashboard", icon: "📊" },
-  { href: "/leads", label: "Sales Pipeline", icon: "👥" },
-];
-
-export function DashboardNav({ user }: { user: NavUser }) {
+export function DashboardNav({ 
+  user, 
+  permissions = {} 
+}: { 
+  user: NavUser; 
+  permissions?: UserPermissions;
+}) {
   const pathname = usePathname();
-  const links = user.role === "master" ? masterLinks : salesLinks;
+  
+  // Filter links based on permissions
+  const links = allLinks.filter((link) => {
+    // Special handling for dashboard links
+    if (link.href === "/master") {
+      return user.role === "master" && (!link.permission || permissions[link.permission]);
+    }
+    if (link.href === "/sales") {
+      return user.role === "sales";
+    }
+    
+    // If link has no permission requirement, show it
+    if (!link.permission) {
+      return true;
+    }
+    
+    // Check if user has the required permission
+    return permissions[link.permission] === true;
+  });
 
   return (
     <>
