@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
@@ -691,3 +691,4 @@ export function AdvancedLeadFilterBar({
     </TooltipProvider>
   );
 }
+
