@@ -114,6 +114,7 @@ type ClientData = {
     businessName: string;
     phone: string;
     email: string | null;
+    address: string | null;
     city: string;
     state: string;
     zipCode: string;
