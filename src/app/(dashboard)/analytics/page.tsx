@@ -65,13 +65,16 @@ export default async function AnalyticsPage() {
     }),
   ]);
 
-  // Serialize data
+  // Serialize data with proper Decimal handling
   const serialized = {
     leads: JSON.parse(JSON.stringify(leads)),
     clients: JSON.parse(JSON.stringify(clients)),
     tasks: JSON.parse(JSON.stringify(tasks)),
     scans: JSON.parse(JSON.stringify(scans)),
-    opportunities: JSON.parse(JSON.stringify(opportunities)),
+    opportunities: opportunities.map(opp => ({
+      ...opp,
+      projectedMrr: opp.projectedMrr ? Number(opp.projectedMrr) : null,
+    })),
   };
 
   return (
