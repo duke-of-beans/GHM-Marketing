@@ -122,12 +122,34 @@ export async function POST(
 
   } catch (error) {
     console.error('Error capturing voice:', error);
+    
+    // Provide specific error messages to frontend
+    let errorMessage = 'Failed to capture voice profile';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      
+      // Determine appropriate status code based on error type
+      if (error.message.includes('API key') || error.message.includes('ANTHROPIC_API_KEY')) {
+        statusCode = 503; // Service Unavailable
+        errorMessage = 'Voice capture service is not configured. Please contact support.';
+      } else if (error.message.includes('not found') || error.message.includes('404')) {
+        statusCode = 404;
+      } else if (error.message.includes('blocked') || error.message.includes('403')) {
+        statusCode = 403;
+      } else if (error.message.includes('timeout') || error.message.includes('too long')) {
+        statusCode = 504; // Gateway Timeout
+      }
+    }
+    
     return NextResponse.json(
       { 
-        error: 'Failed to capture voice profile',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: errorMessage,
+        details: error instanceof Error ? error.message : 'Unknown error',
+        hint: 'Check the website URL and ensure it has substantial text content. Sites with heavy JavaScript or bot protection may not work.'
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 }

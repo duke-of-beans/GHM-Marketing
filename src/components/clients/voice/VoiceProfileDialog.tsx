@@ -78,7 +78,9 @@ export function VoiceProfileDialog({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to capture voice");
+        const errorMsg = data.error || "Failed to capture voice";
+        const hint = data.hint ? `\n\n${data.hint}` : "";
+        throw new Error(errorMsg + hint);
       }
 
       const data = await res.json();
@@ -180,7 +182,9 @@ export function VoiceProfileDialog({
                 <AlertCircle className="h-5 w-5" />
                 <span className="text-sm font-medium">Analysis Failed</span>
               </div>
-              <p className="text-sm text-muted-foreground">{error}</p>
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-muted-foreground whitespace-pre-line">{error}</p>
+              </div>
               <Button onClick={handleCapture} className="w-full">
                 Try Again
               </Button>
