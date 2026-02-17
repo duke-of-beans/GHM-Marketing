@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import { createTerritorySchema } from "@/lib/validations";
-import type { SessionUser } from "@/lib/auth/session";
 
-export async function GET() {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_territories");
+  if (permissionError) return permissionError;
 
   const territories = await prisma.territory.findMany({
     where: { isActive: true },

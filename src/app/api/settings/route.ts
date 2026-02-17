@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { withPermission } from '@/lib/auth/api-permissions';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
-  try {
-    const session = await auth();
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export async function GET(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_settings");
+  if (permissionError) return permissionError;
 
+  try {
     // Get or create settings
     let settings = await prisma.globalSettings.findFirst();
     

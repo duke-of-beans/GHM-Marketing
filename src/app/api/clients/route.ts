@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { getClients, getPortfolioStats } from "@/lib/db/clients";
 import { prisma } from "@/lib/db";
-import type { SessionUser } from "@/lib/auth/session";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
-  }
+  // Check permission
+  const permissionError = await withPermission(request, "view_all_clients");
+  if (permissionError) return permissionError;
 
   const searchParams = Object.fromEntries(request.nextUrl.searchParams);
 
@@ -30,14 +23,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  // Check permission
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
   }
 
   try {

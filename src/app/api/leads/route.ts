@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { getLeads } from "@/lib/db/leads";
 import { leadFilterSchema, createLeadSchema } from "@/lib/validations";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { auth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+  // Check permission
+  const permissionError = await withPermission(request, "view_all_leads");
+  if (permissionError) return permissionError;
 
+  const session = await auth();
   const searchParams = Object.fromEntries(request.nextUrl.searchParams);
   const parsed = leadFilterSchema.safeParse(searchParams);
 
@@ -21,17 +22,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const user = session.user as unknown as SessionUser;
+  const user = session!.user as unknown as SessionUser;
   const result = await getLeads(user, parsed.data);
 
   return NextResponse.json({ success: true, data: result });
 }
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+  // Check permission
+  const permissionError = await withPermission(request, "manage_leads");
+  if (permissionError) return permissionError;
 
   const body = await request.json();
   const parsed = createLeadSchema.safeParse(body);

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  // Check permission
+  const permissionError = await withPermission(req, "manage_products");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { name, category, description, price, pricingModel, isActive } = body;
 
