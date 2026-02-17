@@ -18,19 +18,15 @@ export async function POST(req: NextRequest) {
             healthScore: true,
           },
         },
-        scan: {
-          select: {
-            alerts: true,
-          },
-        },
       },
     });
 
     let updated = 0;
 
     for (const task of tasks) {
-      // Extract severity from scan alerts if available
-      const alerts = task.scan?.alerts as any;
+      // Note: Scan relation not defined in schema, alerts would need separate query
+      // For now, prioritize based on category and client health only
+      const alerts = null;
       let severity: string | undefined;
 
       if (alerts) {
