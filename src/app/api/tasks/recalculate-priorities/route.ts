@@ -24,19 +24,9 @@ export async function POST(req: NextRequest) {
     let updated = 0;
 
     for (const task of tasks) {
-      // Note: Scan relation not defined in schema, alerts would need separate query
-      // For now, prioritize based on category and client health only
-      const alerts = null;
-      let severity: string | undefined;
-
-      if (alerts) {
-        // Check if task relates to critical alert
-        if (alerts.critical?.some((a: any) => a.title === task.title)) {
-          severity = "critical";
-        } else if (alerts.warning?.some((a: any) => a.title === task.title)) {
-          severity = "warning";
-        }
-      }
+      // Note: Scan relation not defined in schema
+      // Prioritize based on category and client health only
+      const severity: string | undefined = undefined;
 
       // Calculate priority
       const priority = calculateTaskPriority({
