@@ -71,6 +71,21 @@ export async function getClient(id: number) {
           reviewCount: true,
           reviewAvg: true,
           competitiveIntel: true,
+          assignedTo: true,
+          assignedUser: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+      masterAssigned: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
         },
       },
       competitors: {

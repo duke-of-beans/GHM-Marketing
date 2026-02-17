@@ -70,9 +70,7 @@ export function DashboardNav({ user }: { user: NavUser }) {
         </nav>
 
         <div className="mt-auto space-y-1">
-          <div className="px-3">
-            <HelpMenu />
-          </div>
+          <HelpMenu />
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors w-full"

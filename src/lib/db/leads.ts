@@ -165,7 +165,13 @@ export async function getDashboardMetrics(user: SessionUser) {
   ];
 
   const [totalLeads, activeLeads, wonLeads, revenueAgg] = await Promise.all([
-    prisma.lead.count({ where: baseFilter }),
+    // Exclude "won" and "lost" - those are completed deals, not active leads
+    prisma.lead.count({ 
+      where: { 
+        ...baseFilter,
+        status: { notIn: ["won", "lost"] }
+      } 
+    }),
     prisma.lead.count({
       where: { ...baseFilter, status: { in: activeStatuses } },
     }),

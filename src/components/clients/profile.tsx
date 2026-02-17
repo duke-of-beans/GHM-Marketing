@@ -109,6 +109,11 @@ type ClientData = {
   onboardedAt: string;
   lastScanAt: string | null;
   nextScanAt: string | null;
+  masterAssigned: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
   lead: {
     id: number;
     businessName: string;
@@ -123,6 +128,12 @@ type ClientData = {
     reviewCount: number | null;
     reviewAvg: string | null;
     competitiveIntel: Record<string, unknown> | null;
+    assignedTo: number | null;
+    assignedUser: {
+      id: number;
+      name: string;
+      email: string;
+    } | null;
   };
   competitors: Competitor[];
   domains: Domain[];
@@ -321,6 +332,16 @@ export function ClientProfile({
               {client.lead?.phone && (
                 <p className="text-base text-muted-foreground">
                   <span className="font-medium">Phone:</span> {client.lead.phone}
+                </p>
+              )}
+              {client.lead?.assignedUser && (
+                <p className="text-base text-muted-foreground">
+                  <span className="font-medium">Sales Rep:</span> {client.lead.assignedUser.name}
+                </p>
+              )}
+              {client.masterAssigned && (
+                <p className="text-base text-muted-foreground">
+                  <span className="font-medium">Account Manager:</span> {client.masterAssigned.name}
                 </p>
               )}
             </div>

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { 
   ArrowRight, 
   ArrowLeft, 
-  X, 
   TrendingUp, 
   Users, 
   DollarSign,
@@ -14,7 +13,6 @@ import {
   Filter,
   Target
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 type TutorialStep = {
   title: string;
@@ -221,19 +219,9 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl">
-              {step.title}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={skipTutorial}
-              className="h-8 w-8 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl">
+            {step.title}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -251,9 +239,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
           <div className="space-y-2">
             {step.tips.map((tip, idx) => (
               <div key={idx} className="flex items-start gap-2 text-sm">
-                <Badge variant="outline" className="mt-0.5 shrink-0">
-                  Tip
-                </Badge>
+                <span className="mt-0.5 shrink-0 text-blue-600">•</span>
                 <p className="text-muted-foreground">{tip}</p>
               </div>
             ))}
