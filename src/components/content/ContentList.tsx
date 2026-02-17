@@ -31,7 +31,7 @@ interface ContentListProps {
 }
 
 interface ContentItem {
-  id: string
+  id: number
   contentType: string
   title: string | null
   content: string
