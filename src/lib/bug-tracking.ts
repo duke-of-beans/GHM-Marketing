@@ -27,15 +27,18 @@ if (typeof window !== "undefined") {
 
   // Capture network errors
   const originalFetch = window.fetch;
-  window.fetch = async function(...args: any[]) {
+  window.fetch = async function(
+    input: RequestInfo | URL,
+    init?: RequestInit
+  ): Promise<Response> {
     const startTime = Date.now();
     try {
-      const response = await originalFetch.apply(this, args);
+      const response = await originalFetch(input, init);
       
       // Track failed requests
       if (!response.ok) {
         (window as any).__networkErrors.push({
-          url: args[0],
+          url: input.toString(),
           status: response.status,
           statusText: response.statusText,
           duration: Date.now() - startTime,
@@ -52,7 +55,7 @@ if (typeof window !== "undefined") {
     } catch (error) {
       // Track network failures
       (window as any).__networkErrors.push({
-        url: args[0],
+        url: input.toString(),
         error: error instanceof Error ? error.message : String(error),
         duration: Date.now() - startTime,
         timestamp: new Date().toISOString(),
