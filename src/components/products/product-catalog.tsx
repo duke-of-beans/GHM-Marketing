@@ -4,7 +4,15 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Edit, Trash2, Search, SlidersHorizontal } from "lucide-react";
 import { ProductDialog } from "./product-dialog";
 import { toast } from "sonner";
 
@@ -22,6 +30,12 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  
+  // Filters and sorting
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [sortBy, setSortBy] = useState<"name" | "price" | "category">("name");
 
   const handleAdd = () => {
     setEditingProduct(null);
@@ -70,15 +84,99 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
     setDialogOpen(false);
   };
 
-  const activeProducts = products.filter((p) => p.isActive);
-  const inactiveProducts = products.filter((p) => !p.isActive);
+  // Get unique categories
+  const categories = Array.from(new Set(products.map(p => p.category).filter(Boolean))) as string[];
+
+  // Filter and sort products
+  const filteredProducts = products
+    .filter(product => {
+      // Search filter
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Category filter
+      const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
+      
+      // Status filter
+      const matchesStatus = statusFilter === "all" || 
+        (statusFilter === "active" && product.isActive) ||
+        (statusFilter === "inactive" && !product.isActive);
+      
+      return matchesSearch && matchesCategory && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === "price") {
+        return Number(a.price) - Number(b.price);
+      } else if (sortBy === "category") {
+        const catA = a.category || "";
+        const catB = b.category || "";
+        return catA.localeCompare(catB);
+      }
+      return 0;
+    });
+
+  const activeProducts = filteredProducts.filter((p) => p.isActive);
+  const inactiveProducts = filteredProducts.filter((p) => !p.isActive);
 
   return (
     <div className="space-y-4">
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search services..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map(cat => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Services</SelectItem>
+            <SelectItem value="active">Active Only</SelectItem>
+            <SelectItem value="inactive">Inactive Only</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Sort by Name</SelectItem>
+            <SelectItem value="price">Sort by Price</SelectItem>
+            <SelectItem value="category">Sort by Category</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Stats and Add Button */}
       <div className="flex items-center justify-between">
         <div className="flex gap-4 text-sm text-muted-foreground">
           <span>{activeProducts.length} Active</span>
           <span>{inactiveProducts.length} Inactive</span>
+          <span className="text-muted-foreground/60">|</span>
+          <span>{filteredProducts.length} of {products.length} shown</span>
         </div>
         <Button onClick={handleAdd}>
           <Plus className="h-4 w-4 mr-1" />
@@ -86,19 +184,39 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
         </Button>
       </div>
 
-      {activeProducts.length === 0 && inactiveProducts.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-2 font-medium">
-              No services in your catalog yet
-            </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Add your SEO service packages here. The system will automatically suggest relevant upsells to clients based on competitive gaps detected in scans.
-            </p>
-            <Button onClick={handleAdd}>
-              <Plus className="h-4 w-4 mr-1" />
-              Add Your First Service
-            </Button>
+            {products.length === 0 ? (
+              <>
+                <p className="text-muted-foreground mb-2 font-medium">
+                  No services in your catalog yet
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Add your SEO service packages here. The system will automatically suggest relevant upsells to clients based on competitive gaps detected in scans.
+                </p>
+                <Button onClick={handleAdd}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Your First Service
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-muted-foreground mb-2">
+                  No services match your filters
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSearchQuery("");
+                    setCategoryFilter("all");
+                    setStatusFilter("all");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : (
