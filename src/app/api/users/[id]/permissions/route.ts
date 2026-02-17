@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { requireMaster, handlePermissionError } from '@/lib/permissions';
 import { 
   UserPermissions, 
@@ -90,7 +91,7 @@ export async function POST(
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        permissions: finalPermissions,
+        permissions: finalPermissions as Prisma.InputJsonValue,
         permissionPreset: finalPreset,
       },
       select: {
