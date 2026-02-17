@@ -42,17 +42,15 @@ export async function POST(req: NextRequest) {
         await prisma.lead.create({
           data: {
             businessName: lead.name,
-            phone: lead.phone || null,
+            phone: lead.phone || "",
             email: null, // Not available from Maps
             website: lead.website || null,
-            city: addressParts.city,
-            state: addressParts.state,
-            zipCode: addressParts.zip,
+            city: addressParts.city || "Unknown",
+            state: addressParts.state || "Unknown",
+            zipCode: addressParts.zip || "00000",
             reviewCount: lead.reviewCount,
             reviewAvg: lead.rating,
-            googlePlaceId: lead.placeId,
             status: "new",
-            source: "discovery",
             assignedToId: user.id,
             qualificationScore: lead.qualificationScore,
             competitiveIntel: {
