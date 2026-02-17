@@ -1,106 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import type { SessionUser } from "@/lib/auth/session";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { getDefaultPermissionsForRole } from "@/lib/permissions";
+import { getUserPermissions } from "@/lib/auth/permissions";
 
-const createUserSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1).max(100),
-  password: z.string().min(8),
-  role: z.enum(["master", "sales"]),
-  territoryId: z.number().int().positive().optional().nullable(),
-});
+/**
+ * GET /api/users
+ * Get all users with their permissions
+ * Requires manage_team permission
+ */
+export async function GET(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_team");
+  if (permissionError) return permissionError;
 
-export async function GET() {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        territoryId: true,
+        permissionPreset: true,
+        permissions: true,
+        territory: {
+          select: {
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            leads: true,
+            clients: true,
+          },
+        },
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
 
-  const users = await prisma.user.findMany({
-    where: { isActive: true },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      territoryId: true,
-      territory: { select: { id: true, name: true } },
-      lastLogin: true,
-      isActive: true,
-      permissions: true,
-      permissionPreset: true,
-      _count: { select: { assignedLeads: true } },
-    },
-    orderBy: [{ role: "asc" }, { name: "asc" }],
-  });
+    // Add effective permissions to each user
+    const usersWithPermissions = users.map((user) => ({
+      ...user,
+      effectivePermissions: getUserPermissions({
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        territoryId: user.territoryId,
+        territoryName: user.territory?.name || null,
+        permissions: user.permissions,
+        permissionPreset: user.permissionPreset,
+      }),
+    }));
 
-  return NextResponse.json({ success: true, data: users });
-}
-
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
-    return NextResponse.json({ success: false, error: "Master access required" }, { status: 403 });
-  }
-
-  const body = await request.json();
-  const parsed = createUserSchema.safeParse(body);
-  if (!parsed.success) {
+    return NextResponse.json({
+      success: true,
+      data: usersWithPermissions,
+    });
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
     return NextResponse.json(
-      { success: false, error: "Validation failed", details: parsed.error.flatten() },
-      { status: 400 }
+      { error: "Failed to fetch users" },
+      { status: 500 }
     );
   }
-
-  // Check for existing email
-  const existing = await prisma.user.findUnique({
-    where: { email: parsed.data.email },
-    select: { id: true },
-  });
-  if (existing) {
-    return NextResponse.json(
-      { success: false, error: "Email already in use" },
-      { status: 409 }
-    );
-  }
-
-  const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-
-  // Set default permissions based on role
-  const defaultPermissions = getDefaultPermissionsForRole(parsed.data.role);
-  const permissionPreset = parsed.data.role === 'master' ? 'master_full' : 'sales_basic';
-
-  const newUser = await prisma.user.create({
-    data: {
-      email: parsed.data.email,
-      name: parsed.data.name,
-      passwordHash,
-      role: parsed.data.role,
-      territoryId: parsed.data.territoryId ?? null,
-      permissions: defaultPermissions as unknown as Prisma.InputJsonValue,
-      permissionPreset: permissionPreset,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      territoryId: true,
-      territory: { select: { id: true, name: true } },
-      permissions: true,
-      permissionPreset: true,
-    },
-  });
-
-  return NextResponse.json({ success: true, data: newUser }, { status: 201 });
 }

@@ -1,181 +1,87 @@
-/**
- * API Route: Update user permissions
- * POST /api/users/[id]/permissions
- * 
- * Allows masters to update a user's permission settings
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
-import { requireMaster, handlePermissionError } from '@/lib/permissions';
-import { 
-  UserPermissions, 
-  PermissionPreset,
-  isUserPermissions,
-  getPreset,
-  detectPreset 
-} from '@/lib/permissions';
-import { z } from 'zod';
-
-const updatePermissionsSchema = z.object({
-  permissionPreset: z.enum(['sales_basic', 'sales_advanced', 'master_lite', 'master_full', 'custom']).optional(),
-  permissions: z.record(z.string(), z.boolean()).optional(),
-});
-
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const session = await auth();
-    const user = session?.user;
-    
-    // Only masters can update permissions
-    requireMaster(user);
-    
-    const userId = parseInt(params.id);
-    if (isNaN(userId)) {
-      return NextResponse.json(
-        { error: 'Invalid user ID' },
-        { status: 400 }
-      );
-    }
-    
-    const body = await request.json();
-    const validation = updatePermissionsSchema.safeParse(body);
-    
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid request body', details: validation.error },
-        { status: 400 }
-      );
-    }
-    
-    const { permissionPreset, permissions } = validation.data;
-    
-    // Determine final permissions and preset
-    let finalPermissions: UserPermissions;
-    let finalPreset: PermissionPreset;
-    
-    if (permissionPreset && permissionPreset !== 'custom') {
-      // Use preset
-      const presetPermissions = getPreset(permissionPreset);
-      if (!presetPermissions) {
-        return NextResponse.json(
-          { error: 'Invalid preset' },
-          { status: 400 }
-        );
-      }
-      finalPermissions = presetPermissions;
-      finalPreset = permissionPreset;
-    } else if (permissions) {
-      // Custom permissions
-      if (!isUserPermissions(permissions)) {
-        return NextResponse.json(
-          { error: 'Invalid permissions object' },
-          { status: 400 }
-        );
-      }
-      finalPermissions = permissions;
-      finalPreset = detectPreset(permissions);
-    } else {
-      return NextResponse.json(
-        { error: 'Must provide either permissionPreset or permissions' },
-        { status: 400 }
-      );
-    }
-    
-    // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        permissions: finalPermissions as unknown as Prisma.InputJsonValue,
-        permissionPreset: finalPreset,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        permissions: true,
-        permissionPreset: true,
-      },
-    });
-    
-    return NextResponse.json({
-      success: true,
-      user: updatedUser,
-    });
-    
-  } catch (error) {
-    return handlePermissionError(error);
-  }
-}
+import { NextRequest, NextResponse } from "next/server";
+import { withPermission } from "@/lib/auth/api-permissions";
+import { prisma } from "@/lib/db";
+import { createAuditLog } from "@/lib/audit-log";
+import { getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
+import { clearPermissionCache } from "@/lib/auth/use-permissions";
 
 /**
- * GET /api/users/[id]/permissions
- * Fetch a user's current permissions
+ * PUT /api/users/[id]/permissions
+ * Update user permissions
+ * Requires manage_team permission
  */
-
-export async function GET(
-  request: NextRequest,
+export async function PUT(
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_team");
+  if (permissionError) return permissionError;
+
   try {
-    const session = await auth();
-    const user = session?.user;
-    
-    if (!user) {
+    const currentUser = await getCurrentUserWithPermissions();
+    if (!currentUser) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
-    
+
     const userId = parseInt(params.id);
-    if (isNaN(userId)) {
+    const body = await req.json();
+    const { permissionPreset, customPermissions } = body;
+
+    // Validate inputs
+    if (permissionPreset && !["sales_basic", "sales_advanced", "master_lite", "master_full", null].includes(permissionPreset)) {
       return NextResponse.json(
-        { error: 'Invalid user ID' },
+        { error: "Invalid permission preset" },
         { status: 400 }
       );
     }
-    
-    // Masters can view anyone's permissions
-    // Sales reps can only view their own
-    if (user.role !== 'master' && parseInt(user.id as string) !== userId) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
-    }
-    
-    const targetUser = await prisma.user.findUnique({
+
+    // Update user permissions
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
+      data: {
+        permissionPreset,
+        permissions: customPermissions || {},
+      },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
-        permissions: true,
         permissionPreset: true,
+        permissions: true,
       },
     });
-    
-    if (!targetUser) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-    
+
+    // Log the permission change
+    await createAuditLog({
+      userId: currentUser.id,
+      userName: currentUser.name || "",
+      userEmail: currentUser.email || "",
+      userRole: currentUser.role,
+      action: "user_update",
+      resource: `user:${userId}`,
+      permission: "manage_team",
+      status: "success",
+      metadata: {
+        updatedFields: ["permissionPreset", "permissions"],
+        newPreset: permissionPreset,
+        targetUser: updatedUser.name,
+      },
+    });
+
     return NextResponse.json({
       success: true,
-      user: targetUser,
+      data: updatedUser,
     });
-    
   } catch (error) {
-    return handlePermissionError(error);
+    console.error("Failed to update permissions:", error);
+    return NextResponse.json(
+      { error: "Failed to update permissions" },
+      { status: 500 }
+    );
   }
 }
