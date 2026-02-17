@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     await prisma.clientReport.update({
       where: { id: reportId },
       data: {
-        sentAt: new Date(),
+        sentToClient: true,
       },
     });
 
