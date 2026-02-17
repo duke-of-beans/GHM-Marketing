@@ -235,7 +235,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
           {data.masterManager && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="secondary">
-                {data.masterManager.name === "Gavin Kirsch"
+                {[1, 2].includes(data.masterManager.id) // Gavin or David (owners)
                   ? "Owner (no payment)"
                   : "Fee: $240/mo"}
               </Badge>

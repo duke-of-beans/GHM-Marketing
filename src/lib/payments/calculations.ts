@@ -43,7 +43,10 @@ export interface PaymentCalculationResult {
 // CONSTANTS
 // ============================================================================
 
-const OWNER_USER_ID = 1; // Gavin's user ID (assumes Gavin is ID 1)
+// Owner user IDs - no self-payment for owners when assigned as master managers
+// TODO: Verify these IDs match production database
+// David Kirsch is primary owner, Gavin Kirsch may be secondary
+const OWNER_USER_IDS = [1, 2]; // Update after verifying user IDs in production
 
 // ============================================================================
 // COMMISSION CALCULATIONS
@@ -163,8 +166,8 @@ export function calculateMasterFee(
   currentMonth: Date,
   masterManagerId: number
 ): PaymentCalculationResult {
-  // Owner (Gavin) doesn't pay himself
-  if (masterManagerId === OWNER_USER_ID) {
+  // Owners (Gavin & David) don't pay themselves
+  if (OWNER_USER_IDS.includes(masterManagerId)) {
     return {
       shouldPay: false,
       amount: new Decimal(0),
