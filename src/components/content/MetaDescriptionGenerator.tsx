@@ -117,7 +117,7 @@ export function MetaDescriptionGenerator({ clientId, onSuccess }: MetaDescriptio
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center gap-1.5"
           >
             <Sparkles className="h-4 w-4 text-primary" />
-            Use client's captured brand voice
+            Use client&apos;s captured brand voice
           </label>
         </div>
       )}

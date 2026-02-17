@@ -25,7 +25,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
       <div>
         <h2 className="text-2xl font-bold">Content Studio</h2>
         <p className="text-muted-foreground mt-1">
-          AI-powered content generation that goes beyond generic templates. Our system researches your client's industry, analyzes local market trends, studies competitor strategies, and creates tailored content that resonates with their specific audience.
+          AI-powered content generation that goes beyond generic templates. Our system researches your client&apos;s industry, analyzes local market trends, studies competitor strategies, and creates tailored content that resonates with their specific audience.
         </p>
       </div>
 

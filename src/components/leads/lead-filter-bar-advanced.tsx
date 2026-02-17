@@ -637,7 +637,7 @@ export function AdvancedLeadFilterBar({
                         <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs">
-                        Business address doesn&apos;t match Google's city-name expectations
+                        Business address doesn&apos;t match Google&apos;s city-name expectations
                       </TooltipContent>
                     </Tooltip>
                   </Label>
