@@ -175,7 +175,7 @@ export async function PUT(
       await prisma.clientNote.create({
         data: {
           clientId,
-          authorId: session.user.id,
+          authorId: parseInt(session.user.id),
           type: "system",
           content: `Compensation updated: ${changes.join(", ")}`,
           isPinned: false,

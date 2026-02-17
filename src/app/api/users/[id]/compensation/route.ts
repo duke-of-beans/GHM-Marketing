@@ -137,7 +137,7 @@ export async function PUT(
     await prisma.clientNote.create({
       data: {
         clientId: 1, // System note (we'll need a better approach for audit logs)
-        authorId: session.user.id,
+        authorId: parseInt(session.user.id),
         type: "system",
         content: `Updated compensation config for ${user.name}: Commission ${validated.commissionEnabled ? 'enabled' : 'disabled'} ($${validated.commissionAmount}), Residual ${validated.residualEnabled ? 'enabled' : 'disabled'} ($${validated.residualAmount}/mo starting month ${validated.residualStartMonth})`,
         isPinned: false,
