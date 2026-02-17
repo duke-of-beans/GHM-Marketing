@@ -151,7 +151,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
       {/* Revenue Forecast */}
       <Card>
         <CardHeader>
-          <CardTitle>Revenue Forecast: Where We're Heading</CardTitle>
+          <CardTitle>Revenue Forecast: Where We&apos;re Heading</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>

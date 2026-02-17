@@ -226,8 +226,8 @@ export function DiscoveryDashboard() {
             </p>
             <p className="text-sm text-muted-foreground mb-2">Try:</p>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Broader location (e.g., "Dallas" instead of "Downtown Dallas")</li>
-              <li>• Different keywords (e.g., "lawyer" instead of "attorney")</li>
+              <li>• Broader location (e.g., &quot;Dallas&quot; instead of &quot;Downtown Dallas&quot;)</li>
+              <li>• Different keywords (e.g., &quot;lawyer&quot; instead of &quot;attorney&quot;)</li>
               <li>• Lower minimum review count</li>
             </ul>
           </CardContent>
