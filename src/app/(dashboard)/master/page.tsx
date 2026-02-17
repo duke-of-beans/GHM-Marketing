@@ -4,6 +4,8 @@ import { getDashboardMetrics, getFunnelStats } from "@/lib/db/leads";
 import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { RepLeaderboard } from "@/components/dashboard/rep-leaderboard";
+import { ManagementFeesWidget } from "@/components/payments/management-fees-widget";
+import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
 
 export default async function MasterDashboard() {
   const user = await requireMaster();
@@ -55,6 +57,8 @@ export default async function MasterDashboard() {
     }),
   ]);
 
+  const isOwner = [1, 2].includes(Number(user.id));
+
   return (
     <div className="space-y-6 pb-20 md:pb-0">
       <div>
@@ -86,6 +90,12 @@ export default async function MasterDashboard() {
       <div className="grid md:grid-cols-2 gap-4">
         <PipelineFunnel stats={funnelStats} />
         <RepLeaderboard reps={repData} />
+      </div>
+
+      {/* Earnings/Profitability Widgets */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <ManagementFeesWidget />
+        {isOwner && <CompanyProfitabilityWidget />}
       </div>
     </div>
   );
