@@ -126,7 +126,15 @@ type ClientData = {
   tasks: Task[];
   notes: ClientNote[];
   scans: Scan[];
-  reports: { id: number; type: string; periodStart: string; periodEnd: string; createdAt: string }[];
+  reports: { 
+    id: number; 
+    type: string; 
+    periodStart: string; 
+    periodEnd: string; 
+    createdAt: string;
+    sentToClient: boolean;
+    content: unknown;
+  }[];
   upsellOpportunities?: Array<{
     id: number;
     productId: number;
@@ -646,10 +654,13 @@ export function ClientProfile({
           <ClientReportsTab
             clientId={client.id}
             reports={client.reports.map((r) => ({
-              ...r,
+              id: r.id,
+              type: r.type,
               periodStart: new Date(r.periodStart),
               periodEnd: new Date(r.periodEnd),
               createdAt: new Date(r.createdAt),
+              sentToClient: r.sentToClient,
+              content: r.content,
             }))}
           />
         </TabsContent>
