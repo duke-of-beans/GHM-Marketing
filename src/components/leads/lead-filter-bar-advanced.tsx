@@ -214,7 +214,7 @@ export function AdvancedLeadFilterBar({
     filters.excludeChains && 1,
     filters.excludeFranchises && 1,
     filters.excludeCorporate && 1,
-  ].filter(Boolean).reduce((a, b) => Number(a) + Number(b), 0);
+  ].filter(Boolean).reduce((a, b) => Number(a) + Number(b), 0) as number;
 
   return (
     <TooltipProvider>
@@ -316,7 +316,7 @@ export function AdvancedLeadFilterBar({
           >
             <Filter className="h-4 w-4 mr-1" />
             {showAdvanced ? "Less" : "More"}
-            {activeFilterCount != null && activeFilterCount > 0 && (
+            {activeFilterCount > 0 && (
               <Badge variant="secondary" className="ml-2 px-1.5 py-0 h-5">
                 {activeFilterCount}
               </Badge>
