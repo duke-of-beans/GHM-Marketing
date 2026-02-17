@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
-import { Loader2, FileText, Share2, Hash, ExternalLink, Pencil, Trash2 } from 'lucide-react'
+import { Loader2, FileText, Share2, Hash, ExternalLink, Pencil, Trash2, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { EditContentDialog } from './EditContentDialog'
+import { VersionHistoryDialog } from './versioning/VersionHistoryDialog'
 import { toast } from 'sonner'
 
 interface ContentListProps {
@@ -36,6 +37,7 @@ interface ContentItem {
   title: string | null
   content: string
   metadata: Record<string, any>
+  currentVersion: number
   createdAt: string
 }
 
@@ -45,6 +47,7 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
   const [error, setError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
 
   const loadContent = async () => {
@@ -220,6 +223,17 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
                       size="sm"
                       onClick={() => {
                         setSelectedContent(item)
+                        setVersionHistoryOpen(true)
+                      }}
+                    >
+                      <Clock className="h-4 w-4 mr-1" />
+                      History
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedContent(item)
                         setEditDialogOpen(true)
                       }}
                     >
@@ -255,6 +269,17 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Version History Dialog */}
+      {selectedContent && (
+        <VersionHistoryDialog
+          open={versionHistoryOpen}
+          onOpenChange={setVersionHistoryOpen}
+          contentId={selectedContent.id}
+          currentVersion={selectedContent.currentVersion}
+          onRestore={handleEditSuccess}
         />
       )}
 

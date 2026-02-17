@@ -24,8 +24,8 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Content Studio</h2>
-        <p className="text-muted-foreground">
-          Generate blog posts, social media content, and meta descriptions for your client.
+        <p className="text-muted-foreground mt-1">
+          AI-powered content generation that goes beyond generic templates. Our system researches your client's industry, analyzes local market trends, studies competitor strategies, and creates tailored content that resonates with their specific audience.
         </p>
       </div>
 
@@ -42,7 +42,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               <CardHeader>
                 <CardTitle>Blog Post Generator</CardTitle>
                 <CardDescription>
-                  Create SEO-optimized blog posts with AI assistance
+                  AI-powered content creation that researches your industry, analyzes competitors, and incorporates local market data to generate SEO-optimized blog posts tailored to your business
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -57,7 +57,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               <CardHeader>
                 <CardTitle>Social Media Content</CardTitle>
                 <CardDescription>
-                  Generate platform-specific social media posts
+                  Generate platform-optimized posts with trending hashtags and engagement strategies designed to maximize reach and audience interaction
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -72,7 +72,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               <CardHeader>
                 <CardTitle>Meta Description Generator</CardTitle>
                 <CardDescription>
-                  Create compelling meta descriptions for better search visibility
+                  Create compelling, click-worthy meta descriptions optimized for search engines and designed to improve organic click-through rates
                 </CardDescription>
               </CardHeader>
               <CardContent>

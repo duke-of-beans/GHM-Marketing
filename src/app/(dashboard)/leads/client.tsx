@@ -4,7 +4,11 @@ import { useState, useMemo } from "react";
 import { KanbanBoard } from "@/components/leads/kanban-board";
 import { LeadDetailSheet } from "@/components/leads/lead-detail-sheet";
 import { CSVImportDialog } from "@/components/leads/csv-import-dialog";
-import { LeadFilterBar, type FilterState } from "@/components/leads/lead-filter-bar";
+import { 
+  AdvancedLeadFilterBar, 
+  type AdvancedFilterState,
+  DEFAULT_FILTERS 
+} from "@/components/leads/lead-filter-bar-advanced";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { LeadStatus, UserRole } from "@prisma/client";
@@ -21,6 +25,22 @@ type KanbanLead = {
   dealValueTotal: number;
   assignedUser: { id: number; name: string } | null;
   _count: { notes: number };
+  
+  // Lead gen engine fields
+  impactScore: number | null;
+  closeLikelihood: number | null;
+  priorityTier: string | null;
+  rating: number | null;
+  marketType: string | null;
+  suppressionSignal: string | null;
+  municipalMismatch: boolean | null;
+  wealthScore: number | null;
+  distanceFromMetro: number | null;
+  website: string | null;
+  publicEmail: string | null;
+  isChain: boolean | null;
+  isFranchise: boolean | null;
+  isCorporate: boolean | null;
 };
 
 type LeadsClientPageProps = {
@@ -31,14 +51,7 @@ type LeadsClientPageProps = {
 export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps) {
   const router = useRouter();
   const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
-  const [filters, setFilters] = useState<FilterState>({
-    search: "",
-    territoryId: null,
-    assignedToId: null,
-    statuses: [],
-    dateRange: "all",
-    sortBy: "newest",
-  });
+  const [filters, setFilters] = useState<AdvancedFilterState>(DEFAULT_FILTERS);
 
   const filteredLeads = useMemo(() => {
     let result = initialLeads;
@@ -70,8 +83,96 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
       result = result.filter((lead) => filters.statuses.includes(lead.status));
     }
 
-    // Date range filter (filtering not yet implemented - would need updatedAt field)
-    // TODO: Add updatedAt to the lead query if date filtering is needed
+    // Impact Score filter
+    if (filters.impactScoreMin > 0 || filters.impactScoreMax < 100) {
+      result = result.filter((lead) => {
+        if (!lead.impactScore) return false;
+        return lead.impactScore >= filters.impactScoreMin && 
+               lead.impactScore <= filters.impactScoreMax;
+      });
+    }
+
+    // Close Likelihood filter
+    if (filters.closeLikelihoodMin > 0 || filters.closeLikelihoodMax < 100) {
+      result = result.filter((lead) => {
+        if (!lead.closeLikelihood) return false;
+        return lead.closeLikelihood >= filters.closeLikelihoodMin && 
+               lead.closeLikelihood <= filters.closeLikelihoodMax;
+      });
+    }
+
+    // Priority Tier filter
+    if (filters.priorityTiers.length > 0) {
+      result = result.filter((lead) => 
+        lead.priorityTier && filters.priorityTiers.includes(lead.priorityTier)
+      );
+    }
+
+    // Rating filter
+    if (filters.ratingMin > 0 || filters.ratingMax < 5) {
+      result = result.filter((lead) => {
+        if (!lead.rating) return false;
+        return lead.rating >= filters.ratingMin && 
+               lead.rating <= filters.ratingMax;
+      });
+    }
+
+    // Review Count filter
+    if (filters.reviewCountMin > 0 || filters.reviewCountMax < 1000) {
+      result = result.filter((lead) => {
+        const count = lead.reviewCount || 0;
+        return count >= filters.reviewCountMin && 
+               count <= filters.reviewCountMax;
+      });
+    }
+
+    // Domain Rating filter
+    if (filters.domainRatingMin > 0 || filters.domainRatingMax < 100) {
+      result = result.filter((lead) => {
+        const rating = lead.domainRating || 0;
+        return rating >= filters.domainRatingMin && 
+               rating <= filters.domainRatingMax;
+      });
+    }
+
+    // Has Website filter
+    if (filters.hasWebsite !== "all") {
+      result = result.filter((lead) => 
+        filters.hasWebsite === "yes" ? !!lead.website : !lead.website
+      );
+    }
+
+    // Has Email filter
+    if (filters.hasEmail !== "all") {
+      result = result.filter((lead) => 
+        filters.hasEmail === "yes" ? !!lead.publicEmail : !lead.publicEmail
+      );
+    }
+
+    // Market Type filter
+    if (filters.marketTypes.length > 0) {
+      result = result.filter((lead) => 
+        lead.marketType && filters.marketTypes.includes(lead.marketType)
+      );
+    }
+
+    // Municipal Mismatch filter
+    if (filters.municipalMismatch !== "all") {
+      result = result.filter((lead) => 
+        filters.municipalMismatch === "yes" ? lead.municipalMismatch : !lead.municipalMismatch
+      );
+    }
+
+    // Exclusions
+    if (filters.excludeChains) {
+      result = result.filter((lead) => !lead.isChain);
+    }
+    if (filters.excludeFranchises) {
+      result = result.filter((lead) => !lead.isFranchise);
+    }
+    if (filters.excludeCorporate) {
+      result = result.filter((lead) => !lead.isCorporate);
+    }
 
     // Sorting
     if (filters.sortBy === "newest") {
@@ -82,6 +183,14 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
       result = [...result].sort((a, b) => b.dealValueTotal - a.dealValueTotal);
     } else if (filters.sortBy === "value-low") {
       result = [...result].sort((a, b) => a.dealValueTotal - b.dealValueTotal);
+    } else if (filters.sortBy === "impact-high") {
+      result = [...result].sort((a, b) => (b.impactScore || 0) - (a.impactScore || 0));
+    } else if (filters.sortBy === "impact-low") {
+      result = [...result].sort((a, b) => (a.impactScore || 0) - (b.impactScore || 0));
+    } else if (filters.sortBy === "close-high") {
+      result = [...result].sort((a, b) => (b.closeLikelihood || 0) - (a.closeLikelihood || 0));
+    } else if (filters.sortBy === "close-low") {
+      result = [...result].sort((a, b) => (a.closeLikelihood || 0) - (b.closeLikelihood || 0));
     } else if (filters.sortBy === "updated") {
       // Already sorted by updatedAt desc from server
     }
@@ -145,7 +254,7 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
         )}
       </div>
 
-      <LeadFilterBar
+      <AdvancedLeadFilterBar
         filters={filters}
         onChange={setFilters}
         showTerritoryFilter={userRole === "master"}

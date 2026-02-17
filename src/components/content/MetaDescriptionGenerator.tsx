@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Loader2, Copy, Check } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2, Copy, Check, Sparkles } from 'lucide-react'
 
 interface MetaDescriptionGeneratorProps {
   clientId: number
@@ -19,6 +20,21 @@ export function MetaDescriptionGenerator({ clientId, onSuccess }: MetaDescriptio
   const [generated, setGenerated] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [hasVoiceProfile, setHasVoiceProfile] = useState(false)
+  const [useVoiceProfile, setUseVoiceProfile] = useState(false)
+
+  // Check for voice profile
+  useEffect(() => {
+    fetch(`/api/clients/${clientId}/voice-profile`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.profile) {
+          setHasVoiceProfile(true)
+          setUseVoiceProfile(true)
+        }
+      })
+      .catch(() => {})
+  }, [clientId])
 
   const handleGenerate = async () => {
     if (!pageUrl.trim() || !content.trim()) {
@@ -37,6 +53,7 @@ export function MetaDescriptionGenerator({ clientId, onSuccess }: MetaDescriptio
           clientId,
           pageUrl: pageUrl.trim(),
           content: content.trim(),
+          useVoiceProfile,
         }),
       })
 
@@ -87,10 +104,54 @@ export function MetaDescriptionGenerator({ clientId, onSuccess }: MetaDescriptio
         />
       </div>
 
+      {hasVoiceProfile && (
+        <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+          <Checkbox
+            id="use-voice-meta"
+            checked={useVoiceProfile}
+            onCheckedChange={(checked) => setUseVoiceProfile(checked as boolean)}
+            disabled={loading}
+          />
+          <label
+            htmlFor="use-voice-meta"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center gap-1.5"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+            Use client's captured brand voice
+          </label>
+        </div>
+      )}
+
       <Button onClick={handleGenerate} disabled={loading} className="w-full">
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Generate Meta Description
       </Button>
+
+      {loading && (
+        <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <p className="text-sm font-medium">Optimizing for search engines...</p>
+          </div>
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <p className="flex items-start gap-2">
+              <span className="text-primary">✓</span>
+              <span>Analyzing page content and identifying key value propositions</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-primary">✓</span>
+              <span>Optimizing for click-through rate while staying within 160 characters</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-primary animate-pulse">→</span>
+              <span>Crafting compelling meta description to improve search visibility</span>
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Creating SEO-optimized meta description designed to increase organic clicks...
+          </p>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">

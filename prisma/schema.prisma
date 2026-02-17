@@ -34,6 +34,14 @@ model User {
   paymentTransactions   PaymentTransaction[]
   salesRepClients       ClientProfile[] @relation("SalesRep")
   masterClients         ClientProfile[] @relation("MasterManager")
+  
+  // Bug reporting relations
+  reportedBugs          BugReport[] @relation("BugReporter")
+  assignedBugs          BugReport[] @relation("BugAssignee")
+  resolvedBugs          BugReport[] @relation("BugResolver")
+  
+  // Settings relations
+  settingsUpdates       GlobalSettings[] @relation("SettingsUpdater")
 
   @@index([territoryId])
   @@map("users")
@@ -323,6 +331,7 @@ model ClientProfile {
   scans               CompetitiveScan[]
   upsellOpportunities UpsellOpportunity[]
   content             ClientContent[]
+  voiceProfile        VoiceProfile?
   
   // Commission system relations
   salesRep             User?    @relation("SalesRep", fields: [salesRepId], references: [id])
@@ -618,17 +627,163 @@ model ClientContent {
   title        String?
   content      String         @db.Text
   keywords     String[]
-  status       String         @default("draft") // "draft", "review", "approved", "published"
+  status       String         @default("draft") // "draft", "review", "approved", "published", "scheduled"
   scheduledFor DateTime?      @map("scheduled_for")
   publishedAt  DateTime?      @map("published_at")
   metadata     Json?          // Store AI generation parameters, platform-specific data
+  currentVersion Int         @default(1) @map("current_version")
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
   
   client       ClientProfile  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  versions     ContentVersion[]
   
   @@index([clientId, status])
   @@index([clientId, contentType])
   @@index([scheduledFor])
   @@map("client_content")
+}
+
+// ============================================================================
+// VOICE PROFILE SYSTEM (SCRVNR)
+// ============================================================================
+
+model VoiceProfile {
+  id                String   @id // voice_xxxxx_yyyyy format
+  clientId          Int      @unique @map("client_id")
+  tonality          String   @db.Text
+  vocabulary        String[] // Array of key terms
+  sentenceStructure String   @db.Text
+  formality         Int      // 1-10 scale
+  enthusiasm        Int      // 1-10 scale
+  technicality      Int      // 1-10 scale
+  brevity           Int      // 1-10 scale
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@map("voice_profiles")
+}
+
+// ============================================================================
+// CONTENT VERSIONING SYSTEM
+// ============================================================================
+
+model ContentVersion {
+  id              Int      @id @default(autoincrement())
+  contentId       Int      @map("content_id")
+  versionNumber   Int      @map("version_number")
+  title           String?
+  content         String   @db.Text
+  keywords        String[]
+  metadata        Json?    // Store generation parameters
+  changeNote      String?  @map("change_note") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  createdBy       Int      @map("created_by")
+  
+  clientContent   ClientContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  
+  @@index([contentId, versionNumber])
+  @@map("content_versions")
+}
+
+// ============================================================================
+// BUG REPORTING SYSTEM
+// ============================================================================
+
+model BugReport {
+  id                Int      @id @default(autoincrement())
+  
+  // Reporter info
+  userId            Int?     @map("user_id")
+  userEmail         String?  @map("user_email")
+  userName          String?  @map("user_name")
+  
+  // Bug details
+  title             String
+  description       String   @db.Text
+  category          String   // "content", "compensation", "scans", "clients", "leads", "ui", "performance", "other"
+  severity          String   @default("medium") // "low", "medium", "high", "critical"
+  status            String   @default("new") // "new", "acknowledged", "in-progress", "resolved", "wont-fix"
+  
+  // Auto-captured metadata
+  pageUrl           String   @map("page_url")
+  userAgent         String   @map("user_agent")
+  screenResolution  String   @map("screen_resolution")
+  timestamp         DateTime @default(now())
+  
+  // Technical context
+  browserInfo       Json?    @map("browser_info")  // Browser name, version, OS
+  consoleErrors     Json?    @map("console_errors") // Last 10 console errors
+  networkErrors     Json?    @map("network_errors") // Failed requests
+  recentActions     Json?    @map("recent_actions") // User's last 5 actions
+  sessionData       Json?    @map("session_data")   // Relevant session state
+  
+  // Assignment
+  assignedTo        Int?     @map("assigned_to")    // Always David Kirsch initially
+  priority          String   @default("high")       // "low", "medium", "high", "top"
+  
+  // Resolution
+  resolvedAt        DateTime? @map("resolved_at")
+  resolvedBy        Int?      @map("resolved_by")
+  resolutionNotes   String?   @map("resolution_notes") @db.Text
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  user              User?     @relation("BugReporter", fields: [userId], references: [id])
+  assignee          User?     @relation("BugAssignee", fields: [assignedTo], references: [id])
+  resolver          User?     @relation("BugResolver", fields: [resolvedBy], references: [id])
+  
+  @@index([status, priority])
+  @@index([category])
+  @@index([assignedTo])
+  @@index([createdAt(sort: Desc)])
+  @@map("bug_reports")
+}
+
+// ============================================================================
+// GLOBAL SETTINGS
+// ============================================================================
+
+model GlobalSettings {
+  id                    Int      @id @default(autoincrement())
+  
+  // Commission Defaults
+  defaultCommission     Float    @default(0.15) @map("default_commission")       // 15%
+  defaultResidual       Float    @default(0.05) @map("default_residual")         // 5%
+  masterManagerFee      Float    @default(240) @map("master_manager_fee")        // $240/mo
+  
+  // Feature Toggles
+  contentStudioEnabled  Boolean  @default(true) @map("content_studio_enabled")
+  scanningEnabled       Boolean  @default(true) @map("scanning_enabled")
+  voiceCaptureEnabled   Boolean  @default(true) @map("voice_capture_enabled")
+  bugReportingEnabled   Boolean  @default(true) @map("bug_reporting_enabled")
+  
+  // Scan Settings
+  scanFrequencyDays     Int      @default(30) @map("scan_frequency_days")
+  scanCostLimit         Float    @default(100) @map("scan_cost_limit")          // $100/mo
+  
+  // Notification Settings
+  emailNotifications    Boolean  @default(true) @map("email_notifications")
+  taskAssignmentAlerts  Boolean  @default(true) @map("task_assignment_alerts")
+  scanCompleteAlerts    Boolean  @default(true) @map("scan_complete_alerts")
+  
+  // API Keys (encrypted)
+  openaiApiKey          String?  @map("openai_api_key")
+  googleApiKey          String?  @map("google_api_key")
+  semrushApiKey         String?  @map("semrush_api_key")
+  ahrefsApiKey          String?  @map("ahrefs_api_key")
+  
+  // Theme
+  defaultTheme          String   @default("light") @map("default_theme")         // "light" or "dark"
+  
+  // Metadata
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  updatedBy             Int?     @map("updated_by")
+  
+  updater               User?    @relation("SettingsUpdater", fields: [updatedBy], references: [id])
+  
+  @@map("global_settings")
 }

@@ -45,12 +45,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-sm">
-        <CardHeader className="text-center space-y-3">
+        <CardHeader className="text-center space-y-2 pb-4">
           <Image
             src="/logo.png"
             alt="GHM Digital Marketing"
-            width={180}
-            height={60}
+            width={240}
+            height={80}
             className="mx-auto"
             priority
           />

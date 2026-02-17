@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { DollarSign, User, UserCheck } from "lucide-react";
+import { DollarSign, User, UserCheck, X } from "lucide-react";
 
 interface User {
   id: number;
@@ -152,6 +152,60 @@ export function ClientCompensationSection({ clientId, users }: Props) {
     }
   };
 
+  const handleRemoveOverride = async (userId: number) => {
+    if (!data) return;
+    
+    setSaving(true);
+    try {
+      // Remove the override from the list
+      const overrides = data.compensationOverrides
+        .filter(o => o.userId !== userId)
+        .map(override => ({
+          userId: override.userId,
+          commissionAmount: override.commissionAmount,
+          residualAmount: override.residualAmount,
+          feeAmount: override.feeAmount,
+          reason: override.reason,
+        }));
+
+      const res = await fetch(`/api/clients/${clientId}/compensation`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          salesRepId: data.salesRepId,
+          masterManagerId: data.masterManagerId,
+          onboardedMonth: data.onboardedMonth
+            ? new Date(data.onboardedMonth).toISOString()
+            : null,
+          overrides: overrides.length > 0 ? overrides : undefined,
+        }),
+      });
+
+      const json = await res.json();
+      
+      if (!res.ok) throw new Error(json.error);
+      
+      toast.success("Override removed");
+      setData(json.data);
+    } catch (error) {
+      toast.error("Failed to remove override");
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Helper to get the effective fee amount for a user (override or default)
+  const getEffectiveFee = (userId: number): number | null => {
+    const override = data?.compensationOverrides.find(o => o.userId === userId);
+    if (override && override.feeAmount !== null) {
+      return override.feeAmount;
+    }
+    // Default master manager fee logic
+    if ([1, 2].includes(userId)) return 0; // Owners
+    return 240; // Default
+  };
+
   if (loading) {
     return <div className="text-sm text-muted-foreground">Loading...</div>;
   }
@@ -240,9 +294,9 @@ export function ClientCompensationSection({ clientId, users }: Props) {
           {data.masterManager && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="secondary">
-                {[1, 2].includes(data.masterManager.id) // Gavin or David (owners)
+                {getEffectiveFee(data.masterManager.id) === 0
                   ? "Owner (no payment)"
-                  : "Fee: $240/mo"}
+                  : `Fee: $${getEffectiveFee(data.masterManager.id)}/mo`}
               </Badge>
             </div>
           )}
@@ -251,11 +305,18 @@ export function ClientCompensationSection({ clientId, users }: Props) {
         {/* Compensation Overrides */}
         <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-sm font-medium">Compensation Overrides</h4>
-              <p className="text-sm text-muted-foreground">
-                Custom amounts for this specific client
-              </p>
+            <div className="flex items-center gap-2">
+              <div>
+                <h4 className="text-sm font-medium">Compensation Overrides</h4>
+                <p className="text-sm text-muted-foreground">
+                  Custom amounts for this specific client
+                </p>
+              </div>
+              {data.compensationOverrides.length > 0 && (
+                <Badge variant="outline" className="text-xs">
+                  {data.compensationOverrides.length} active
+                </Badge>
+              )}
             </div>
             <Button
               variant="outline"
@@ -274,7 +335,18 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                   key={override.userId}
                   className="p-3 border rounded-lg space-y-2"
                 >
-                  <div className="font-medium">{override.user.name}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium">{override.user.name}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                      onClick={() => handleRemoveOverride(override.userId)}
+                      disabled={saving}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     {override.commissionAmount !== null && (
                       <div>

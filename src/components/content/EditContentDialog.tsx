@@ -28,6 +28,7 @@ export function EditContentDialog({
 }: EditContentDialogProps) {
   const [title, setTitle] = useState(initialTitle || '')
   const [content, setContent] = useState(initialContent)
+  const [changeNote, setChangeNote] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSave = async () => {
@@ -37,7 +38,11 @@ export function EditContentDialog({
       const response = await fetch(`/api/content/${contentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ 
+          title, 
+          content,
+          changeNote: changeNote.trim() || 'Content updated',
+        }),
       })
 
       if (!response.ok) {
@@ -84,6 +89,19 @@ export function EditContentDialog({
               rows={15}
               className="font-mono text-sm"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="changeNote">Change Note (Optional)</Label>
+            <Input
+              id="changeNote"
+              value={changeNote}
+              onChange={(e) => setChangeNote(e.target.value)}
+              placeholder="Describe what changed (e.g., Fixed typos, Updated keywords)"
+            />
+            <p className="text-xs text-muted-foreground">
+              This note will appear in version history
+            </p>
           </div>
 
           <div className="flex gap-2 justify-end">

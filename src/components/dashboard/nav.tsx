@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import { HelpMenu } from "@/components/onboarding/help-menu";
+import { BugReportButton } from "@/components/bug-report/BugReportButton";
 
 type NavUser = {
   name: string;
@@ -24,6 +25,8 @@ const masterLinks = [
   { href: "/products", label: "Service Catalog", icon: "📦" },
   { href: "/territories", label: "Territories", icon: "🗺️" },
   { href: "/team", label: "Team", icon: "🧑‍💼" },
+  { href: "/bugs", label: "Bug Reports", icon: "🐛" },
+  { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
 const salesLinks = [
@@ -71,6 +74,11 @@ export function DashboardNav({ user }: { user: NavUser }) {
 
         <div className="mt-auto space-y-1">
           <HelpMenu />
+          <BugReportButton 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+          />
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors w-full"

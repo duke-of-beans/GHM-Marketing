@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2, Sparkles } from 'lucide-react'
 
 interface SocialMediaGeneratorProps {
   clientId: number
@@ -31,6 +32,21 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
   const [loading, setLoading] = useState(false)
   const [generated, setGenerated] = useState<GeneratedContent[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [hasVoiceProfile, setHasVoiceProfile] = useState(false)
+  const [useVoiceProfile, setUseVoiceProfile] = useState(false)
+
+  // Check for voice profile
+  useEffect(() => {
+    fetch(`/api/clients/${clientId}/voice-profile`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.profile) {
+          setHasVoiceProfile(true)
+          setUseVoiceProfile(true)
+        }
+      })
+      .catch(() => {})
+  }, [clientId])
 
   const handleGenerate = async () => {
     if (!topic.trim()) {
@@ -49,7 +65,8 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
           clientId,
           topic: topic.trim(),
           platform,
-          tone,
+          tone: useVoiceProfile ? 'client-voice' : tone,
+          useVoiceProfile,
         }),
       })
 
@@ -102,11 +119,19 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
 
         <div className="space-y-2">
           <Label htmlFor="tone">Tone</Label>
-          <Select value={tone} onValueChange={setTone}>
+          <Select value={useVoiceProfile ? 'client-voice' : tone} onValueChange={setTone} disabled={useVoiceProfile}>
             <SelectTrigger id="tone">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              {hasVoiceProfile && (
+                <SelectItem value="client-voice">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3" />
+                    Client's Voice
+                  </span>
+                </SelectItem>
+              )}
               <SelectItem value="professional">Professional</SelectItem>
               <SelectItem value="casual">Casual</SelectItem>
               <SelectItem value="friendly">Friendly</SelectItem>
@@ -116,10 +141,54 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
         </div>
       </div>
 
+      {hasVoiceProfile && (
+        <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+          <Checkbox
+            id="use-voice-social"
+            checked={useVoiceProfile}
+            onCheckedChange={(checked) => setUseVoiceProfile(checked as boolean)}
+            disabled={loading}
+          />
+          <label
+            htmlFor="use-voice-social"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center gap-1.5"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+            Use client's captured brand voice
+          </label>
+        </div>
+      )}
+
       <Button onClick={handleGenerate} disabled={loading} className="w-full">
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Generate Social Media Posts
       </Button>
+
+      {loading && (
+        <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <p className="text-sm font-medium">Crafting platform-optimized content...</p>
+          </div>
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <p className="flex items-start gap-2">
+              <span className="text-primary">✓</span>
+              <span>Analyzing {platform === 'twitter' ? 'Twitter/X' : platform.charAt(0).toUpperCase() + platform.slice(1)} best practices and character limits</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-primary">✓</span>
+              <span>Researching trending hashtags and engagement patterns</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <span className="text-primary animate-pulse">→</span>
+              <span>Creating compelling copy designed to maximize reach and engagement</span>
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground italic">
+            Generating strategic social content that resonates with your audience...
+          </p>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">

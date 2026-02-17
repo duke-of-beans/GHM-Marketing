@@ -40,7 +40,7 @@ export async function PATCH(
   try {
     const contentId = parseInt(params.id);
     const body = await request.json();
-    const { title, content } = body;
+    const { title, content, changeNote } = body;
 
     if (isNaN(contentId)) {
       return NextResponse.json(
@@ -49,12 +49,39 @@ export async function PATCH(
       );
     }
 
-    // Update the content
+    // Get current content
+    const currentContent = await prisma.clientContent.findUnique({
+      where: { id: contentId },
+    });
+
+    if (!currentContent) {
+      return NextResponse.json(
+        { error: 'Content not found' },
+        { status: 404 }
+      );
+    }
+
+    // Create version of current state before updating
+    await prisma.contentVersion.create({
+      data: {
+        contentId,
+        versionNumber: currentContent.currentVersion,
+        title: currentContent.title,
+        content: currentContent.content,
+        keywords: currentContent.keywords,
+        metadata: currentContent.metadata as any,
+        changeNote: changeNote || 'Content updated',
+        createdBy: 1, // TODO: Use session user ID
+      },
+    });
+
+    // Update the content with new version number
     const updated = await prisma.clientContent.update({
       where: { id: contentId },
       data: {
         ...(title !== undefined && { title }),
         ...(content !== undefined && { content }),
+        currentVersion: currentContent.currentVersion + 1,
       },
     });
 

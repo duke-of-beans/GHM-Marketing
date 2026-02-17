@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface BlogGeneratorProps {
   clientId: number;
@@ -19,6 +20,23 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
   const [tone, setTone] = useState("professional");
   const [wordCount, setWordCount] = useState("1200");
   const [generating, setGenerating] = useState(false);
+  const [hasVoiceProfile, setHasVoiceProfile] = useState(false);
+  const [useVoiceProfile, setUseVoiceProfile] = useState(false);
+
+  // Check if client has voice profile
+  useEffect(() => {
+    fetch(`/api/clients/${clientId}/voice-profile`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.profile) {
+          setHasVoiceProfile(true);
+          setUseVoiceProfile(true); // Auto-enable if available
+        }
+      })
+      .catch(() => {
+        // Voice profile doesn't exist, that's fine
+      });
+  }, [clientId]);
 
   async function handleGenerate() {
     if (!keywords.trim()) {
@@ -35,8 +53,9 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
           clientId,
           industry,
           keywords: keywords.split(",").map(k => k.trim()).filter(Boolean),
-          tone,
+          tone: useVoiceProfile ? "client-voice" : tone,
           wordCount: parseInt(wordCount),
+          useVoiceProfile,
         }),
       });
 
@@ -84,11 +103,23 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-sm font-medium mb-1.5 block">Tone</label>
-            <Select value={tone} onValueChange={setTone} disabled={generating}>
+            <Select 
+              value={useVoiceProfile ? "client-voice" : tone} 
+              onValueChange={setTone} 
+              disabled={generating || useVoiceProfile}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                {hasVoiceProfile && (
+                  <SelectItem value="client-voice">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkles className="h-3 w-3" />
+                      Client's Voice
+                    </span>
+                  </SelectItem>
+                )}
                 <SelectItem value="professional">Professional</SelectItem>
                 <SelectItem value="conversational">Conversational</SelectItem>
                 <SelectItem value="authoritative">Authoritative</SelectItem>
@@ -96,6 +127,12 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
                 <SelectItem value="technical">Technical</SelectItem>
               </SelectContent>
             </Select>
+            {hasVoiceProfile && useVoiceProfile && (
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                Using captured brand voice
+              </p>
+            )}
           </div>
 
           <div>
@@ -113,6 +150,24 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
             </Select>
           </div>
         </div>
+
+        {hasVoiceProfile && (
+          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+            <Checkbox
+              id="use-voice"
+              checked={useVoiceProfile}
+              onCheckedChange={(checked) => setUseVoiceProfile(checked as boolean)}
+              disabled={generating}
+            />
+            <label
+              htmlFor="use-voice"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex items-center gap-1.5"
+            >
+              <Sparkles className="h-4 w-4 text-primary" />
+              Use client's captured brand voice
+            </label>
+          </div>
+        )}
 
         <Button
           onClick={handleGenerate}
@@ -133,8 +188,32 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
         </Button>
 
         {generating && (
-          <div className="text-xs text-muted-foreground text-center p-4 bg-muted rounded">
-            This usually takes 10-20 seconds. Claude is writing SEO-optimized content for you...
+          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <p className="text-sm font-medium">Creating your blog post...</p>
+            </div>
+            <div className="space-y-2 text-xs text-muted-foreground">
+              <p className="flex items-start gap-2">
+                <span className="text-primary">✓</span>
+                <span>Researching industry trends and local market data for {industry || 'your business'}</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-primary">✓</span>
+                <span>Analyzing competitor content and identifying content gaps</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-primary">✓</span>
+                <span>Incorporating target keywords naturally while maintaining readability</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="text-primary animate-pulse">→</span>
+                <span>Writing engaging, SEO-optimized content tailored to your audience</span>
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground italic">
+              This sophisticated analysis typically takes 15-30 seconds. Your content will be ready shortly.
+            </p>
           </div>
         )}
       </CardContent>

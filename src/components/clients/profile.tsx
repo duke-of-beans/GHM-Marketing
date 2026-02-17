@@ -29,6 +29,8 @@ import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
 import { ClientCompensationSection } from "./client-compensation";
 import { ContentStudioTab } from "../content/ContentStudioTab";
+import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
+import { Mic, Sparkles } from "lucide-react";
 
 // ============================================================================
 // TYPES
@@ -232,6 +234,8 @@ export function ClientProfile({
   const [refreshKey, setRefreshKey] = useState(0);
   const handleUpdate = () => setRefreshKey(prev => prev + 1);
   const [users, setUsers] = useState<Array<{id: number; name: string; email: string; role: string}>>([]);
+  const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
+  const [voiceProfile, setVoiceProfile] = useState<any>(null);
 
   // Load users for compensation dropdown
   useEffect(() => {
@@ -244,6 +248,20 @@ export function ClientProfile({
       })
       .catch(console.error);
   }, []);
+
+  // Load voice profile if exists
+  useEffect(() => {
+    if (client.voiceProfileId) {
+      fetch(`/api/clients/${client.id}/voice-profile`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setVoiceProfile(data.profile);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [client.id, client.voiceProfileId, refreshKey]);
 
   // ---- Task status update ----
   async function updateTask(taskId: number, status: string) {
@@ -303,7 +321,31 @@ export function ClientProfile({
               <Badge variant="outline" className={`${healthColor(client.healthScore)} text-sm px-3 py-1`}>
                 Health: {client.healthScore}
               </Badge>
+              {client.voiceProfileId && (
+                <Badge variant="secondary" className="text-sm px-3 py-1 gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  Custom Voice
+                </Badge>
+              )}
               <EditClientDialog client={client} onUpdate={handleUpdate} />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setVoiceDialogOpen(true)}
+                className="gap-2"
+              >
+                {client.voiceProfileId ? (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Voice Profile
+                  </>
+                ) : (
+                  <>
+                    <Mic className="h-4 w-4" />
+                    Capture Voice
+                  </>
+                )}
+              </Button>
             </div>
             <div className="mt-2 space-y-1">
               <p className="text-base text-muted-foreground">
@@ -737,6 +779,16 @@ export function ClientProfile({
           <ClientCompensationSection clientId={client.id} users={users} />
         </TabsContent>
       </Tabs>
+
+      {/* Voice Profile Dialog */}
+      <VoiceProfileDialog
+        open={voiceDialogOpen}
+        onOpenChange={setVoiceDialogOpen}
+        clientId={client.id}
+        websiteUrl={client.lead?.website || undefined}
+        existingProfile={voiceProfile}
+        onSuccess={handleUpdate}
+      />
     </div>
   );
 }
