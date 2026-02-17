@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         domainRating: null,
         reviewCount: null,
         reviewAvg: null,
-        competitiveIntel: null,
+        // Note: competitiveIntel is a relation, not a field - it defaults to undefined
       },
     });
 
