@@ -20,7 +20,7 @@ import { z } from 'zod';
 
 const updatePermissionsSchema = z.object({
   permissionPreset: z.enum(['sales_basic', 'sales_advanced', 'master_lite', 'master_full', 'custom']).optional(),
-  permissions: z.record(z.boolean()).optional(),
+  permissions: z.record(z.string(), z.boolean()).optional(),
 });
 
 export async function POST(
