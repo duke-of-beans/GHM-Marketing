@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Decimal } from "@prisma/client/runtime/library";
 import {
-  calculateCommission,
   calculateResidual,
   getFirstDayOfMonth,
 } from "@/lib/payments/calculations";

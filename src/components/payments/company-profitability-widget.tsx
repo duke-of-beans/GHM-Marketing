@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, DollarSign, HelpCircle } from "lucide-react";
+import { TrendingUp, HelpCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import {
   Tooltip,

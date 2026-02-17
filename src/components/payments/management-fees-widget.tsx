@@ -90,7 +90,7 @@ export function ManagementFeesWidget() {
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  Your earnings as a Master Manager. You receive $240/month for each client you manage, starting in Month 1 after onboarding. Owners (David & Gavin) don't pay themselves master fees.
+                  Your earnings as a Master Manager. You receive $240/month for each client you manage, starting in Month 1 after onboarding. Owners (David & Gavin) don&apos;t pay themselves master fees.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -119,7 +119,7 @@ export function ManagementFeesWidget() {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p className="text-sm">
-                    Expected management fees for this month based on clients you're currently managing.
+                    Expected management fees for this month based on clients you&apos;re currently managing.
                   </p>
                 </TooltipContent>
               </Tooltip>
