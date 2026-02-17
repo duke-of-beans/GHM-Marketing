@@ -39,7 +39,8 @@ export default async function AnalyticsPage() {
         id: true,
         status: true,
         createdAt: true,
-        completedAt: true,
+        deployedAt: true,
+        measuredAt: true,
       },
     }),
     prisma.competitiveScan.findMany({
