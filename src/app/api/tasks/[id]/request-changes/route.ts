@@ -25,7 +25,7 @@ export async function POST(
       data: {
         clientId: task.clientId,
         taskId: task.id,
-        authorId: user.id,
+        authorId: parseInt(user.id),
         type: "task-note",
         content: `Editor feedback: ${body.feedback}`,
       },
