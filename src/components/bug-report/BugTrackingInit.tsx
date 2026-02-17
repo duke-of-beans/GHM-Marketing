@@ -34,11 +34,11 @@ export function BugTrackingInit() {
     ): Promise<Response> {
       const startTime = Date.now();
       try {
-        const response = await originalFetch(input, init);
+        const response = await originalFetch.call(this, input, init);
         
         if (!response.ok) {
           (window as any).__networkErrors.push({
-            url: typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
+            url: typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url,
             status: response.status,
             statusText: response.statusText,
             duration: Date.now() - startTime,
@@ -53,7 +53,7 @@ export function BugTrackingInit() {
         return response;
       } catch (error) {
         (window as any).__networkErrors.push({
-          url: typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
+          url: typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url,
           error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date().toISOString(),
