@@ -3,14 +3,11 @@
  * Utilities for checking user permissions
  */
 
-import { UserPermissions, UserWithPermissions, isUserPermissions } from './types';
-import { getDefaultPermissionsForRole } from './presets';
+import { UserPermissions, UserWithPermissions } from './types';
+import { SALES_BASIC_PRESET } from './presets';
 
 /**
  * Check if a user has a specific permission
- * @param user User object with permissions
- * @param permission Permission key to check
- * @returns true if user has the permission
  */
 export function hasPermission(
   user: UserWithPermissions | null | undefined,
@@ -18,19 +15,14 @@ export function hasPermission(
 ): boolean {
   if (!user) return false;
   
-  // Master-only features bypass permission system
-  if (user.role === 'master' && isMasterOnlyFeature(permission)) {
-    return true;
+  // Owner role has all permissions (except master-only features handled elsewhere)
+  if (user.role === 'master') {
+    // Masters get all permissions by default
+    return user.permissions[permission] ?? true;
   }
   
-  // Validate permissions object
-  if (!isUserPermissions(user.permissions)) {
-    console.warn('Invalid permissions object, using role defaults');
-    const defaults = getDefaultPermissionsForRole(user.role);
-    return defaults[permission];
-  }
-  
-  return user.permissions[permission] === true;
+  // Sales reps check their specific permissions
+  return user.permissions[permission] ?? false;
 }
 
 /**
@@ -40,7 +32,7 @@ export function hasAnyPermission(
   user: UserWithPermissions | null | undefined,
   permissions: (keyof UserPermissions)[]
 ): boolean {
-  return permissions.some(p => hasPermission(user, p));
+  return permissions.some(permission => hasPermission(user, permission));
 }
 
 /**
@@ -50,101 +42,95 @@ export function hasAllPermissions(
   user: UserWithPermissions | null | undefined,
   permissions: (keyof UserPermissions)[]
 ): boolean {
-  return permissions.every(p => hasPermission(user, p));
+  return permissions.every(permission => hasPermission(user, permission));
 }
 
 /**
- * Check if permission is a master-only feature
- * These never get permission toggles
- */
-function isMasterOnlyFeature(permission: keyof UserPermissions): boolean {
-  // Master-only features are NOT in the permission system
-  // They're hard-coded to role checks in the UI
-  return false;
-}
-
-/**
- * Get user's role (for backwards compatibility with role-based checks)
- */
-export function getUserRole(user: UserWithPermissions | null | undefined): 'master' | 'sales' | null {
-  return user?.role ?? null;
-}
-
-/**
- * Check if user is master (for hard-coded master features)
+ * Check if user is a master (for hard-coded master-only features)
  */
 export function isMaster(user: UserWithPermissions | null | undefined): boolean {
   return user?.role === 'master';
 }
 
 /**
- * Check if user can access Settings panel
- * Hard-coded to master role only
+ * Get safe permissions object with defaults
  */
-export function canAccessSettings(user: UserWithPermissions | null | undefined): boolean {
-  return isMaster(user);
-}
-
-/**
- * Check if user can manage compensation
- * Hard-coded to master role only
- */
-export function canManageCompensation(user: UserWithPermissions | null | undefined): boolean {
-  return isMaster(user);
-}
-
-/**
- * Check if user can manage user permissions
- * Hard-coded to master role only
- */
-export function canManageUserPermissions(user: UserWithPermissions | null | undefined): boolean {
-  return isMaster(user);
-}
-
-/**
- * Helper to build permission-aware navigation items
- */
-export function filterNavItemsByPermissions<T extends { permission?: keyof UserPermissions }>(
-  items: T[],
-  user: UserWithPermissions | null | undefined
-): T[] {
-  return items.filter(item => {
-    if (!item.permission) return true; // No permission required
-    return hasPermission(user, item.permission);
-  });
-}
-
-/**
- * Get summary of what user can do (for debugging/display)
- */
-export function getPermissionSummary(user: UserWithPermissions | null | undefined): {
-  role: string;
-  preset: string;
-  enabledPermissions: (keyof UserPermissions)[];
-  disabledPermissions: (keyof UserPermissions)[];
-} | null {
-  if (!user) return null;
-  
-  const permissions = user.permissions;
-  if (!isUserPermissions(permissions)) {
-    return null;
+export function getSafePermissions(
+  permissions: unknown
+): UserPermissions {
+  // If permissions is invalid or empty, return default
+  if (!permissions || typeof permissions !== 'object') {
+    return SALES_BASIC_PRESET;
   }
   
-  const enabled: (keyof UserPermissions)[] = [];
-  const disabled: (keyof UserPermissions)[] = [];
+  const perms = permissions as Partial<UserPermissions>;
   
-  (Object.keys(permissions) as (keyof UserPermissions)[]).forEach(key => {
-    if (permissions[key]) {
-      enabled.push(key);
-    } else {
-      disabled.push(key);
-    }
-  });
-  
+  // Return with defaults for any missing keys
   return {
-    role: user.role,
-    preset: user.permissionPreset,
-    enabledPermissions: enabled,
-    disabledPermissions: disabled,
+    canViewAllClients: perms.canViewAllClients ?? false,
+    canEditClients: perms.canEditClients ?? false,
+    canManageTasks: perms.canManageTasks ?? false,
+    canAccessContentStudio: perms.canAccessContentStudio ?? false,
+    canAccessDiscovery: perms.canAccessDiscovery ?? true,
+    canClaimAnyLead: perms.canClaimAnyLead ?? false,
+    canReassignLeads: perms.canReassignLeads ?? false,
+    canViewCompetitiveScans: perms.canViewCompetitiveScans ?? false,
+    canTriggerScans: perms.canTriggerScans ?? false,
+    canAccessVoiceCapture: perms.canAccessVoiceCapture ?? false,
+    canViewTeamAnalytics: perms.canViewTeamAnalytics ?? false,
+    canViewOthersEarnings: perms.canViewOthersEarnings ?? false,
+    canGenerateReports: perms.canGenerateReports ?? false,
+    canReportBugs: perms.canReportBugs ?? true,
+    canAccessOwnDashboard: perms.canAccessOwnDashboard ?? true,
   };
+}
+
+/**
+ * Filter users that have a specific permission
+ */
+export function filterUsersByPermission(
+  users: UserWithPermissions[],
+  permission: keyof UserPermissions
+): UserWithPermissions[] {
+  return users.filter(user => hasPermission(user, permission));
+}
+
+/**
+ * Check if user can view a specific client
+ * (either owns it, or has canViewAllClients)
+ */
+export function canViewClient(
+  user: UserWithPermissions | null | undefined,
+  clientUserId: number | null
+): boolean {
+  if (!user) return false;
+  
+  // Masters can view all clients
+  if (user.role === 'master') return true;
+  
+  // Can view all clients permission
+  if (hasPermission(user, 'canViewAllClients')) return true;
+  
+  // Can view own clients
+  return clientUserId === user.id;
+}
+
+/**
+ * Check if user can edit a specific client
+ * (either owns it, or has canEditClients for all)
+ */
+export function canEditClient(
+  user: UserWithPermissions | null | undefined,
+  clientUserId: number | null
+): boolean {
+  if (!user) return false;
+  
+  // Masters can edit all clients
+  if (user.role === 'master') return true;
+  
+  // Can edit all clients permission
+  if (hasPermission(user, 'canEditClients')) return true;
+  
+  // Can edit own clients (if they're assigned to them)
+  return clientUserId === user.id;
 }

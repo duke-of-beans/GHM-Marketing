@@ -37,21 +37,20 @@ export {
   hasPermission,
   hasAnyPermission,
   hasAllPermissions,
-  getUserRole,
   isMaster,
-  canAccessSettings,
-  canManageCompensation,
-  canManageUserPermissions,
-  filterNavItemsByPermissions,
-  getPermissionSummary,
+  getSafePermissions,
+  filterUsersByPermission,
+  canViewClient,
+  canEditClient,
 } from './checker';
 
 // Middleware (server-side)
 export {
   requirePermission,
   requireMaster,
-  requireAnyPermission,
-  requireAllPermissions,
+  checkPermission,
+  PermissionError,
+  handlePermissionError,
   withPermission,
-  withMasterOnly,
+  withMaster,
 } from './middleware';

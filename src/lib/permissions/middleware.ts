@@ -8,149 +8,114 @@ import { UserPermissions, UserWithPermissions } from './types';
 import { hasPermission, isMaster } from './checker';
 
 /**
- * Require a specific permission for an API route
- * Throws 401 if not authenticated, 403 if lacks permission
- * 
- * Usage in API route:
- * ```ts
- * const user = await getAuthenticatedUser(request);
- * requirePermission(user, 'canViewAllClients');
- * // Continue with route logic...
- * ```
+ * Require a specific permission
+ * Throws 403 if user doesn't have permission
  */
 export function requirePermission(
   user: UserWithPermissions | null | undefined,
   permission: keyof UserPermissions
 ): void {
   if (!user) {
-    throw new Error('UNAUTHORIZED');
+    throw new PermissionError('Unauthorized', 401);
   }
   
   if (!hasPermission(user, permission)) {
-    throw new Error('FORBIDDEN');
+    throw new PermissionError(
+      `Permission denied: ${permission} required`,
+      403
+    );
   }
 }
 
 /**
- * Require master role (for hard-coded master features)
+ * Require master role
+ * Use for hard-coded master-only features (settings, compensation, etc.)
  */
-export function requireMaster(user: UserWithPermissions | null | undefined): void {
+export function requireMaster(
+  user: UserWithPermissions | null | undefined
+): void {
   if (!user) {
-    throw new Error('UNAUTHORIZED');
+    throw new PermissionError('Unauthorized', 401);
   }
   
   if (!isMaster(user)) {
-    throw new Error('FORBIDDEN');
+    throw new PermissionError(
+      'Master role required',
+      403
+    );
   }
 }
 
 /**
- * Require ANY of the specified permissions
+ * Check if user has permission (returns boolean, doesn't throw)
  */
-export function requireAnyPermission(
+export function checkPermission(
   user: UserWithPermissions | null | undefined,
-  permissions: (keyof UserPermissions)[]
-): void {
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
+  permission: keyof UserPermissions
+): boolean {
+  return hasPermission(user, permission);
+}
+
+/**
+ * Custom permission error
+ */
+export class PermissionError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 403
+  ) {
+    super(message);
+    this.name = 'PermissionError';
+  }
+}
+
+/**
+ * Handle permission errors in API routes
+ */
+export function handlePermissionError(error: unknown): NextResponse {
+  if (error instanceof PermissionError) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: error.statusCode }
+    );
   }
   
-  const hasAny = permissions.some(p => hasPermission(user, p));
-  if (!hasAny) {
-    throw new Error('FORBIDDEN');
-  }
+  console.error('Unexpected error:', error);
+  return NextResponse.json(
+    { error: 'Internal server error' },
+    { status: 500 }
+  );
 }
 
 /**
- * Require ALL of the specified permissions
+ * Wrap an API handler with permission check
  */
-export function requireAllPermissions(
-  user: UserWithPermissions | null | undefined,
-  permissions: (keyof UserPermissions)[]
-): void {
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
-  }
-  
-  const hasAll = permissions.every(p => hasPermission(user, p));
-  if (!hasAll) {
-    throw new Error('FORBIDDEN');
-  }
-}
-
-/**
- * Helper to wrap permission check with proper error responses
- * 
- * Usage:
- * ```ts
- * export async function GET(request: NextRequest) {
- *   return withPermission(request, 'canViewAllClients', async (user) => {
- *     // Your route logic here
- *     return NextResponse.json({ data: '...' });
- *   });
- * }
- * ```
- */
-export async function withPermission<T>(
-  user: UserWithPermissions | null | undefined,
+export function withPermission<T>(
   permission: keyof UserPermissions,
-  handler: (user: UserWithPermissions) => Promise<T>
-): Promise<T | NextResponse> {
-  try {
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  handler: (user: UserWithPermissions, ...args: T[]) => Promise<NextResponse>
+) {
+  return async (user: UserWithPermissions | null, ...args: T[]): Promise<NextResponse> => {
+    try {
+      requirePermission(user, permission);
+      return await handler(user as UserWithPermissions, ...args);
+    } catch (error) {
+      return handlePermissionError(error);
     }
-    
-    if (!hasPermission(user, permission)) {
-      return NextResponse.json(
-        { error: 'Forbidden - insufficient permissions' },
-        { status: 403 }
-      );
-    }
-    
-    return await handler(user);
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      if (error.message === 'FORBIDDEN') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-    throw error;
-  }
+  };
 }
 
 /**
- * Helper to wrap master-only routes
+ * Wrap an API handler with master role check
  */
-export async function withMasterOnly<T>(
-  user: UserWithPermissions | null | undefined,
-  handler: (user: UserWithPermissions) => Promise<T>
-): Promise<T | NextResponse> {
-  try {
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export function withMaster<T>(
+  handler: (user: UserWithPermissions, ...args: T[]) => Promise<NextResponse>
+) {
+  return async (user: UserWithPermissions | null, ...args: T[]): Promise<NextResponse> => {
+    try {
+      requireMaster(user);
+      return await handler(user as UserWithPermissions, ...args);
+    } catch (error) {
+      return handlePermissionError(error);
     }
-    
-    if (!isMaster(user)) {
-      return NextResponse.json(
-        { error: 'Forbidden - master access required' },
-        { status: 403 }
-      );
-    }
-    
-    return await handler(user);
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'UNAUTHORIZED') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      if (error.message === 'FORBIDDEN') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-    throw error;
-  }
+  };
 }
