@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
     
     const {
       businessName,
-      contactName,
       phone,
       email,
       website,
@@ -105,7 +104,6 @@ export async function POST(request: NextRequest) {
       data: {
         leadId: lead.id,
         businessName,
-        contactName: contactName || null,
         retainerAmount,
         status: "active",
         healthScore: 50, // Default middle score

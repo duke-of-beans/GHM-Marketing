@@ -29,7 +29,6 @@ type ClientDialogProps = {
 export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogProps) {
   const [formData, setFormData] = useState({
     businessName: "",
-    contactName: "",
     phone: "",
     email: "",
     website: "",
@@ -87,7 +86,6 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
         // Reset form
         setFormData({
           businessName: "",
-          contactName: "",
           phone: "",
           email: "",
           website: "",
@@ -141,16 +139,6 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contactName">Contact Name</Label>
-                <Input
-                  id="contactName"
-                  value={formData.contactName}
-                  onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                  placeholder="John Smith"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number *</Label>
                 <Input
                   id="phone"
@@ -173,7 +161,7 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label htmlFor="website">Website</Label>
                 <Input
                   id="website"
