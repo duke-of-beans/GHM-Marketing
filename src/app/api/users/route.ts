@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       passwordHash,
       role: parsed.data.role,
       territoryId: parsed.data.territoryId ?? null,
-      permissions: defaultPermissions,
+      permissions: defaultPermissions as unknown as Prisma.InputJsonValue,
       permissionPreset: permissionPreset,
     },
     select: {
