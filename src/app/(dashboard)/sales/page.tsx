@@ -73,16 +73,23 @@ export default async function SalesDashboard() {
           value={availableInTerritory}
           subtitle="In my territory"
           className="[&_p.text-2xl]:text-blue-600 [&_p.text-3xl]:text-blue-600"
+          tooltip="Unassigned leads in your territory that are ready to be claimed. Grab these to build your pipeline!"
         />
-        <MetricCard title="My Active" value={myActive} />
+        <MetricCard 
+          title="My Active" 
+          value={myActive}
+          tooltip="Leads currently assigned to you in active sales stages (Scheduled, Contacted, Follow Up, Paperwork)."
+        />
         <MetricCard
           title="My Wins"
           value={myWon}
           className="[&_p.text-2xl]:text-green-600 [&_p.text-3xl]:text-green-600"
+          tooltip="Total number of deals you've successfully closed. Great work!"
         />
         <MetricCard
           title="My Revenue"
           value={formatCurrency(Number(myRevenue._sum.dealValueTotal ?? 0))}
+          tooltip="Total deal value from all your won clients. This drives your commission and residuals!"
         />
       </div>
 

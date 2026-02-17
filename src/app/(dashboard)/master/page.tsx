@@ -68,21 +68,28 @@ export default async function MasterDashboard() {
 
       {/* Top metrics row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <MetricCard title="Total Leads" value={metrics.totalLeads} />
+        <MetricCard 
+          title="Total Leads" 
+          value={metrics.totalLeads}
+          tooltip="Total number of leads in the system across all territories and statuses."
+        />
         <MetricCard
           title="Active Pipeline"
           value={metrics.activeLeads}
           subtitle={`${metrics.conversionRate}% conversion`}
+          tooltip="Leads currently in active sales stages (Scheduled, Contacted, Follow Up, Paperwork). Conversion rate = Won / (Won + Lost)."
         />
         <MetricCard
           title="Won Deals"
           value={metrics.wonDeals}
           className="[&_p.text-2xl]:text-green-600 [&_p.text-3xl]:text-green-600"
+          tooltip="Total number of successfully closed deals that converted to active clients."
         />
         <MetricCard
           title="MRR"
           value={formatCurrency(metrics.totalMRR)}
           subtitle={`ARR ${formatCurrency(metrics.totalARR)}`}
+          tooltip="Monthly Recurring Revenue from all active clients. ARR = Annual Run Rate (MRR × 12)."
         />
       </div>
 
