@@ -18,16 +18,27 @@ export default async function ClientDetailPage({
   if (!client) notFound();
 
   // Serialize Prisma types (Decimal, Date) and ensure safe defaults
-  const serialized = JSON.parse(JSON.stringify(client));
+  // Convert Decimals to numbers explicitly to avoid JSON serialization issues
+  const serialized = {
+    ...client,
+    retainerAmount: Number(client.retainerAmount),
+    lead: client.lead ? {
+      ...client.lead,
+      reviewAvg: client.lead.reviewAvg ? Number(client.lead.reviewAvg) : null,
+    } : null,
+  };
+
+  // Parse dates and other JSON-safe conversions
+  const safeSerialized = JSON.parse(JSON.stringify(serialized));
 
   // Guard: ensure required arrays exist (defensive against partial data)
-  serialized.competitors = serialized.competitors || [];
-  serialized.domains = serialized.domains || [];
-  serialized.tasks = serialized.tasks || [];
-  serialized.notes = serialized.notes || [];
-  serialized.scans = serialized.scans || [];
-  serialized.reports = serialized.reports || [];
-  serialized.upsellOpportunities = serialized.upsellOpportunities || [];
+  safeSerialized.competitors = safeSerialized.competitors || [];
+  safeSerialized.domains = safeSerialized.domains || [];
+  safeSerialized.tasks = safeSerialized.tasks || [];
+  safeSerialized.notes = safeSerialized.notes || [];
+  safeSerialized.scans = safeSerialized.scans || [];
+  safeSerialized.reports = safeSerialized.reports || [];
+  safeSerialized.upsellOpportunities = safeSerialized.upsellOpportunities || [];
 
   return (
     <div className="space-y-4 pb-20 md:pb-0">
@@ -38,7 +49,7 @@ export default async function ClientDetailPage({
         <span>/</span>
         <span className="text-foreground">{client.businessName}</span>
       </div>
-      <ClientProfile client={serialized} />
+      <ClientProfile client={safeSerialized} />
     </div>
   );
 }

@@ -269,8 +269,8 @@ export function ClientProfile({
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {client.lead.city}, {client.lead.state}
-            {client.lead.website && (
+            {client.lead?.city && client.lead?.state && `${client.lead.city}, ${client.lead.state}`}
+            {client.lead?.website && (
               <>
                 {" · "}
                 <a
@@ -287,7 +287,11 @@ export function ClientProfile({
                 </a>
               </>
             )}
-            {" · "}{client.lead.phone}
+            {client.lead?.phone && (
+              <>
+                {" · "}{client.lead.phone}
+              </>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">

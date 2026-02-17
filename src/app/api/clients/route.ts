@@ -92,10 +92,15 @@ export async function POST(request: NextRequest) {
         website: website || null,
         city,
         state,
-        zipCode: zipCode || null,
+        zipCode: zipCode || "", // Empty string instead of null
         status: "won", // Mark as won since we're creating a client
         dealValueTotal: retainerAmount,
         leadSourceId: leadSource.id,
+        // Set defaults for fields expected by detail page
+        domainRating: null,
+        reviewCount: null,
+        reviewAvg: null,
+        competitiveIntel: null,
       },
     });
 
