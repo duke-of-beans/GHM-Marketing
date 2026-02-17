@@ -34,6 +34,7 @@ const allLinks: NavLink[] = [
   { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
   { href: "/territories", label: "Territories", icon: "🗺️", permission: "manage_territories" },
   { href: "/team", label: "Team", icon: "🧑‍💼", permission: "manage_team" },
+  { href: "/audit", label: "Audit Logs", icon: "🔒", permission: "manage_settings" },
   { href: "/bugs", label: "Bug Reports", icon: "🐛" }, // Available to all
   { href: "/settings", label: "Settings", icon: "⚙️", permission: "manage_settings" },
 ];

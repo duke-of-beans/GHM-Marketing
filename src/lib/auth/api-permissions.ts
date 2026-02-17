@@ -2,15 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getUserPermissions, PermissionKey } from "./permissions";
+import { logPermissionCheck } from "@/lib/audit-log";
 
 /**
- * API middleware to check permissions
+ * API middleware to check permissions with audit logging
  * Use in API routes to enforce permission-based access
  */
 export async function withPermission(
   req: NextRequest,
   requiredPermission: PermissionKey
 ): Promise<NextResponse | null> {
+  const startTime = Date.now();
+  
   try {
     const session = await auth();
 
@@ -26,6 +29,8 @@ export async function withPermission(
       where: { id: parseInt(session.user.id) },
       select: {
         id: true,
+        name: true,
+        email: true,
         role: true,
         permissions: true,
         permissionPreset: true,
@@ -45,7 +50,22 @@ export async function withPermission(
       permissionPreset: user.permissionPreset,
     });
 
-    if (!permissions[requiredPermission]) {
+    const granted = permissions[requiredPermission] === true;
+    
+    // Audit log the permission check
+    await logPermissionCheck({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      userRole: user.role,
+      permission: requiredPermission,
+      resource: req.nextUrl.pathname,
+      granted,
+      ipAddress: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || undefined,
+      userAgent: req.headers.get("user-agent") || undefined,
+    });
+
+    if (!granted) {
       return NextResponse.json(
         {
           error: "Forbidden",
