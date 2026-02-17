@@ -127,6 +127,17 @@ type ClientData = {
   notes: ClientNote[];
   scans: Scan[];
   reports: { id: number; type: string; periodStart: string; periodEnd: string; createdAt: string }[];
+  upsellOpportunities?: Array<{
+    id: number;
+    productId: number;
+    product: { name: string; category: string | null };
+    gapCategory: string;
+    opportunityScore: number;
+    reasoning: string;
+    projectedMrr: string;
+    projectedRoi: string | null;
+    status: string;
+  }>;
 };
 
 // ============================================================================
