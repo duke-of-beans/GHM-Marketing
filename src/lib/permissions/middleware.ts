@@ -12,14 +12,16 @@ import { hasPermission, isMaster } from './checker';
  * Throws 403 if user doesn't have permission
  */
 export function requirePermission(
-  user: UserWithPermissions | null | undefined,
+  user: Partial<UserWithPermissions> | null | undefined,
   permission: keyof UserPermissions
 ): void {
   if (!user) {
     throw new PermissionError('Unauthorized', 401);
   }
   
-  if (!hasPermission(user, permission)) {
+  // If user doesn't have permissions field (e.g., from session), deny access
+  // API routes should fetch full user if permission checks needed
+  if (!user.permissions || !hasPermission(user as UserWithPermissions, permission)) {
     throw new PermissionError(
       `Permission denied: ${permission} required`,
       403
@@ -32,13 +34,13 @@ export function requirePermission(
  * Use for hard-coded master-only features (settings, compensation, etc.)
  */
 export function requireMaster(
-  user: UserWithPermissions | null | undefined
+  user: { role?: string } | null | undefined
 ): void {
   if (!user) {
     throw new PermissionError('Unauthorized', 401);
   }
   
-  if (!isMaster(user)) {
+  if (user.role !== 'master') {
     throw new PermissionError(
       'Master role required',
       403
@@ -50,10 +52,11 @@ export function requireMaster(
  * Check if user has permission (returns boolean, doesn't throw)
  */
 export function checkPermission(
-  user: UserWithPermissions | null | undefined,
+  user: Partial<UserWithPermissions> | null | undefined,
   permission: keyof UserPermissions
 ): boolean {
-  return hasPermission(user, permission);
+  if (!user?.permissions) return false;
+  return hasPermission(user as UserWithPermissions, permission);
 }
 
 /**
@@ -92,12 +95,12 @@ export function handlePermissionError(error: unknown): NextResponse {
  */
 export function withPermission<T>(
   permission: keyof UserPermissions,
-  handler: (user: UserWithPermissions, ...args: T[]) => Promise<NextResponse>
+  handler: (user: any, ...args: T[]) => Promise<NextResponse>
 ) {
-  return async (user: UserWithPermissions | null, ...args: T[]): Promise<NextResponse> => {
+  return async (user: any, ...args: T[]): Promise<NextResponse> => {
     try {
       requirePermission(user, permission);
-      return await handler(user as UserWithPermissions, ...args);
+      return await handler(user, ...args);
     } catch (error) {
       return handlePermissionError(error);
     }
@@ -108,12 +111,12 @@ export function withPermission<T>(
  * Wrap an API handler with master role check
  */
 export function withMaster<T>(
-  handler: (user: UserWithPermissions, ...args: T[]) => Promise<NextResponse>
+  handler: (user: any, ...args: T[]) => Promise<NextResponse>
 ) {
-  return async (user: UserWithPermissions | null, ...args: T[]): Promise<NextResponse> => {
+  return async (user: any, ...args: T[]): Promise<NextResponse> => {
     try {
       requireMaster(user);
-      return await handler(user as UserWithPermissions, ...args);
+      return await handler(user, ...args);
     } catch (error) {
       return handlePermissionError(error);
     }
