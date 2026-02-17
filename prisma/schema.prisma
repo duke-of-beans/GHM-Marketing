@@ -27,6 +27,13 @@ model User {
   stageMetrics   StageMetrics[]
   territory      Territory?       @relation(fields: [territoryId], references: [id])
   workOrders     WorkOrder[]
+  
+  // Commission system relations
+  compensationConfig    UserCompensationConfig?
+  compensationOverrides ClientCompensationOverride[]
+  paymentTransactions   PaymentTransaction[]
+  salesRepClients       ClientProfile[] @relation("SalesRep")
+  masterClients         ClientProfile[] @relation("MasterManager")
 
   @@index([territoryId])
   @@map("users")
@@ -301,6 +308,12 @@ model ClientProfile {
   onboardedAt         DateTime             @default(now()) @map("onboarded_at")
   lastScanAt          DateTime?            @map("last_scan_at")
   nextScanAt          DateTime?            @map("next_scan_at")
+  
+  // Commission system fields
+  salesRepId      Int?     @map("sales_rep_id")
+  masterManagerId Int?     @map("master_manager_id")
+  onboardedMonth  DateTime? @map("onboarded_month") @db.Date
+  
   competitors         ClientCompetitor[]
   domains             ClientDomain[]
   notes               ClientNote[]
@@ -309,6 +322,12 @@ model ClientProfile {
   tasks               ClientTask[]
   scans               CompetitiveScan[]
   upsellOpportunities UpsellOpportunity[]
+  
+  // Commission system relations
+  salesRep             User?    @relation("SalesRep", fields: [salesRepId], references: [id])
+  masterManager        User?    @relation("MasterManager", fields: [masterManagerId], references: [id])
+  compensationOverrides ClientCompensationOverride[]
+  paymentTransactions   PaymentTransaction[]
 
   @@map("client_profiles")
 }
@@ -487,6 +506,81 @@ model UpsellOpportunity {
   @@index([status])
   @@index([opportunityScore(sort: Desc)])
   @@map("upsell_opportunities")
+}
+
+// ============================================================================
+// COMMISSION SYSTEM TABLES
+// ============================================================================
+
+model UserCompensationConfig {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique @map("user_id")
+  
+  // Commission settings
+  commissionEnabled  Boolean  @default(true) @map("commission_enabled")
+  commissionAmount   Decimal  @default(1000) @map("commission_amount") @db.Decimal(10, 2)
+  
+  // Residual settings
+  residualEnabled    Boolean  @default(true) @map("residual_enabled")
+  residualAmount     Decimal  @default(200) @map("residual_amount") @db.Decimal(10, 2)
+  residualStartMonth Int      @default(2) @map("residual_start_month")
+  
+  // Master manager settings (for masters only)
+  masterFeeEnabled   Boolean  @default(false) @map("master_fee_enabled")
+  masterFeeAmount    Decimal  @default(240) @map("master_fee_amount") @db.Decimal(10, 2)
+  
+  notes              String?
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_compensation_config")
+}
+
+model ClientCompensationOverride {
+  id                Int      @id @default(autoincrement())
+  clientId          Int      @map("client_id")
+  userId            Int      @map("user_id")
+  
+  // Override settings (null = use user default)
+  commissionAmount  Decimal? @map("commission_amount") @db.Decimal(10, 2)
+  residualAmount    Decimal? @map("residual_amount") @db.Decimal(10, 2)
+  
+  reason            String?  // Why this client is different
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([clientId, userId])
+  @@map("client_compensation_overrides")
+}
+
+model PaymentTransaction {
+  id              Int      @id @default(autoincrement())
+  clientId        Int      @map("client_id")
+  userId          Int      @map("user_id")
+  
+  type            String   // "commission" | "residual" | "master_fee"
+  amount          Decimal  @db.Decimal(10, 2)
+  month           DateTime @db.Date
+  
+  status          String   @default("pending") // "pending" | "paid" | "held" | "cancelled"
+  paidAt          DateTime? @map("paid_at")
+  notes           String?
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, month])
+  @@index([clientId, month])
+  @@index([status])
+  @@map("payment_transactions")
 }
 
 enum UserRole {
