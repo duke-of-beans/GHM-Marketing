@@ -174,11 +174,11 @@ export function ClientCompensationSection({ clientId, users }: Props) {
             Sales Rep
           </Label>
           <Select
-            value={data.salesRepId?.toString() || ""}
+            value={data.salesRepId?.toString() || "none"}
             onValueChange={(value) =>
               setData({
                 ...data,
-                salesRepId: value ? parseInt(value) : null,
+                salesRepId: value === "none" ? null : parseInt(value),
               })
             }
           >
@@ -186,7 +186,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
               <SelectValue placeholder="No sales rep assigned" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.id.toString()}>
                   {user.name} ({user.role})
@@ -210,11 +210,11 @@ export function ClientCompensationSection({ clientId, users }: Props) {
             Master Manager
           </Label>
           <Select
-            value={data.masterManagerId?.toString() || ""}
+            value={data.masterManagerId?.toString() || "none"}
             onValueChange={(value) =>
               setData({
                 ...data,
-                masterManagerId: value ? parseInt(value) : null,
+                masterManagerId: value === "none" ? null : parseInt(value),
               })
             }
           >
@@ -222,7 +222,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
               <SelectValue placeholder="No master manager assigned" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {users
                 .filter((u) => u.role === "master")
                 .map((user) => (
@@ -299,15 +299,16 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                 <div className="space-y-2">
                   <Label htmlFor="override-user">User</Label>
                   <Select
-                    value={overrideUserId?.toString() || ""}
+                    value={overrideUserId?.toString() || "none"}
                     onValueChange={(value) =>
-                      setOverrideUserId(value ? parseInt(value) : null)
+                      setOverrideUserId(value === "none" ? null : parseInt(value))
                     }
                   >
                     <SelectTrigger id="override-user">
                       <SelectValue placeholder="Select user..." />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {users.map((user) => (
                         <SelectItem key={user.id} value={user.id.toString()}>
                           {user.name}
