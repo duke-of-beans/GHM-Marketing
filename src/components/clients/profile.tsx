@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,6 +27,7 @@ import { ScanHistory } from "./scan-history";
 import { ClientReportsTab } from "./reports/client-reports-tab";
 import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
+import { ClientCompensationSection } from "./client-compensation";
 
 // ============================================================================
 // TYPES
@@ -212,6 +213,19 @@ export function ClientProfile({
   const [notes, setNotes] = useState<ClientNote[]>(client.notes);
   const [refreshKey, setRefreshKey] = useState(0);
   const handleUpdate = () => setRefreshKey(prev => prev + 1);
+  const [users, setUsers] = useState<Array<{id: number; name: string; email: string; role: string}>>([]);
+
+  // Load users for compensation dropdown
+  useEffect(() => {
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setUsers(data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   // ---- Task status update ----
   async function updateTask(taskId: number, status: string) {
@@ -356,6 +370,7 @@ export function ClientProfile({
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="compensation">Compensation</TabsTrigger>
         </TabsList>
 
         {/* TAB 1: COMPETITIVE SCORECARD */}
@@ -671,6 +686,11 @@ export function ClientProfile({
               content: r.content,
             }))}
           />
+        </TabsContent>
+
+        {/* TAB 6: COMPENSATION */}
+        <TabsContent value="compensation" className="space-y-4">
+          <ClientCompensationSection clientId={client.id} users={users} />
         </TabsContent>
       </Tabs>
     </div>

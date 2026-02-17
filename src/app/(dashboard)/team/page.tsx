@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { CompensationConfigSection } from "@/components/team/compensation-config";
 
 type Territory = { id: number; name: string };
 
@@ -314,6 +315,9 @@ export default function TeamPage() {
           ))
         )}
       </div>
+
+      {/* Compensation Configuration */}
+      <CompensationConfigSection users={users} />
     </div>
   );
 }
