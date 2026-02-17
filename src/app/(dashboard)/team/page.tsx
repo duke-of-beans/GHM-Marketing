@@ -3,8 +3,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { CompensationConfigSection } from "@/components/team/compensation-config";
 
 type Territory = { id: number; name: string };
 
@@ -28,12 +43,34 @@ type UserForm = {
   territoryId: number | null;
 };
 
+type CompensationConfig = {
+  commissionEnabled: boolean;
+  commissionAmount: number;
+  residualEnabled: boolean;
+  residualAmount: number;
+  residualStartMonth: number;
+  masterFeeEnabled: boolean;
+  masterFeeAmount: number;
+  notes: string | null;
+};
+
 const emptyForm: UserForm = {
   name: "",
   email: "",
   password: "",
   role: "sales",
   territoryId: null,
+};
+
+const defaultCompensation: CompensationConfig = {
+  commissionEnabled: true,
+  commissionAmount: 1000,
+  residualEnabled: true,
+  residualAmount: 200,
+  residualStartMonth: 2,
+  masterFeeEnabled: true,
+  masterFeeAmount: 240,
+  notes: null,
 };
 
 export default function TeamPage() {
@@ -43,6 +80,7 @@ export default function TeamPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<UserForm>(emptyForm);
+  const [compensation, setCompensation] = useState<CompensationConfig>(defaultCompensation);
   const [saving, setSaving] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -102,10 +140,25 @@ export default function TeamPage() {
 
       const data = await res.json();
       if (data.success) {
+        const userId = editingId || data.data.id;
+        
+        // Save compensation config
+        try {
+          await fetch(`/api/users/${userId}/compensation`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(compensation),
+          });
+        } catch (compError) {
+          console.error("Failed to save compensation:", compError);
+          toast.error("User saved but compensation failed to update");
+        }
+        
         toast.success(editingId ? "User updated" : "User created");
         setShowForm(false);
         setEditingId(null);
         setForm(emptyForm);
+        setCompensation(defaultCompensation);
         fetchData();
       } else {
         toast.error(data.error || "Failed to save");
@@ -117,7 +170,7 @@ export default function TeamPage() {
     }
   };
 
-  const handleEdit = (user: UserRecord) => {
+  const handleEdit = async (user: UserRecord) => {
     setEditingId(user.id);
     setForm({
       name: user.name,
@@ -127,6 +180,18 @@ export default function TeamPage() {
       territoryId: user.territoryId,
     });
     setShowForm(true);
+    
+    // Load compensation config
+    try {
+      const res = await fetch(`/api/users/${user.id}/compensation`);
+      const json = await res.json();
+      if (res.ok && json.data) {
+        setCompensation(json.data);
+      }
+    } catch (error) {
+      console.error("Failed to load compensation:", error);
+      setCompensation(defaultCompensation);
+    }
   };
 
   const handleDeactivate = async (id: number) => {
@@ -164,6 +229,7 @@ export default function TeamPage() {
             setShowForm(!showForm);
             setEditingId(null);
             setForm(emptyForm);
+            setCompensation(defaultCompensation);
           }}
         >
           {showForm ? "Cancel" : "+ Add Rep"}
@@ -176,83 +242,236 @@ export default function TeamPage() {
             {editingId ? "Edit User" : "New User"}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm text-muted-foreground">Name *</label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="John Smith"
-              />
-            </div>
-            {!editingId && (
-              <div>
-                <label className="text-sm text-muted-foreground">Email *</label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="john@ghmmarketing.com"
-                />
-              </div>
-            )}
-            {editingId && (
-              <div>
-                <label className="text-sm text-muted-foreground">Email</label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-              </div>
-            )}
-            <div>
-              <label className="text-sm text-muted-foreground">
-                {editingId ? "New Password (leave blank to keep)" : "Password *"}
-              </label>
-              <Input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={editingId ? "••••••••" : "Min 8 characters"}
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground">Role</label>
-              <select
-                className="w-full h-9 px-2 text-sm border rounded bg-background"
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value })}
-              >
-                <option value="sales">Sales Rep</option>
-                <option value="master">Master</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground">Territory</label>
-              <select
-                className="w-full h-9 px-2 text-sm border rounded bg-background"
-                value={form.territoryId ?? ""}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    territoryId: e.target.value
-                      ? Number(e.target.value)
-                      : null,
-                  })
-                }
-              >
-                <option value="">No territory</option>
-                {territories.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="compensation">Compensation</TabsTrigger>
+            </TabsList>
 
-          <Button onClick={handleSave} disabled={saving}>
+            {/* BASIC INFO TAB */}
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm text-muted-foreground">Name *</label>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="John Smith"
+                  />
+                </div>
+                {!editingId && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Email *</label>
+                    <Input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      placeholder="john@ghmmarketing.com"
+                    />
+                  </div>
+                )}
+                {editingId && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Email</label>
+                    <Input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="text-sm text-muted-foreground">
+                    {editingId ? "New Password (leave blank to keep)" : "Password *"}
+                  </label>
+                  <Input
+                    type="password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    placeholder={editingId ? "••••••••" : "Min 8 characters"}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Role</label>
+                  <select
+                    className="w-full h-9 px-2 text-sm border rounded bg-background"
+                    value={form.role}
+                    onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  >
+                    <option value="sales">Sales Rep</option>
+                    <option value="master">Master</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Territory</label>
+                  <select
+                    className="w-full h-9 px-2 text-sm border rounded bg-background"
+                    value={form.territoryId ?? ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        territoryId: e.target.value
+                          ? Number(e.target.value)
+                          : null,
+                      })
+                    }
+                  >
+                    <option value="">No territory</option>
+                    {territories.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* COMPENSATION TAB */}
+            <TabsContent value="compensation" className="space-y-4">
+              {/* Commission Settings */}
+              <div className="space-y-3 p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="commission-enabled">Commission at Close</Label>
+                    <p className="text-xs text-muted-foreground">One-time payment when deal closes</p>
+                  </div>
+                  <Switch
+                    id="commission-enabled"
+                    checked={compensation.commissionEnabled}
+                    onCheckedChange={(checked) =>
+                      setCompensation({ ...compensation, commissionEnabled: checked })
+                    }
+                  />
+                </div>
+                {compensation.commissionEnabled && (
+                  <div>
+                    <Label htmlFor="commission-amount">Amount ($)</Label>
+                    <Input
+                      id="commission-amount"
+                      type="number"
+                      min="0"
+                      step="100"
+                      value={compensation.commissionAmount}
+                      onChange={(e) =>
+                        setCompensation({
+                          ...compensation,
+                          commissionAmount: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Residual Settings */}
+              <div className="space-y-3 p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="residual-enabled">Monthly Residual</Label>
+                    <p className="text-xs text-muted-foreground">Recurring payment each month</p>
+                  </div>
+                  <Switch
+                    id="residual-enabled"
+                    checked={compensation.residualEnabled}
+                    onCheckedChange={(checked) =>
+                      setCompensation({ ...compensation, residualEnabled: checked })
+                    }
+                  />
+                </div>
+                {compensation.residualEnabled && (
+                  <>
+                    <div>
+                      <Label htmlFor="residual-amount">Monthly Amount ($)</Label>
+                      <Input
+                        id="residual-amount"
+                        type="number"
+                        min="0"
+                        step="50"
+                        value={compensation.residualAmount}
+                        onChange={(e) =>
+                          setCompensation({
+                            ...compensation,
+                            residualAmount: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="residual-start">Start Month</Label>
+                      <Input
+                        id="residual-start"
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={compensation.residualStartMonth}
+                        onChange={(e) =>
+                          setCompensation({
+                            ...compensation,
+                            residualStartMonth: parseInt(e.target.value) || 2,
+                          })
+                        }
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Month 1 = onboarding month
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Master Fee Settings */}
+              <div className="space-y-3 p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="master-fee-enabled">Master Management Fee</Label>
+                    <p className="text-xs text-muted-foreground">Monthly fee for managing accounts</p>
+                  </div>
+                  <Switch
+                    id="master-fee-enabled"
+                    checked={compensation.masterFeeEnabled}
+                    onCheckedChange={(checked) =>
+                      setCompensation({ ...compensation, masterFeeEnabled: checked })
+                    }
+                  />
+                </div>
+                {compensation.masterFeeEnabled && (
+                  <div>
+                    <Label htmlFor="master-fee-amount">Monthly Fee ($)</Label>
+                    <Input
+                      id="master-fee-amount"
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={compensation.masterFeeAmount}
+                      onChange={(e) =>
+                        setCompensation({
+                          ...compensation,
+                          masterFeeAmount: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label htmlFor="comp-notes">Notes</Label>
+                <Textarea
+                  id="comp-notes"
+                  placeholder="Special compensation arrangements, exceptions, etc."
+                  value={compensation.notes || ""}
+                  onChange={(e) =>
+                    setCompensation({ ...compensation, notes: e.target.value || null })
+                  }
+                  rows={3}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <Button onClick={handleSave} disabled={saving} className="w-full">
             {saving
               ? "Saving..."
               : editingId
@@ -315,9 +534,6 @@ export default function TeamPage() {
           ))
         )}
       </div>
-
-      {/* Compensation Configuration */}
-      <CompensationConfigSection users={users} />
     </div>
   );
 }
