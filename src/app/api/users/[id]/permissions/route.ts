@@ -144,7 +144,7 @@ export async function GET(
     
     // Masters can view anyone's permissions
     // Sales reps can only view their own
-    if (user.role !== 'master' && user.id !== userId) {
+    if (user.role !== 'master' && parseInt(user.id as string) !== userId) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
