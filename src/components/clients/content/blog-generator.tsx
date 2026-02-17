@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,7 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
         }
       })
       .catch(() => {
-        // Voice profile doesn't exist, that's fine
+        // Voice profile doesn&apos;t exist, that's fine
       });
   }, [clientId]);
 
@@ -116,7 +116,7 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
                   <SelectItem value="client-voice">
                     <span className="flex items-center gap-1.5">
                       <Sparkles className="h-3 w-3" />
-                      Client's Voice
+                      Client&apos;s Voice
                     </span>
                   </SelectItem>
                 )}
@@ -220,3 +220,4 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
     </Card>
   );
 }
+

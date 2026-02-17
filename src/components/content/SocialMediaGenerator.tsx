@@ -128,7 +128,7 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
                 <SelectItem value="client-voice">
                   <span className="flex items-center gap-1.5">
                     <Sparkles className="h-3 w-3" />
-                    Client's Voice
+                    Client&apos;s Voice
                   </span>
                 </SelectItem>
               )}
