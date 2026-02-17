@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
-import { Loader2, FileText, Share2, Hash, ExternalLink } from 'lucide-react'
+import { Loader2, FileText, Share2, Hash, ExternalLink, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,6 +12,18 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { EditContentDialog } from './EditContentDialog'
+import { toast } from 'sonner'
 
 interface ContentListProps {
   clientId: number
@@ -31,6 +43,9 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
   const [content, setContent] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
 
   const loadContent = async () => {
     setLoading(true)
@@ -55,6 +70,31 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
   useEffect(() => {
     loadContent()
   }, [clientId, refreshTrigger])
+
+  const handleDelete = async () => {
+    if (!selectedContent) return
+
+    try {
+      const response = await fetch(`/api/content/${selectedContent.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete content')
+      }
+
+      toast.success('Content deleted successfully')
+      setContent(prev => prev.filter(item => item.id !== selectedContent.id))
+      setDeleteDialogOpen(false)
+      setSelectedContent(null)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete content')
+    }
+  }
+
+  const handleEditSuccess = () => {
+    loadContent()
+  }
 
   const getIcon = (contentType: string) => {
     switch (contentType) {
@@ -175,6 +215,29 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
                     >
                       Copy Content
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedContent(item)
+                        setEditDialogOpen(true)
+                      }}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedContent(item)
+                        setDeleteDialogOpen(true)
+                      }}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -182,6 +245,39 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
           )
         })}
       </div>
+
+      {/* Edit Dialog */}
+      {selectedContent && (
+        <EditContentDialog
+          contentId={selectedContent.id}
+          initialTitle={selectedContent.title}
+          initialContent={selectedContent.content}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Content</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this content? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { BlogGenerator } from '../clients/content/blog-generator'
 import { SocialMediaGenerator } from './SocialMediaGenerator'
 import { MetaDescriptionGenerator } from './MetaDescriptionGenerator'
 import { ContentList } from './ContentList'
+import { ContentCalendar } from './ContentCalendar'
 
 interface ContentStudioTabProps {
   clientId: number
@@ -32,6 +33,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
         <TabsList>
           <TabsTrigger value="generate">Generate Content</TabsTrigger>
           <TabsTrigger value="library">Content Library</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="generate">
@@ -92,6 +94,10 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="calendar">
+          <ContentCalendar clientId={clientId} />
         </TabsContent>
       </Tabs>
     </div>
