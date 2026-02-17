@@ -28,6 +28,7 @@ import { ClientReportsTab } from "./reports/client-reports-tab";
 import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
 import { ClientCompensationSection } from "./client-compensation";
+import { ContentStudioTab } from "../content/ContentStudioTab";
 
 // ============================================================================
 // TYPES
@@ -406,6 +407,7 @@ export function ClientProfile({
           </TabsTrigger>
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="content">Content Studio</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
         </TabsList>
@@ -709,7 +711,12 @@ export function ClientProfile({
           </div>
         </TabsContent>
 
-        {/* TAB 5: REPORTS */}
+        {/* TAB 5: CONTENT STUDIO */}
+        <TabsContent value="content" className="space-y-4">
+          <ContentStudioTab clientId={client.id} />
+        </TabsContent>
+
+        {/* TAB 6: REPORTS */}
         <TabsContent value="reports" className="space-y-4">
           <ClientReportsTab
             clientId={client.id}
@@ -725,7 +732,7 @@ export function ClientProfile({
           />
         </TabsContent>
 
-        {/* TAB 6: COMPENSATION */}
+        {/* TAB 7: COMPENSATION */}
         <TabsContent value="compensation" className="space-y-4">
           <ClientCompensationSection clientId={client.id} users={users} />
         </TabsContent>
