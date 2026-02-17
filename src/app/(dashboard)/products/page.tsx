@@ -19,9 +19,9 @@ export default async function ProductsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Product Catalog</h1>
+        <h1 className="text-3xl font-bold">Service Catalog</h1>
         <p className="text-muted-foreground mt-1">
-          Manage your service offerings and pricing for upsell recommendations
+          Manage your SEO service offerings, pricing, and package details
         </p>
       </div>
 

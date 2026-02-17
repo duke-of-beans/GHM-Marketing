@@ -27,9 +27,9 @@ export default async function ReviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Content Review Queue</h1>
+        <h1 className="text-2xl font-bold">Content Review</h1>
         <p className="text-sm text-muted-foreground">
-          {tasksInReview.length} {tasksInReview.length === 1 ? "task" : "tasks"} awaiting review
+          Review and approve content drafts before they go live for clients — {tasksInReview.length} {tasksInReview.length === 1 ? "task" : "tasks"} awaiting review
         </p>
       </div>
 

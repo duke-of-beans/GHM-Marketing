@@ -15,19 +15,19 @@ type NavUser = {
 
 const masterLinks = [
   { href: "/master", label: "Dashboard", icon: "📊" },
-  { href: "/discovery", label: "Discovery", icon: "🔍" },
-  { href: "/leads", label: "Leads", icon: "👥" },
-  { href: "/clients", label: "Clients", icon: "🏢" },
-  { href: "/review", label: "Review", icon: "✍️" },
+  { href: "/discovery", label: "Find Leads", icon: "🔍" },
+  { href: "/leads", label: "Sales Pipeline", icon: "👥" },
+  { href: "/clients", label: "Client Portfolio", icon: "🏢" },
+  { href: "/review", label: "Content Review", icon: "✍️" },
   { href: "/analytics", label: "Analytics", icon: "📈" },
-  { href: "/products", label: "Products", icon: "📦" },
+  { href: "/products", label: "Service Catalog", icon: "📦" },
   { href: "/territories", label: "Territories", icon: "🗺️" },
   { href: "/team", label: "Team", icon: "🧑‍💼" },
 ];
 
 const salesLinks = [
   { href: "/sales", label: "Dashboard", icon: "📊" },
-  { href: "/leads", label: "Leads", icon: "👥" },
+  { href: "/leads", label: "Sales Pipeline", icon: "👥" },
 ];
 
 export function DashboardNav({ user }: { user: NavUser }) {

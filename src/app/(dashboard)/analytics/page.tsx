@@ -80,9 +80,9 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Analytics</h1>
+        <h1 className="text-3xl font-bold">Business Analytics</h1>
         <p className="text-muted-foreground mt-1">
-          Revenue forecasting, conversion tracking, and performance metrics
+          Revenue performance, pipeline health, and growth forecasting at a glance
         </p>
       </div>
 

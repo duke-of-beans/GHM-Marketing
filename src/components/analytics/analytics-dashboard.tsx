@@ -3,6 +3,13 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Tooltip as InfoTooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
+import {
   LineChart,
   Line,
   BarChart,
@@ -32,14 +39,27 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const metrics = useMemo(() => calculateMetrics(data), [data]);
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Monthly Recurring Revenue
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Monthly Recurring Revenue
+              </CardTitle>
+              <InfoTooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Total monthly recurring revenue from active client retainers. ARR (Annual Recurring Revenue) = MRR × 12.
+                  </p>
+                </TooltipContent>
+              </InfoTooltip>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${metrics.mrr.toLocaleString()}</div>
@@ -51,9 +71,21 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              MRR Growth Rate
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                MRR Growth Rate
+              </CardTitle>
+              <InfoTooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Month-over-month growth in recurring revenue. Healthy SaaS businesses target 10-20% monthly growth.
+                  </p>
+                </TooltipContent>
+              </InfoTooltip>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.mrrGrowth.toFixed(1)}%</div>
@@ -65,9 +97,21 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Lead → Client Rate
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Lead → Client Rate
+              </CardTitle>
+              <InfoTooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Percentage of leads that become paying clients. Industry average is 15-25%. Higher rates indicate better qualification or sales process.
+                  </p>
+                </TooltipContent>
+              </InfoTooltip>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.conversionRate.toFixed(1)}%</div>
@@ -79,9 +123,21 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Average Client Value
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Average Client Value
+              </CardTitle>
+              <InfoTooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Average monthly retainer per client. Higher values indicate premium service positioning or upsell success.
+                  </p>
+                </TooltipContent>
+              </InfoTooltip>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${metrics.avgClientValue.toLocaleString()}</div>
@@ -95,7 +151,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
       {/* Revenue Forecast */}
       <Card>
         <CardHeader>
-          <CardTitle>Revenue Forecast (Next 6 Months)</CardTitle>
+          <CardTitle>Revenue Forecast: Where We're Heading</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -129,7 +185,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         {/* Conversion Funnel */}
         <Card>
           <CardHeader>
-            <CardTitle>Conversion Funnel</CardTitle>
+            <CardTitle>Pipeline Conversion: Where Leads Drop Off</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -147,7 +203,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         {/* Lead Sources */}
         <Card>
           <CardHeader>
-            <CardTitle>Lead Sources</CardTitle>
+            <CardTitle>Lead Sources: Where Your Best Prospects Come From</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -191,9 +247,21 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Avg Health Score
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Avg Health Score
+              </CardTitle>
+              <InfoTooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Composite score (0-100) based on competitive position, ranking trends, and scan results. &lt;40 = needs attention, 60-80 = healthy, &gt;80 = leading.
+                  </p>
+                </TooltipContent>
+              </InfoTooltip>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.avgHealthScore.toFixed(0)}</div>
@@ -218,6 +286,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         </Card>
       </div>
     </div>
+    </TooltipProvider>
   );
 }
 

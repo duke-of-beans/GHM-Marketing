@@ -1,9 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle, Plus } from "lucide-react";
+import { AddClientDialog } from "./add-client-dialog";
+import { useRouter } from "next/navigation";
 
 type ClientItem = {
   id: number;
@@ -62,16 +73,36 @@ export function ClientPortfolio({
   clients: ClientItem[];
   stats: PortfolioStats;
 }) {
+  const router = useRouter();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const handleClientAdded = () => {
+    router.refresh();
+  };
+
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
-      {/* Stats bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <MetricCard title="Active Clients" value={stats.total} />
-        <MetricCard
-          title="Avg Health"
-          value={stats.avgHealth}
-          subtitle={healthLabel(stats.avgHealth)}
-        />
+    <TooltipProvider>
+      <div className="space-y-6 pb-20 md:pb-0">
+        {/* Stats bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <MetricCard title="Active Clients" value={stats.total} />
+          <div className="relative">
+            <MetricCard
+              title="Avg Health"
+              value={stats.avgHealth}
+              subtitle={healthLabel(stats.avgHealth)}
+            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help absolute top-2 right-2" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">
+                  Composite score (0-100) based on competitive position, ranking trends, and scan results. &lt;40 = needs attention, 60-80 = healthy, &gt;80 = leading position.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         <MetricCard
           title="Needs Attention"
           value={stats.needsAttention}
@@ -85,6 +116,18 @@ export function ClientPortfolio({
           title="Monthly Revenue"
           value={formatCurrency(stats.totalRevenue)}
         />
+      </div>
+
+      {/* Action Bar */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">{clients.length} Active {clients.length === 1 ? 'Client' : 'Clients'}</h3>
+          <p className="text-sm text-muted-foreground">Manage client portfolio and track performance</p>
+        </div>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-1" />
+          Add Client
+        </Button>
       </div>
 
       {/* Client cards */}
@@ -164,6 +207,14 @@ export function ClientPortfolio({
           ))}
         </div>
       )}
+
+      {/* Add Client Dialog */}
+      <AddClientDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onSuccess={handleClientAdded}
+      />
     </div>
+    </TooltipProvider>
   );
 }

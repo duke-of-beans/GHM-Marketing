@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { ProductDialog } from "./product-dialog";
+import { toast } from "sonner";
 
 type Product = {
   id: number;
@@ -33,7 +34,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    if (!confirm("Are you sure you want to delete this service?")) return;
 
     try {
       const response = await fetch(`/api/products/${id}`, {
@@ -42,9 +43,15 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
 
       if (response.ok) {
         setProducts((prev) => prev.filter((p) => p.id !== id));
+        toast.success('Service deleted successfully');
+      } else {
+        toast.error('Failed to delete service');
       }
     } catch (error) {
-      console.error("Failed to delete product:", error);
+      console.error("Failed to delete service:", error);
+      toast.error('Failed to delete service', {
+        description: 'An unexpected error occurred'
+      });
     }
   };
 
@@ -53,8 +60,12 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
       setProducts((prev) =>
         prev.map((p) => (p.id === product.id ? product : p))
       );
+      toast.success('Service updated successfully');
     } else {
       setProducts((prev) => [product, ...prev]);
+      toast.success('Service added successfully', {
+        description: 'Service is now available for upsell recommendations'
+      });
     }
     setDialogOpen(false);
   };
@@ -71,19 +82,22 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
         </div>
         <Button onClick={handleAdd}>
           <Plus className="h-4 w-4 mr-1" />
-          Add Product
+          Add Service
         </Button>
       </div>
 
       {activeProducts.length === 0 && inactiveProducts.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">
-              No products yet. Add your first service offering to enable upsell recommendations.
+            <p className="text-muted-foreground mb-2 font-medium">
+              No services in your catalog yet
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Add your SEO service packages here. The system will automatically suggest relevant upsells to clients based on competitive gaps detected in scans.
             </p>
             <Button onClick={handleAdd}>
               <Plus className="h-4 w-4 mr-1" />
-              Add Your First Product
+              Add Your First Service
             </Button>
           </CardContent>
         </Card>
@@ -91,7 +105,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
         <>
           {activeProducts.length > 0 && (
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm">Active Products</h3>
+              <h3 className="font-semibold text-sm">Active Services</h3>
               {activeProducts.map((product) => (
                 <Card key={product.id}>
                   <CardHeader>
@@ -149,7 +163,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
           {inactiveProducts.length > 0 && (
             <div className="space-y-3">
               <h3 className="font-semibold text-sm text-muted-foreground">
-                Inactive Products
+                Inactive Services
               </h3>
               {inactiveProducts.map((product) => (
                 <Card key={product.id} className="opacity-60">

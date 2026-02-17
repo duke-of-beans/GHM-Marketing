@@ -101,23 +101,23 @@ export function ProductDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{product ? "Edit Product" : "Add Product"}</DialogTitle>
+          <DialogTitle>{product ? "Edit Service" : "Add Service"}</DialogTitle>
           <DialogDescription>
             {product
-              ? "Update product details and pricing"
-              : "Add a new service offering to your catalog"}
+              ? "Update service details and pricing"
+              : "Add a new SEO service offering to your catalog"}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Product Name *</Label>
+              <Label htmlFor="name">Service Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Content Marketing Package"
+                placeholder="Local SEO - Basic Package"
                 required
               />
             </div>
@@ -148,7 +148,7 @@ export function ProductDialog({
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Brief description of what's included..."
+              placeholder="What's included in this service? Be specific - this helps the system match it to client needs."
               rows={3}
             />
           </div>
@@ -166,6 +166,7 @@ export function ProductDialog({
                 placeholder="500.00"
                 required
               />
+              <p className="text-xs text-muted-foreground">Monthly rate for recurring services, or one-time price</p>
             </div>
 
             <div className="space-y-2">
@@ -178,12 +179,13 @@ export function ProductDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="monthly">Monthly Recurring</SelectItem>
                   <SelectItem value="one-time">One-Time</SelectItem>
-                  <SelectItem value="hourly">Hourly</SelectItem>
-                  <SelectItem value="project">Project</SelectItem>
+                  <SelectItem value="hourly">Hourly Rate</SelectItem>
+                  <SelectItem value="project">Project-Based</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">How is this service billed?</p>
             </div>
           </div>
 
@@ -207,7 +209,7 @@ export function ProductDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Saving..." : product ? "Update Product" : "Add Product"}
+              {isSaving ? "Saving..." : product ? "Update Service" : "Add Service"}
             </Button>
           </div>
         </form>

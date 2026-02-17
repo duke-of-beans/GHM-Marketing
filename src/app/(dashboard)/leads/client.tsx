@@ -100,9 +100,9 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
     <div className="space-y-4 pb-20 md:pb-0">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Pipeline</h1>
+          <h1 className="text-2xl font-bold">Sales Pipeline</h1>
           <p className="text-sm text-muted-foreground">
-            {filteredLeads.length} leads · Drag between stages · Tap for details
+            Manage leads from first contact through deal close — {filteredLeads.length} leads • Drag cards between stages
           </p>
         </div>
         {userRole === "master" && (

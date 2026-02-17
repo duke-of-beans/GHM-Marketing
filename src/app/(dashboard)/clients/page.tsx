@@ -13,9 +13,9 @@ export default async function ClientsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Clients</h1>
+        <h1 className="text-2xl font-bold">Client Portfolio</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Active client portfolio — competitive intelligence & service delivery
+          Track client performance, manage SEO tasks, and monitor how they stack up against competitors
         </p>
       </div>
       <ClientPortfolio clients={JSON.parse(JSON.stringify(clients))} stats={stats} />

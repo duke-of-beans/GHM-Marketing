@@ -30,8 +30,10 @@ export function ReviewQueue({ tasks }: { tasks: Task[] }) {
     return (
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
-          <p>No tasks in review queue</p>
-          <p className="text-sm mt-2">Tasks will appear here when writers submit drafts</p>
+          <p className="font-medium mb-2">No tasks in review queue</p>
+          <p className="text-sm">
+            Tasks appear here when content drafts are submitted by writers. You'll review the brief, check the draft, and either approve or request changes.
+          </p>
         </CardContent>
       </Card>
     );

@@ -75,41 +75,58 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
       const lead = leads.find((l) => l.id === leadId);
       if (!lead || lead.status === newStatus) return;
 
-      // Optimistic update
-      setLeads((prev) =>
-        prev.map((l) =>
-          l.id === leadId ? { ...l, status: newStatus } : l
-        )
-      );
-
-      try {
-        const res = await fetch(`/api/leads/${leadId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to update status");
-        }
-
-        toast.success(
-          newStatus === "won"
-            ? `🎉 ${lead.businessName} won! Client profile created.`
-            : `${lead.businessName} → ${LEAD_STATUS_CONFIG[newStatus].label}`
-        );
-      } catch {
-        // Revert on failure
-        setLeads((prev) =>
-          prev.map((l) =>
-            l.id === leadId ? { ...l, status: lead.status } : l
-          )
-        );
-        toast.error("Failed to update lead status");
-      }
+      await updateLeadStatus(leadId, newStatus, lead.status, lead.businessName);
     },
     [leads]
   );
+
+  // Shared status update logic for both drag-and-drop and mobile dropdown
+  const updateLeadStatus = async (
+    leadId: number,
+    newStatus: LeadStatus,
+    oldStatus: LeadStatus,
+    businessName: string
+  ) => {
+    // Optimistic update
+    setLeads((prev) =>
+      prev.map((l) =>
+        l.id === leadId ? { ...l, status: newStatus } : l
+      )
+    );
+
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update status");
+      }
+
+      toast.success(
+        newStatus === "won"
+          ? `🎉 ${businessName} won! Client profile created.`
+          : `${businessName} → ${LEAD_STATUS_CONFIG[newStatus].label}`
+      );
+    } catch {
+      // Revert on failure
+      setLeads((prev) =>
+        prev.map((l) =>
+          l.id === leadId ? { ...l, status: oldStatus } : l
+        )
+      );
+      toast.error("Failed to update lead status");
+    }
+  };
+
+  // Mobile status change handler
+  const handleStatusChange = (leadId: number, newStatus: LeadStatus) => {
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead || lead.status === newStatus) return;
+    updateLeadStatus(leadId, newStatus, lead.status, lead.businessName);
+  };
 
   // Group leads by status
   const columns = KANBAN_STATUSES.map((status) => ({
@@ -140,6 +157,7 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
                 key={lead.id}
                 lead={lead}
                 onClick={() => onLeadClick(lead.id)}
+                onStatusChange={handleStatusChange}
               />
             ))}
           </KanbanColumn>

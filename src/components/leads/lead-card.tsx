@@ -3,7 +3,17 @@
 import { useDraggable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { LEAD_STATUS_CONFIG, ACTIVE_STATUSES } from "@/types";
 import type { LeadStatus } from "@prisma/client";
+
+const KANBAN_STATUSES: LeadStatus[] = [...ACTIVE_STATUSES, "won"];
 
 type LeadCardProps = {
   lead: {
@@ -20,9 +30,10 @@ type LeadCardProps = {
     _count: { notes: number };
   };
   onClick: () => void;
+  onStatusChange?: (leadId: number, newStatus: LeadStatus) => void;
 };
 
-export function LeadCard({ lead, onClick }: LeadCardProps) {
+export function LeadCard({ lead, onClick, onStatusChange }: LeadCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: lead.id });
 
@@ -32,6 +43,12 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
   const formatCurrency = (val: number) =>
     val > 0 ? `$${val.toLocaleString()}` : "—";
+
+  const handleStatusChange = (newStatus: string) => {
+    if (onStatusChange) {
+      onStatusChange(lead.id, newStatus as LeadStatus);
+    }
+  };
 
   return (
     <Card
@@ -87,6 +104,27 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
           )}
         </div>
       </div>
+
+      {/* Mobile-only stage selector */}
+      {onStatusChange && (
+        <div className="md:hidden mt-2 pt-2 border-t" onClick={(e) => e.stopPropagation()}>
+          <Select value={lead.status} onValueChange={handleStatusChange}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {KANBAN_STATUSES.map((status) => (
+                <SelectItem key={status} value={status} className="text-xs">
+                  {LEAD_STATUS_CONFIG[status].label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Tap to change stage
+          </p>
+        </div>
+      )}
     </Card>
   );
 }

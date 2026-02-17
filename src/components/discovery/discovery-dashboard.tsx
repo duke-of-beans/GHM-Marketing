@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Plus } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Search, Plus, HelpCircle } from "lucide-react";
+import { toast } from "sonner";
 
 type DiscoveryResult = {
   placeId: string;
@@ -28,14 +30,31 @@ export function DiscoveryDashboard() {
   const [minReviews, setMinReviews] = useState("10");
   const [minRating, setMinRating] = useState("3.5");
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<DiscoveryResult[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isImporting, setIsImporting] = useState(false);
 
   const handleSearch = async () => {
+    // Validation
+    if (!keyword.trim()) {
+      toast.error('Business type is required', {
+        description: 'Please enter a type of business (e.g., plumber, dentist)'
+      });
+      return;
+    }
+    
+    if (!location.trim()) {
+      toast.error('Location is required', {
+        description: 'Please enter a city, state, or zip code'
+      });
+      return;
+    }
+
     setIsSearching(true);
     setResults([]);
     setSelected(new Set());
+    setHasSearched(true);
 
     try {
       const response = await fetch("/api/discovery/search", {
@@ -53,9 +72,21 @@ export function DiscoveryDashboard() {
       if (response.ok) {
         const data = await response.json();
         setResults(data.results || []);
+        if (data.results && data.results.length > 0) {
+          toast.success(`Found ${data.results.length} businesses`, {
+            description: 'Review and select leads to import'
+          });
+        }
+      } else {
+        toast.error('Search failed', {
+          description: 'Please try again or adjust your search criteria'
+        });
       }
     } catch (error) {
       console.error("Search failed:", error);
+      toast.error('Search failed', {
+        description: 'An unexpected error occurred'
+      });
     } finally {
       setIsSearching(false);
     }
@@ -94,13 +125,22 @@ export function DiscoveryDashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Successfully imported ${data.imported} leads!`);
+        toast.success(`Successfully imported ${data.imported} ${data.imported === 1 ? 'lead' : 'leads'}!`, {
+          description: 'New leads added to your sales pipeline'
+        });
         // Remove imported from results
         setResults(results.filter((r) => !selected.has(r.placeId)));
         setSelected(new Set());
+      } else {
+        toast.error('Failed to import leads', {
+          description: 'Please try again or contact support'
+        });
       }
     } catch (error) {
       console.error("Import failed:", error);
+      toast.error('Import failed', {
+        description: 'An unexpected error occurred'
+      });
     } finally {
       setIsImporting(false);
     }
@@ -113,7 +153,8 @@ export function DiscoveryDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <TooltipProvider>
+      <div className="space-y-6">
       {/* Search Form */}
       <Card>
         <CardHeader>
@@ -122,41 +163,47 @@ export function DiscoveryDashboard() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="keyword">Keyword / Industry</Label>
+              <Label htmlFor="keyword">Business Type</Label>
               <Input
                 id="keyword"
                 placeholder="plumber, dentist, lawyer..."
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">What type of business are you looking for?</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
-                placeholder="Austin, TX"
+                placeholder="Austin, TX or 78701"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">City, state, or zip code</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minReviews">Min Reviews</Label>
+              <Label htmlFor="minReviews">Minimum Reviews</Label>
               <Input
                 id="minReviews"
                 type="number"
+                placeholder="10"
                 value={minReviews}
                 onChange={(e) => setMinReviews(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">More reviews = more established</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minRating">Min Rating</Label>
+              <Label htmlFor="minRating">Minimum Star Rating</Label>
               <Input
                 id="minRating"
                 type="number"
                 step="0.1"
+                placeholder="3.5"
                 value={minRating}
                 onChange={(e) => setMinRating(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">Rating from 1.0 to 5.0</p>
             </div>
           </div>
           <Button
@@ -171,6 +218,22 @@ export function DiscoveryDashboard() {
       </Card>
 
       {/* Results */}
+      {hasSearched && results.length === 0 && !isSearching && (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground mb-4 font-medium">
+              No businesses found matching your search
+            </p>
+            <p className="text-sm text-muted-foreground mb-2">Try:</p>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Broader location (e.g., "Dallas" instead of "Downtown Dallas")</li>
+              <li>• Different keywords (e.g., "lawyer" instead of "attorney")</li>
+              <li>• Lower minimum review count</li>
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {results.length > 0 && (
         <Card>
           <CardHeader>
@@ -210,9 +273,21 @@ export function DiscoveryDashboard() {
                         <h4 className="font-semibold">{result.name}</h4>
                         <p className="text-sm text-muted-foreground">{result.address}</p>
                       </div>
-                      <Badge className={getScoreColor(result.qualificationScore)}>
-                        Score: {result.qualificationScore}
-                      </Badge>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-1">
+                            <Badge className={getScoreColor(result.qualificationScore)}>
+                              Quality: {result.qualificationScore}/100
+                            </Badge>
+                            <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-sm">
+                            Automated quality score (0-100) based on reviews, rating, website presence, and verification status. Higher scores indicate better lead quality.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                     <div className="flex gap-4 text-sm text-muted-foreground mb-2">
                       <span>⭐ {result.rating} ({result.reviewCount} reviews)</span>
@@ -250,6 +325,7 @@ export function DiscoveryDashboard() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
