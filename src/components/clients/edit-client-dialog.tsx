@@ -1,0 +1,370 @@
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Pencil } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface EditClientDialogProps {
+  client: {
+    id: number;
+    lead: {
+      businessName: string;
+      phone: string;
+      email: string | null;
+      website: string | null;
+      address: string | null;
+      city: string;
+      state: string;
+      zipCode: string;
+    };
+    retainerAmount: number;
+    scanFrequency: string;
+    status: string;
+  };
+  onUpdate: () => void;
+}
+
+export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Form state
+  const [businessName, setBusinessName] = useState(client.lead.businessName);
+  const [phone, setPhone] = useState(client.lead.phone);
+  const [email, setEmail] = useState(client.lead.email || '');
+  const [website, setWebsite] = useState(client.lead.website || '');
+  const [address, setAddress] = useState(client.lead.address || '');
+  const [city, setCity] = useState(client.lead.city);
+  const [state, setState] = useState(client.lead.state);
+  const [zipCode, setZipCode] = useState(client.lead.zipCode);
+  const [retainerAmount, setRetainerAmount] = useState(client.retainerAmount.toString());
+  const [scanFrequency, setScanFrequency] = useState(client.scanFrequency);
+  const [status, setStatus] = useState(client.status);
+
+  // Validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    // Required fields
+    if (!businessName || businessName.length < 2) {
+      newErrors.businessName = 'Business name must be at least 2 characters';
+    }
+
+    // Phone validation
+    const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    if (!phone || !phoneRegex.test(phone)) {
+      newErrors.phone = 'Valid phone number required (e.g., 555-123-4567)';
+    }
+
+    // Email validation (if provided)
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Valid email address required';
+    }
+
+    // Website validation (if provided)
+    if (website && !/^https?:\/\/.+/.test(website)) {
+      newErrors.website = 'Website must start with http:// or https://';
+    }
+
+    // City
+    if (!city) {
+      newErrors.city = 'City is required';
+    }
+
+    // State
+    if (!state || state.length !== 2) {
+      newErrors.state = 'State must be 2-letter code (e.g., CA)';
+    }
+
+    // Zip code validation
+    if (zipCode && !/^\d{5}(-\d{4})?$/.test(zipCode)) {
+      newErrors.zipCode = 'Valid ZIP code required (e.g., 12345 or 12345-6789)';
+    }
+
+    // Retainer amount
+    const amount = parseFloat(retainerAmount);
+    if (isNaN(amount) || amount < 0) {
+      newErrors.retainerAmount = 'Retainer amount must be a positive number';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validateForm()) {
+      toast.error('Please fix validation errors');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`/api/clients/${client.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead: {
+            businessName,
+            phone,
+            email: email || null,
+            website: website || null,
+            address: address || null,
+            city,
+            state: state.toUpperCase(),
+            zipCode,
+          },
+          clientProfile: {
+            retainerAmount: parseFloat(retainerAmount),
+            scanFrequency,
+            status,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update client');
+      }
+
+      toast.success(data.message || 'Client updated successfully');
+      setOpen(false);
+      onUpdate();
+    } catch (error) {
+      console.error('Error updating client:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update client');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)} variant="outline" size="sm">
+        <Pencil className="mr-2 h-4 w-4" />
+        Edit
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Client Information</DialogTitle>
+            <DialogDescription>
+              Update client details. Changes will be logged in the activity history.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {/* Business Name */}
+            <div className="grid gap-2">
+              <Label htmlFor="businessName">
+                Business Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="businessName"
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="The German Auto Doctor"
+              />
+              {errors.businessName && (
+                <p className="text-sm text-red-500">{errors.businessName}</p>
+              )}
+            </div>
+
+            {/* Contact Information */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="phone">
+                  Phone <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(805) 555-1234"
+                />
+                {errors.phone && (
+                  <p className="text-sm text-red-500">{errors.phone}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="contact@example.com"
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://example.com"
+              />
+              {errors.website && (
+                <p className="text-sm text-red-500">{errors.website}</p>
+              )}
+            </div>
+
+            {/* Address */}
+            <div className="grid gap-2">
+              <Label htmlFor="address">Street Address</Label>
+              <Input
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="123 Main St"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-2 col-span-2">
+                <Label htmlFor="city">
+                  City <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Simi Valley"
+                />
+                {errors.city && (
+                  <p className="text-sm text-red-500">{errors.city}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="state">
+                  State <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="state"
+                  value={state}
+                  onChange={(e) => setState(e.target.value.toUpperCase())}
+                  placeholder="CA"
+                  maxLength={2}
+                />
+                {errors.state && (
+                  <p className="text-sm text-red-500">{errors.state}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="zipCode">ZIP Code</Label>
+              <Input
+                id="zipCode"
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+                placeholder="93065"
+              />
+              {errors.zipCode && (
+                <p className="text-sm text-red-500">{errors.zipCode}</p>
+              )}
+            </div>
+
+            {/* Service Configuration */}
+            <div className="border-t pt-4 mt-2">
+              <h3 className="font-medium mb-4">Service Configuration</h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="retainerAmount">
+                    Monthly Retainer <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                    <Input
+                      id="retainerAmount"
+                      type="number"
+                      value={retainerAmount}
+                      onChange={(e) => setRetainerAmount(e.target.value)}
+                      className="pl-7"
+                      placeholder="2400"
+                    />
+                  </div>
+                  {errors.retainerAmount && (
+                    <p className="text-sm text-red-500">{errors.retainerAmount}</p>
+                  )}
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="scanFrequency">Scan Frequency</Label>
+                  <Select value={scanFrequency} onValueChange={setScanFrequency}>
+                    <SelectTrigger id="scanFrequency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                      <SelectItem value="monthly">Monthly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-2 mt-4">
+                <Label htmlFor="status">Client Status</Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger id="status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="paused">Paused</SelectItem>
+                    <SelectItem value="at_risk">At Risk</SelectItem>
+                    <SelectItem value="churned">Churned</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={loading}>
+              {loading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
