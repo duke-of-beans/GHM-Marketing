@@ -34,6 +34,7 @@ interface CompensationOverride {
   userId: number;
   commissionAmount: number | null;
   residualAmount: number | null;
+  feeAmount: number | null;
   reason: string | null;
   user: User;
 }
@@ -63,6 +64,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
   const [overrideUserId, setOverrideUserId] = useState<number | null>(null);
   const [overrideCommission, setOverrideCommission] = useState<string>("");
   const [overrideResidual, setOverrideResidual] = useState<string>("");
+  const [overrideFee, setOverrideFee] = useState<string>("");
   const [overrideReason, setOverrideReason] = useState("");
 
   useEffect(() => {
@@ -100,16 +102,18 @@ export function ClientCompensationSection({ clientId, users }: Props) {
           userId: override.userId,
           commissionAmount: override.commissionAmount,
           residualAmount: override.residualAmount,
+          feeAmount: override.feeAmount,
           reason: override.reason,
         });
       }
       
       // Add new override if form filled
-      if (overrideUserId && (overrideCommission || overrideResidual)) {
+      if (overrideUserId && (overrideCommission || overrideResidual || overrideFee)) {
         overrides.push({
           userId: overrideUserId,
           commissionAmount: overrideCommission ? parseFloat(overrideCommission) : null,
           residualAmount: overrideResidual ? parseFloat(overrideResidual) : null,
+          feeAmount: overrideFee ? parseFloat(overrideFee) : null,
           reason: overrideReason || null,
         });
       }
@@ -138,6 +142,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
       setOverrideUserId(null);
       setOverrideCommission("");
       setOverrideResidual("");
+      setOverrideFee("");
       setOverrideReason("");
     } catch (error) {
       toast.error("Failed to save compensation");
@@ -270,7 +275,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                   className="p-3 border rounded-lg space-y-2"
                 >
                   <div className="font-medium">{override.user.name}</div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
                     {override.commissionAmount !== null && (
                       <div>
                         <span className="text-muted-foreground">Commission: </span>
@@ -281,6 +286,12 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                       <div>
                         <span className="text-muted-foreground">Residual: </span>
                         ${override.residualAmount}/mo
+                      </div>
+                    )}
+                    {override.feeAmount !== null && (
+                      <div>
+                        <span className="text-muted-foreground">Fee: </span>
+                        ${override.feeAmount}/mo
                       </div>
                     )}
                   </div>
@@ -318,7 +329,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="override-commission">Commission Override</Label>
                     <div className="flex items-center gap-2">
@@ -347,6 +358,22 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                         placeholder="Leave empty for default"
                         value={overrideResidual}
                         onChange={(e) => setOverrideResidual(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="override-fee">Fee Override</Label>
+                    <div className="flex items-center gap-2">
+                      <span>$</span>
+                      <Input
+                        id="override-fee"
+                        type="number"
+                        min="0"
+                        step="50"
+                        placeholder="Leave empty for default"
+                        value={overrideFee}
+                        onChange={(e) => setOverrideFee(e.target.value)}
                       />
                     </div>
                   </div>

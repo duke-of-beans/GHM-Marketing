@@ -17,6 +17,7 @@ const ClientCompensationSchema = z.object({
         userId: z.number().int(),
         commissionAmount: z.number().min(0).nullable(),
         residualAmount: z.number().min(0).nullable(),
+        feeAmount: z.number().min(0).nullable(),
         reason: z.string().optional().nullable(),
       })
     )
@@ -152,6 +153,7 @@ export async function PUT(
           userId: override.userId,
           commissionAmount: override.commissionAmount,
           residualAmount: override.residualAmount,
+          feeAmount: override.feeAmount,
           reason: override.reason || null,
         })),
       });

@@ -547,6 +547,7 @@ model ClientCompensationOverride {
   // Override settings (null = use user default)
   commissionAmount  Decimal? @map("commission_amount") @db.Decimal(10, 2)
   residualAmount    Decimal? @map("residual_amount") @db.Decimal(10, 2)
+  feeAmount         Decimal? @map("fee_amount") @db.Decimal(10, 2)
   
   reason            String?  // Why this client is different
   createdAt         DateTime @default(now()) @map("created_at")
