@@ -50,14 +50,7 @@ export async function POST(req: NextRequest) {
             zipCode: addressParts.zip || "00000",
             reviewCount: lead.reviewCount,
             reviewAvg: lead.rating,
-            status: "new",
-            assignedToId: user.id,
-            qualificationScore: lead.qualificationScore,
-            competitiveIntel: {
-              category: lead.category,
-              discoveryReasons: lead.reasons,
-              discoveredAt: new Date().toISOString(),
-            },
+            status: "available",
           },
         });
 
