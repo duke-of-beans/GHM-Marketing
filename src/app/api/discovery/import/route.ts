@@ -23,14 +23,12 @@ export async function POST(req: NextRequest) {
     for (const lead of leads) {
       try {
         // Check if lead already exists by place_id or phone
-        const existing = await prisma.lead.findFirst({
-          where: {
-            OR: [
-              { googlePlaceId: lead.placeId },
-              lead.phone ? { phone: lead.phone } : {},
-            ],
-          },
-        });
+        // Check for duplicates by phone
+        const existing = lead.phone
+          ? await prisma.lead.findFirst({
+              where: { phone: lead.phone },
+            })
+          : null;
 
         if (existing) {
           skipped++;
