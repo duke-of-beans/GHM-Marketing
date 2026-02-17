@@ -96,26 +96,38 @@
 
 ## 🔄 Post-Deployment TODO
 
-### Immediate
-- [x] Deploy to production
-- [x] Fix analytics error
-- [x] Reorder navigation
-- [ ] Test all 8 features in production
-- [ ] Monitor error logs
+> **📋 COMPREHENSIVE TODO:** See `MISSING_FEATURES_TODO.md` for complete 30-item audit
 
-### Schema Migration Needed
+### **🔴 CRITICAL - Week 1**
+- [ ] Run portal migration: `ALTER TABLE client_profiles ADD COLUMN portal_token VARCHAR(255) UNIQUE;`
+- [ ] Rename portal files (remove `.disabled` extension)
+- [ ] Configure Resend API key (email)
+- [ ] Configure Anthropic API key (AI briefs)
+- [ ] Test all 9 features end-to-end
+- [ ] Load product catalog
+- [ ] Set up territories
+
+### **🟡 HIGH PRIORITY - Week 2**
+- [ ] Verify competitive scan cron running
+- [ ] Implement keyword tracking (replace placeholders)
+- [ ] Set up error monitoring (Sentry)
+- [ ] Configure audit logging
+
+### **Schema Migration Needed**
 ```sql
 ALTER TABLE client_profiles 
 ADD COLUMN portal_token VARCHAR(255) UNIQUE;
 ```
 
-### Enable Client Portal
+### **Enable Client Portal**
 1. Run migration above
 2. Rename files:
    - `src/app/(portal)/portal/page.tsx.disabled` → `page.tsx`
    - `src/app/api/email/send-portal-invite/route.ts.disabled` → `route.ts`
    - `src/app/api/clients/[id]/generate-portal-token/route.ts.disabled` → `route.ts`
 3. Commit and deploy
+
+**Full TODO list:** `MISSING_FEATURES_TODO.md` (30 items, priorities, timelines)
 
 ---
 

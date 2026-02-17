@@ -603,26 +603,106 @@ A complete, enterprise-grade B2B SaaS platform for SEO agencies with:
 
 ---
 
-## 🚀 **NEXT STEPS**
+## 🚀 **NEXT STEPS & TODO LIST**
 
-### **Immediate (This Week):**
-1. Configure Resend domain + API key
-2. Add Anthropic API key for AI briefs
-3. Load products into catalog
-4. Run discovery searches
-5. Send test portal invites
+> **📋 COMPREHENSIVE TODO:** See `MISSING_FEATURES_TODO.md` for complete 30-item audit with priorities and timelines
 
-### **Short Term (2 Weeks):**
-1. Full client rollout
-2. Monitor metrics
-3. Gather feedback
-4. Optimize algorithms
+### **🔴 CRITICAL - Week 1 (1-2 days)**
 
-### **Long Term (1 Month+):**
-1. Mobile app
-2. More AI features
-3. Advanced integrations
-4. White-label offering
+**Deployment Blockers:**
+1. **Client Portal Migration**
+   ```sql
+   ALTER TABLE client_profiles ADD COLUMN portal_token VARCHAR(255) UNIQUE;
+   ```
+   Then rename 3 `.disabled` files back to `.ts`/`.tsx`
+
+2. **API Key Configuration**
+   - Add Resend API key (email automation)
+   - Add Anthropic API key (AI content briefs)
+   - Verify CRON_SECRET configured
+
+3. **Production Testing**
+   - Test all 9 features end-to-end
+   - Verify cron jobs running
+   - Validate email delivery
+   - Check AI brief generation
+
+4. **Product Catalog**
+   - Load actual GHM service offerings
+   - Required for upsell detection matching
+
+5. **Territory Setup**
+   - Define geographic territories
+   - Assign to sales reps
+
+**Impact:** Unlocks full platform functionality
+
+---
+
+### **🟡 HIGH PRIORITY - Week 2 (3-5 days)**
+
+1. **Competitive Scan Verification**
+   - Verify daily cron running
+   - Check scan history populating
+   - Validate task auto-creation
+
+2. **Keyword Tracking Integration**
+   - Replace placeholder rankings with real API data
+   - Integrate Ahrefs or SE Ranking
+   - Critical for competitive intel value
+
+3. **Error Monitoring**
+   - Set up Sentry
+   - Configure alerts
+   - Add structured logging
+
+**Impact:** Production stability + real competitive data
+
+---
+
+### **🟠 MEDIUM PRIORITY - Month 1 (1-2 weeks)**
+
+1. Backup & disaster recovery testing
+2. Security hardening (2FA, rate limiting)
+3. Audit logging for compliance
+4. Performance optimization (caching, queries)
+5. Advanced analytics (cohorts, churn prediction)
+6. Work order PDF generation (sales tool)
+
+**Impact:** Enterprise-grade operations
+
+---
+
+### **🟢 LOW/FUTURE - Ongoing**
+
+**Enhancements (19 items):**
+- Voice profile system for AI content
+- Mobile native apps (iOS/Android)
+- White-label multi-tenant platform
+- Advanced integrations (Zapier, Slack, Calendar)
+- Custom report builder
+- Accessibility improvements
+- Keyboard shortcuts & command palette
+- And 12 more...
+
+**Impact:** Scale and competitive differentiation
+
+---
+
+### **📊 TODO SUMMARY**
+
+- **Total Items:** 30
+- **Critical:** 3 (blockers)
+- **High:** 2 (valuable)
+- **Medium:** 6 (professional)
+- **Low/Future:** 19 (enhancements)
+
+**Platform Completeness:** 95%
+- Built: 9 complete features
+- Blocked: 1 feature (portal - needs migration)
+- Missing: Configuration & testing, not code
+
+**See `MISSING_FEATURES_TODO.md` for full details, timelines, and action plans.**
 
 ---
 
