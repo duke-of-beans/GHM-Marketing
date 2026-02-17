@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 type Territory = { id: number; name: string };
 type Rep = { id: number; name: string };
@@ -258,9 +257,11 @@ export function LeadFilterBar({
                   key={option.value}
                   className="flex items-center gap-2 text-sm cursor-pointer"
                 >
-                  <Checkbox
+                  <input
+                    type="checkbox"
                     checked={filters.statuses.includes(option.value)}
-                    onCheckedChange={() => toggleStatus(option.value)}
+                    onChange={() => toggleStatus(option.value)}
+                    className="rounded border-gray-300"
                   />
                   {option.label}
                 </label>

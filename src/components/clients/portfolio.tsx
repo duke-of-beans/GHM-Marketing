@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { HelpCircle, Plus } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
+import { ClientFilterBar, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
 
 type ClientItem = {
@@ -75,6 +76,102 @@ export function ClientPortfolio({
 }) {
   const router = useRouter();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    healthFilter: "all",
+    revenueRange: "all",
+    taskFilter: "all",
+    scanFilter: "all",
+    sortBy: "health-low",
+  });
+
+  const filteredClients = useMemo(() => {
+    let result = clients;
+
+    // Search filter
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      result = result.filter(
+        (client) =>
+          client.businessName.toLowerCase().includes(q) ||
+          client.lead.city.toLowerCase().includes(q) ||
+          client.lead.state.toLowerCase().includes(q)
+      );
+    }
+
+    // Health filter
+    if (filters.healthFilter !== "all") {
+      result = result.filter((client) => {
+        if (filters.healthFilter === "healthy") return client.healthScore >= 75;
+        if (filters.healthFilter === "competitive")
+          return client.healthScore >= 50 && client.healthScore < 75;
+        if (filters.healthFilter === "attention") return client.healthScore < 50;
+        return true;
+      });
+    }
+
+    // Revenue range filter
+    if (filters.revenueRange !== "all") {
+      result = result.filter((client) => {
+        const revenue = Number(client.retainerAmount);
+        if (filters.revenueRange === "high") return revenue >= 2000;
+        if (filters.revenueRange === "mid")
+          return revenue >= 1000 && revenue < 2000;
+        if (filters.revenueRange === "low") return revenue < 1000;
+        return true;
+      });
+    }
+
+    // Task filter
+    if (filters.taskFilter !== "all") {
+      result = result.filter((client) => {
+        if (filters.taskFilter === "has-tasks") return client.tasks.length > 0;
+        if (filters.taskFilter === "no-tasks") return client.tasks.length === 0;
+        return true;
+      });
+    }
+
+    // Scan filter
+    if (filters.scanFilter !== "all") {
+      result = result.filter((client) => {
+        if (!client.lastScanAt) return filters.scanFilter === "needs-scan";
+        const daysSince = Math.floor(
+          (Date.now() - new Date(client.lastScanAt).getTime()) /
+            (1000 * 60 * 60 * 24)
+        );
+        if (filters.scanFilter === "recent") return daysSince < 7;
+        if (filters.scanFilter === "needs-scan") return daysSince >= 7;
+        return true;
+      });
+    }
+
+    // Sorting
+    if (filters.sortBy === "health-low") {
+      result = [...result].sort((a, b) => a.healthScore - b.healthScore);
+    } else if (filters.sortBy === "health-high") {
+      result = [...result].sort((a, b) => b.healthScore - a.healthScore);
+    } else if (filters.sortBy === "revenue-high") {
+      result = [...result].sort(
+        (a, b) => Number(b.retainerAmount) - Number(a.retainerAmount)
+      );
+    } else if (filters.sortBy === "revenue-low") {
+      result = [...result].sort(
+        (a, b) => Number(a.retainerAmount) - Number(b.retainerAmount)
+      );
+    } else if (filters.sortBy === "name-az") {
+      result = [...result].sort((a, b) =>
+        a.businessName.localeCompare(b.businessName)
+      );
+    } else if (filters.sortBy === "scan-recent") {
+      result = [...result].sort((a, b) => {
+        const aTime = a.lastScanAt ? new Date(a.lastScanAt).getTime() : 0;
+        const bTime = b.lastScanAt ? new Date(b.lastScanAt).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+
+    return result;
+  }, [clients, filters]);
 
   const handleClientAdded = () => {
     router.refresh();
@@ -121,8 +218,18 @@ export function ClientPortfolio({
       {/* Action Bar */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">{clients.length} Active {clients.length === 1 ? 'Client' : 'Clients'}</h3>
-          <p className="text-sm text-muted-foreground">Manage client portfolio and track performance</p>
+          <h3 className="text-lg font-semibold">
+            {filteredClients.length} {filteredClients.length === 1 ? "Client" : "Clients"}
+            {filteredClients.length !== clients.length && (
+              <span className="text-sm text-muted-foreground font-normal">
+                {" "}
+                of {clients.length} total
+              </span>
+            )}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Manage client portfolio and track performance
+          </p>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-1" />
@@ -130,19 +237,28 @@ export function ClientPortfolio({
         </Button>
       </div>
 
+      {/* Filter Bar */}
+      <ClientFilterBar filters={filters} onChange={setFilters} />
+
       {/* Client cards */}
-      {clients.length === 0 ? (
+      {filteredClients.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              No active clients yet. Clients are created automatically when leads
-              are marked as &ldquo;won&rdquo; in the sales pipeline.
-            </p>
+            {clients.length === 0 ? (
+              <p className="text-muted-foreground">
+                No active clients yet. Clients are created automatically when leads
+                are marked as &ldquo;won&rdquo; in the sales pipeline.
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                No clients match your filters. Try adjusting your search criteria.
+              </p>
+            )}
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {clients.map((client) => (
+          {filteredClients.map((client) => (
             <Link
               key={client.id}
               href={`/clients/${client.id}`}
