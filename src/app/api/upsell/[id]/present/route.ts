@@ -26,7 +26,7 @@ export async function POST(
     await prisma.clientNote.create({
       data: {
         clientId: opportunity.clientId,
-        authorId: user.id,
+        authorId: parseInt(user.id),
         type: "upsell-presented",
         content: `Presented upsell opportunity: ${opportunity.product.name} - ${opportunity.reasoning}`,
       },
