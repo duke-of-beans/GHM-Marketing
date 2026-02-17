@@ -322,6 +322,7 @@ model ClientProfile {
   tasks               ClientTask[]
   scans               CompetitiveScan[]
   upsellOpportunities UpsellOpportunity[]
+  content             ClientContent[]
   
   // Commission system relations
   salesRep             User?    @relation("SalesRep", fields: [salesRepId], references: [id])
@@ -603,4 +604,30 @@ enum PricingModel {
   one_time
   monthly
   annual
+}
+
+// ============================================================================
+// CONTENT GENERATION SYSTEM
+// ============================================================================
+
+model ClientContent {
+  id           Int            @id @default(autoincrement())
+  clientId     Int            @map("client_id")
+  contentType  String         @map("content_type") // "blog", "social", "meta"
+  title        String?
+  content      String         @db.Text
+  keywords     String[]
+  status       String         @default("draft") // "draft", "review", "approved", "published"
+  scheduledFor DateTime?      @map("scheduled_for")
+  publishedAt  DateTime?      @map("published_at")
+  metadata     Json?          // Store AI generation parameters, platform-specific data
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  
+  client       ClientProfile  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@index([clientId, status])
+  @@index([clientId, contentType])
+  @@index([scheduledFor])
+  @@map("client_content")
 }
