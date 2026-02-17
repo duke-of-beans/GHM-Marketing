@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import type { SessionUser } from "@/lib/auth/session";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
