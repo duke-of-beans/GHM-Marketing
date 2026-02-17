@@ -81,7 +81,7 @@ export async function getClient(id: number) {
           },
         },
       },
-      masterAssigned: {
+      masterManager: {
         select: {
           id: true,
           name: true,

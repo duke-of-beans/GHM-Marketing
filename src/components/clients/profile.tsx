@@ -109,7 +109,7 @@ type ClientData = {
   onboardedAt: string;
   lastScanAt: string | null;
   nextScanAt: string | null;
-  masterAssigned: {
+  masterManager: {
     id: number;
     name: string;
     email: string;
@@ -339,9 +339,9 @@ export function ClientProfile({
                   <span className="font-medium">Sales Rep:</span> {client.lead.assignedUser.name}
                 </p>
               )}
-              {client.masterAssigned && (
+              {client.masterManager && (
                 <p className="text-base text-muted-foreground">
-                  <span className="font-medium">Account Manager:</span> {client.masterAssigned.name}
+                  <span className="font-medium">Account Manager:</span> {client.masterManager.name}
                 </p>
               )}
             </div>
