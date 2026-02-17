@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { getDefaultPermissionsForRole } from "@/lib/permissions";
 
 const createUserSchema = z.object({
   email: z.string().email(),
@@ -30,6 +31,8 @@ export async function GET() {
       territory: { select: { id: true, name: true } },
       lastLogin: true,
       isActive: true,
+      permissions: true,
+      permissionPreset: true,
       _count: { select: { assignedLeads: true } },
     },
     orderBy: [{ role: "asc" }, { name: "asc" }],
@@ -72,6 +75,10 @@ export async function POST(request: NextRequest) {
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
+  // Set default permissions based on role
+  const defaultPermissions = getDefaultPermissionsForRole(parsed.data.role);
+  const permissionPreset = parsed.data.role === 'master' ? 'master_full' : 'sales_basic';
+
   const newUser = await prisma.user.create({
     data: {
       email: parsed.data.email,
@@ -79,6 +86,8 @@ export async function POST(request: NextRequest) {
       passwordHash,
       role: parsed.data.role,
       territoryId: parsed.data.territoryId ?? null,
+      permissions: defaultPermissions,
+      permissionPreset: permissionPreset,
     },
     select: {
       id: true,
@@ -87,6 +96,8 @@ export async function POST(request: NextRequest) {
       role: true,
       territoryId: true,
       territory: { select: { id: true, name: true } },
+      permissions: true,
+      permissionPreset: true,
     },
   });
 
