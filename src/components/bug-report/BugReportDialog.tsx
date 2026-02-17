@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Bug, CheckCircle2 } from "lucide-react";
+import { Loader2, Bug, CheckCircle2, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -35,6 +35,7 @@ export function BugReportDialog({
   defaultCategory,
   contextInfo,
 }: Props) {
+  const [type, setType] = useState<"bug" | "feature">("bug");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(defaultCategory || "");
@@ -112,6 +113,7 @@ export function BugReportDialog({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          type,
           title,
           description,
           category,
@@ -125,10 +127,11 @@ export function BugReportDialog({
       }
 
       setSubmitted(true);
-      toast.success("Bug report submitted successfully!");
+      toast.success(type === "bug" ? "Bug report submitted successfully!" : "Feature request submitted successfully!");
 
       // Reset form after delay
       setTimeout(() => {
+        setType("bug");
         setTitle("");
         setDescription("");
         setCategory("");
@@ -150,11 +153,23 @@ export function BugReportDialog({
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Bug className="h-5 w-5 text-orange-600" />
-            Report a Bug
+            {type === "bug" ? (
+              <>
+                <Bug className="h-5 w-5 text-orange-600" />
+                Report a Bug
+              </>
+            ) : (
+              <>
+                <Lightbulb className="h-5 w-5 text-blue-600" />
+                Request a Feature
+              </>
+            )}
           </DialogTitle>
           <DialogDescription>
-            Help us improve by reporting issues you encounter. We capture technical details automatically to help us fix problems faster.
+            {type === "bug" 
+              ? "Help us improve by reporting issues you encounter. We capture technical details automatically to help us fix problems faster."
+              : "Share your ideas to help us build a better product. Describe what you'd like to see and how it would help your workflow."
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -169,10 +184,36 @@ export function BugReportDialog({
         ) : (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="title">What went wrong? *</Label>
+              <Label>Type</Label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={type === "bug" ? "default" : "outline"}
+                  onClick={() => setType("bug")}
+                  disabled={submitting}
+                  className="flex-1"
+                >
+                  <Bug className="h-4 w-4 mr-2" />
+                  Bug Report
+                </Button>
+                <Button
+                  type="button"
+                  variant={type === "feature" ? "default" : "outline"}
+                  onClick={() => setType("feature")}
+                  disabled={submitting}
+                  className="flex-1"
+                >
+                  <Lightbulb className="h-4 w-4 mr-2" />
+                  Feature Request
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">{type === "bug" ? "What went wrong?" : "What would you like?"} *</Label>
               <Input
                 id="title"
-                placeholder="Brief description of the issue"
+                placeholder={type === "bug" ? "Brief description of the issue" : "Brief description of the feature"}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={submitting}
@@ -183,15 +224,21 @@ export function BugReportDialog({
               <Label htmlFor="description">Tell us more *</Label>
               <Textarea
                 id="description"
-                placeholder="What were you trying to do? What happened instead? What did you expect?"
+                placeholder={
+                  type === "bug"
+                    ? "What were you trying to do? What happened instead? What did you expect?"
+                    : "How would this feature help you? What problem does it solve? How should it work?"
+                }
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
                 disabled={submitting}
               />
-              <p className="text-xs text-muted-foreground">
-                Technical details like browser info and console errors are captured automatically
-              </p>
+              {type === "bug" && (
+                <p className="text-xs text-muted-foreground">
+                  Technical details like browser info and console errors are captured automatically
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -213,29 +260,33 @@ export function BugReportDialog({
                     <SelectItem value="leads">Lead Management</SelectItem>
                     <SelectItem value="ui">UI/Display</SelectItem>
                     <SelectItem value="performance">Performance</SelectItem>
+                    <SelectItem value="integration">Integration</SelectItem>
+                    <SelectItem value="reporting">Reporting</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="severity">Severity</Label>
-                <Select 
-                  value={severity} 
-                  onValueChange={setSeverity}
-                  disabled={submitting}
-                >
-                  <SelectTrigger id="severity">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low - Minor inconvenience</SelectItem>
-                    <SelectItem value="medium">Medium - Affects work</SelectItem>
-                    <SelectItem value="high">High - Blocks progress</SelectItem>
-                    <SelectItem value="critical">Critical - System down</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {type === "bug" && (
+                <div className="space-y-2">
+                  <Label htmlFor="severity">Severity</Label>
+                  <Select 
+                    value={severity} 
+                    onValueChange={setSeverity}
+                    disabled={submitting}
+                  >
+                    <SelectTrigger id="severity">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low - Minor inconvenience</SelectItem>
+                      <SelectItem value="medium">Medium - Affects work</SelectItem>
+                      <SelectItem value="high">High - Blocks progress</SelectItem>
+                      <SelectItem value="critical">Critical - System down</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 pt-2">
@@ -258,7 +309,7 @@ export function BugReportDialog({
                     Submitting...
                   </>
                 ) : (
-                  "Submit Report"
+                  type === "bug" ? "Submit Report" : "Submit Request"
                 )}
               </Button>
             </div>
