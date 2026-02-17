@@ -91,7 +91,7 @@ export async function POST(
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        permissions: finalPermissions as Prisma.InputJsonValue,
+        permissions: finalPermissions as unknown as Prisma.InputJsonValue,
         permissionPreset: finalPreset,
       },
       select: {
