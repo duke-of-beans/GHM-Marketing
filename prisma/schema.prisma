@@ -14,6 +14,11 @@ model User {
   passwordHash   String           @map("password_hash")
   name           String
   role           UserRole         @default(sales)
+  
+  // Granular permission system
+  permissions        Json     @default("{}") // Feature flags (UserPermissions interface)
+  permissionPreset   String   @default("sales_basic") @map("permission_preset") // sales_basic, sales_advanced, master_lite, master_full, custom
+  
   territoryId    Int?             @map("territory_id")
   isActive       Boolean          @default(true) @map("is_active")
   createdAt      DateTime         @default(now()) @map("created_at")

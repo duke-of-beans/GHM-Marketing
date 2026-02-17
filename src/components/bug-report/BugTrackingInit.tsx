@@ -28,14 +28,17 @@ export function BugTrackingInit() {
 
     // Capture network errors
     const originalFetch = window.fetch;
-    window.fetch = async function(...args: any[]) {
+    window.fetch = async function(
+      input: RequestInfo | URL,
+      init?: RequestInit
+    ): Promise<Response> {
       const startTime = Date.now();
       try {
-        const response = await originalFetch.apply(this, args);
+        const response = await originalFetch(input, init);
         
         if (!response.ok) {
           (window as any).__networkErrors.push({
-            url: args[0],
+            url: typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
             status: response.status,
             statusText: response.statusText,
             duration: Date.now() - startTime,
@@ -50,7 +53,7 @@ export function BugTrackingInit() {
         return response;
       } catch (error) {
         (window as any).__networkErrors.push({
-          url: args[0],
+          url: typeof input === 'string' ? input : input instanceof URL ? input.href : input.url,
           error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date().toISOString(),
