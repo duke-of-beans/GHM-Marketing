@@ -4,6 +4,32 @@ import { notFound } from "next/navigation";
 import { ClientProfile } from "@/components/clients/profile";
 import Link from "next/link";
 
+// Helper to convert all Decimal fields to numbers recursively
+function serializeDecimals(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    return obj.map(item => serializeDecimals(item));
+  }
+  
+  // Handle Prisma Decimal objects (they have toNumber() method)
+  if (typeof obj === 'object' && obj.constructor?.name === 'Decimal') {
+    return Number(obj);
+  }
+  
+  // Handle plain objects
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const key in obj) {
+      result[key] = serializeDecimals(obj[key]);
+    }
+    return result;
+  }
+  
+  return obj;
+}
+
 export default async function ClientDetailPage({
   params,
 }: {
@@ -17,16 +43,8 @@ export default async function ClientDetailPage({
   const client = await getClient(clientId);
   if (!client) notFound();
 
-  // Serialize Prisma types (Decimal, Date) and ensure safe defaults
-  // Convert Decimals to numbers explicitly to avoid JSON serialization issues
-  const serialized = {
-    ...client,
-    retainerAmount: Number(client.retainerAmount),
-    lead: client.lead ? {
-      ...client.lead,
-      reviewAvg: client.lead.reviewAvg ? Number(client.lead.reviewAvg) : null,
-    } : null,
-  };
+  // Convert all Decimal fields to numbers recursively
+  const serialized = serializeDecimals(client);
 
   // Parse dates and other JSON-safe conversions
   const safeSerialized = JSON.parse(JSON.stringify(serialized));
