@@ -162,6 +162,11 @@ function healthColor(score: number) {
 }
 
 function priorityColor(p: string) {
+  if (p === "Critical") return "bg-red-100 text-red-800";
+  if (p === "High") return "bg-orange-100 text-orange-800";
+  if (p === "Standard") return "bg-blue-100 text-blue-800";
+  if (p === "Low") return "bg-gray-100 text-gray-800";
+  // Legacy support
   if (p === "P1") return "bg-red-100 text-red-800";
   if (p === "P2") return "bg-orange-100 text-orange-800";
   if (p === "P3") return "bg-blue-100 text-blue-800";
@@ -278,47 +283,57 @@ export function ClientProfile({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{client.businessName}</h1>
-            <Badge variant="outline" className={healthColor(client.healthScore)}>
-              Health: {client.healthScore}
-            </Badge>
-            <EditClientDialog client={client} onUpdate={handleUpdate} />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-3xl font-bold">{client.businessName}</h1>
+              <Badge variant="outline" className={`${healthColor(client.healthScore)} text-sm px-3 py-1`}>
+                Health: {client.healthScore}
+              </Badge>
+              <EditClientDialog client={client} onUpdate={handleUpdate} />
+            </div>
+            <div className="mt-2 space-y-1">
+              <p className="text-base text-muted-foreground">
+                {client.lead?.city && client.lead?.state && (
+                  <>
+                    <span className="font-medium">Location:</span> {client.lead.city}, {client.lead.state}
+                  </>
+                )}
+              </p>
+              {client.lead?.website && (
+                <p className="text-base text-muted-foreground">
+                  <span className="font-medium">Website:</span>{" "}
+                  <a
+                    href={
+                      client.lead.website.startsWith("http")
+                        ? client.lead.website
+                        : `https://${client.lead.website}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-foreground"
+                  >
+                    {client.lead.website}
+                  </a>
+                </p>
+              )}
+              {client.lead?.phone && (
+                <p className="text-base text-muted-foreground">
+                  <span className="font-medium">Phone:</span> {client.lead.phone}
+                </p>
+              )}
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            {client.lead?.city && client.lead?.state && `${client.lead.city}, ${client.lead.state}`}
-            {client.lead?.website && (
-              <>
-                {" · "}
-                <a
-                  href={
-                    client.lead.website.startsWith("http")
-                      ? client.lead.website
-                      : `https://${client.lead.website}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-foreground"
-                >
-                  {client.lead.website}
-                </a>
-              </>
-            )}
-            {client.lead?.phone && (
-              <>
-                {" · "}{client.lead.phone}
-              </>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{formatCurrency(Number(client.retainerAmount))}/mo</span>
-          <span>·</span>
-          <span>Client since {formatDate(client.onboardedAt)}</span>
-          <span>·</span>
-          <span>Last scan: {timeAgo(client.lastScanAt)}</span>
+          <div className="flex flex-col gap-2 text-right">
+            <div className="text-3xl font-bold text-primary">
+              {formatCurrency(Number(client.retainerAmount))}<span className="text-lg text-muted-foreground">/mo</span>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p><span className="font-medium">Client since:</span> {formatDate(client.onboardedAt)}</p>
+              <p><span className="font-medium">Last scan:</span> {timeAgo(client.lastScanAt)}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -712,7 +727,7 @@ function AddTaskDialog({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("content");
-  const [priority, setPriority] = useState("P3");
+  const [priority, setPriority] = useState("Standard");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -775,10 +790,10 @@ function AddTaskDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="P1">P1 — Critical</SelectItem>
-                <SelectItem value="P2">P2 — High</SelectItem>
-                <SelectItem value="P3">P3 — Standard</SelectItem>
-                <SelectItem value="P4">P4 — Low</SelectItem>
+                <SelectItem value="Critical">🔴 Critical</SelectItem>
+                <SelectItem value="High">🟠 High</SelectItem>
+                <SelectItem value="Standard">🔵 Standard</SelectItem>
+                <SelectItem value="Low">⚪ Low</SelectItem>
               </SelectContent>
             </Select>
           </div>
