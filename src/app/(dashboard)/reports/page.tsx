@@ -1,11 +1,11 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
 
 
 export default async function ReportsPage() {
-  await requireMaster();
+  await requirePermission("view_analytics");
 
   // Territory breakdown
   const territories = await prisma.territory.findMany({

@@ -1,8 +1,8 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { DiscoveryDashboard } from "@/components/discovery/discovery-dashboard";
 
 export default async function DiscoveryPage() {
-  await requireMaster();
+  await requirePermission("view_all_leads");
 
   return (
     <div className="space-y-6">

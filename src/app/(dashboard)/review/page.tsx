@@ -1,9 +1,9 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { ReviewQueue } from "@/components/review/review-queue";
 
 export default async function ReviewPage() {
-  await requireMaster();
+  await requirePermission("manage_clients");
 
   // Get all tasks in review status
   const tasksInReview = await prisma.clientTask.findMany({

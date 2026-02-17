@@ -1,9 +1,9 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { getClients, getPortfolioStats } from "@/lib/db/clients";
 import { ClientPortfolio } from "@/components/clients/portfolio";
 
 export default async function ClientsPage() {
-  await requireMaster();
+  await requirePermission("view_all_clients");
 
   const [clients, stats] = await Promise.all([
     getClients({ status: "active" }),
