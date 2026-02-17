@@ -5,7 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { UserPermissions, UserWithPermissions } from './types';
-import { hasPermission, isMaster } from './checker';
+import { hasPermission } from './checker';
 
 /**
  * Require a specific permission

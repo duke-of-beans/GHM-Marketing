@@ -6,7 +6,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Shield, Mail, MapPin, Users as UsersIcon } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail, MapPin, Users as UsersIcon } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

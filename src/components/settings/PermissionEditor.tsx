@@ -55,7 +55,7 @@ export function PermissionEditor({ permissions, onChange }: PermissionEditorProp
       <div className="space-y-2">
         <h4 className="font-semibold text-sm">Custom Permissions</h4>
         <p className="text-xs text-muted-foreground">
-          Toggle individual permissions. Changes set preset to "Custom".
+          Toggle individual permissions. Changes set preset to &ldquo;Custom&rdquo;.
         </p>
       </div>
 
