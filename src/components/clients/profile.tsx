@@ -101,7 +101,7 @@ type Scan = {
 type ClientData = {
   id: number;
   businessName: string;
-  retainerAmount: string | number;
+  retainerAmount: number;
   healthScore: number;
   scanFrequency: string;
   status: string;
