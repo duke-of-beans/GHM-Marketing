@@ -26,6 +26,7 @@ import { formatCurrency } from "@/components/dashboard/metric-card";
 import { ScanHistory } from "./scan-history";
 import { ClientReportsTab } from "./reports/client-reports-tab";
 import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
+import { EditClientDialog } from "./edit-client-dialog";
 
 // ============================================================================
 // TYPES
@@ -209,6 +210,8 @@ export function ClientProfile({
   const [activeTab, setActiveTab] = useState("scorecard");
   const [tasks, setTasks] = useState<Task[]>(client.tasks);
   const [notes, setNotes] = useState<ClientNote[]>(client.notes);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const handleUpdate = () => setRefreshKey(prev => prev + 1);
 
   // ---- Task status update ----
   async function updateTask(taskId: number, status: string) {
@@ -267,6 +270,7 @@ export function ClientProfile({
             <Badge variant="outline" className={healthColor(client.healthScore)}>
               Health: {client.healthScore}
             </Badge>
+            <EditClientDialog client={client} onUpdate={handleUpdate} />
           </div>
           <p className="text-sm text-muted-foreground mt-1">
             {client.lead?.city && client.lead?.state && `${client.lead.city}, ${client.lead.state}`}
