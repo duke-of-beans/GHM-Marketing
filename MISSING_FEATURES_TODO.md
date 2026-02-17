@@ -4,6 +4,352 @@
 
 ---
 
+## 🔴 **CRITICAL - ARCHITECTURAL FOUNDATION**
+
+### 0. Granular Permission System
+**Status:** Designed, not implemented  
+**Priority:** CRITICAL - Needed for team scaling and role flexibility  
+**Use Case:** Allow sales reps (e.g., Arian) to access advanced features like client management and content studio WITHOUT full master promotion
+
+**Current Problem:**
+- Hard-coded roles: `sales`, `master`, `owner`
+- All-or-nothing permissions
+- Can't give partial access (e.g., Arian manages clients post-sale but not compensation)
+
+**Proposed Solution: Feature-Flag Permission System**
+
+#### Database Schema Addition:
+```prisma
+model User {
+  // ... existing fields
+  
+  // New permissions field (JSON) - stores feature flags
+  permissions Json @default("{}")
+  
+  // Permission preset for easy management
+  permissionPreset String @default("sales_basic") 
+  // Options: sales_basic, sales_advanced, master_lite, master_full, custom
+}
+```
+
+#### Permission Interface (TypeScript):
+```typescript
+interface UserPermissions {
+  // Client Management
+  canViewAllClients: boolean;      // See all clients (not just own deals)
+  canEditClients: boolean;          // Edit client profiles
+  canManageTasks: boolean;          // Create/assign tasks for clients
+  canAccessContentStudio: boolean;  // Generate content for clients
+  
+  // Sales & Discovery
+  canAccessDiscovery: boolean;      // Use lead discovery tools
+  canClaimAnyLead: boolean;         // Claim leads outside assigned territory
+  canReassignLeads: boolean;        // Move leads between reps
+  
+  // Intelligence & Scanning
+  canViewCompetitiveScans: boolean; // See competitive intel data
+  canTriggerScans: boolean;         // Manually trigger competitive scans
+  canAccessVoiceCapture: boolean;   // Use SCRVNR voice capture system
+  
+  // Analytics & Reporting
+  canViewTeamAnalytics: boolean;    // See company-wide metrics
+  canViewOthersEarnings: boolean;   // See other reps' commissions
+  canGenerateReports: boolean;      // Create client reports
+  
+  // System Features (Global - Not Togglable)
+  canReportBugs: boolean;           // Bug reporting (controlled by global settings)
+  canAccessOwnDashboard: boolean;   // Personal metrics (always true for all users)
+  
+  // Master-Only Features (NEVER Togglable - Hard-Coded)
+  // These remain restricted to role="master" or role="owner":
+  // - Settings panel access
+  // - Compensation management
+  // - User permission management
+  // - API key configuration
+  // - Global system configuration
+}
+```
+
+#### Permission Presets (Quick Templates):
+
+**1. Sales Basic** (Default for new reps)
+```json
+{
+  "canViewAllClients": false,
+  "canEditClients": false,
+  "canManageTasks": false,
+  "canAccessContentStudio": false,
+  "canAccessDiscovery": true,
+  "canClaimAnyLead": false,
+  "canReassignLeads": false,
+  "canViewCompetitiveScans": false,
+  "canTriggerScans": false,
+  "canAccessVoiceCapture": false,
+  "canViewTeamAnalytics": false,
+  "canViewOthersEarnings": false,
+  "canGenerateReports": false,
+  "canReportBugs": true,
+  "canAccessOwnDashboard": true
+}
+```
+
+**2. Sales Advanced** (High performers)
+```json
+{
+  "canViewAllClients": false,
+  "canEditClients": false,
+  "canManageTasks": false,
+  "canAccessContentStudio": true,  // Can create content for OWN clients
+  "canAccessDiscovery": true,
+  "canClaimAnyLead": false,
+  "canReassignLeads": false,
+  "canViewCompetitiveScans": true,  // View only
+  "canTriggerScans": false,
+  "canAccessVoiceCapture": true,
+  "canViewTeamAnalytics": false,
+  "canViewOthersEarnings": false,
+  "canGenerateReports": true,
+  "canReportBugs": true,
+  "canAccessOwnDashboard": true
+}
+```
+
+**3. Master Lite** (Post-sale manager - Arian's use case)
+```json
+{
+  "canViewAllClients": true,        // See all clients
+  "canEditClients": true,            // Edit all client profiles
+  "canManageTasks": true,            // Manage tasks for all clients
+  "canAccessContentStudio": true,    // Create content for ALL clients
+  "canAccessDiscovery": true,
+  "canClaimAnyLead": false,
+  "canReassignLeads": false,
+  "canViewCompetitiveScans": true,
+  "canTriggerScans": false,          // View only, can't trigger
+  "canAccessVoiceCapture": true,
+  "canViewTeamAnalytics": false,     // No team analytics
+  "canViewOthersEarnings": false,    // No earnings visibility
+  "canGenerateReports": true,
+  "canReportBugs": true,
+  "canAccessOwnDashboard": true
+}
+```
+
+**4. Master Full** (Full manager)
+```json
+{
+  "canViewAllClients": true,
+  "canEditClients": true,
+  "canManageTasks": true,
+  "canAccessContentStudio": true,
+  "canAccessDiscovery": true,
+  "canClaimAnyLead": true,
+  "canReassignLeads": true,
+  "canViewCompetitiveScans": true,
+  "canTriggerScans": true,
+  "canAccessVoiceCapture": true,
+  "canViewTeamAnalytics": true,
+  "canViewOthersEarnings": true,
+  "canGenerateReports": true,
+  "canReportBugs": true,
+  "canAccessOwnDashboard": true
+}
+```
+
+**5. Custom** - Manually toggle each permission individually
+
+#### UI Design - User Management Page:
+
+**Location:** `/settings` → "Team Members" tab (master-only)
+
+**Layout:**
+```
+┌─────────────────────────────────────────────────────┐
+│ Team Members                              [+ Add User] │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ 📊 Arian Thompson (sales)                          │
+│ └─ Email: arian@ghm.com                            │
+│ └─ Territory: Dallas Metro                         │
+│                                                     │
+│    Permission Preset: [Master Lite ▼]              │
+│    ├─ Sales Basic                                  │
+│    ├─ Sales Advanced                               │
+│    ├─ Master Lite          ✓ Selected              │
+│    ├─ Master Full                                  │
+│    └─ Custom...                                    │
+│                                                     │
+│    📋 Custom Permissions:                          │
+│    (Shown when "Custom" preset selected)           │
+│                                                     │
+│    Client Management:                              │
+│    ✅ View All Clients                             │
+│    ✅ Edit Clients                                 │
+│    ✅ Manage Tasks                                 │
+│    ✅ Access Content Studio                        │
+│                                                     │
+│    Sales & Discovery:                              │
+│    ✅ Access Discovery                             │
+│    ⬜ Claim Any Lead                               │
+│    ⬜ Reassign Leads                               │
+│                                                     │
+│    Intelligence:                                   │
+│    ✅ View Competitive Scans                       │
+│    ⬜ Trigger Scans                                │
+│    ✅ Voice Capture (SCRVNR)                       │
+│                                                     │
+│    Analytics:                                      │
+│    ⬜ View Team Analytics                          │
+│    ⬜ View Others' Earnings                        │
+│    ✅ Generate Reports                             │
+│                                                     │
+│    [Save Changes] [Reset to Preset]                │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ 📊 Mike Johnson (sales)                            │
+│ └─ Permission Preset: [Sales Basic ▼]              │
+│    (Collapsed view - click to expand)              │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+#### Implementation Files:
+
+**Phase 1: Database & Utilities (30 minutes)**
+1. `prisma/schema.prisma` - Add permissions field
+2. `src/lib/permissions/types.ts` - Permission interface definitions
+3. `src/lib/permissions/presets.ts` - Preset configurations
+4. `src/lib/permissions/checker.ts` - Permission checking utilities
+5. `src/lib/permissions/middleware.ts` - Server-side permission enforcement
+6. Migration: `npx prisma db push`
+
+**Phase 2: API Endpoints (30 minutes)**
+7. `src/app/api/users/[id]/permissions/route.ts` - GET/PATCH permissions
+8. Update existing API routes to check permissions (not just roles)
+
+**Phase 3: UI Components (1 hour)**
+9. `src/app/(dashboard)/settings/team/page.tsx` - Team management page
+10. `src/components/settings/UserPermissionsEditor.tsx` - Permission toggle UI
+11. `src/components/settings/PermissionPresetSelector.tsx` - Preset dropdown
+12. `src/components/dashboard/nav.tsx` - Update nav to check permissions
+
+**Phase 4: Integration (1 hour)**
+13. Replace all `user.role === "master"` checks with feature checks
+14. Update navigation visibility based on permissions
+15. Update page access guards with permission checks
+16. Add permission tooltips explaining restricted features
+
+**Phase 5: Tutorial & Documentation (30 minutes)**
+17. Update `onboarding-tutorial.tsx` for new permission features
+18. Add permission system documentation
+19. Create migration guide for existing users
+
+#### Permission Checking Pattern:
+
+**Old Way (Role-Based):**
+```typescript
+if (user.role === "master") {
+  // Show feature
+}
+```
+
+**New Way (Permission-Based):**
+```typescript
+import { hasPermission } from "@/lib/permissions/checker";
+
+if (hasPermission(user, "canViewAllClients")) {
+  // Show feature
+}
+```
+
+**Server-Side API Protection:**
+```typescript
+import { requirePermission } from "@/lib/permissions/middleware";
+
+export async function GET(req: Request) {
+  const user = await getUser(req);
+  requirePermission(user, "canViewTeamAnalytics");
+  
+  // Continue with logic...
+}
+```
+
+#### Migration Strategy:
+
+**Existing Users:**
+```typescript
+// Migration script to run once
+async function migrateExistingUsers() {
+  // Sales reps → Sales Basic preset
+  await prisma.user.updateMany({
+    where: { role: "sales" },
+    data: { 
+      permissions: SALES_BASIC_PRESET,
+      permissionPreset: "sales_basic"
+    }
+  });
+  
+  // Masters → Master Full preset
+  await prisma.user.updateMany({
+    where: { role: "master" },
+    data: { 
+      permissions: MASTER_FULL_PRESET,
+      permissionPreset: "master_full"
+    }
+  });
+  
+  // Owners → Master Full preset (keep role="owner" for system settings)
+  await prisma.user.updateMany({
+    where: { role: "owner" },
+    data: { 
+      permissions: MASTER_FULL_PRESET,
+      permissionPreset: "master_full"
+    }
+  });
+}
+```
+
+#### Testing Checklist:
+
+**Permission Enforcement:**
+- [ ] Sales Basic cannot access team analytics
+- [ ] Sales Advanced can generate content for own clients only
+- [ ] Master Lite can edit all clients
+- [ ] Master Lite cannot access Settings panel
+- [ ] Master Full can reassign leads
+- [ ] Owners retain all system settings access
+
+**UI Behavior:**
+- [ ] Navigation hides restricted items
+- [ ] Permission preset dropdown works
+- [ ] Custom permission toggles save correctly
+- [ ] Permission changes apply immediately (no re-login needed)
+- [ ] Tooltip explains why feature is restricted
+
+**API Security:**
+- [ ] API routes reject unauthorized requests
+- [ ] Permission checks happen server-side
+- [ ] Client-side checks match server-side
+- [ ] Permission bypass attempts fail gracefully
+
+#### Benefits:
+
+1. **Flexibility:** Promote Arian to client management without full master access
+2. **Scalability:** Easy to add new permissions as features grow
+3. **Security:** Granular control over sensitive features
+4. **UX:** Clear preset system + custom overrides
+5. **Audit Trail:** Track permission changes in database
+
+#### Edge Cases to Handle:
+
+- User downgrades from Master Full to Master Lite → Still has access to their own managed clients
+- Permission conflicts → Preset always wins unless "Custom" selected
+- Missing permissions in old users → Default to most restrictive (Sales Basic)
+- API endpoints → Always check permissions server-side, never trust client
+
+---
+
 ## 🔴 **CRITICAL - BLOCKING DEPLOYMENT**
 
 ### 1. Client Portal Migration
