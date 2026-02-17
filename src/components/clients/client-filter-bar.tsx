@@ -11,7 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, X, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type FilterState = {
   search: string;
@@ -50,7 +56,8 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
     filters.sortBy !== "health-low";
 
   return (
-    <div className="space-y-3 p-4 border rounded-lg bg-card">
+    <TooltipProvider>
+      <div className="space-y-3 p-4 border rounded-lg bg-card">
       {/* Basic Filters Row */}
       <div className="flex flex-wrap gap-2">
         <Input
@@ -192,9 +199,19 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
         <div className="pt-3 border-t space-y-3">
           {/* Revenue Range */}
           <div>
-            <label className="text-sm font-medium mb-2 block">
-              Monthly Revenue
-            </label>
+            <div className="flex items-center gap-1.5 mb-2">
+              <label className="text-sm font-medium">Monthly Revenue</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Filter clients by their monthly retainer amount. High = $2,000+, Mid = $1,000-$1,999, Low = under $1,000.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant={filters.revenueRange === "all" ? "default" : "outline"}
@@ -229,7 +246,19 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
 
           {/* Task Filter */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Open Tasks</label>
+            <div className="flex items-center gap-1.5 mb-2">
+              <label className="text-sm font-medium">Open Tasks</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Filter by whether clients have open SEO tasks. Use this to find clients who need work completed or those with no pending tasks.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant={filters.taskFilter === "all" ? "default" : "outline"}
@@ -261,7 +290,19 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
 
           {/* Scan Status */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Scan Status</label>
+            <div className="flex items-center gap-1.5 mb-2">
+              <label className="text-sm font-medium">Scan Status</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Filter by when clients were last scanned. Recent = scanned within 7 days, Needs Scan = 7+ days since last scan. Regular scans track competitive position.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant={filters.scanFilter === "all" ? "default" : "outline"}
@@ -293,6 +334,7 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 }
 

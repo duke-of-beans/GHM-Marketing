@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, DollarSign } from "lucide-react";
+import { Users, DollarSign, HelpCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ManagementFeesData {
   totalFeesEarned: number;
@@ -70,13 +76,26 @@ export function ManagementFeesWidget() {
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Users className="h-4 w-4" />
-          Management Fees
-        </CardTitle>
-      </CardHeader>
+    <TooltipProvider>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Management Fees
+            </CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">
+                  Your earnings as a Master Manager. You receive $240/month for each client you manage, starting in Month 1 after onboarding. Owners (David & Gavin) don't pay themselves master fees.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </CardHeader>
       <CardContent className="space-y-4">
         {/* Total Earned */}
         <div>
@@ -94,6 +113,16 @@ export function ManagementFeesWidget() {
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-blue-600" />
               <p className="text-sm font-medium">This Month</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Expected management fees for this month based on clients you're currently managing.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <p className="text-lg font-bold text-blue-600">
               {formatCurrency(data.monthlyFees)}
@@ -117,5 +146,6 @@ export function ManagementFeesWidget() {
         )}
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 }

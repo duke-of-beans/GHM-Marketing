@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, DollarSign } from "lucide-react";
+import { TrendingUp, DollarSign, HelpCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ProfitabilityData {
   totalRevenue: number;
@@ -77,13 +83,26 @@ export function CompanyProfitabilityWidget() {
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <TrendingUp className="h-4 w-4" />
-          Company Profitability
-        </CardTitle>
-      </CardHeader>
+    <TooltipProvider>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Company Profitability
+            </CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">
+                  Company profit breakdown showing revenue vs expenses. Net profit = monthly revenue minus all compensation (commissions, residuals, master fees). Owners only.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </CardHeader>
       <CardContent className="space-y-4">
         {/* Net Profit */}
         <div>
@@ -93,9 +112,21 @@ export function CompanyProfitabilityWidget() {
             </p>
             <p className="text-xs text-muted-foreground">Net Profit</p>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            {data.profitMargin.toFixed(1)}% margin · {data.activeClients} active clients
-          </p>
+          <div className="flex items-center gap-1 mt-1">
+            <p className="text-sm text-muted-foreground">
+              {data.profitMargin.toFixed(1)}% margin · {data.activeClients} active clients
+            </p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">
+                  Profit margin = (Net Profit ÷ Total Revenue) × 100. Higher margins indicate better operational efficiency.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
 
         {/* Revenue & Expenses */}
@@ -153,5 +184,6 @@ export function CompanyProfitabilityWidget() {
         </div>
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 }

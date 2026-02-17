@@ -11,7 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, X, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Territory = { id: number; name: string };
 type Rep = { id: number; name: string };
@@ -95,7 +101,8 @@ export function LeadFilterBar({
     filters.sortBy !== "newest";
 
   return (
-    <div className="space-y-3 p-4 border rounded-lg bg-card">
+    <TooltipProvider>
+      <div className="space-y-3 p-4 border rounded-lg bg-card">
       {/* Basic Filters Row */}
       <div className="flex flex-wrap gap-2">
         <Input
@@ -250,7 +257,19 @@ export function LeadFilterBar({
         <div className="pt-3 border-t space-y-3">
           {/* Status Checkboxes */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Status</label>
+            <div className="flex items-center gap-1.5 mb-2">
+              <label className="text-sm font-medium">Status</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Filter leads by their current status in the sales pipeline. Available = unassigned, Scheduled = meeting set, Contacted = first touch made, Follow Up = nurturing, Paperwork = contracts in progress, Won = closed deals, Lost = rejected/dead.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {STATUS_OPTIONS.map((option) => (
                 <label
@@ -271,7 +290,19 @@ export function LeadFilterBar({
 
           {/* Date Range */}
           <div>
-            <label className="text-sm font-medium mb-2 block">Date Range</label>
+            <div className="flex items-center gap-1.5 mb-2">
+              <label className="text-sm font-medium">Date Range</label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Filter leads by when they were last updated or created. Use this to focus on recent activity or older leads that may need attention.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant={filters.dateRange === "all" ? "default" : "outline"}
@@ -306,6 +337,7 @@ export function LeadFilterBar({
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 }
 

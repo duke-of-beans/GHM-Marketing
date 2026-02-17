@@ -2,8 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, Users } from "lucide-react";
+import { DollarSign, TrendingUp, Users, HelpCircle } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface EarningsData {
   totalCommissionEarned: number;
@@ -74,13 +80,26 @@ export function MyEarningsWidget() {
   const totalEarned = data.totalCommissionEarned + data.totalResidualEarned;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <DollarSign className="h-4 w-4" />
-          My Earnings
-        </CardTitle>
-      </CardHeader>
+    <TooltipProvider>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              My Earnings
+            </CardTitle>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="text-sm">
+                  Your total earnings from commissions (paid at client close) and monthly residuals. Commissions are one-time payments of $1,000 per new client. Residuals start Month 2 at $200/month per active client.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </CardHeader>
       <CardContent className="space-y-4">
         {/* Total Earned */}
         <div>
@@ -108,6 +127,16 @@ export function MyEarningsWidget() {
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-blue-600" />
               <p className="text-sm font-medium">Monthly Recurring</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Your expected monthly residual income from active clients. This is recurring revenue that continues as long as clients remain active.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <p className="text-lg font-bold text-blue-600">
               {formatCurrency(data.monthlyResidual)}
@@ -122,7 +151,19 @@ export function MyEarningsWidget() {
         {data.pendingCommissions > 0 && (
           <div className="pt-3 border-t">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Pending</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm text-muted-foreground">Pending</p>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">
+                      Commission payments that have been generated but not yet marked as paid. These will be processed in the next payment cycle.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <p className="text-sm font-medium text-orange-600">
                 {formatCurrency(data.pendingCommissions)}
               </p>
@@ -131,5 +172,6 @@ export function MyEarningsWidget() {
         )}
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 }
