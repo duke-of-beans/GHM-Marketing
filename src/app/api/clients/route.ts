@@ -96,7 +96,6 @@ export async function POST(request: NextRequest) {
         zipCode: zipCode || null,
         status: "won", // Mark as won since we're creating a client
         dealValueTotal: retainerAmount,
-        qualificationScore: 100, // Manual entries get max score
         leadSourceId: leadSource.id,
       },
     });
