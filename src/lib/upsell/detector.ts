@@ -110,7 +110,7 @@ export async function saveUpsellOpportunities(
   scanId: number,
   opportunities: UpsellOpportunity[]
 ) {
-  const created = [];
+  const created: any[] = [];
 
   for (const opp of opportunities) {
     // Check if this opportunity already exists
@@ -123,7 +123,7 @@ export async function saveUpsellOpportunities(
     });
 
     if (!existing) {
-      const created = await prisma.upsellOpportunity.create({
+      const newOpportunity = await prisma.upsellOpportunity.create({
         data: {
           clientId,
           productId: opp.productId,
@@ -135,7 +135,7 @@ export async function saveUpsellOpportunities(
           projectedRoi: opp.projectedRoi,
         },
       });
-      created.push(created);
+      created.push(newOpportunity);
     }
   }
 
