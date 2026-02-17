@@ -6,10 +6,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Users, Plus, Search } from "lucide-react";
+import { Loader2, Users, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { UserPermissionCard } from "./UserPermissionCard";
 
@@ -28,6 +35,8 @@ export function TeamManagementTab() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"all" | "master" | "sales">("all");
+  const [sortBy, setSortBy] = useState<"name" | "role" | "leads">("name");
 
   useEffect(() => {
     loadUsers();
@@ -75,10 +84,33 @@ export function TeamManagementTab() {
     }
   }
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = users
+    .filter(user => {
+      // Search filter
+      const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Role filter
+      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      
+      return matchesSearch && matchesRole;
+    })
+    .sort((a, b) => {
+      // Sort logic
+      if (sortBy === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === "role") {
+        // Master before Sales
+        if (a.role === b.role) return a.name.localeCompare(b.name);
+        return a.role === "master" ? -1 : 1;
+      } else if (sortBy === "leads") {
+        // Most leads first
+        const aLeads = a._count?.assignedLeads || 0;
+        const bLeads = b._count?.assignedLeads || 0;
+        return bLeads - aLeads;
+      }
+      return 0;
+    });
 
   if (loading) {
     return (
@@ -106,15 +138,40 @@ export function TeamManagementTab() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by name or email..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        <Select value={roleFilter} onValueChange={(v: any) => setRoleFilter(v)}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Filter by role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Roles</SelectItem>
+            <SelectItem value="master">Master Only</SelectItem>
+            <SelectItem value="sales">Sales Only</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Sort by Name</SelectItem>
+            <SelectItem value="role">Sort by Role</SelectItem>
+            <SelectItem value="leads">Sort by Leads</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* User List */}

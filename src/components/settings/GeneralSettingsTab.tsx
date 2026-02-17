@@ -136,44 +136,42 @@ export function GeneralSettingsTab() {
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="defaultCommission">Default Commission (%)</Label>
+              <Label htmlFor="defaultCommission">Default Commission ($)</Label>
               <Input
                 id="defaultCommission"
                 type="number"
-                step="0.01"
+                step="1"
                 min="0"
-                max="1"
-                value={(settings.defaultCommission * 100).toFixed(0)}
+                value={settings.defaultCommission}
                 onChange={(e) =>
                   updateSetting(
                     "defaultCommission",
-                    parseFloat(e.target.value) / 100
+                    parseFloat(e.target.value)
                   )
                 }
               />
               <p className="text-xs text-muted-foreground">
-                Percentage of MRR (0-100)
+                Dollar amount per sale
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="defaultResidual">Default Residual (%)</Label>
+              <Label htmlFor="defaultResidual">Default Residual ($)</Label>
               <Input
                 id="defaultResidual"
                 type="number"
-                step="0.01"
+                step="1"
                 min="0"
-                max="1"
-                value={(settings.defaultResidual * 100).toFixed(0)}
+                value={settings.defaultResidual}
                 onChange={(e) =>
                   updateSetting(
                     "defaultResidual",
-                    parseFloat(e.target.value) / 100
+                    parseFloat(e.target.value)
                   )
                 }
               />
               <p className="text-xs text-muted-foreground">
-                Ongoing monthly commission (0-100)
+                Ongoing monthly dollar amount
               </p>
             </div>
 

@@ -54,12 +54,7 @@ export function PresetSelector({ currentPreset, onChange }: PresetSelectorProps)
         <SelectContent>
           {PRESET_OPTIONS.map((preset) => (
             <SelectItem key={preset.value} value={preset.value}>
-              <div className="flex flex-col">
-                <span className="font-medium">{preset.label}</span>
-                <span className="text-xs text-muted-foreground">
-                  {preset.description}
-                </span>
-              </div>
+              {preset.label}
             </SelectItem>
           ))}
         </SelectContent>
