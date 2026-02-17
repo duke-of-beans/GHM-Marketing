@@ -35,11 +35,15 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
     search: "",
     territoryId: null,
     assignedToId: null,
+    statuses: [],
+    dateRange: "all",
+    sortBy: "newest",
   });
 
   const filteredLeads = useMemo(() => {
     let result = initialLeads;
 
+    // Search filter
     if (filters.search) {
       const q = filters.search.toLowerCase();
       result = result.filter(
@@ -50,6 +54,7 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
       );
     }
 
+    // Assigned to filter
     if (filters.assignedToId !== null) {
       if (filters.assignedToId === 0) {
         result = result.filter((lead) => !lead.assignedUser);
@@ -58,6 +63,27 @@ export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps
           (lead) => lead.assignedUser?.id === filters.assignedToId
         );
       }
+    }
+
+    // Status filter
+    if (filters.statuses.length > 0) {
+      result = result.filter((lead) => filters.statuses.includes(lead.status));
+    }
+
+    // Date range filter (filtering not yet implemented - would need updatedAt field)
+    // TODO: Add updatedAt to the lead query if date filtering is needed
+
+    // Sorting
+    if (filters.sortBy === "newest") {
+      // Already sorted by updatedAt desc from server
+    } else if (filters.sortBy === "oldest") {
+      result = [...result].reverse();
+    } else if (filters.sortBy === "value-high") {
+      result = [...result].sort((a, b) => b.dealValueTotal - a.dealValueTotal);
+    } else if (filters.sortBy === "value-low") {
+      result = [...result].sort((a, b) => a.dealValueTotal - b.dealValueTotal);
+    } else if (filters.sortBy === "updated") {
+      // Already sorted by updatedAt desc from server
     }
 
     return result;
