@@ -80,7 +80,6 @@ export async function POST(request: NextRequest) {
       leadSource = await prisma.leadSource.create({
         data: {
           name: "Manual Entry",
-          description: "Manually added existing clients",
         },
       });
     }
