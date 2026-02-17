@@ -5,6 +5,7 @@ import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyEarningsWidget } from "@/components/payments/my-earnings-widget";
+import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -151,6 +152,9 @@ export default async function SalesDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial userRole="sales" userName={user.name} />
     </div>
   );
 }

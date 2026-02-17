@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
+import { HelpMenu } from "@/components/onboarding/help-menu";
 
 type NavUser = {
   name: string;
@@ -68,13 +69,18 @@ export function DashboardNav({ user }: { user: NavUser }) {
           ))}
         </nav>
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors mt-auto"
-        >
-          <span>🚪</span>
-          Sign Out
-        </button>
+        <div className="mt-auto space-y-1">
+          <div className="px-3">
+            <HelpMenu />
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors w-full"
+          >
+            <span>🚪</span>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* Mobile bottom nav */}

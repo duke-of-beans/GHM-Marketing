@@ -6,6 +6,7 @@ import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { RepLeaderboard } from "@/components/dashboard/rep-leaderboard";
 import { ManagementFeesWidget } from "@/components/payments/management-fees-widget";
 import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
+import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 
 export default async function MasterDashboard() {
   const user = await requireMaster();
@@ -104,6 +105,12 @@ export default async function MasterDashboard() {
         <ManagementFeesWidget />
         {isOwner && <CompanyProfitabilityWidget />}
       </div>
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial 
+        userRole={isOwner ? "owner" : "master"} 
+        userName={user.name} 
+      />
     </div>
   );
 }
