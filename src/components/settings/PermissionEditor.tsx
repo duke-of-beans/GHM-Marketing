@@ -1,72 +1,97 @@
 /**
- * Permission Editor Component
- * Checkbox interface for toggling individual permissions
+ * Permission Editor
+ * Toggle switches for individual permissions
  */
 
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import {
-  UserPermissions,
-  PERMISSION_CATEGORIES,
-  PERMISSION_LABELS,
-  PERMISSION_DESCRIPTIONS,
-} from "@/lib/permissions";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+
+const PERMISSION_CATEGORIES = {
+  "Client Management": [
+    { key: "canViewAllClients", label: "View All Clients", description: "See all clients (not just own deals)" },
+    { key: "canEditClients", label: "Edit Clients", description: "Edit client profiles" },
+    { key: "canManageTasks", label: "Manage Tasks", description: "Create and assign tasks for clients" },
+    { key: "canAccessContentStudio", label: "Access Content Studio", description: "Generate content for clients" },
+  ],
+  "Sales & Discovery": [
+    { key: "canAccessDiscovery", label: "Access Discovery", description: "Use lead discovery tools" },
+    { key: "canClaimAnyLead", label: "Claim Any Lead", description: "Claim leads outside assigned territory" },
+    { key: "canReassignLeads", label: "Reassign Leads", description: "Move leads between reps" },
+  ],
+  "Intelligence": [
+    { key: "canViewCompetitiveScans", label: "View Competitive Scans", description: "See competitive intel data" },
+    { key: "canTriggerScans", label: "Trigger Scans", description: "Manually trigger competitive scans" },
+    { key: "canAccessVoiceCapture", label: "Voice Capture", description: "Use SCRVNR voice capture system" },
+  ],
+  "Analytics": [
+    { key: "canViewTeamAnalytics", label: "View Team Analytics", description: "See company-wide metrics" },
+    { key: "canViewOthersEarnings", label: "View Others' Earnings", description: "See other reps' commissions" },
+    { key: "canGenerateReports", label: "Generate Reports", description: "Create client reports" },
+  ],
+  "System": [
+    { key: "canReportBugs", label: "Report Bugs", description: "Bug reporting system" },
+    { key: "canAccessOwnDashboard", label: "Access Own Dashboard", description: "Personal metrics" },
+  ],
+};
 
 interface PermissionEditorProps {
-  permissions: UserPermissions;
-  onChange: (permissions: UserPermissions) => void;
-  disabled?: boolean;
+  permissions: Record<string, boolean>;
+  onChange: (permissions: Record<string, boolean>) => void;
 }
 
-export function PermissionEditor({
-  permissions,
-  onChange,
-  disabled = false,
-}: PermissionEditorProps) {
-  function togglePermission(key: keyof UserPermissions, value: boolean) {
-    onChange({ ...permissions, [key]: value });
+export function PermissionEditor({ permissions, onChange }: PermissionEditorProps) {
+  function togglePermission(key: string) {
+    onChange({
+      ...permissions,
+      [key]: !permissions[key],
+    });
   }
 
   return (
-    <div className="space-y-6">
-      {Object.entries(PERMISSION_CATEGORIES).map(([category, permissionKeys]) => (
-        <div key={category} className="space-y-3">
-          <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-            {category}
-          </h4>
-          <div className="space-y-3 pl-4 border-l-2 border-muted">
-            {permissionKeys.map((key) => (
-              <div key={key} className="flex items-start space-x-3">
-                <Checkbox
-                  id={key}
-                  checked={permissions[key as keyof UserPermissions]}
-                  onCheckedChange={(checked) =>
-                    togglePermission(
-                      key as keyof UserPermissions,
-                      checked as boolean
-                    )
-                  }
-                  disabled={disabled}
-                  className="mt-1"
-                />
-                <div className="flex-1 space-y-1">
-                  <Label
-                    htmlFor={key}
-                    className="text-sm font-medium cursor-pointer"
-                  >
-                    {PERMISSION_LABELS[key as keyof UserPermissions]}
+    <div className="space-y-6 py-4">
+      <div className="space-y-2">
+        <h4 className="font-semibold text-sm">Custom Permissions</h4>
+        <p className="text-xs text-muted-foreground">
+          Toggle individual permissions. Changes set preset to "Custom".
+        </p>
+      </div>
+
+      {Object.entries(PERMISSION_CATEGORIES).map(([category, perms], idx) => (
+        <div key={category}>
+          {idx > 0 && <Separator className="my-4" />}
+          <div className="space-y-4">
+            <h5 className="font-medium text-sm text-muted-foreground">{category}</h5>
+            {perms.map((perm) => (
+              <div
+                key={perm.key}
+                className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                <div className="space-y-0.5 flex-1">
+                  <Label className="text-sm font-normal cursor-pointer">
+                    {perm.label}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    {PERMISSION_DESCRIPTIONS[key as keyof UserPermissions]}
+                    {perm.description}
                   </p>
                 </div>
+                <Switch
+                  checked={permissions[perm.key] || false}
+                  onCheckedChange={() => togglePermission(perm.key)}
+                />
               </div>
             ))}
           </div>
         </div>
       ))}
+
+      <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
+        <p className="text-xs text-amber-900 dark:text-amber-100">
+          <strong>Note:</strong> Some features (Settings, Compensation, User Management) are restricted to Master role only and cannot be toggled here.
+        </p>
+      </div>
     </div>
   );
 }
