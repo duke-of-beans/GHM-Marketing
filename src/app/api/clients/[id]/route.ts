@@ -114,7 +114,7 @@ export async function PATCH(
       await prisma.clientNote.create({
         data: {
           clientId: clientId,
-          authorId: session.user.id,
+          authorId: parseInt(session.user.id),
           content: `Updated client details: ${changes.join(', ')}`,
           type: 'system',
           isPinned: false,
