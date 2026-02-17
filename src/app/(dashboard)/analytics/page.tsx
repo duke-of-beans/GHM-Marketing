@@ -1,9 +1,9 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 
 export default async function AnalyticsPage() {
-  await requireMaster();
+  await requirePermission("view_analytics");
 
   // Fetch analytics data
   const [leads, clients, tasks, scans, opportunities] = await Promise.all([
