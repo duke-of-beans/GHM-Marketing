@@ -7,6 +7,11 @@ import { RepLeaderboard } from "@/components/dashboard/rep-leaderboard";
 import { ManagementFeesWidget } from "@/components/payments/management-fees-widget";
 import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
+import { 
+  QuickActions, 
+  RevenueMetricsWidget, 
+  GoalsWidget 
+} from "@/components/dashboard/dashboard-widgets";
 
 export default async function MasterDashboard() {
   const user = await requirePermission("view_analytics");
@@ -91,6 +96,22 @@ export default async function MasterDashboard() {
           value={formatCurrency(metrics.totalMRR)}
           subtitle={`ARR ${formatCurrency(metrics.totalARR)}`}
           tooltip="Monthly Recurring Revenue from all active clients. ARR = Annual Run Rate (MRR × 12)."
+        />
+      </div>
+
+      {/* Quick Actions + Revenue + Goals */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <QuickActions />
+        <RevenueMetricsWidget 
+          mrr={metrics.totalMRR}
+          arr={metrics.totalARR}
+          growth={5.2}
+        />
+        <GoalsWidget 
+          wonDeals={metrics.wonDeals}
+          targetDeals={20}
+          revenue={metrics.totalMRR}
+          targetRevenue={50000}
         />
       </div>
 

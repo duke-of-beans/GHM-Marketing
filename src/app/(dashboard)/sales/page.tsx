@@ -8,6 +8,7 @@ import { MyEarningsWidget } from "@/components/payments/my-earnings-widget";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Target, TrendingUp, DollarSign, Zap } from "lucide-react";
 
 export default async function SalesDashboard() {
   const user = await getCurrentUser();
@@ -93,6 +94,42 @@ export default async function SalesDashboard() {
           tooltip="Total deal value from all your won clients. This drives your commission and residuals!"
         />
       </div>
+
+      {/* Quick Actions for Sales */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-yellow-500" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/leads">
+              <Button className="w-full h-auto flex-col items-start gap-2 p-4 bg-blue-50 hover:bg-blue-100 text-blue-900 border-none">
+                <div className="flex items-center gap-2 w-full">
+                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  <span className="font-semibold text-sm">View Pipeline</span>
+                </div>
+                <span className="text-xs text-muted-foreground text-left w-full">
+                  Manage your active leads
+                </span>
+              </Button>
+            </Link>
+            <Link href="/leads?filter=available">
+              <Button variant="outline" className="w-full h-auto flex-col items-start gap-2 p-4 bg-green-50 hover:bg-green-100 border-none">
+                <div className="flex items-center gap-2 w-full">
+                  <Target className="h-5 w-5 text-green-600" />
+                  <span className="font-semibold text-sm">Claim Leads</span>
+                </div>
+                <span className="text-xs text-muted-foreground text-left w-full">
+                  {availableInTerritory} available now
+                </span>
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid md:grid-cols-2 gap-4">
         {/* Pipeline funnel */}
