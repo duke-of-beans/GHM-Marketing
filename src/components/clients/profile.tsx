@@ -336,8 +336,19 @@ export function ClientProfile({
                       Health: {client.healthScore}
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-sm">Composite score (0–100) based on competitive position, ranking trends, and scan results. 75+ = healthy, 50–74 = competitive, &lt;50 = needs attention. Updated each time a competitive scan runs.</p>
+                  <TooltipContent className="max-w-xs space-y-2">
+                    <p className="text-sm font-medium">How this score is calculated</p>
+                    <div className="text-xs space-y-1 text-muted-foreground">
+                      <p>Composite score (0–100), updated each time a competitive scan runs.</p>
+                      <div className="pt-1 space-y-0.5 font-mono">
+                        <p>Momentum (vs last scan)  25%</p>
+                        <p>Domain authority         20%</p>
+                        <p>Competitive position     20%</p>
+                        <p>Review count + rating    20%</p>
+                        <p>Site speed               15%</p>
+                      </div>
+                      <p className="pt-1">75+ = healthy · 50–74 = competitive · &lt;50 = needs attention</p>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
