@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GHM SCRVNR Voice Profile",
+  "description": "Voice DNA for a web property brand. One profile per brand identity (not per client — a client can have multiple brands).",
+  "version": "1.0.0",
+
+  "profile_id": "",
+  "client_slug": "",
+  "brand_slug": "",
+  "brand_display_name": "",
+  "tier_scope": [],
+  "created": "",
+  "last_updated": "",
+  "source_url": "",
+  "source_pages_sampled": [],
+  "capture_method": "extraction",
+
+  "reading_level": {
+    "flesch_kincaid_grade": null,
+    "description": "FK grade level of source copy. Decimal.",
+    "target_min": null,
+    "target_max": null,
+    "tolerance": 1.5,
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "sentence_rhythm": {
+    "avg_length_words": null,
+    "std_dev_words": null,
+    "burstiness_score": null,
+    "description": "Burstiness: ratio of std_dev to mean sentence length. >0.60 = human-natural variance. <0.40 = AI-flat.",
+    "target_burstiness_min": 0.60,
+    "tolerance": 0.1,
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "contraction_rate": {
+    "measured": null,
+    "description": "Fraction of eligible positions where contractions appear (0.0-1.0).",
+    "target_min": null,
+    "target_max": null,
+    "tolerance": 0.10,
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "technical_specificity": {
+    "level": null,
+    "description": "low | moderate | high | very-high. Does copy commit to specific numbers, model names, failure modes, measurements?",
+    "markers_detected": [],
+    "target": null,
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "register": {
+    "primary_person": null,
+    "description": "first | second | third. What grammatical person dominates the copy?",
+    "formality_score": null,
+    "formality_description": "1-10. 1=very casual, 10=very formal.",
+    "warmth_score": null,
+    "warmth_description": "1-10. 1=clinical/cold, 10=conversational/warm.",
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "trust_signal_pattern": {
+    "type": null,
+    "description": "certification-led | tenure-referenced | specific-claim | social-proof | authority-led | mixed",
+    "examples_detected": [],
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "native_constructions": {
+    "description": "Phrases, patterns, or sentence structures native to this brand voice. Used in Pass 2 alignment scoring.",
+    "items": [],
+    "confidence_threshold": 0.70,
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "negative_space": {
+    "description": "What this voice never says. Patterns that would be out of character. Used as negative markers in Pass 2.",
+    "items": [],
+    "provenance": "human-defined",
+    "locked": false,
+    "override_note": null
+  },
+
+  "vocabulary": {
+    "density_score": null,
+    "description": "Type-token ratio approximation. Higher = more varied vocabulary.",
+    "domain_specific_terms": [],
+    "characteristic_word_choices": [],
+    "avoided_terms": [],
+    "provenance": "machine-extracted",
+    "locked": false,
+    "override_note": null
+  },
+
+  "override_history": [],
+
+  "locked_fields": [],
+
+  "capture_confidence": {
+    "overall": null,
+    "per_field": {},
+    "low_confidence_flags": [],
+    "notes": ""
+  },
+
+  "intake_interview_data": {
+    "description": "For Tier 3 profiles built from scratch, not extraction. Stores raw intake answers.",
+    "completed": false,
+    "answers": {}
+  }
+}

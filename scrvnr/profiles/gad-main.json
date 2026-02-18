@@ -1,0 +1,225 @@
+{
+  "profile_id": "gad-main",
+  "client_slug": "german-auto-doctor",
+  "brand_slug": "main",
+  "brand_display_name": "German Auto Doctor",
+  "tier_scope": ["T1", "T2", "T3"],
+  "created": "2026-02-18T00:00:00Z",
+  "last_updated": "2026-02-18T00:00:00Z",
+  "source_url": "https://germanautodoctorsimivalley.com",
+  "source_pages_sampled": [
+    "https://germanautodoctorsimivalley.com/",
+    "https://germanautodoctorsimivalley.com/european-auto-repair-westlake-village/"
+  ],
+  "capture_method": "manual-extraction",
+
+  "reading_level": {
+    "flesch_kincaid_grade": 8.5,
+    "description": "Accessible but technical. Commits to automotive terminology without over-explaining. Customers are assumed to know what an oil change is; they may not know what 996/997 coolant line pinning means. Copy explains the latter but not the former.",
+    "target_min": 7.0,
+    "target_max": 10.0,
+    "tolerance": 1.5,
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "sentence_rhythm": {
+    "avg_length_words": 16.0,
+    "std_dev_words": 10.5,
+    "burstiness_score": 0.66,
+    "description": "Moderate burstiness. Short punchy CTAs and declarations ('We've got you covered.') mixed with longer explanatory sentences about services and vehicle specifics. Not flat, but not maximally bursty either.",
+    "target_burstiness_min": 0.55,
+    "tolerance": 0.15,
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "contraction_rate": {
+    "measured": 0.28,
+    "description": "Moderate contraction usage. Uses contractions in conversational/CTA copy ('we've got you covered', 'we're going to give you') but drops them in service description lists and technical specs. Not aggressively formal but not casual either.",
+    "target_min": 0.18,
+    "target_max": 0.40,
+    "tolerance": 0.10,
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "technical_specificity": {
+    "level": "high",
+    "description": "Commits to specific model codes, branded part names, and precise service descriptions. Uses 996/997, GT2, GT3, Turbo nomenclature. Lists specific upgrade types. Does not hide behind generic language when a specific term exists.",
+    "markers_detected": [
+      "996/997 coolant line pinning",
+      "GT2, GT3, and Turbo",
+      "4-wheel alignment and corner balancing",
+      "Audi, BMW, Mercedes, Porsche, Volkswagen, MINI, Bentley, Aston Martin, Maserati",
+      "big brake conversion",
+      "turbocharger service & upgrades"
+    ],
+    "target": "high",
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "register": {
+    "primary_person": "second",
+    "description": "Strong second-person orientation ('your car', 'your investment', 'your vehicle', 'we are here to help'). Speaks directly to the car owner. Business writes as a confident peer — we know your car, we'll fix it right. Not cold, not gushing.",
+    "formality_score": 5,
+    "formality_description": "Mid-range formality. Professional but conversational. No legal or academic register. Not chatty-casual either. Business-direct.",
+    "warmth_score": 7,
+    "warmth_description": "Warm but grounded. Trust built through specific claims and competence, not emotional language. 'Family run shop that treats you like family' is the customer's voice (reviews), not the brand's own copy. Brand voice is competent-warm, not sentimental.",
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "trust_signal_pattern": {
+    "type": "mixed",
+    "description": "Primarily expertise-led and specific-claim. Expertise: 'trained technicians,' 'specialists in all European cars,' 'correctly diagnose and repair your German or European car the first time, every time.' Specific-claim: detailed service lists, named model codes, named upgrade types. Not certification-heavy. Not social-proof-led (reviews exist but the brand copy doesn't lean on them).",
+    "examples_detected": [
+      "trained technicians know how to correctly diagnose and repair your German or European car the first time, every time",
+      "we specialize in repair and preventative maintenance for European brands",
+      "The German Auto Doctor started as a Performance shop",
+      "specialists in all European cars",
+      "exactly where it needs it"
+    ],
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "native_constructions": {
+    "description": "Phrases and sentence patterns that recur in GAD copy. The brand has consistent verbal habits — these are the tells.",
+    "items": [
+      {"pattern": "the first time, every time", "confidence": 0.95, "frequency": 3},
+      {"pattern": "bumper to bumper", "confidence": 0.90, "frequency": 2},
+      {"pattern": "we've got you covered", "confidence": 0.90, "frequency": 2},
+      {"pattern": "german or european car", "confidence": 0.88, "frequency": 3},
+      {"pattern": "trained technicians", "confidence": 0.85, "frequency": 3},
+      {"pattern": "european auto", "confidence": 0.85, "frequency": 4},
+      {"pattern": "preventative maintenance", "confidence": 0.82, "frequency": 3},
+      {"pattern": "we specialize in", "confidence": 0.80, "frequency": 3},
+      {"pattern": "repair and maintenance", "confidence": 0.78, "frequency": 3},
+      {"pattern": "don't pay high dealer prices", "confidence": 0.95, "frequency": 2},
+      {"pattern": "from big projects to simple", "confidence": 0.90, "frequency": 2},
+      {"pattern": "your vehicle", "confidence": 0.75, "frequency": 5},
+      {"pattern": "repair and maintenance for european", "confidence": 0.80, "frequency": 2},
+      {"pattern": "correctly diagnose", "confidence": 0.85, "frequency": 2},
+      {"pattern": "maximizing your mileage", "confidence": 0.82, "frequency": 2},
+      {"pattern": "sophisticated engineering", "confidence": 0.78, "frequency": 2}
+    ],
+    "confidence_threshold": 0.70,
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "negative_space": {
+    "description": "Language this brand voice would never use. Some are general AI-isms. Some are specific to GAD — things that would read as out-of-character given their direct, competence-first style.",
+    "items": [
+      "passionate about your vehicle",
+      "we are dedicated to providing",
+      "world-class service",
+      "industry-leading",
+      "cutting-edge technology",
+      "state-of-the-art facility",
+      "our team of experts",
+      "committed to excellence",
+      "unparalleled service",
+      "we pride ourselves",
+      "we strive to",
+      "going above and beyond",
+      "trusted partner",
+      "peace of mind",
+      "look no further",
+      "don't hesitate to contact us",
+      "feel free to reach out",
+      "in the realm of automotive",
+      "navigating the complexities",
+      "seamless experience",
+      "tailor-made solutions"
+    ],
+    "provenance": "human-defined",
+    "locked": false,
+    "override_note": null
+  },
+
+  "vocabulary": {
+    "density_score": 0.52,
+    "description": "Good vocabulary variety. Technical terms freely used (they assume an owner who knows their marque). Mixes automotive specifics with plain direct English. No corporate jargon. No inflated word choices.",
+    "domain_specific_terms": [
+      "coolant line pinning",
+      "corner balancing",
+      "turbocharger",
+      "clutch replacement",
+      "transmission rebuild",
+      "brake conversion",
+      "suspension",
+      "alignment",
+      "diagnostics",
+      "mileage specific services",
+      "pre purchase inspection",
+      "oil leak repairs"
+    ],
+    "characteristic_word_choices": [
+      "repair",
+      "service",
+      "maintenance",
+      "european",
+      "german",
+      "technicians",
+      "vehicle",
+      "performance",
+      "upgrade",
+      "correct",
+      "specialize",
+      "bumper",
+      "dealer"
+    ],
+    "avoided_terms": [
+      "solutions",
+      "innovative",
+      "leverage",
+      "synergy",
+      "ecosystem",
+      "holistic",
+      "scalable",
+      "streamlined",
+      "best-in-class",
+      "robust"
+    ],
+    "provenance": "manual-extraction",
+    "locked": false,
+    "override_note": null
+  },
+
+  "override_history": [],
+
+  "locked_fields": [],
+
+  "capture_confidence": {
+    "overall": "medium",
+    "source_word_count": 1200,
+    "per_field": {
+      "reading_level": "medium",
+      "sentence_rhythm": "medium",
+      "contraction_rate": "medium",
+      "technical_specificity": "high",
+      "register": "high",
+      "trust_signal_pattern": "high",
+      "native_constructions": "medium",
+      "vocabulary": "medium"
+    },
+    "low_confidence_flags": [],
+    "notes": "Profile built from homepage + location page copy (~1200 words). Technical specificity, register, and trust pattern have high confidence from clear signals. Contraction rate and rhythm are medium — scrape service pages and blog posts to increase sample size. Negative space is human-defined and can be expanded as GHM produces copy that reveals more out-of-character patterns."
+  },
+
+  "intake_interview_data": {
+    "description": "For Tier 3 profiles built from scratch. Not applicable here — extracted from live site.",
+    "completed": false,
+    "answers": {}
+  }
+}
