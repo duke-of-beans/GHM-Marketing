@@ -30,8 +30,8 @@ export async function GET(req: NextRequest) {
         },
         _count: {
           select: {
-            leads: true,
-            clients: true,
+            assignedLeads: true,
+            salesRepClients: true,
           },
         },
       },
