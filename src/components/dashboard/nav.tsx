@@ -68,14 +68,16 @@ export function DashboardNav({
       {/* Desktop sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-gray-50/50 dark:bg-gray-950 p-4 overflow-hidden">
         <div className="mb-3 flex-shrink-0">
-          <Image
-            src="/logo.png"
-            alt="GHM Digital Marketing"
-            width={180}
-            height={59}
-            className="mb-1 dark:brightness-0 dark:invert"
-            priority
-          />
+          <Link href={user.role === "master" ? "/master" : "/sales"}>
+            <Image
+              src="/logo.png"
+              alt="GHM Digital Marketing"
+              width={180}
+              height={59}
+              className="mb-1 dark:brightness-0 dark:invert hover:opacity-80 transition-opacity"
+              priority
+            />
+          </Link>
           <p className="text-xs text-muted-foreground">{user.name}</p>
         </div>
 
