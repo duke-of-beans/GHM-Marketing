@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TrendingUp, X, DollarSign, Mail } from "lucide-react";
 import { toast } from "sonner";
 
@@ -185,7 +191,16 @@ export function UpsellOpportunities({
                 <div className="flex items-center gap-2 mb-1">
                   <CardTitle className="text-base">{opp.productName}</CardTitle>
                   <Badge variant={getScoreBadgeVariant(opp.opportunityScore)}>
-                    {opp.opportunityScore} Score
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-help">{opp.opportunityScore} Score</span>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-sm">AI-generated opportunity score (0–100) based on the client's current service gaps and competitive position. 80+ = high priority, 60–79 = moderate, below 60 = low. Higher scores mean a stronger case for recommending this service.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </Badge>
                   <Badge variant="outline" className="text-xs">
                     {opp.category}

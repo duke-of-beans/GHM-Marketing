@@ -13,6 +13,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Search, FileText, Mail } from "lucide-react";
 import { LEAD_STATUS_CONFIG } from "@/types";
 import { toast } from "sonner";
 import type { LeadStatus } from "@prisma/client";
@@ -602,59 +609,101 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
 
             {/* SEO metrics */}
             {(lead.domainRating !== null || lead.reviewCount !== null) && (
-              <div className="grid grid-cols-4 gap-2 text-center pb-4">
-                <div className="bg-muted/50 rounded px-2 py-1.5">
-                  <p className="text-xs text-muted-foreground">DR</p>
-                  <p className="text-sm font-semibold">{lead.domainRating ?? "—"}</p>
+              <TooltipProvider>
+                <div className="grid grid-cols-4 gap-2 text-center pb-4">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="bg-muted/50 rounded px-2 py-1.5 cursor-help">
+                        <p className="text-xs text-muted-foreground">DR</p>
+                        <p className="text-sm font-semibold">{lead.domainRating ?? "—"}</p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">Domain Rating (0–100) — Ahrefs authority score measuring how strong this website's backlink profile is. Higher = stronger online presence and easier to rank in Google. DR 30+ is established; DR 50+ is competitive.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="bg-muted/50 rounded px-2 py-1.5 cursor-help">
+                        <p className="text-xs text-muted-foreground">Rank</p>
+                        <p className="text-sm font-semibold">{lead.currentRank ?? "—"}</p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">Google Maps / Local Pack ranking position for their primary keyword in their city. #1 = top spot; lower numbers = more visibility. Businesses outside the top 3 get significantly fewer calls.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <div className="bg-muted/50 rounded px-2 py-1.5">
+                    <p className="text-xs text-muted-foreground">Reviews</p>
+                    <p className="text-sm font-semibold">{lead.reviewCount ?? "—"}</p>
+                  </div>
+                  <div className="bg-muted/50 rounded px-2 py-1.5">
+                    <p className="text-xs text-muted-foreground">Avg ⭐</p>
+                    <p className="text-sm font-semibold">
+                      {lead.reviewAvg ? lead.reviewAvg.toFixed(1) : "—"}
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-muted/50 rounded px-2 py-1.5">
-                  <p className="text-xs text-muted-foreground">Rank</p>
-                  <p className="text-sm font-semibold">{lead.currentRank ?? "—"}</p>
-                </div>
-                <div className="bg-muted/50 rounded px-2 py-1.5">
-                  <p className="text-xs text-muted-foreground">Reviews</p>
-                  <p className="text-sm font-semibold">{lead.reviewCount ?? "—"}</p>
-                </div>
-                <div className="bg-muted/50 rounded px-2 py-1.5">
-                  <p className="text-xs text-muted-foreground">Avg</p>
-                  <p className="text-sm font-semibold">
-                    {lead.reviewAvg ? lead.reviewAvg.toFixed(1) : "—"}
-                  </p>
-                </div>
-              </div>
+              </TooltipProvider>
             )}
 
             <Separator />
 
             {/* Action buttons */}
-            <div className="flex flex-wrap gap-2 py-3">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleEnrich}
-                disabled={enriching}
-              >
-                {enriching ? "Enriching..." : "🔍 Enrich Data"}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleGenerateWO}
-                disabled={generatingWO || lead.dealProducts.length === 0}
-              >
-                {generatingWO ? "Generating..." : "📄 Work Order"}
-              </Button>
-              {lead.email && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleSendWO}
-                  disabled={lead.dealProducts.length === 0}
-                >
-                  📧 Send WO
-                </Button>
-              )}
-            </div>
+            <TooltipProvider>
+              <div className="flex flex-wrap gap-2 py-3">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleEnrich}
+                      disabled={enriching}
+                    >
+                      <Search className="h-4 w-4 mr-1.5" />
+                      {enriching ? "Enriching..." : "Enrich Data"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Pulls the latest Domain Rating, Google ranking, reviews, and contact info from external sources. Updates the lead with fresh intelligence.</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleGenerateWO}
+                      disabled={generatingWO || lead.dealProducts.length === 0}
+                    >
+                      <FileText className="h-4 w-4 mr-1.5" />
+                      {generatingWO ? "Generating..." : "Work Order"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Generates a PDF service agreement listing all attached products and pricing. Downloads to your device. Add products first to enable this.</p>
+                  </TooltipContent>
+                </Tooltip>
+                {lead.email && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleSendWO}
+                        disabled={lead.dealProducts.length === 0}
+                      >
+                        <Mail className="h-4 w-4 mr-1.5" />
+                        Send WO
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">Emails the work order PDF directly to {lead.email}. The client receives a professional service agreement they can sign and return.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+            </TooltipProvider>
 
             <Separator />
 

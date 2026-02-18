@@ -142,7 +142,7 @@ export function DashboardNav({
           className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-muted-foreground touch-target justify-center"
         >
           <span className="text-lg">🚪</span>
-          Out
+          Exit
         </button>
       </nav>
     </>

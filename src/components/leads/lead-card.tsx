@@ -10,6 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { LEAD_STATUS_CONFIG, ACTIVE_STATUSES } from "@/types";
 import type { LeadStatus } from "@prisma/client";
 
@@ -68,18 +74,27 @@ export function LeadCard({ lead, onClick, onStatusChange }: LeadCardProps) {
             {lead.businessName}
           </h3>
           {lead.domainRating !== null && (
-            <span
-              className={cn(
-                "flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded",
-                lead.domainRating >= 30
-                  ? "bg-green-100 text-green-700"
-                  : lead.domainRating >= 15
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
-              )}
-            >
-              DR {lead.domainRating}
-            </span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span
+                    className={cn(
+                      "flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded cursor-help",
+                      lead.domainRating >= 30
+                        ? "bg-green-100 text-green-700"
+                        : lead.domainRating >= 15
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                    )}
+                  >
+                    DR {lead.domainRating}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">Domain Rating (0–100) — website authority score. Green (30+) = established site. Yellow (15–29) = developing. Red (&lt;15) = low authority. Higher DR = better SEO starting point.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
 

@@ -11,6 +11,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { 
   AlertCircle, 
   AlertTriangle, 
@@ -20,6 +26,20 @@ import {
   ChevronDown,
   ChevronUp 
 } from 'lucide-react';
+
+// Human-readable labels for raw metric field names
+const METRIC_LABELS: Record<string, string> = {
+  backlinks: "Backlinks",
+  reviewCount: "Review Count",
+  reviewRating: "Review Rating",
+  domainRating: "Domain Rating",
+  rankingPosition: "Google Ranking",
+  pageSpeed: "Page Speed",
+  organicTraffic: "Organic Traffic",
+  keywordRankings: "Keyword Rankings",
+  localPack: "Local Map Pack",
+  citations: "Business Citations",
+};
 
 interface Scan {
   id: number;
@@ -191,24 +211,35 @@ function AlertItem({
     severity === 'warning' ? 'text-yellow-600' : 
     'text-blue-600';
   
+  const metricLabel = METRIC_LABELS[alert.metric] || alert.metric.replace(/([A-Z])/g, ' $1').trim();
+
   return (
-    <div className="flex gap-2 text-sm">
-      <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${colorClass}`} />
-      <div className="flex-1">
-        <p>{alert.message}</p>
-        <div className="flex gap-2 mt-1">
-          <span className="text-xs text-muted-foreground">Metric: {alert.metric}</span>
-          {alert.competitor && (
-            <span className="text-xs text-muted-foreground">• Competitor: {alert.competitor}</span>
-          )}
-          {alert.keyword && (
-            <span className="text-xs text-muted-foreground">• Keyword: {alert.keyword}</span>
-          )}
-          {alert.actionable && (
-            <Badge variant="secondary" className="text-xs h-5">Actionable</Badge>
-          )}
+    <TooltipProvider>
+      <div className="flex gap-2 text-sm">
+        <Icon className={`h-4 w-4 mt-0.5 flex-shrink-0 ${colorClass}`} />
+        <div className="flex-1">
+          <p>{alert.message}</p>
+          <div className="flex gap-2 mt-1 flex-wrap">
+            <span className="text-xs text-muted-foreground">Metric: {metricLabel}</span>
+            {alert.competitor && (
+              <span className="text-xs text-muted-foreground">· Competitor: {alert.competitor}</span>
+            )}
+            {alert.keyword && (
+              <span className="text-xs text-muted-foreground">· Keyword: {alert.keyword}</span>
+            )}
+            {alert.actionable && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="secondary" className="text-xs h-5 cursor-help">Actionable</Badge>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">This alert has a specific recommended action that can improve the client's score. Prioritize these over informational alerts.</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

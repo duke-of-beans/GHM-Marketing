@@ -148,6 +148,7 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
             key={col.status}
             id={col.status}
             title={col.config.label}
+            description={col.config.description}
             color={col.config.color}
             bgColor={col.config.bgColor}
             count={col.leads.length}

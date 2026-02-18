@@ -185,55 +185,63 @@ export type ProductWithDealInfo = {
 
 export const LEAD_STATUS_CONFIG: Record<
   LeadStatus,
-  { label: string; color: string; bgColor: string; isTerminal: boolean }
+  { label: string; color: string; bgColor: string; isTerminal: boolean; description: string }
 > = {
   available: {
     label: "Available",
     color: "text-blue-700",
     bgColor: "bg-blue-50",
     isTerminal: false,
+    description: "Unclaimed leads ready to be picked up. First come, first served — claim one to start your sales process.",
   },
   scheduled: {
     label: "Scheduled",
     color: "text-yellow-700",
     bgColor: "bg-yellow-50",
     isTerminal: false,
+    description: "A meeting or call has been booked with this prospect. Show up prepared — this is your shot to pitch.",
   },
   contacted: {
     label: "Contacted",
     color: "text-purple-700",
     bgColor: "bg-purple-50",
     isTerminal: false,
+    description: "You've had a first conversation. They're aware of the service but haven't committed. Stay warm.",
   },
   follow_up: {
     label: "Follow Up",
     color: "text-orange-700",
     bgColor: "bg-orange-50",
     isTerminal: false,
+    description: "Active nurturing — proposal sent or in discussion. They're interested but need more touches to close.",
   },
   paperwork: {
     label: "Paperwork",
     color: "text-indigo-700",
     bgColor: "bg-indigo-50",
     isTerminal: false,
+    description: "Deal agreed verbally — contracts and agreements in progress. Nearly there, keep momentum.",
   },
   won: {
     label: "Won",
     color: "text-green-700",
     bgColor: "bg-green-50",
     isTerminal: true,
+    description: "Deal closed. A client profile has been created and they're onboarded into the system.",
   },
   lost_rejection: {
     label: "Lost (Rejection)",
     color: "text-red-700",
     bgColor: "bg-red-50",
     isTerminal: true,
+    description: "Prospect declined the service. Removed from active pipeline.",
   },
   lost_deferred: {
     label: "Lost (Deferred)",
     color: "text-gray-700",
     bgColor: "bg-gray-50",
     isTerminal: true,
+    description: "Prospect interested but not ready now. Consider re-approaching in 3–6 months.",
   },
 };
 

@@ -23,6 +23,12 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ScanHistory } from "./scan-history";
 import { ClientReportsTab } from "./reports/client-reports-tab";
 import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
@@ -318,9 +324,18 @@ export function ClientProfile({
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-3xl font-bold">{client.businessName}</h1>
-              <Badge variant="outline" className={`${healthColor(client.healthScore)} text-sm px-3 py-1`}>
-                Health: {client.healthScore}
-              </Badge>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline" className={`${healthColor(client.healthScore)} text-sm px-3 py-1 cursor-help`}>
+                      Health: {client.healthScore}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Composite score (0–100) based on competitive position, ranking trends, and scan results. 75+ = healthy, 50–74 = competitive, &lt;50 = needs attention. Updated each time a competitive scan runs.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               {client.voiceProfileId && (
                 <Badge variant="secondary" className="text-sm px-3 py-1 gap-1">
                   <Sparkles className="h-3 w-3" />
@@ -699,9 +714,10 @@ export function ClientProfile({
           {/* Pinned standards first */}
           {notes.filter((n) => n.isPinned).length > 0 && (
             <div>
-              <h3 className="text-sm font-medium mb-2">
+              <h3 className="text-sm font-medium mb-0.5">
                 📌 Client Standards
               </h3>
+              <p className="text-xs text-muted-foreground mb-2">Pinned instructions that always apply to this account</p>
               <div className="space-y-2">
                 {notes
                   .filter((n) => n.isPinned)
@@ -723,7 +739,7 @@ export function ClientProfile({
           <div>
             <h3 className="text-sm font-medium mb-2">Notes</h3>
             {notes.filter((n) => !n.isPinned).length === 0 ? (
-              <p className="text-sm text-muted-foreground">No notes yet.</p>
+              <p className="text-sm text-muted-foreground">No notes yet. Add contact logs, task updates, or pin a Client Standard above to keep standing instructions visible at all times.</p>
             ) : (
               <div className="space-y-2">
                 {notes
