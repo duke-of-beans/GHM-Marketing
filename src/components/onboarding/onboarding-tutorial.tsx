@@ -172,13 +172,13 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
   const isLastStep = currentStep === steps.length - 1;
 
   useEffect(() => {
-    // Check if user has seen tutorial — single key so role changes don't re-trigger
+    // Check if user has seen tutorial — runs once on mount only
     const seen = localStorage.getItem("tutorial-seen");
     if (!seen) {
       setHasSeenTutorial(false);
       setIsOpen(true);
     }
-  }, [userRole]);
+  }, []);
 
   const handleNext = () => {
     if (isLastStep) {
