@@ -336,3 +336,95 @@ If actively recruiting → **Full build immediately**
 
 **Created:** February 17, 2026  
 **Status:** Awaiting decision on implementation order
+
+
+---
+
+## 📥 BACKLOG — Added February 18, 2026
+
+### 🟡 Pipeline Filter UX
+
+**1. Make "Pipeline Status" collapsible in More Filters panel**
+- The top section of the More Filters dropdown ("Pipeline Status") is not collapsible like the bottom two sections. Make all three sections consistent — all collapsible, all open by default.
+
+**2. Rethink default visible filter/sort options**
+- Move most-used options to always-visible (above the More Filters button). Suggested top-level defaults: Status, Assigned Rep, Territory, Sort (newest / deal value / close score).
+- Move secondary options into More Filters: Score range, Market type, Lead source, Deal value, Distance, Wealth score, etc.
+- Review which reps actually use each filter and prioritize accordingly.
+
+**3. Expand filter/sort options using the full Lead model**
+- The current filter set is far narrower than what the data supports. Audit the Lead model and expose relevant fields:
+  - `closeScore`, `impactScore`, `wealthScore` (range sliders or tiers)
+  - `priorityTier` (dropdown)
+  - `marketType` (dropdown)
+  - `pitchAngle` (dropdown)
+  - `suppressionSignal` (boolean / exclude toggle)
+  - `distanceFromMetro` (range)
+  - `domainRating` (range)
+  - `intelNeedsRefresh` (boolean)
+  - `dealValueTotal` / `mrr` / `arr` (range)
+  - `leadSourceId` (multi-select)
+  - `createdAt` (date range)
+- Also review the discovery/lead gen engine (Outscraper qualification scoring) to understand what enrichment fields can be filtered on.
+
+---
+
+### 🟡 TeamFeed Enhancements
+
+**4. Multimedia & emoji support for TeamFeed messages**
+- Blueprint was previously drafted (check transcript). Implement:
+  - Emoji picker (e.g. emoji-mart) inline in compose box
+  - Image/GIF attachment support (upload or paste)
+  - GIF search (Giphy or Tenor API)
+  - Render inline in the message thread
+  - File size limits + accepted types enforced server-side
+
+---
+
+### 🔴 Account Hierarchy & User Activity
+
+**5. Add "Admin" role above Master/Manager**
+- David's account should be Admin — full access to everything, including role management, billing visibility, and system config that Managers shouldn't touch.
+- New role hierarchy: **Admin → Manager → Sales**
+- Admin-only capabilities: manage all roles, view all user activity, system settings, future billing.
+- This is a schema change (`UserRole` enum). Plan migration carefully to avoid breaking existing auth/permission checks.
+
+**6. Rename "master" role → "manager" across entire codebase**
+- DB enum value, UI labels, permission presets, seed data, middleware, nav, API guards, all strings.
+- "Sales" stays as-is.
+- Coordinate with Admin role addition (do both in one migration pass).
+
+**7. User activity / session statistics (Admin-only view)**
+- Track and surface per-user session data:
+  - Last login datetime
+  - Total login count
+  - Session durations (average + history)
+  - Pages most visited
+  - Activity heatmap (days/times active)
+- Implementation options: extend `AuditLog` with session tracking, or add a `UserSession` model.
+- Surface in a new "User Activity" section in Settings (Admin-only tab).
+- Consider a lightweight dashboard widget showing who's been active recently.
+
+
+**8. "My Tasks" widget on dashboard (role-aware)**
+- Add a personal task widget to the dashboard, visible to all account types but content tailored by role:
+  - **Sales reps:** their assigned client tasks, leads needing follow-up, overdue pipeline actions
+  - **Managers:** tasks assigned to their team, approvals pending, scan alerts needing review
+  - **Admin:** system-level items, unresolved bug reports, pending feature requests
+- Show priority badges (urgent/high/medium), due dates, and client context where applicable
+- Clickable — each item routes directly to the relevant record
+- Widget should be collapsible and respect the existing dashboard layout/personalization system
+
+**9. Bug reports & feature requests — visibility and status feedback**
+- Currently bug/feature submissions go nowhere visible. Fix this end to end:
+  - Reports should only be visible to Admin (currently "master" — update when role rename happens)
+  - Admin sees all tickets in the Bug Reports page with full detail, status management, and assignment
+  - Users who submit a ticket should receive status updates — at minimum: Received → In Progress → Resolved (or Won't Fix)
+  - Status change should trigger an in-app notification (and optionally a push notification if they have it enabled)
+  - Consider a lightweight "My Submissions" view for non-admin users so they can check ticket status without seeing everyone else's
+  - Ticket statuses: new → acknowledged → in-progress → resolved → won't-fix (already in schema, just needs to be surfaced to submitters)
+
+
+**10. Clicking the GHM logo navigates to the dashboard home**
+- The logo in the nav/header should be a link to `/` (or `/master` / `/sales` depending on role)
+- Quick win, should take ~5 minutes
