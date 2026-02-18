@@ -32,7 +32,7 @@ export default async function DashboardLayout({
   }) : {};
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
       <DashboardNav user={session.user} permissions={permissions} />
       <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>

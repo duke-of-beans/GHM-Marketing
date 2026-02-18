@@ -137,7 +137,7 @@ export function AuditLogsViewer() {
     };
     
     return (
-      <Badge className={colors[action] || "bg-gray-100 text-gray-700"}>
+      <Badge className={colors[action] || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"}>
         {action.replace(/_/g, " ")}
       </Badge>
     );

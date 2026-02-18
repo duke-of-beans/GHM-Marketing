@@ -149,7 +149,7 @@ export function DiscoveryDashboard() {
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600 bg-green-50";
     if (score >= 60) return "text-blue-600 bg-blue-50";
-    return "text-gray-600 bg-gray-50";
+    return "text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-800";
   };
 
   return (
@@ -261,7 +261,7 @@ export function DiscoveryDashboard() {
               {results.map((result) => (
                 <div
                   key={result.placeId}
-                  className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50"
+                  className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50"
                 >
                   <Checkbox
                     checked={selected.has(result.placeId)}
@@ -302,7 +302,7 @@ export function DiscoveryDashboard() {
                           🌐 Website
                         </a>
                       )}
-                      <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
                         {result.category}
                       </span>
                     </div>

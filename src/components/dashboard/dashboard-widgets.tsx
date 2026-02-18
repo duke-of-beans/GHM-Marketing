@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { 
   Plus, 
-  Search, 
   FileText, 
   TrendingUp, 
   Users,
@@ -16,7 +15,6 @@ import {
 
 /**
  * Quick Actions Widget for Master Dashboard
- * Provides fast access to common workflows
  */
 export function QuickActions() {
   const actions = [
@@ -25,32 +23,36 @@ export function QuickActions() {
       icon: Plus,
       href: "/discovery",
       description: "Find new prospects",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 hover:bg-blue-100",
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/70",
+      iconBg: "bg-blue-100 dark:bg-blue-900/60",
     },
     {
       label: "Review Content",
       icon: FileText,
       href: "/review",
       description: "Approve pending work",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 hover:bg-purple-100",
+      color: "text-purple-600 dark:text-purple-400",
+      bgColor: "bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/70",
+      iconBg: "bg-purple-100 dark:bg-purple-900/60",
     },
     {
       label: "View Pipeline",
       icon: TrendingUp,
       href: "/leads",
       description: "Check sales progress",
-      color: "text-green-600",
-      bgColor: "bg-green-50 hover:bg-green-100",
+      color: "text-green-600 dark:text-green-400",
+      bgColor: "bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/70",
+      iconBg: "bg-green-100 dark:bg-green-900/60",
     },
     {
       label: "Manage Team",
       icon: Users,
       href: "/settings?tab=team",
       description: "Update team members",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50 hover:bg-orange-100",
+      color: "text-orange-600 dark:text-orange-400",
+      bgColor: "bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/40 dark:hover:bg-orange-950/70",
+      iconBg: "bg-orange-100 dark:bg-orange-900/60",
     },
   ];
 
@@ -70,11 +72,11 @@ export function QuickActions() {
                 variant="ghost"
                 className={`w-full h-auto justify-start gap-3 px-3 py-2.5 ${action.bgColor} rounded-lg`}
               >
-                <div className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-md bg-white/70`}>
+                <div className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-md ${action.iconBg}`}>
                   <action.icon className={`h-4 w-4 ${action.color}`} />
                 </div>
                 <div className="flex flex-col items-start min-w-0">
-                  <span className="font-semibold text-sm leading-tight">{action.label}</span>
+                  <span className="font-semibold text-sm leading-tight text-foreground">{action.label}</span>
                   <span className="text-xs text-muted-foreground leading-tight">{action.description}</span>
                 </div>
               </Button>
@@ -101,9 +103,9 @@ export function RevenueMetricsWidget({
   const isPositiveGrowth = growth > 0;
   
   return (
-    <Card className="bg-gradient-to-br from-green-50 to-emerald-50">
+    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-900">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-green-900">
+        <CardTitle className="flex items-center gap-2 text-green-900 dark:text-green-300">
           <DollarSign className="h-5 w-5" />
           Revenue Performance
         </CardTitle>
@@ -111,7 +113,7 @@ export function RevenueMetricsWidget({
       <CardContent className="space-y-4">
         <div>
           <div className="text-sm text-muted-foreground mb-1">Monthly Recurring Revenue</div>
-          <div className="text-3xl font-bold text-green-700">
+          <div className="text-3xl font-bold text-green-700 dark:text-green-400">
             ${mrr.toLocaleString()}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -119,10 +121,10 @@ export function RevenueMetricsWidget({
           </div>
         </div>
         
-        <div className="pt-3 border-t border-green-200">
+        <div className="pt-3 border-t border-green-200 dark:border-green-900">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Growth Rate</span>
-            <div className={`flex items-center gap-1 ${isPositiveGrowth ? 'text-green-600' : 'text-gray-500'}`}>
+            <div className={`flex items-center gap-1 ${isPositiveGrowth ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
               <TrendingUp className={`h-4 w-4 ${isPositiveGrowth ? '' : 'opacity-50'}`} />
               <span className="font-semibold">{growth.toFixed(1)}%</span>
             </div>
@@ -159,13 +161,12 @@ export function GoalsWidget({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Deals Goal */}
         <div>
           <div className="flex justify-between text-sm mb-2">
-            <span>Deals Closed</span>
+            <span className="text-foreground">Deals Closed</span>
             <span className="font-semibold">{wonDeals} / {targetDeals}</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div 
               className="bg-blue-500 h-2 rounded-full transition-all" 
               style={{ width: `${Math.min(dealsProgress, 100)}%` }}
@@ -176,15 +177,14 @@ export function GoalsWidget({
           </div>
         </div>
 
-        {/* Revenue Goal */}
         <div>
           <div className="flex justify-between text-sm mb-2">
-            <span>Revenue</span>
+            <span className="text-foreground">Revenue</span>
             <span className="font-semibold">
               ${(revenue / 1000).toFixed(0)}K / ${(targetRevenue / 1000).toFixed(0)}K
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div 
               className="bg-green-500 h-2 rounded-full transition-all" 
               style={{ width: `${Math.min(revenueProgress, 100)}%` }}

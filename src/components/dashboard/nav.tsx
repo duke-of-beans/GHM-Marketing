@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
 import { HelpMenu } from "@/components/onboarding/help-menu";
-import { BugReportButton } from "@/components/bug-report/BugReportButton";
 
 type NavUser = {
   name: string;
@@ -67,20 +66,20 @@ export function DashboardNav({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-56 border-r bg-gray-50/50 p-4">
-        <div className="mb-3">
+      <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-gray-50/50 dark:bg-gray-950 p-4 overflow-hidden">
+        <div className="mb-3 flex-shrink-0">
           <Image
             src="/logo.png"
             alt="GHM Digital Marketing"
             width={180}
             height={59}
-            className="mb-1"
+            className="mb-1 dark:brightness-0 dark:invert"
             priority
           />
           <p className="text-xs text-muted-foreground">{user.name}</p>
         </div>
 
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto min-h-0">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -89,7 +88,7 @@ export function DashboardNav({
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 pathname === link.href
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
               )}
             >
               <span>{link.icon}</span>
@@ -98,14 +97,14 @@ export function DashboardNav({
           ))}
         </nav>
 
-        <div className="mt-auto space-y-1 border-t pt-3">
+        <div className="flex-shrink-0 space-y-1 border-t pt-3 mt-3">
           <Link
             href="/profile"
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
               pathname === "/profile"
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+                : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
             )}
           >
             <span>👤</span>
@@ -118,7 +117,7 @@ export function DashboardNav({
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 pathname.startsWith("/settings")
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
               )}
             >
               <span>⚙️</span>
@@ -126,14 +125,9 @@ export function DashboardNav({
             </Link>
           )}
           <HelpMenu />
-          <BugReportButton 
-            variant="ghost" 
-            size="sm" 
-            className="w-full justify-start text-muted-foreground hover:bg-gray-100 hover:text-foreground"
-          />
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors w-full"
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground transition-colors w-full"
           >
             <span>🚪</span>
             Sign Out
@@ -142,7 +136,7 @@ export function DashboardNav({
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t flex justify-around py-2 safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex justify-around py-2 safe-area-bottom">
         {links.map((link) => (
           <Link
             key={link.href}
