@@ -336,31 +336,34 @@ export function ClientProfile({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              {client.voiceProfileId && (
-                <Badge variant="secondary" className="text-sm px-3 py-1 gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  Custom Voice
-                </Badge>
-              )}
               <EditClientDialog client={client} onUpdate={handleUpdate} />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setVoiceDialogOpen(true)}
-                className="gap-2"
-              >
-                {client.voiceProfileId ? (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Voice Profile
-                  </>
-                ) : (
-                  <>
-                    <Mic className="h-4 w-4" />
-                    Capture Voice
-                  </>
+              <div className="relative inline-flex">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVoiceDialogOpen(true)}
+                  className={`gap-2 ${client.voiceProfileId ? "border-green-500/60 text-green-700 dark:text-green-400 hover:border-green-500" : ""}`}
+                >
+                  {client.voiceProfileId ? (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      Voice Captured
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="h-4 w-4" />
+                      Capture Voice
+                    </>
+                  )}
+                </Button>
+                {client.voiceProfileId && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white shadow-sm">
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="2,6 5,9 10,3" />
+                    </svg>
+                  </span>
                 )}
-              </Button>
+              </div>
             </div>
             <div className="mt-2 space-y-1">
               <p className="text-base text-muted-foreground">
