@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { z } from "zod";
@@ -15,18 +15,12 @@ const updateUserSchema = z.object({
 });
 
 export async function PATCH(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const currentUser = session.user as unknown as SessionUser;
-  if (currentUser.role !== "master") {
-    return NextResponse.json({ success: false, error: "Master access required" }, { status: 403 });
-  }
+  // Check permission
+  const permissionError = await withPermission(req, "manage_users");
+  if (permissionError) return permissionError;
 
   const { id } = await params;
   const userId = parseInt(id, 10);
@@ -34,7 +28,7 @@ export async function PATCH(
     return NextResponse.json({ success: false, error: "Invalid user ID" }, { status: 400 });
   }
 
-  const body = await request.json();
+  const body = await req.json();
   const parsed = updateUserSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
@@ -86,18 +80,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const currentUser = session.user as unknown as SessionUser;
-  if (currentUser.role !== "master") {
-    return NextResponse.json({ success: false, error: "Master access required" }, { status: 403 });
-  }
+  // Check permission
+  const permissionError = await withPermission(req, "manage_users");
+  if (permissionError) return permissionError;
 
   const { id } = await params;
   const userId = parseInt(id, 10);

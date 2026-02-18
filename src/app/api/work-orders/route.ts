@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission, getUserFromRequest } from "@/lib/auth/api-permissions";
 import { generateWorkOrder } from "@/lib/pdf/generate-work-order";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_leads");
+  if (permissionError) return permissionError;
 
-  const user = session.user as unknown as SessionUser;
-  const body = await request.json();
+  const user = await getUserFromRequest(req);
+  const body = await req.json();
   const { leadId, notes } = body;
 
   if (!leadId || typeof leadId !== "number") {
@@ -52,14 +51,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "view_reports");
+  if (permissionError) return permissionError;
 
-  const user = session.user as unknown as SessionUser;
-  const leadId = request.nextUrl.searchParams.get("leadId");
+  const user = await getUserFromRequest(req);
+  const leadId = req.nextUrl.searchParams.get("leadId");
 
   const where = leadId
     ? { leadId: parseInt(leadId, 10) }

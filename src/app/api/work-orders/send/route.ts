@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission, getUserFromRequest } from "@/lib/auth/api-permissions";
 import { generateWorkOrder } from "@/lib/pdf/generate-work-order";
 import { sendWorkOrderEmail } from "@/lib/email";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_leads");
+  if (permissionError) return permissionError;
 
-  const user = session.user as unknown as SessionUser;
-  const body = await request.json();
+  const user = await getUserFromRequest(req);
+  const body = await req.json();
   const { leadId, notes } = body;
 
   if (!leadId || typeof leadId !== "number") {

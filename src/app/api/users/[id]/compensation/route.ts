@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
@@ -23,14 +23,13 @@ const CompensationConfigSchema = z.object({
 // ============================================================================
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "master") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Check permission
+    const permissionError = await withPermission(req, "manage_users");
+    if (permissionError) return permissionError;
 
     const userId = parseInt(params.id);
     if (isNaN(userId)) {
@@ -81,21 +80,20 @@ export async function GET(
 // ============================================================================
 
 export async function PUT(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "master") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // Check permission
+    const permissionError = await withPermission(req, "manage_users");
+    if (permissionError) return permissionError;
 
     const userId = parseInt(params.id);
     if (isNaN(userId)) {
       return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = await req.json();
     const validated = CompensationConfigSchema.parse(body);
 
     // Verify user exists
