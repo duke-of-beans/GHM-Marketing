@@ -1,91 +1,53 @@
 import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { getDashboardMetrics, getFunnelStats } from "@/lib/db/leads";
-import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { RepLeaderboard } from "@/components/dashboard/rep-leaderboard";
 import { ManagementFeesWidget } from "@/components/payments/management-fees-widget";
 import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
-import { 
-  QuickActions, 
-  RevenueMetricsWidget, 
-  GoalsWidget 
-} from "@/components/dashboard/dashboard-widgets";
+import { QuickActions, RevenueMetricsWidget, GoalsWidget } from "@/components/dashboard/dashboard-widgets";
+import { MetricsRow } from "@/components/dashboard/MetricsRow";
+import { TeamFeedWidget } from "@/components/team-feed/TeamFeed";
+import { MasterDashboardGrid } from "@/components/dashboard/MasterDashboardGrid";
+import type { ResponsiveLayouts } from "react-grid-layout";
 
 export default async function MasterDashboard() {
   const user = await requirePermission("view_analytics");
 
-  const [metrics, funnelStats, repData, mrrGrowth, contextStats, globalSettings] = await Promise.all([
+  const [metrics, funnelStats, repData, mrrGrowth, contextStats, globalSettings, teamUsers, savedLayout] = await Promise.all([
     getDashboardMetrics(user),
     getFunnelStats(user),
-    // Get rep performance
+
+    // Rep performance
     prisma.user.findMany({
       where: { role: "sales", isActive: true },
-      include: {
-        territory: { select: { name: true } },
-        _count: {
-          select: { assignedLeads: true },
-        },
-      },
-    }).then(async (reps) => {
-      // Fetch per-rep stats
-      return Promise.all(
-        reps.map(async (rep) => {
-          const [active, won, revenue] = await Promise.all([
-            prisma.lead.count({
-              where: {
-                assignedTo: rep.id,
-                status: {
-                  in: ["scheduled", "contacted", "follow_up", "paperwork"],
-                },
-              },
-            }),
-            prisma.lead.count({
-              where: { assignedTo: rep.id, status: "won" },
-            }),
-            prisma.lead.aggregate({
-              where: { assignedTo: rep.id, status: "won" },
-              _sum: { dealValueTotal: true },
-            }),
-          ]);
-          return {
-            id: rep.id,
-            name: rep.name,
-            territoryName: rep.territory?.name ?? "Unassigned",
-            assigned: rep._count.assignedLeads,
-            active,
-            won,
-            revenue: Number(revenue._sum.dealValueTotal ?? 0),
-          };
-        })
-      );
-    }),
-    // Real MRR growth: compare this month's client retainers to last month's
+      include: { territory: { select: { name: true } }, _count: { select: { assignedLeads: true } } },
+    }).then(async (reps) =>
+      Promise.all(reps.map(async (rep) => {
+        const [active, won, revenue] = await Promise.all([
+          prisma.lead.count({ where: { assignedTo: rep.id, status: { in: ["scheduled","contacted","follow_up","paperwork"] } } }),
+          prisma.lead.count({ where: { assignedTo: rep.id, status: "won" } }),
+          prisma.lead.aggregate({ where: { assignedTo: rep.id, status: "won" }, _sum: { dealValueTotal: true } }),
+        ]);
+        return { id: rep.id, name: rep.name, territoryName: rep.territory?.name ?? "Unassigned", assigned: rep._count.assignedLeads, active, won, revenue: Number(revenue._sum.dealValueTotal ?? 0) };
+      }))
+    ),
+
+    // MRR growth
     (async () => {
       const now = new Date();
       const firstOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const firstOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-
-      const [currentClients, lastMonthClients] = await Promise.all([
-        prisma.clientProfile.findMany({
-          where: { status: "active" },
-          select: { retainerAmount: true },
-        }),
-        prisma.clientProfile.findMany({
-          where: {
-            status: "active",
-            onboardedAt: { lt: firstOfThisMonth },
-          },
-          select: { retainerAmount: true },
-        }),
+      const [curr, prev] = await Promise.all([
+        prisma.clientProfile.findMany({ where: { status: "active" }, select: { retainerAmount: true } }),
+        prisma.clientProfile.findMany({ where: { status: "active", onboardedAt: { lt: firstOfThisMonth } }, select: { retainerAmount: true } }),
       ]);
-
-      const currentMRR = currentClients.reduce((s, c) => s + Number(c.retainerAmount), 0);
-      const lastMRR = lastMonthClients.reduce((s, c) => s + Number(c.retainerAmount), 0);
-      return lastMRR > 0 ? parseFloat(((currentMRR - lastMRR) / lastMRR * 100).toFixed(1)) : 0;
+      const curMRR = curr.reduce((s, c) => s + Number(c.retainerAmount), 0);
+      const prevMRR = prev.reduce((s, c) => s + Number(c.retainerAmount), 0);
+      return prevMRR > 0 ? parseFloat(((curMRR - prevMRR) / prevMRR * 100).toFixed(1)) : 0;
     })(),
-    // Context stats for the dashboard subtitle
+
+    // Context stats
     (async () => {
       const [needsAttention, availableLeads] = await Promise.all([
         prisma.clientProfile.count({ where: { status: "active", healthScore: { lt: 50 } } }),
@@ -93,91 +55,86 @@ export default async function MasterDashboard() {
       ]);
       return { needsAttention, availableLeads };
     })(),
+
     prisma.globalSettings.findFirst(),
+
+    // Team users for messaging audience selector
+    prisma.user.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, role: true },
+      orderBy: { name: "asc" },
+    }),
+
+    // Saved dashboard layout
+    prisma.user.findUnique({
+      where: { id: parseInt(user.id) },
+      select: { dashboardLayout: true },
+    }).then(u => (u?.dashboardLayout as ResponsiveLayouts | null) ?? null),
   ]);
 
   const isOwner = [1, 2].includes(Number(user.id));
+  const isMaster = user.role === "master";
+
+  // Goals widget or placeholder
+  const goalsWidget = globalSettings?.goalsEnabled ? (
+    <GoalsWidget
+      wonDeals={metrics.wonDeals}
+      targetDeals={globalSettings.monthlyDealTarget ?? 20}
+      revenue={metrics.totalMRR}
+      targetRevenue={globalSettings.monthlyRevenueTarget ?? 50000}
+    />
+  ) : (
+    <div className="flex flex-col items-center justify-center h-full rounded-lg border border-dashed text-sm text-muted-foreground p-6 text-center gap-1">
+      <span>Goals widget disabled.</span>
+      <a href="/settings" className="underline text-xs">Configure in Settings → General</a>
+    </div>
+  );
 
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
-      <div>
+    <div className="pb-20 md:pb-4">
+      <div className="mb-4">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
           {[
-            contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? 's' : ''} need attention`,
-            contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? 's' : ''} available`,
-          ].filter(Boolean).join(' · ') || `Good work, ${user.name.split(' ')[0]} — everything looks healthy`}
+            contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
+            contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
+          ].filter(Boolean).join(" · ") || `Good work, ${user.name.split(" ")[0]} — everything looks healthy`}
         </p>
       </div>
 
-      {/* Top metrics row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <MetricCard 
-          title="Total Leads" 
-          value={metrics.totalLeads}
-          tooltip="Total number of leads in the system across all territories and statuses."
-        />
-        <MetricCard
-          title="Active Pipeline"
-          value={metrics.activeLeads}
-          subtitle={`${metrics.conversionRate}% conversion`}
-          tooltip="Leads currently in active sales stages (Scheduled, Contacted, Follow Up, Paperwork). Conversion rate = Won / (Won + Lost)."
-        />
-        <MetricCard
-          title="Won Deals"
-          value={metrics.wonDeals}
-          className="[&_p.text-2xl]:text-green-600 [&_p.text-3xl]:text-green-600"
-          tooltip="Total number of successfully closed deals that converted to active clients."
-        />
-        <MetricCard
-          title="MRR"
-          value={formatCurrency(metrics.totalMRR)}
-          subtitle={`ARR ${formatCurrency(metrics.totalARR)}`}
-          tooltip="Monthly Recurring Revenue from all active clients. ARR = Annual Run Rate (MRR × 12)."
-        />
-      </div>
+      <MasterDashboardGrid
+        savedLayout={savedLayout}
+        showProfitability={isOwner}
+      >
+        {{
+          "metrics": (
+            <MetricsRow
+              totalLeads={metrics.totalLeads}
+              activeLeads={metrics.activeLeads}
+              conversionRate={metrics.conversionRate}
+              wonDeals={metrics.wonDeals}
+              totalMRR={metrics.totalMRR}
+              totalARR={metrics.totalARR}
+            />
+          ),
+          "quick-actions": <QuickActions />,
+          "revenue": <RevenueMetricsWidget mrr={metrics.totalMRR} arr={metrics.totalARR} growth={mrrGrowth} />,
+          "goals": goalsWidget,
+          "team-feed": (
+            <TeamFeedWidget
+              users={teamUsers}
+              isMaster={isMaster}
+              currentUserId={parseInt(user.id)}
+            />
+          ),
+          "pipeline": <PipelineFunnel stats={funnelStats} />,
+          "leaderboard": <RepLeaderboard reps={repData} />,
+          "mgmt-fees": <ManagementFeesWidget />,
+          "profitability": <CompanyProfitabilityWidget />,
+        }}
+      </MasterDashboardGrid>
 
-      {/* Quick Actions + Revenue + Goals */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <QuickActions />
-        <RevenueMetricsWidget 
-          mrr={metrics.totalMRR}
-          arr={metrics.totalARR}
-          growth={mrrGrowth}
-        />
-        {globalSettings?.goalsEnabled && (
-          <GoalsWidget
-            wonDeals={metrics.wonDeals}
-            targetDeals={globalSettings.monthlyDealTarget ?? 20}
-            revenue={metrics.totalMRR}
-            targetRevenue={globalSettings.monthlyRevenueTarget ?? 50000}
-          />
-        )}
-        {!globalSettings?.goalsEnabled && (
-          <div className="flex items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground p-6 text-center">
-            Goals widget disabled.<br />
-            <a href="/settings" className="underline mt-1 inline-block">Configure in Settings → General</a>
-          </div>
-        )}
-      </div>
-
-      {/* Pipeline + Rep performance */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <PipelineFunnel stats={funnelStats} />
-        <RepLeaderboard reps={repData} />
-      </div>
-
-      {/* Earnings/Profitability Widgets */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <ManagementFeesWidget />
-        {isOwner && <CompanyProfitabilityWidget />}
-      </div>
-
-      {/* Onboarding Tutorial */}
-      <OnboardingTutorial 
-        userRole={isOwner ? "owner" : "master"} 
-        userName={user.name} 
-      />
+      <OnboardingTutorial userRole={isOwner ? "owner" : "master"} userName={user.name} />
     </div>
   );
 }

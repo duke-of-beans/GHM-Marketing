@@ -50,6 +50,14 @@ model User {
   
   // Audit logging
   auditLogs             AuditLog[] @relation("AuditLogs")
+  
+  // Dashboard personalization
+  dashboardLayout       Json?      @map("dashboard_layout")  // react-grid-layout serialized state
+  
+  // Team messaging
+  sentMessages          TeamMessage[] @relation("MessageAuthor")
+  receivedMessages      TeamMessage[] @relation("MessageRecipient")
+  messageReads          TeamMessageRead[]
 
   @@index([territoryId])
   @@map("users")
@@ -847,4 +855,62 @@ model AuditLog {
   @@index([status])
   @@index([resource])
   @@map("audit_logs")
+}
+
+
+// TEAM MESSAGING
+// ============================================================================
+
+model TeamMessage {
+  id              Int      @id @default(autoincrement())
+  
+  content         String   @db.Text
+  
+  // Who sent it
+  authorId        Int      @map("author_id")
+  author          User     @relation("MessageAuthor", fields: [authorId], references: [id])
+  
+  // Who it's for: "all", "role:master", "role:sales", or specific userId
+  audienceType    String   @default("all") @map("audience_type")  // "all" | "role" | "user"
+  audienceValue   String?  @map("audience_value")                  // role name or user id string
+  
+  // For direct replies — parent message id
+  parentId        Int?     @map("parent_id")
+  parent          TeamMessage?  @relation("Replies", fields: [parentId], references: [id])
+  replies         TeamMessage[] @relation("Replies")
+  
+  // If direct message, who is the recipient (for notifications/unread count)
+  recipientId     Int?     @map("recipient_id")
+  recipient       User?    @relation("MessageRecipient", fields: [recipientId], references: [id])
+  
+  // Pinned messages stay at top of feed on dashboard
+  isPinned        Boolean  @default(false) @map("is_pinned")
+  
+  // Priority: "normal" | "important" | "urgent"
+  priority        String   @default("normal")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  reads           TeamMessageRead[]
+  
+  @@index([authorId])
+  @@index([recipientId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("team_messages")
+}
+
+model TeamMessageRead {
+  id        Int      @id @default(autoincrement())
+  messageId Int      @map("message_id")
+  userId    Int      @map("user_id")
+  readAt    DateTime @default(now()) @map("read_at")
+  
+  message   TeamMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([messageId, userId])
+  @@index([userId])
+  @@map("team_message_reads")
 }
