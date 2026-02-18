@@ -26,6 +26,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultCategory?: string;
+  defaultType?: "bug" | "feature";
   contextInfo?: Record<string, any>;
 }
 
@@ -33,9 +34,10 @@ export function BugReportDialog({
   open, 
   onOpenChange,
   defaultCategory,
+  defaultType = "bug",
   contextInfo,
 }: Props) {
-  const [type, setType] = useState<"bug" | "feature">("bug");
+  const [type, setType] = useState<"bug" | "feature">(defaultType);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(defaultCategory || "");
@@ -48,9 +50,10 @@ export function BugReportDialog({
 
   useEffect(() => {
     if (open) {
+      setType(defaultType);
       captureMetadata();
     }
-  }, [open]);
+  }, [open, defaultType]);
 
   function captureMetadata() {
     const meta: any = {

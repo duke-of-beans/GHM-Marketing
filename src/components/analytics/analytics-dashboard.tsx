@@ -133,7 +133,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p className="text-sm">
-                    Average monthly retainer per client. Higher values indicate premium service positioning or upsell success.
+                    Estimated annual value per client (MRR × 12 ÷ active clients). Higher values indicate premium service positioning or successful upsells.
                   </p>
                 </TooltipContent>
               </InfoTooltip>
@@ -142,7 +142,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           <CardContent>
             <div className="text-2xl font-bold">${metrics.avgClientValue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Lifetime value estimate
+              Annual value estimate
             </p>
           </CardContent>
         </Card>
@@ -257,7 +257,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p className="text-sm">
-                    Composite score (0-100) based on competitive position, ranking trends, and scan results. &lt;40 = needs attention, 60-80 = healthy, &gt;80 = leading.
+                    Composite score (0–100) based on competitive position, ranking trends, and scan results. 75+ = healthy, 50–74 = competitive, &lt;50 = needs attention.
                   </p>
                 </TooltipContent>
               </InfoTooltip>
