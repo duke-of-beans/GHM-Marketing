@@ -233,7 +233,7 @@ function AlertItem({
                   <Badge variant="secondary" className="text-xs h-5 cursor-help">Actionable</Badge>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
-                  <p className="text-sm">This alert has a specific recommended action that can improve the client's score. Prioritize these over informational alerts.</p>
+                  <p className="text-sm">This alert has a specific recommended action that can improve the client&apos;s score. Prioritize these over informational alerts.</p>
                 </TooltipContent>
               </Tooltip>
             )}

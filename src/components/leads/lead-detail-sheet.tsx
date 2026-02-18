@@ -619,7 +619,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      <p className="text-sm">Domain Rating (0–100) — Ahrefs authority score measuring how strong this website's backlink profile is. Higher = stronger online presence and easier to rank in Google. DR 30+ is established; DR 50+ is competitive.</p>
+                      <p className="text-sm">Domain Rating (0–100) — Ahrefs authority score measuring how strong this website&apos;s backlink profile is. Higher = stronger online presence and easier to rank in Google. DR 30+ is established; DR 50+ is competitive.</p>
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip>

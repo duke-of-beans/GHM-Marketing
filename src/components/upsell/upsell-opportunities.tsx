@@ -197,7 +197,7 @@ export function UpsellOpportunities({
                           <span className="cursor-help">{opp.opportunityScore} Score</span>
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs">
-                          <p className="text-sm">AI-generated opportunity score (0–100) based on the client's current service gaps and competitive position. 80+ = high priority, 60–79 = moderate, below 60 = low. Higher scores mean a stronger case for recommending this service.</p>
+                          <p className="text-sm">AI-generated opportunity score (0–100) based on the client&apos;s current service gaps and competitive position. 80+ = high priority, 60–79 = moderate, below 60 = low. Higher scores mean a stronger case for recommending this service.</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
