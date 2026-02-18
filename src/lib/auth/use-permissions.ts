@@ -114,19 +114,3 @@ export function useHasAllPermissions(...requiredPermissions: PermissionKey[]): b
   const { permissions } = usePermissions();
   return requiredPermissions.every((perm) => permissions[perm] === true);
 }
-
-/**
- * Component wrapper that only renders children if user has permission
- */
-export function WithPermission({
-  permission,
-  children,
-  fallback = null,
-}: {
-  permission: PermissionKey;
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  const hasPermission = useHasPermission(permission);
-  return hasPermission ? <>{children}</> : <>{fallback}</>;
-}
