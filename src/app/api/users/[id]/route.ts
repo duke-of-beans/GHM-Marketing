@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withPermission } from "@/lib/auth/api-permissions";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { z } from "zod";
@@ -87,13 +87,18 @@ export async function DELETE(
   const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
+  const currentUser = await getCurrentUserWithPermissions();
+  if (!currentUser) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = await params;
   const userId = parseInt(id, 10);
   if (isNaN(userId)) {
     return NextResponse.json({ success: false, error: "Invalid user ID" }, { status: 400 });
   }
 
-  // Don't let master deactivate themselves
+  // Don't let user deactivate themselves
   if (userId === Number(currentUser.id)) {
     return NextResponse.json(
       { success: false, error: "Cannot deactivate your own account" },
