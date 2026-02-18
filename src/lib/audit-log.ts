@@ -57,7 +57,7 @@ export async function createAuditLog(params: AuditLogParams) {
         errorMessage: params.errorMessage,
         ipAddress: params.ipAddress,
         userAgent: params.userAgent,
-        metadata: params.metadata as Record<string, unknown>,
+        metadata: (params.metadata ?? {}) as any,
         duration: params.duration,
       },
     });
