@@ -162,6 +162,18 @@ export function ClientPortfolio({
       result = [...result].sort((a, b) =>
         a.businessName.localeCompare(b.businessName)
       );
+    } else if (filters.sortBy === "name-za") {
+      result = [...result].sort((a, b) =>
+        b.businessName.localeCompare(a.businessName)
+      );
+    } else if (filters.sortBy === "newest") {
+      result = [...result].sort(
+        (a, b) => new Date(b.onboardedAt).getTime() - new Date(a.onboardedAt).getTime()
+      );
+    } else if (filters.sortBy === "oldest") {
+      result = [...result].sort(
+        (a, b) => new Date(a.onboardedAt).getTime() - new Date(b.onboardedAt).getTime()
+      );
     } else if (filters.sortBy === "scan-recent") {
       result = [...result].sort((a, b) => {
         const aTime = a.lastScanAt ? new Date(a.lastScanAt).getTime() : 0;

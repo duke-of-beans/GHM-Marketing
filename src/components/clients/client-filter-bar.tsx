@@ -25,7 +25,7 @@ type FilterState = {
   revenueRange: "all" | "high" | "mid" | "low";
   taskFilter: "all" | "has-tasks" | "no-tasks";
   scanFilter: "all" | "recent" | "needs-scan";
-  sortBy: "health-high" | "health-low" | "revenue-high" | "revenue-low" | "name-az" | "scan-recent";
+  sortBy: "health-high" | "health-low" | "revenue-high" | "revenue-low" | "name-az" | "name-za" | "scan-recent" | "newest" | "oldest";
 };
 
 type ClientFilterBarProps = {
@@ -97,7 +97,10 @@ export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
             <SelectItem value="revenue-high">Revenue: High to Low</SelectItem>
             <SelectItem value="revenue-low">Revenue: Low to High</SelectItem>
             <SelectItem value="name-az">Name: A to Z</SelectItem>
+            <SelectItem value="name-za">Name: Z to A</SelectItem>
             <SelectItem value="scan-recent">Recently Scanned</SelectItem>
+            <SelectItem value="newest">Newest Client</SelectItem>
+            <SelectItem value="oldest">Oldest Client</SelectItem>
           </SelectContent>
         </Select>
 
