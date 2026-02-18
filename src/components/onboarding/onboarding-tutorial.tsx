@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ type TutorialStep = {
   icon: React.ReactNode;
   tips: string[];
   action?: string;
+  route?: string; // page to navigate to when this step is shown
 };
 
 // ─── Sales Rep Tutorial ───────────────────────────────────────────────────────
@@ -42,11 +44,12 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "Your Personal Dashboard",
     description: "This is your command center. Every number here is personalized to you — your territory, your pipeline, your money.",
     icon: <TrendingUp className="h-12 w-12 text-green-600" />,
+    route: "/sales",
     tips: [
       "Available leads = unclaimed leads in your territory, ready to grab",
       "My Active = leads you're currently working through the pipeline",
       "Won deals = closed clients you've converted",
-      "Your earnings widget shows commissions earned + monthly residuals",
+      "Your earnings widget shows commissions earned and monthly residuals",
     ],
     action: "Check your dashboard every morning — it's your scoreboard",
   },
@@ -54,6 +57,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "Claiming Leads",
     description: "Head to the Leads page to see all available opportunities in your territory. Leads are first-come, first-served — don't sleep on them.",
     icon: <Users className="h-12 w-12 text-purple-600" />,
+    route: "/leads",
     tips: [
       "The 'Available' column shows unclaimed leads in your territory",
       "Click any lead card to view details and claim it",
@@ -66,6 +70,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "Working Your Pipeline",
     description: "The Kanban board is your sales process visualized. Move leads from left to right as they progress through each stage.",
     icon: <Filter className="h-12 w-12 text-orange-600" />,
+    route: "/leads",
     tips: [
       "Stages: Available → Scheduled → Contacted → Follow Up → Paperwork → Won",
       "Drag & drop a lead card to move it to a new stage",
@@ -76,20 +81,22 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
   },
   {
     title: "Track Your Earnings",
-    description: "Your earnings widget shows exactly what you've made and what's on the way. Two income streams: upfront commissions and ongoing residuals.",
+    description: "Your earnings widget shows exactly what you've made and what's on the way — commissions when a deal closes, residuals every month after that.",
     icon: <DollarSign className="h-12 w-12 text-green-600" />,
+    route: "/sales",
     tips: [
-      "Commission: $1,000 one-time when a client closes (Month 1)",
-      "Residuals: $200/month per active client starting Month 2",
+      "Commission: one-time payment when a client closes (Month 1)",
+      "Residuals: recurring monthly payment per active client starting Month 2",
       "The more clients you close and retain, the higher your monthly passive income",
-      "Your earnings widget shows total commissions + recurring monthly residuals",
+      "Your exact rates are configured by your manager — check with them if something looks off",
     ],
-    action: "Every client you close pays you $200/month — forever",
+    action: "Every retained client is recurring income — forever",
   },
   {
     title: "Your Goals",
     description: "The Goals widget on your dashboard tracks progress toward your personal targets for the month. Use it to keep yourself on track.",
     icon: <Target className="h-12 w-12 text-blue-600" />,
+    route: "/sales",
     tips: [
       "Goals are configured by your manager — check with them if something looks off",
       "Progress bars update in real time as you close deals and move leads",
@@ -101,6 +108,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "Team Feed",
     description: "The Team Feed widget keeps you connected with the rest of the team. Check here for announcements, updates, and direct messages from your manager.",
     icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
+    route: "/sales",
     tips: [
       "Pinned messages (amber border) are important — read these first",
       "Urgent and Important badges signal priority messages from management",
@@ -114,6 +122,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "Your Profile",
     description: "Keep your account info current. You can update your name, email, and password anytime from the My Profile page in the navigation.",
     icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    route: "/profile",
     tips: [
       "Find 'My Profile' in the left sidebar navigation",
       "Change your name or email without needing your manager",
@@ -124,6 +133,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
     title: "You're Ready! 🚀",
     description: "That's everything you need to hit the ground running. Claim leads, work your pipeline, close deals, and watch your residual income grow every month.",
     icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
+    route: "/leads",
     tips: [
       "Hover over any ? icon in the app for in-context explanations",
       "Need help? Use the Help menu in the top right for support options",
@@ -149,6 +159,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Your Master Dashboard",
     description: "Your dashboard gives you a live view of everything: company-wide metrics, pipeline health, team leaderboard, revenue trends, and your managed client earnings.",
     icon: <LayoutDashboard className="h-12 w-12 text-green-600" />,
+    route: "/master",
     tips: [
       "Top metrics row: total leads, active pipeline, won deals, and MRR/ARR",
       "Pipeline Funnel shows conversion at each sales stage",
@@ -162,6 +173,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Arrange Your Dashboard",
     description: "Your dashboard is fully customizable. Move and resize any widget to match how you work. Your layout is saved per user, so it's yours alone.",
     icon: <LayoutDashboard className="h-12 w-12 text-slate-600" />,
+    route: "/master",
     tips: [
       "Click 'Arrange widgets' in the top right corner to enter edit mode",
       "Drag widgets using the handle bar that appears at the top of each card",
@@ -175,6 +187,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Client Portfolio",
     description: "The Clients tab is your full client roster. Monitor health scores, scan status, service details, and upcoming tasks all in one place.",
     icon: <Users className="h-12 w-12 text-purple-600" />,
+    route: "/clients",
     tips: [
       "Health score: 75+ = healthy, 50–74 = competitive pressure, below 50 = needs attention",
       "Filter clients by revenue tier, health score, scan status, or assigned rep",
@@ -187,8 +200,9 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Team Management",
     description: "The Settings → Team tab is where you manage your reps: territories, compensation rates, permissions, and account status.",
     icon: <Filter className="h-12 w-12 text-orange-600" />,
+    route: "/settings",
     tips: [
-      "Default rates: $1,000 commission, $200 residuals, $240 master fees",
+      "Default compensation rates are configured in Settings — reps see their own rates on their dashboard",
       "Override compensation rates per rep or per client as needed",
       "Permission presets (Sales, Master, Owner) control what each role can access",
       "Deactivate inactive reps without deleting their data — reactivate any time",
@@ -198,12 +212,14 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   },
   {
     title: "Your Earnings",
-    description: "As a Master Manager, you earn $240/month for every client under your management — from Month 1. If you also close deals, you earn commissions and residuals on top.",
+    description: "As a Master Manager, you earn a management fee for every client under your management — from Month 1. If you also close deals, you earn commissions and residuals on top.",
     icon: <DollarSign className="h-12 w-12 text-green-600" />,
+    route: "/master",
     tips: [
-      "Management fees: $240/month per client you manage, starting Month 1",
-      "Sales commission: $1,000 one-time per deal you personally close",
-      "Sales residuals: $200/month per client from Month 2 if you sold them",
+      "Management fees: per-client monthly earnings starting Month 1, for every client you manage",
+      "Sales commission: one-time per deal you personally close",
+      "Sales residuals: monthly per client from Month 2 if you sold them",
+      "Your exact rates are configured in Settings — check with the owner if something looks off",
       "All earnings are tracked in the Management Fees widget on your dashboard",
     ],
     action: "Grow your managed book — every client is $240/month",
@@ -212,6 +228,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Team Feed",
     description: "Team Feed is your broadcast and messaging channel. Communicate directly with your team without leaving the dashboard.",
     icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
+    route: "/master",
     tips: [
       "Post to Everyone, a specific role (masters/sales), or a single person (Direct)",
       "Pin messages to float them to the top of everyone's feed permanently",
@@ -226,6 +243,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Analytics & Reports",
     description: "The Analytics tab provides deeper insights: conversion funnels, revenue trends, client health distribution, and rep performance breakdowns.",
     icon: <BarChart3 className="h-12 w-12 text-blue-600" />,
+    route: "/analytics",
     tips: [
       "Filter by date range, territory, or rep for granular views",
       "Health score distribution shows the overall wellness of your client base",
@@ -238,6 +256,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Your Profile",
     description: "Keep your account info current. Update your name, email, or password anytime from My Profile in the navigation — no need to go through settings.",
     icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    route: "/profile",
     tips: [
       "Find 'My Profile' in the left sidebar navigation",
       "Role, territory, and permissions changes are done in Settings → Team",
@@ -248,6 +267,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "You're All Set! 🚀",
     description: "You now know every tool in the dashboard. Focus on keeping client health high, supporting your reps, and growing your managed book.",
     icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
+    route: "/master",
     tips: [
       "Hover over any ? icon in the app for in-context explanations",
       "Need help? Use the Help menu for support options and to report bugs",
@@ -265,9 +285,11 @@ type OnboardingTutorialProps = {
 };
 
 export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(true);
+  const [originPath, setOriginPath] = useState<string | null>(null);
 
   const steps = userRole === "sales" ? SALES_REP_TUTORIAL : MASTER_TUTORIAL;
   const step = steps[currentStep];
@@ -278,9 +300,17 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     const seen = localStorage.getItem("tutorial-seen");
     if (!seen) {
       setHasSeenTutorial(false);
+      setOriginPath(window.location.pathname);
       setIsOpen(true);
     }
   }, []);
+
+  // Navigate to the relevant page when a step has a route
+  useEffect(() => {
+    if (isOpen && step.route) {
+      router.push(step.route);
+    }
+  }, [currentStep, isOpen]);
 
   const handleNext = () => {
     if (isLastStep) {
@@ -299,11 +329,16 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     setHasSeenTutorial(true);
     setIsOpen(false);
     setCurrentStep(0);
+    // Return to where they started
+    if (originPath) {
+      router.push(originPath);
+    }
   };
 
   // Expose restart function to Help menu
   useEffect(() => {
     (window as any).restartTutorial = () => {
+      setOriginPath(window.location.pathname);
       setCurrentStep(0);
       setIsOpen(true);
     };

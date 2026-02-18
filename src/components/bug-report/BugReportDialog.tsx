@@ -170,8 +170,8 @@ export function BugReportDialog({
           </DialogTitle>
           <DialogDescription>
             {type === "bug" 
-              ? "Help us improve by reporting issues you encounter. We capture technical details automatically to help us fix problems faster."
-              : "Share your ideas to help us build a better product. Describe what you'd like to see and how it would help your workflow."
+              ? "Describe what broke. I capture technical details automatically — the more context you give, the faster it gets fixed."
+              : "Describe what you want built. I read every request, even the ones that never ship."
             }
           </DialogDescription>
         </DialogHeader>
@@ -179,9 +179,12 @@ export function BugReportDialog({
         {submitted ? (
           <div className="py-8 text-center space-y-3">
             <CheckCircle2 className="h-12 w-12 mx-auto text-green-600" />
-            <h3 className="font-medium text-lg">Thank you!</h3>
+            <h3 className="font-medium text-lg">Got it.</h3>
             <p className="text-sm text-muted-foreground">
-              Your bug report has been submitted and will be reviewed shortly.
+              {type === "bug" 
+                ? "I'll take a look. Technical details were captured automatically — should have enough to track it down."
+                : "Feature request noted. No promises, but I read every one."
+              }
             </p>
           </div>
         ) : (
@@ -224,7 +227,7 @@ export function BugReportDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Tell us more *</Label>
+              <Label htmlFor="description">Tell me more *</Label>
               <Textarea
                 id="description"
                 placeholder={

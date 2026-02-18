@@ -242,6 +242,7 @@ export function ClientProfile({
   const [users, setUsers] = useState<Array<{id: number; name: string; email: string; role: string}>>([]);
   const [voiceDialogOpen, setVoiceDialogOpen] = useState(false);
   const [voiceProfile, setVoiceProfile] = useState<any>(null);
+  const [localHasVoice, setLocalHasVoice] = useState(!!client.voiceProfileId);
 
   // Load users for compensation dropdown
   useEffect(() => {
@@ -257,12 +258,16 @@ export function ClientProfile({
 
   // Load voice profile if exists
   useEffect(() => {
-    if (client.voiceProfileId) {
+    if (client.voiceProfileId || refreshKey > 0) {
       fetch(`/api/clients/${client.id}/voice-profile`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.success) {
+          if (data.success && data.profile) {
             setVoiceProfile(data.profile);
+            setLocalHasVoice(true);
+          } else {
+            setVoiceProfile(null);
+            setLocalHasVoice(false);
           }
         })
         .catch(console.error);
@@ -342,9 +347,9 @@ export function ClientProfile({
                   variant="outline"
                   size="sm"
                   onClick={() => setVoiceDialogOpen(true)}
-                  className={`gap-2 ${client.voiceProfileId ? "border-green-500/60 text-green-700 dark:text-green-400 hover:border-green-500" : ""}`}
+                  className={`gap-2 ${localHasVoice ? "border-green-500/60 text-green-700 dark:text-green-400 hover:border-green-500" : ""}`}
                 >
-                  {client.voiceProfileId ? (
+                  {localHasVoice ? (
                     <>
                       <Sparkles className="h-4 w-4" />
                       Voice Captured
@@ -356,7 +361,7 @@ export function ClientProfile({
                     </>
                   )}
                 </Button>
-                {client.voiceProfileId && (
+                {localHasVoice && (
                   <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white shadow-sm">
                     <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="2,6 5,9 10,3" />
@@ -806,7 +811,20 @@ export function ClientProfile({
         clientId={client.id}
         websiteUrl={client.lead?.website || undefined}
         existingProfile={voiceProfile}
-        onSuccess={handleUpdate}
+        onSuccess={() => {
+          handleUpdate();
+          // Immediately sync local badge state — fetch will confirm truth
+          // but dialog already has the real state after capture/remove
+        }}
+        onRemoved={() => {
+          setLocalHasVoice(false);
+          setVoiceProfile(null);
+          handleUpdate();
+        }}
+        onCaptured={() => {
+          setLocalHasVoice(true);
+          handleUpdate();
+        }}
       />
     </div>
   );

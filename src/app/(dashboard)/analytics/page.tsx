@@ -98,15 +98,15 @@ export default async function AnalyticsPage() {
               Deep dive into revenue trends, team performance, and service analytics
             </p>
           </div>
-          <span className="text-xs bg-amber-100 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full font-medium">
+          <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50 px-2.5 py-1 rounded-full font-medium">
             🔧 Live data coming soon
           </span>
         </div>
 
         {/* Coming Soon Placeholder */}
-        <div className="rounded-lg border-2 border-dashed border-amber-200 bg-amber-50/40 p-8 text-center space-y-2">
-          <p className="text-base font-semibold text-amber-900">Advanced charts are being connected to live data</p>
-          <p className="text-sm text-amber-700">
+        <div className="rounded-lg border-2 border-dashed border-amber-200 dark:border-amber-700/50 bg-amber-50/40 dark:bg-amber-950/20 p-8 text-center space-y-2">
+          <p className="text-base font-semibold text-amber-900 dark:text-amber-300">Advanced charts are being connected to live data</p>
+          <p className="text-sm text-amber-700 dark:text-amber-400/80">
             Rep performance, territory comparisons, revenue trends, and service mix charts will appear here once real-time data pipelines are complete.
             The analytics above already reflect accurate live data.
           </p>

@@ -34,6 +34,8 @@ interface Props {
   websiteUrl?: string;
   existingProfile?: VoiceProfile | null;
   onSuccess?: () => void;
+  onRemoved?: () => void;
+  onCaptured?: () => void;
 }
 
 export function VoiceProfileDialog({
@@ -43,6 +45,8 @@ export function VoiceProfileDialog({
   websiteUrl,
   existingProfile,
   onSuccess,
+  onRemoved,
+  onCaptured,
 }: Props) {
   const [status, setStatus] = useState<"idle" | "analyzing" | "success" | "error">("idle");
   const [progress, setProgress] = useState(0);
@@ -88,6 +92,7 @@ export function VoiceProfileDialog({
       setStatus("success");
       toast.success("Voice profile captured!");
       onSuccess?.();
+      onCaptured?.();
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -108,6 +113,7 @@ export function VoiceProfileDialog({
       setProfile(null);
       setStatus("idle");
       onSuccess?.();
+      onRemoved?.();
     } catch (err) {
       toast.error("Failed to remove voice profile");
       console.error(err);
