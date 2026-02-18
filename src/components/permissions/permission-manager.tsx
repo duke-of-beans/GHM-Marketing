@@ -23,7 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Users, Shield, Search, Edit } from "lucide-react";
 import { toast } from "sonner";
-import type { UserPermissions } from "@/lib/auth/permissions";
+import { type UserPermissions, PERMISSION_PRESETS } from "@/lib/auth/permissions";
 
 type User = {
   id: number;
@@ -33,7 +33,7 @@ type User = {
   territoryId: number | null;
   territory: { name: string } | null;
   permissionPreset: string | null;
-  permissions: any;
+  permissions: Record<string, boolean>;
   effectivePermissions: UserPermissions;
   _count: {
     leads: number;
@@ -41,8 +41,9 @@ type User = {
   };
 };
 
-const PERMISSION_PRESETS = [
-  { value: null, label: "None (Custom Only)" },
+// Dropdown options for the preset selector
+const PRESET_OPTIONS = [
+  { value: "none", label: "None (Custom Only)" },
   { value: "sales_basic", label: "Sales Basic" },
   { value: "sales_advanced", label: "Sales Advanced" },
   { value: "master_lite", label: "Master Lite" },
@@ -80,11 +81,10 @@ export function PermissionManager() {
     try {
       const res = await fetch("/api/users");
       const data = await res.json();
-      
       if (data.success) {
         setUsers(data.data);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to load users");
     } finally {
       setLoading(false);
@@ -100,6 +100,42 @@ export function PermissionManager() {
     setEditPreset(user.permissionPreset);
     setEditPermissions(user.permissions || {});
     setEditDialogOpen(true);
+  };
+
+  // Effective permissions = preset base merged with custom overrides.
+  // This is what the toggles should display — not raw custom overrides.
+  const presetBase: Record<string, boolean> =
+    editPreset && PERMISSION_PRESETS[editPreset]
+      ? (PERMISSION_PRESETS[editPreset] as Record<string, boolean>)
+      : {};
+  const effectiveEditPermissions: Record<string, boolean> = {
+    ...presetBase,
+    ...editPermissions,
+  };
+
+  const handlePresetChange = (val: string) => {
+    const presetKey = val === "none" ? null : val;
+    setEditPreset(presetKey);
+    // Clear custom overrides so the new preset takes clean control.
+    // Individual toggles can still be flipped afterward to create targeted overrides.
+    setEditPermissions({});
+  };
+
+  const togglePermission = (key: string) => {
+    const currentEffective = effectiveEditPermissions[key] === true;
+    const newValue = !currentEffective;
+    const presetValue = editPreset
+      ? ((PERMISSION_PRESETS[editPreset] as Record<string, boolean>)?.[key] === true)
+      : false;
+
+    if (newValue === presetValue) {
+      // Toggling back to what the preset provides — remove the override
+      const { [key]: _removed, ...rest } = editPermissions;
+      setEditPermissions(rest);
+    } else {
+      // Store a custom override that differs from the preset
+      setEditPermissions((prev) => ({ ...prev, [key]: newValue }));
+    }
   };
 
   const handleSave = async () => {
@@ -121,35 +157,32 @@ export function PermissionManager() {
       if (data.success) {
         toast.success("Permissions updated successfully");
         setEditDialogOpen(false);
-        fetchUsers(); // Refresh list
+        fetchUsers();
       } else {
         toast.error(data.error || "Failed to update permissions");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to update permissions");
     } finally {
       setSaving(false);
     }
   };
 
-  const togglePermission = (key: string) => {
-    setEditPermissions((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Group permissions by category
-  const permissionsByCategory = PERMISSION_DEFINITIONS.reduce((acc, perm) => {
-    if (!acc[perm.category]) acc[perm.category] = [];
-    acc[perm.category].push(perm);
-    return acc;
-  }, {} as Record<string, typeof PERMISSION_DEFINITIONS>);
+  const permissionsByCategory = PERMISSION_DEFINITIONS.reduce(
+    (acc, perm) => {
+      if (!acc[perm.category]) acc[perm.category] = [];
+      acc[perm.category].push(perm);
+      return acc;
+    },
+    {} as Record<string, typeof PERMISSION_DEFINITIONS>
+  );
 
   return (
     <div className="space-y-6">
@@ -174,7 +207,6 @@ export function PermissionManager() {
             </div>
           </div>
 
-          {/* Users Table */}
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">Loading...</div>
           ) : filteredUsers.length === 0 ? (
@@ -203,30 +235,26 @@ export function PermissionManager() {
                       {user.territory && ` • ${user.territory.name}`}
                       {` • ${user._count.leads} leads, ${user._count.clients} clients`}
                     </div>
-                    
+
                     {/* Show active permissions */}
                     <div className="flex gap-1 mt-2 flex-wrap">
                       {Object.entries(user.effectivePermissions)
-                        .filter(([_, value]) => value === true)
+                        .filter(([, value]) => value === true)
                         .slice(0, 5)
                         .map(([key]) => (
                           <Badge key={key} variant="secondary" className="text-xs">
                             {key.replace(/_/g, " ")}
                           </Badge>
                         ))}
-                      {Object.values(user.effectivePermissions).filter(v => v === true).length > 5 && (
+                      {Object.values(user.effectivePermissions).filter((v) => v === true).length > 5 && (
                         <Badge variant="secondary" className="text-xs">
-                          +{Object.values(user.effectivePermissions).filter(v => v === true).length - 5} more
+                          +{Object.values(user.effectivePermissions).filter((v) => v === true).length - 5} more
                         </Badge>
                       )}
                     </div>
                   </div>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openEditDialog(user)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => openEditDialog(user)}>
                     <Edit className="h-4 w-4 mr-1" />
                     Edit
                   </Button>
@@ -254,41 +282,39 @@ export function PermissionManager() {
             {/* Permission Preset */}
             <div className="space-y-2">
               <Label>Permission Preset</Label>
-              <Select
-                value={editPreset || "none"}
-                onValueChange={(val) => setEditPreset(val === "none" ? null : val)}
-              >
+              <Select value={editPreset ?? "none"} onValueChange={handlePresetChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select preset" />
                 </SelectTrigger>
                 <SelectContent>
-                  {PERMISSION_PRESETS.map((preset) => (
-                    <SelectItem key={preset.value || "none"} value={preset.value || "none"}>
-                      {preset.label}
+                  {PRESET_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Presets provide a base set of permissions. Custom permissions below will override preset values.
+                Selecting a preset updates all toggles below. You can then flip individual
+                toggles to override specific permissions.
               </p>
             </div>
 
-            {/* Custom Permissions */}
+            {/* Permission Toggles */}
             <div className="space-y-4">
-              <Label>Custom Permission Overrides</Label>
+              <Label>Permissions</Label>
               {Object.entries(permissionsByCategory).map(([category, permissions]) => (
                 <div key={category} className="space-y-2">
                   <div className="font-medium text-sm">{category}</div>
                   <div className="space-y-2 ml-4">
                     {permissions.map((perm) => (
                       <div key={perm.key} className="flex items-center justify-between">
-                        <Label htmlFor={perm.key} className="text-sm font-normal">
+                        <Label htmlFor={perm.key} className="text-sm font-normal cursor-pointer">
                           {perm.label}
                         </Label>
                         <Switch
                           id={perm.key}
-                          checked={editPermissions[perm.key] === true}
+                          checked={effectiveEditPermissions[perm.key] === true}
                           onCheckedChange={() => togglePermission(perm.key)}
                         />
                       </div>
