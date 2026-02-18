@@ -143,6 +143,7 @@ export function WithAnyPermission({
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {
-  const hasAny = useHasAnyPermission(...permissions);
+  const { permissions: userPermissions } = usePermissions();
+  const hasAny = permissions.some((perm) => userPermissions[perm] === true);
   return hasAny ? <>{children}</> : <>{fallback}</>;
 }
