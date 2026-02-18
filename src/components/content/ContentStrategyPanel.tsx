@@ -92,7 +92,7 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
     }
   }
 
-  function useTopicForKeywords(title: string) {
+  function applyTopicToKeywords(title: string) {
     setKeywordInput(title);
     toast.info("Topic copied to keyword research — switch to the Keywords tab");
   }
@@ -158,7 +158,7 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
                   variant="ghost"
                   size="sm"
                   className="shrink-0 text-xs h-7 px-2"
-                  onClick={() => useTopicForKeywords(topic.title)}
+                  onClick={() => applyTopicToKeywords(topic.title)}
                   title="Research keywords for this topic"
                 >
                   <ChevronRight className="h-3.5 w-3.5 mr-1" />
