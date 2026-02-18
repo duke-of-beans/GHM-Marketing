@@ -144,6 +144,7 @@ export default async function MasterDashboard() {
           arr={metrics.totalARR}
           growth={mrrGrowth}
         />
+        {/* TODO: Move targetDeals + targetRevenue to GlobalSettings schema so goals are configurable per-tenant */}
         <GoalsWidget 
           wonDeals={metrics.wonDeals}
           targetDeals={20}

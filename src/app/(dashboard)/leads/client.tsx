@@ -261,6 +261,16 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
         showTerritoryFilter={userRole === "master"}
       />
 
+      {/* Cap warning — shown when lead count exceeds the 500-lead kanban limit */}
+      {totalLeadCount > 500 && (
+        <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-amber-200 bg-amber-50 text-amber-800">
+          <span>⚠️</span>
+          <span>
+            Showing 500 of {totalLeadCount.toLocaleString()} leads — use filters above to narrow results and see specific leads.
+          </span>
+        </div>
+      )}
+
       <KanbanBoard
         initialLeads={filteredLeads}
         onLeadClick={(id) => setSelectedLeadId(id)}
