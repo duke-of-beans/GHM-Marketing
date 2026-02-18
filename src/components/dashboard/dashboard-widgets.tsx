@@ -47,7 +47,7 @@ export function QuickActions() {
     {
       label: "Manage Team",
       icon: Users,
-      href: "/team",
+      href: "/settings?tab=team",
       description: "Update team members",
       color: "text-orange-600",
       bgColor: "bg-orange-50 hover:bg-orange-100",
@@ -63,12 +63,12 @@ export function QuickActions() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-2">
           {actions.map((action) => (
             <Link key={action.href} href={action.href} className="min-w-0">
               <Button
                 variant="outline"
-                className={`w-full h-auto flex-col items-start gap-1 p-2.5 ${action.bgColor} border-none transition-colors overflow-hidden`}
+                className={`w-full h-auto flex-col items-start gap-1 p-2.5 ${action.bgColor} border-none transition-colors`}
               >
                 <div className="flex items-center gap-1.5 w-full min-w-0">
                   <action.icon className={`h-4 w-4 flex-shrink-0 ${action.color}`} />
