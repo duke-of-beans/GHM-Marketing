@@ -28,42 +28,27 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PATCH(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_settings");
+  if (permissionError) return permissionError;
+
   try {
-    const session = await auth();
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Only master users can update settings
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true, role: true },
-    });
-
-    if (user?.role !== 'master') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const body = await request.json();
+    const body = await req.json();
 
     // Get or create settings
     let settings = await prisma.globalSettings.findFirst();
     
     if (!settings) {
       settings = await prisma.globalSettings.create({
-        data: { updatedBy: user.id },
+        data: {},
       });
     }
 
     // Update settings
     const updated = await prisma.globalSettings.update({
       where: { id: settings.id },
-      data: {
-        ...body,
-        updatedBy: user.id,
-      },
+      data: body,
     });
 
     return NextResponse.json({ success: true, settings: updated });
