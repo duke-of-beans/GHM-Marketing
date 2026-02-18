@@ -63,22 +63,20 @@ export function QuickActions() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-2">
+        <div className="flex flex-col gap-1.5">
           {actions.map((action) => (
-            <Link key={action.href} href={action.href} className="min-w-0">
+            <Link key={action.href} href={action.href}>
               <Button
-                variant="outline"
-                className={`w-full h-auto flex-col items-start gap-1 p-2.5 ${action.bgColor} border-none transition-colors`}
+                variant="ghost"
+                className={`w-full h-auto justify-start gap-3 px-3 py-2.5 ${action.bgColor} rounded-lg`}
               >
-                <div className="flex items-center gap-1.5 w-full min-w-0">
-                  <action.icon className={`h-4 w-4 flex-shrink-0 ${action.color}`} />
-                  <span className="font-semibold text-xs leading-tight text-left whitespace-normal break-words">
-                    {action.label}
-                  </span>
+                <div className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-md bg-white/70`}>
+                  <action.icon className={`h-4 w-4 ${action.color}`} />
                 </div>
-                <span className="hidden sm:block text-xs text-muted-foreground text-left w-full leading-tight">
-                  {action.description}
-                </span>
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="font-semibold text-sm leading-tight">{action.label}</span>
+                  <span className="text-xs text-muted-foreground leading-tight">{action.description}</span>
+                </div>
               </Button>
             </Link>
           ))}

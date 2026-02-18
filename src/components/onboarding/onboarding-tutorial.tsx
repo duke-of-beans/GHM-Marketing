@@ -172,8 +172,8 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
   const isLastStep = currentStep === steps.length - 1;
 
   useEffect(() => {
-    // Check if user has seen tutorial
-    const seen = localStorage.getItem(`tutorial-seen-${userRole}`);
+    // Check if user has seen tutorial — single key so role changes don't re-trigger
+    const seen = localStorage.getItem("tutorial-seen");
     if (!seen) {
       setHasSeenTutorial(false);
       setIsOpen(true);
@@ -193,7 +193,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
   };
 
   const completeTutorial = () => {
-    localStorage.setItem(`tutorial-seen-${userRole}`, "true");
+    localStorage.setItem("tutorial-seen", "true");
     setHasSeenTutorial(true);
     setIsOpen(false);
     setCurrentStep(0);

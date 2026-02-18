@@ -5,14 +5,20 @@ import { Settings as SettingsIcon, Users, Sliders } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { useState, useEffect } from "react";
 
-function SettingsContent() {
+export default function SettingsPage() {
   const { data: session } = useSession();
   const currentUserRole = (session?.user as any)?.role ?? "master";
-  const searchParams = useSearchParams();
-  const defaultTab = searchParams.get("tab") === "team" ? "team" : "general";
+  const [activeTab, setActiveTab] = useState("general");
+
+  useEffect(() => {
+    // Read ?tab=team from URL without useSearchParams (avoids Suspense/session conflict)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tab") === "team") {
+      setActiveTab("team");
+    }
+  }, []);
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -26,7 +32,7 @@ function SettingsContent() {
         </p>
       </div>
 
-      <Tabs defaultValue={defaultTab} className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="general" className="gap-2">
             <Sliders className="h-4 w-4" />
@@ -47,13 +53,5 @@ function SettingsContent() {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-export default function SettingsPage() {
-  return (
-    <Suspense fallback={<div className="p-6 animate-pulse"><div className="h-8 w-48 bg-muted rounded" /></div>}>
-      <SettingsContent />
-    </Suspense>
   );
 }
