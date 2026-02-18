@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withPermission, getUserFromRequest } from "@/lib/auth/api-permissions";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { generateWorkOrder } from "@/lib/pdf/generate-work-order";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
@@ -10,7 +10,11 @@ export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_leads");
   if (permissionError) return permissionError;
 
-  const user = await getUserFromRequest(req);
+  const user = await getCurrentUserWithPermissions();
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
   const { leadId, notes } = body;
 
@@ -52,11 +56,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  // Check permission
-  const permissionError = await withPermission(req, "view_reports");
+  // Check permission - work orders are reports, so use view_analytics
+  const permissionError = await withPermission(req, "view_analytics");
   if (permissionError) return permissionError;
 
-  const user = await getUserFromRequest(req);
+  const user = await getCurrentUserWithPermissions();
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const leadId = req.nextUrl.searchParams.get("leadId");
 
   const where = leadId

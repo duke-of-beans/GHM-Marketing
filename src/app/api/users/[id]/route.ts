@@ -19,7 +19,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   // Check permission
-  const permissionError = await withPermission(req, "manage_users");
+  const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
   const { id } = await params;
@@ -84,7 +84,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   // Check permission
-  const permissionError = await withPermission(req, "manage_users");
+  const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
   const { id } = await params;

@@ -28,7 +28,7 @@ export async function GET(
 ) {
   try {
     // Check permission
-    const permissionError = await withPermission(req, "manage_users");
+    const permissionError = await withPermission(req, "manage_team");
     if (permissionError) return permissionError;
 
     const userId = parseInt(params.id);
@@ -85,7 +85,7 @@ export async function PUT(
 ) {
   try {
     // Check permission
-    const permissionError = await withPermission(req, "manage_users");
+    const permissionError = await withPermission(req, "manage_team");
     if (permissionError) return permissionError;
 
     const userId = parseInt(params.id);

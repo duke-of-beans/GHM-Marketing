@@ -58,7 +58,7 @@ export async function PUT(
 
     // Log the permission change
     await createAuditLog({
-      userId: currentUser.id,
+      userId: parseInt(currentUser.id),
       userName: currentUser.name || "",
       userEmail: currentUser.email || "",
       userRole: currentUser.role,

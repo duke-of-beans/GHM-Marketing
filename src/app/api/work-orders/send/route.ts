@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withPermission, getUserFromRequest } from "@/lib/auth/api-permissions";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { generateWorkOrder } from "@/lib/pdf/generate-work-order";
 import { sendWorkOrderEmail } from "@/lib/email";
 import type { SessionUser } from "@/lib/auth/session";
@@ -11,7 +11,11 @@ export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_leads");
   if (permissionError) return permissionError;
 
-  const user = await getUserFromRequest(req);
+  const user = await getCurrentUserWithPermissions();
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
   const { leadId, notes } = body;
 
