@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 
@@ -249,9 +249,46 @@ export function GeneralSettingsTab() {
         </CardContent>
       </Card>
 
+      {/* Push Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Push Notifications
+          </CardTitle>
+          <CardDescription>
+            Control which events trigger browser push notifications for the entire team. Individual users can
+            enable or disable notifications in their browser at any time.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="pushMessagesEnabled">Team Messages</Label>
+              <p className="text-sm text-muted-foreground">Notify team when new messages are sent in TeamFeed</p>
+            </div>
+            <Switch
+              id="pushMessagesEnabled"
+              checked={!!settings.pushMessagesEnabled}
+              onCheckedChange={(checked) => updateSetting("pushMessagesEnabled", checked)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="pushTasksEnabled">Task Assignments</Label>
+              <p className="text-sm text-muted-foreground">Notify users when a client task is assigned to them</p>
+            </div>
+            <Switch
+              id="pushTasksEnabled"
+              checked={!!settings.pushTasksEnabled}
+              onCheckedChange={(checked) => updateSetting("pushTasksEnabled", checked)}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Save Button - positioned at the bottom */}
-      <div className="flex justify-end pt-4">
-        <Button onClick={saveSettings} disabled={saving} size="lg">
+      <div className="flex justify-end pt-4">        <Button onClick={saveSettings} disabled={saving} size="lg">
           {saving ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

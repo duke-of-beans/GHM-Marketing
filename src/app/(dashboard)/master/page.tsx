@@ -92,9 +92,6 @@ export default async function MasterDashboard() {
 
   return (
     <MasterPageClient
-      users={teamUsers}
-      isMaster={isMaster}
-      currentUserId={parseInt(user.id)}
       heading={
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>

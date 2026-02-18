@@ -640,7 +640,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                   <div className="bg-muted/50 rounded px-2 py-1.5">
                     <p className="text-xs text-muted-foreground">Avg ⭐</p>
                     <p className="text-sm font-semibold">
-                      {lead.reviewAvg ? lead.reviewAvg.toFixed(1) : "—"}
+                      {lead.reviewAvg != null ? Number(lead.reviewAvg).toFixed(1) : "—"}
                     </p>
                   </div>
                 </div>

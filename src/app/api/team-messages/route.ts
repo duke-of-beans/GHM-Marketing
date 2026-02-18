@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { sendPushToUsers } from "@/lib/push";
 
 // GET /api/team-messages — fetch messages visible to the current user
 export async function GET(req: NextRequest) {
@@ -103,6 +104,39 @@ export async function POST(req: NextRequest) {
   await prisma.teamMessageRead.create({
     data: { messageId: message.id, userId },
   });
+
+  // Fire push notifications if global setting is enabled
+  const settings = await prisma.globalSettings.findFirst({ select: { pushMessagesEnabled: true } });
+  if (settings?.pushMessagesEnabled !== false) {
+    const authorName = message.author.name;
+    const preview = content.length > 80 ? content.slice(0, 80) + "…" : content;
+    const pushPayload = {
+      title: `💬 ${authorName}`,
+      body: preview,
+      url: "/",
+      tag: "team-message",
+    };
+
+    if (audienceType === "user" && recipientId) {
+      // Direct message — only notify the recipient (not the author)
+      const rid = parseInt(recipientId);
+      if (rid !== userId) await sendPushToUsers([rid], pushPayload);
+    } else if (audienceType === "role" && audienceValue) {
+      // Role-targeted — notify all users of that role except the author
+      const roleUsers = await prisma.user.findMany({
+        where: { role: audienceValue as any, isActive: true, id: { not: userId } },
+        select: { id: true },
+      });
+      await sendPushToUsers(roleUsers.map((u) => u.id), pushPayload);
+    } else {
+      // Broadcast — notify everyone except the author
+      const allUsers = await prisma.user.findMany({
+        where: { isActive: true, id: { not: userId } },
+        select: { id: true },
+      });
+      await sendPushToUsers(allUsers.map((u) => u.id), pushPayload);
+    }
+  }
 
   return NextResponse.json({ message }, { status: 201 });
 }

@@ -58,6 +58,7 @@ model User {
   sentMessages          TeamMessage[] @relation("MessageAuthor")
   receivedMessages      TeamMessage[] @relation("MessageRecipient")
   messageReads          TeamMessageRead[]
+  pushSubscriptions     PushSubscription[]
 
   @@index([territoryId])
   @@map("users")
@@ -786,6 +787,8 @@ model GlobalSettings {
   emailNotifications    Boolean  @default(true) @map("email_notifications")
   taskAssignmentAlerts  Boolean  @default(true) @map("task_assignment_alerts")
   scanCompleteAlerts    Boolean  @default(true) @map("scan_complete_alerts")
+  pushMessagesEnabled   Boolean  @default(true) @map("push_messages_enabled")
+  pushTasksEnabled      Boolean  @default(true) @map("push_tasks_enabled")
   
   // API Keys (encrypted)
   openaiApiKey          String?  @map("openai_api_key")
@@ -914,3 +917,28 @@ model TeamMessageRead {
   @@index([userId])
   @@map("team_message_reads")
 }
+
+// ============================================================================
+// PUSH SUBSCRIPTIONS
+// ============================================================================
+
+model PushSubscription {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  endpoint    String   @db.Text
+  p256dh      String   @db.Text
+  auth        String   @db.Text
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+// ============================================================================
+// PUSH NOTIFICATION SUBSCRIPTIONS
+// ============================================================================
+

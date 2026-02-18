@@ -106,9 +106,9 @@ export default async function SalesDashboard() {
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
             <Link href="/leads">
-              <Button className="w-full h-auto flex-col items-start gap-2 p-4 bg-blue-50 hover:bg-blue-100 text-blue-900 border-none">
+              <Button className="w-full h-auto flex-col items-start gap-2 p-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/70 text-blue-900 dark:text-blue-200 border-none">
                 <div className="flex items-center gap-2 w-full">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                  <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   <span className="font-semibold text-sm">View Pipeline</span>
                 </div>
                 <span className="text-xs text-muted-foreground text-left w-full">
@@ -117,9 +117,9 @@ export default async function SalesDashboard() {
               </Button>
             </Link>
             <Link href="/leads?filter=available">
-              <Button variant="outline" className="w-full h-auto flex-col items-start gap-2 p-4 bg-green-50 hover:bg-green-100 border-none">
+              <Button variant="outline" className="w-full h-auto flex-col items-start gap-2 p-4 bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/70 dark:text-green-200 border-none">
                 <div className="flex items-center gap-2 w-full">
-                  <Target className="h-5 w-5 text-green-600" />
+                  <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
                   <span className="font-semibold text-sm">Claim Leads</span>
                 </div>
                 <span className="text-xs text-muted-foreground text-left w-full">
