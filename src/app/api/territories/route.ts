@@ -19,18 +19,12 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ success: true, data: territories });
 }
 
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  // Check permission
+  const permissionError = await withPermission(req, "manage_territories");
+  if (permissionError) return permissionError;
 
-  const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
-    return NextResponse.json({ success: false, error: "Master access required" }, { status: 403 });
-  }
-
-  const body = await request.json();
+  const body = await req.json();
   const parsed = createTerritorySchema.safeParse(body);
 
   if (!parsed.success) {
