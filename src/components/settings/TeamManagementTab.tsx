@@ -99,7 +99,8 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
       const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to deactivate user");
-      toast.success("User deactivated");
+      toast.success("User deactivated — showing inactive users so you can permanently delete if needed.");
+      setShowInactive(true);
       loadUsers();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to deactivate user");
