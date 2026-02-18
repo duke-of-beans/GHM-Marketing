@@ -16,7 +16,7 @@ import {
 export default async function MasterDashboard() {
   const user = await requirePermission("view_analytics");
 
-  const [metrics, funnelStats, repData] = await Promise.all([
+  const [metrics, funnelStats, repData, mrrGrowth] = await Promise.all([
     getDashboardMetrics(user),
     getFunnelStats(user),
     // Get rep performance
@@ -61,6 +61,30 @@ export default async function MasterDashboard() {
         })
       );
     }),
+    // Real MRR growth: compare this month's client retainers to last month's
+    (async () => {
+      const now = new Date();
+      const firstOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const firstOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+      const [currentClients, lastMonthClients] = await Promise.all([
+        prisma.clientProfile.findMany({
+          where: { status: "active" },
+          select: { retainerAmount: true },
+        }),
+        prisma.clientProfile.findMany({
+          where: {
+            status: "active",
+            onboardedAt: { lt: firstOfThisMonth },
+          },
+          select: { retainerAmount: true },
+        }),
+      ]);
+
+      const currentMRR = currentClients.reduce((s, c) => s + Number(c.retainerAmount), 0);
+      const lastMRR = lastMonthClients.reduce((s, c) => s + Number(c.retainerAmount), 0);
+      return lastMRR > 0 ? parseFloat(((currentMRR - lastMRR) / lastMRR * 100).toFixed(1)) : 0;
+    })(),
   ]);
 
   const isOwner = [1, 2].includes(Number(user.id));
@@ -105,7 +129,7 @@ export default async function MasterDashboard() {
         <RevenueMetricsWidget 
           mrr={metrics.totalMRR}
           arr={metrics.totalARR}
-          growth={5.2}
+          growth={mrrGrowth}
         />
         <GoalsWidget 
           wonDeals={metrics.wonDeals}
