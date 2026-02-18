@@ -8,39 +8,47 @@ export default async function LeadsPage() {
   const baseFilter = territoryFilter(user);
 
   // Fetch leads in active pipeline stages + recently won for Kanban
-  const leads = await prisma.lead.findMany({
-    where: {
-      ...baseFilter,
-      status: { in: [...ACTIVE_STATUSES, "won"] },
-    },
-    select: {
-      id: true,
-      businessName: true,
-      phone: true,
-      city: true,
-      state: true,
-      status: true,
-      domainRating: true,
-      reviewCount: true,
-      dealValueTotal: true,
-      assignedUser: { select: { id: true, name: true } },
-      _count: { select: { notes: true } },
-      // Lead gen engine fields (actual database field names)
-      impactScore: true,
-      closeScore: true, // Note: database has "closeScore" not "closeLikelihood"
-      priorityTier: true,
-      reviewAvg: true, // Note: database has "reviewAvg" not "rating"
-      marketType: true,
-      suppressionSignal: true,
-      wealthScore: true,
-      distanceFromMetro: true,
-      website: true,
-      email: true, // Note: database has "email" not "publicEmail"
-      // Note: database does NOT have municipalMismatch, isChain, isFranchise, isCorporate fields
-    },
-    orderBy: { updatedAt: "desc" },
-    take: 500, // Kanban cap for performance
-  });
+  const [leads, totalLeadCount] = await Promise.all([
+    prisma.lead.findMany({
+      where: {
+        ...baseFilter,
+        status: { in: [...ACTIVE_STATUSES, "won"] },
+      },
+      select: {
+        id: true,
+        businessName: true,
+        phone: true,
+        city: true,
+        state: true,
+        status: true,
+        domainRating: true,
+        reviewCount: true,
+        dealValueTotal: true,
+        assignedUser: { select: { id: true, name: true } },
+        _count: { select: { notes: true } },
+        // Lead gen engine fields (actual database field names)
+        impactScore: true,
+        closeScore: true, // Note: database has "closeScore" not "closeLikelihood"
+        priorityTier: true,
+        reviewAvg: true, // Note: database has "reviewAvg" not "rating"
+        marketType: true,
+        suppressionSignal: true,
+        wealthScore: true,
+        distanceFromMetro: true,
+        website: true,
+        email: true, // Note: database has "email" not "publicEmail"
+        // Note: database does NOT have municipalMismatch, isChain, isFranchise, isCorporate fields
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 500, // Kanban cap for performance
+    }),
+    prisma.lead.count({
+      where: {
+        ...baseFilter,
+        status: { in: [...ACTIVE_STATUSES, "won"] },
+      },
+    }),
+  ]);
 
   // Serialize Prisma Decimals to plain numbers + map database fields to client type
   const serializedLeads = leads.map((lead) => ({
@@ -76,6 +84,7 @@ export default async function LeadsPage() {
   return (
     <LeadsClientPage
       initialLeads={serializedLeads}
+      totalLeadCount={totalLeadCount}
       userRole={user.role}
     />
   );

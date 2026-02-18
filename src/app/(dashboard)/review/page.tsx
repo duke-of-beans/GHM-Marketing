@@ -24,12 +24,25 @@ export default async function ReviewPage() {
     ],
   });
 
+  // Count tasks waiting more than 5 days
+  const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+  const staleCount = tasksInReview.filter(
+    (t) => new Date(t.updatedAt) < fiveDaysAgo
+  ).length;
+
+  const subtitle = tasksInReview.length === 0
+    ? "No tasks awaiting review right now"
+    : [
+        `${tasksInReview.length} ${tasksInReview.length === 1 ? "task" : "tasks"} awaiting review`,
+        staleCount > 0 && `⚠️ ${staleCount} waiting over 5 days`,
+      ].filter(Boolean).join(" · ");
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Content Review</h1>
-        <p className="text-sm text-muted-foreground">
-          Review and approve content drafts before they go live for clients — {tasksInReview.length} {tasksInReview.length === 1 ? "task" : "tasks"} awaiting review
+        <p className={`text-sm ${staleCount > 0 ? "text-amber-600 font-medium" : "text-muted-foreground"}`}>
+          {subtitle}
         </p>
       </div>
 

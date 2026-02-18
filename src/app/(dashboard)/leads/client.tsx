@@ -45,10 +45,11 @@ type KanbanLead = {
 
 type LeadsClientPageProps = {
   initialLeads: KanbanLead[];
+  totalLeadCount: number;
   userRole: UserRole;
 };
 
-export function LeadsClientPage({ initialLeads, userRole }: LeadsClientPageProps) {
+export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: LeadsClientPageProps) {
   const router = useRouter();
   const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
   const [filters, setFilters] = useState<AdvancedFilterState>(DEFAULT_FILTERS);

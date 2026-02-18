@@ -16,7 +16,7 @@ import {
 export default async function MasterDashboard() {
   const user = await requirePermission("view_analytics");
 
-  const [metrics, funnelStats, repData, mrrGrowth] = await Promise.all([
+  const [metrics, funnelStats, repData, mrrGrowth, contextStats] = await Promise.all([
     getDashboardMetrics(user),
     getFunnelStats(user),
     // Get rep performance
@@ -85,6 +85,14 @@ export default async function MasterDashboard() {
       const lastMRR = lastMonthClients.reduce((s, c) => s + Number(c.retainerAmount), 0);
       return lastMRR > 0 ? parseFloat(((currentMRR - lastMRR) / lastMRR * 100).toFixed(1)) : 0;
     })(),
+    // Context stats for the dashboard subtitle
+    (async () => {
+      const [needsAttention, availableLeads] = await Promise.all([
+        prisma.clientProfile.count({ where: { status: "active", healthScore: { lt: 50 } } }),
+        prisma.lead.count({ where: { status: "available" } }),
+      ]);
+      return { needsAttention, availableLeads };
+    })(),
   ]);
 
   const isOwner = [1, 2].includes(Number(user.id));
@@ -93,7 +101,12 @@ export default async function MasterDashboard() {
     <div className="space-y-6 pb-20 md:pb-0">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Welcome back, {user.name.split(' ')[0]}</p>
+        <p className="text-sm text-muted-foreground">
+          {[
+            contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? 's' : ''} need attention`,
+            contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? 's' : ''} available`,
+          ].filter(Boolean).join(' · ') || `Good work, ${user.name.split(' ')[0]} — everything looks healthy`}
+        </p>
       </div>
 
       {/* Top metrics row */}
