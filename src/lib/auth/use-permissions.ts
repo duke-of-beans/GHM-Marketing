@@ -130,16 +130,3 @@ export function WithPermission({
   const hasPermission = useHasPermission(permission);
   return hasPermission ? <>{children}</> : <>{fallback}</>;
 }
-
-/**
- * Component wrapper that renders children if user has ANY permission
- */
-export function WithAnyPermission(props: {
-  permissions: PermissionKey[];
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
-}) {
-  const { permissions: userPermissions } = usePermissions();
-  const hasAny = props.permissions.some((perm) => userPermissions[perm] === true);
-  return hasAny ? <>{props.children}</> : <>{props.fallback ?? null}</>;
-}
