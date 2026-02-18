@@ -24,21 +24,16 @@ type NavLink = {
 };
 
 const allLinks: NavLink[] = [
+  // Core workflow — everyone
   { href: "/master", label: "Dashboard", icon: "📊", permission: "view_analytics" },
-  { href: "/sales", label: "Dashboard", icon: "📊" }, // Sales dashboard (no permission needed)
+  { href: "/sales", label: "Dashboard", icon: "📊" },
   { href: "/discovery", label: "Find Leads", icon: "🔍", permission: "view_all_leads" },
   { href: "/leads", label: "Sales Pipeline", icon: "👥", permission: "manage_leads" },
   { href: "/clients", label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
   { href: "/review", label: "Content Review", icon: "✍️", permission: "manage_clients" },
   { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
   { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
-  { href: "/territories", label: "Territories", icon: "🗺️", permission: "manage_territories" },
-  { href: "/settings?tab=team", label: "Team", icon: "🧑‍💼", permission: "manage_team" },
-  { href: "/permissions", label: "Permissions", icon: "🔐", permission: "manage_team" },
-  { href: "/audit", label: "Audit Logs", icon: "🔒", permission: "manage_settings" },
-  { href: "/profile", label: "My Profile", icon: "👤" }, // Available to all
-  { href: "/bugs", label: "Bug Reports", icon: "🐛" }, // Available to all
-  { href: "/settings", label: "Settings", icon: "⚙️", permission: "manage_settings" },
+  // Admin items live in Settings tabs — not separate nav items
 ];
 
 export function DashboardNav({ 
@@ -103,7 +98,33 @@ export function DashboardNav({
           ))}
         </nav>
 
-        <div className="mt-auto space-y-1">
+        <div className="mt-auto space-y-1 border-t pt-3">
+          <Link
+            href="/profile"
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+              pathname === "/profile"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+            )}
+          >
+            <span>👤</span>
+            My Profile
+          </Link>
+          {permissions.manage_settings && (
+            <Link
+              href="/settings"
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+                pathname.startsWith("/settings")
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-gray-100 hover:text-foreground"
+              )}
+            >
+              <span>⚙️</span>
+              Settings
+            </Link>
+          )}
           <HelpMenu />
           <BugReportButton 
             variant="ghost" 

@@ -16,7 +16,7 @@ import {
 export default async function MasterDashboard() {
   const user = await requirePermission("view_analytics");
 
-  const [metrics, funnelStats, repData, mrrGrowth, contextStats] = await Promise.all([
+  const [metrics, funnelStats, repData, mrrGrowth, contextStats, globalSettings] = await Promise.all([
     getDashboardMetrics(user),
     getFunnelStats(user),
     // Get rep performance
@@ -93,6 +93,7 @@ export default async function MasterDashboard() {
       ]);
       return { needsAttention, availableLeads };
     })(),
+    prisma.globalSettings.findFirst(),
   ]);
 
   const isOwner = [1, 2].includes(Number(user.id));
@@ -144,13 +145,20 @@ export default async function MasterDashboard() {
           arr={metrics.totalARR}
           growth={mrrGrowth}
         />
-        {/* TODO: Move targetDeals + targetRevenue to GlobalSettings schema so goals are configurable per-tenant */}
-        <GoalsWidget 
-          wonDeals={metrics.wonDeals}
-          targetDeals={20}
-          revenue={metrics.totalMRR}
-          targetRevenue={50000}
-        />
+        {globalSettings?.goalsEnabled && (
+          <GoalsWidget
+            wonDeals={metrics.wonDeals}
+            targetDeals={globalSettings.monthlyDealTarget ?? 20}
+            revenue={metrics.totalMRR}
+            targetRevenue={globalSettings.monthlyRevenueTarget ?? 50000}
+          />
+        )}
+        {!globalSettings?.goalsEnabled && (
+          <div className="flex items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground p-6 text-center">
+            Goals widget disabled.<br />
+            <a href="/settings" className="underline mt-1 inline-block">Configure in Settings → General</a>
+          </div>
+        )}
       </div>
 
       {/* Pipeline + Rep performance */}

@@ -1,11 +1,23 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, Users, Sliders } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+
+// Territories is a client component — safe to embed
+const TerritoriesContent = dynamic(
+  () => import("@/app/(dashboard)/territories/page"),
+  { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
+);
+
+const VALID_TABS = ["general", "team", "territories", "permissions", "audit"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -13,11 +25,9 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
 
   useEffect(() => {
-    // Read ?tab=team from URL without useSearchParams (avoids Suspense/session conflict)
     const params = new URLSearchParams(window.location.search);
-    if (params.get("tab") === "team") {
-      setActiveTab("team");
-    }
+    const tab = params.get("tab");
+    if (tab && VALID_TABS.includes(tab)) setActiveTab(tab);
   }, []);
 
   return (
@@ -28,19 +38,26 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p className="text-muted-foreground mt-1">
-          Configure global settings and manage your team
+          Configure your platform, manage your team, and control access
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="general" className="gap-2">
-            <Sliders className="h-4 w-4" />
-            General
+        <TabsList className="flex-wrap h-auto gap-1">
+          <TabsTrigger value="general" className="gap-1.5">
+            <Sliders className="h-4 w-4" />General
           </TabsTrigger>
-          <TabsTrigger value="team" className="gap-2">
-            <Users className="h-4 w-4" />
-            Team
+          <TabsTrigger value="team" className="gap-1.5">
+            <Users className="h-4 w-4" />Team
+          </TabsTrigger>
+          <TabsTrigger value="territories" className="gap-1.5">
+            <Map className="h-4 w-4" />Territories
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="gap-1.5">
+            <Shield className="h-4 w-4" />Permissions
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="gap-1.5">
+            <FileText className="h-4 w-4" />Audit Log
           </TabsTrigger>
         </TabsList>
 
@@ -50,6 +67,52 @@ export default function SettingsPage() {
 
         <TabsContent value="team">
           <TeamManagementTab currentUserRole={currentUserRole} />
+        </TabsContent>
+
+        <TabsContent value="territories">
+          <TerritoriesContent />
+        </TabsContent>
+
+        <TabsContent value="permissions">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Permission Presets
+              </CardTitle>
+              <CardDescription>
+                Manage role-based permission presets that control what each team member can see and do across the dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild>
+                <Link href="/permissions">
+                  Open Permissions Manager <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Audit Logs
+              </CardTitle>
+              <CardDescription>
+                Full history of changes made across the platform — user actions, permission changes, client updates, and more.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild>
+                <Link href="/audit">
+                  Open Audit Log <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

@@ -216,7 +216,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) completeTutorial(); }}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl">

@@ -788,6 +788,11 @@ model GlobalSettings {
   // Theme
   defaultTheme          String   @default("light") @map("default_theme")         // "light" or "dark"
   
+  // Monthly Goals (null = disabled/not set)
+  goalsEnabled          Boolean  @default(false) @map("goals_enabled")
+  monthlyDealTarget     Int?     @map("monthly_deal_target")
+  monthlyRevenueTarget  Float?   @map("monthly_revenue_target")
+  
   // Metadata
   updatedAt             DateTime @updatedAt @map("updated_at")
   updatedBy             Int?     @map("updated_by")
