@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
         name: true,
         email: true,
         role: true,
+        isActive: true,
         territoryId: true,
         permissionPreset: true,
         permissions: true,

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
-import type { SessionUser } from "@/lib/auth/session";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { createAuditLog } from "@/lib/audit-log";
 
 const updateUserSchema = z.object({
   email: z.string().email().optional(),
@@ -18,7 +18,6 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // Check permission
   const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
@@ -40,7 +39,6 @@ export async function PATCH(
   const updateData: Record<string, unknown> = {};
   if (parsed.data.email !== undefined) updateData.email = parsed.data.email;
 
-  // Check for email conflict
   if (updateData.email) {
     const existing = await prisma.user.findFirst({
       where: { email: updateData.email as string, id: { not: userId } },
@@ -83,7 +81,6 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // Check permission
   const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
@@ -98,18 +95,101 @@ export async function DELETE(
     return NextResponse.json({ success: false, error: "Invalid user ID" }, { status: 400 });
   }
 
-  // Don't let user deactivate themselves
+  // Cannot act on yourself
   if (userId === Number(currentUser.id)) {
     return NextResponse.json(
-      { success: false, error: "Cannot deactivate your own account" },
+      { success: false, error: "Cannot delete your own account" },
       { status: 400 }
     );
   }
 
+  const permanent = req.nextUrl.searchParams.get("permanent") === "true";
+
+  // Hard delete: masters only
+  if (permanent && currentUser.role !== "master") {
+    return NextResponse.json(
+      { success: false, error: "Only master users can permanently delete accounts" },
+      { status: 403 }
+    );
+  }
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      _count: {
+        select: {
+          assignedLeads: true,
+          salesRepClients: true,
+        },
+      },
+    },
+  });
+
+  if (!targetUser) {
+    return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+  }
+
+  if (permanent) {
+    // Block hard delete if user has active leads or clients — caller must reassign first
+    if (targetUser._count.assignedLeads > 0 || targetUser._count.salesRepClients > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Cannot permanently delete a user with active leads or clients. Reassign them first.",
+          details: {
+            assignedLeads: targetUser._count.assignedLeads,
+            activeClients: targetUser._count.salesRepClients,
+          },
+        },
+        { status: 409 }
+      );
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    await createAuditLog({
+      userId: parseInt(currentUser.id),
+      userName: currentUser.name ?? "",
+      userEmail: currentUser.email ?? "",
+      userRole: currentUser.role,
+      action: "user_delete",
+      resource: `user:${userId}`,
+      permission: "manage_team",
+      status: "success",
+      metadata: {
+        deletedUser: targetUser.name,
+        deletedEmail: targetUser.email,
+        permanent: true,
+      },
+    });
+
+    return NextResponse.json({ success: true, permanent: true });
+  }
+
+  // Soft delete (deactivate)
   await prisma.user.update({
     where: { id: userId },
     data: { isActive: false },
   });
 
-  return NextResponse.json({ success: true });
+  await createAuditLog({
+    userId: parseInt(currentUser.id),
+    userName: currentUser.name ?? "",
+    userEmail: currentUser.email ?? "",
+    userRole: currentUser.role,
+    action: "user_update",
+    resource: `user:${userId}`,
+    permission: "manage_team",
+    status: "success",
+    metadata: {
+      updatedFields: ["isActive"],
+      newValue: false,
+      targetUser: targetUser.name,
+    },
+  });
+
+  return NextResponse.json({ success: true, permanent: false });
 }

@@ -4,8 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings as SettingsIcon, Users, Sliders } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
+import { useSession } from "next-auth/react";
 
 export default function SettingsPage() {
+  const { data: session } = useSession();
+  const currentUserRole = (session?.user as any)?.role ?? "master";
   return (
     <div className="space-y-6 max-w-6xl">
       <div>
@@ -35,7 +38,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="team">
-          <TeamManagementTab />
+          <TeamManagementTab currentUserRole={currentUserRole} />
         </TabsContent>
       </Tabs>
     </div>

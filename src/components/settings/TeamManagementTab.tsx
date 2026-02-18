@@ -6,7 +6,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, Users, Plus, Search, SlidersHorizontal } from "lucide-react";
+import {
+  Loader2,
+  Users,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,18 +33,24 @@ interface User {
   name: string;
   email: string;
   role: "master" | "sales";
+  isActive: boolean;
   permissions: Record<string, boolean>;
   permissionPreset: string;
   territory?: { id: number; name: string } | null;
-  _count?: { assignedLeads: number };
+  _count?: { assignedLeads: number; salesRepClients?: number };
 }
 
-export function TeamManagementTab() {
+interface TeamManagementTabProps {
+  currentUserRole?: "master" | "sales";
+}
+
+export function TeamManagementTab({ currentUserRole = "master" }: TeamManagementTabProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<"all" | "master" | "sales">("all");
   const [sortBy, setSortBy] = useState<"name" | "role" | "leads">("name");
+  const [showInactive, setShowInactive] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -52,65 +66,96 @@ export function TeamManagementTab() {
       } else {
         toast.error("Failed to load team members");
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Failed to load team members");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handlePermissionUpdate(userId: number, updates: {
-    permissionPreset?: string;
-    permissions?: Record<string, boolean>;
-  }) {
+  async function handlePermissionUpdate(
+    userId: number,
+    updates: { permissionPreset?: string; permissions?: Record<string, boolean> }
+  ) {
     try {
       const res = await fetch(`/api/users/${userId}/permissions`, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Failed to update permissions");
       }
+      toast.success("Permissions updated");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update permissions");
+    }
+  }
 
-      toast.success("Permissions updated successfully");
-      loadUsers(); // Reload to reflect changes
-    } catch (error) {
-      console.error(error);
-      toast.error(error instanceof Error ? error.message : "Failed to update permissions");
+  async function handleDeactivate(userId: number) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to deactivate user");
+      toast.success("User deactivated");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to deactivate user");
+    }
+  }
+
+  async function handleReactivate(userId: number) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reactivate user");
+      toast.success("User reactivated");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to reactivate user");
+    }
+  }
+
+  async function handleHardDelete(userId: number) {
+    try {
+      const res = await fetch(`/api/users/${userId}?permanent=true`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to permanently delete user");
+      toast.success("User permanently deleted");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to permanently delete user");
     }
   }
 
   const filteredUsers = users
-    .filter(user => {
-      // Search filter
-      const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    .filter((user) => {
+      const matchesSearch =
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Role filter
       const matchesRole = roleFilter === "all" || user.role === roleFilter;
-      
-      return matchesSearch && matchesRole;
+      const matchesActive = showInactive ? true : user.isActive;
+      return matchesSearch && matchesRole && matchesActive;
     })
     .sort((a, b) => {
-      // Sort logic
-      if (sortBy === "name") {
-        return a.name.localeCompare(b.name);
-      } else if (sortBy === "role") {
-        // Master before Sales
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "role") {
         if (a.role === b.role) return a.name.localeCompare(b.name);
         return a.role === "master" ? -1 : 1;
-      } else if (sortBy === "leads") {
-        // Most leads first
-        const aLeads = a._count?.assignedLeads || 0;
-        const bLeads = b._count?.assignedLeads || 0;
-        return bLeads - aLeads;
+      }
+      if (sortBy === "leads") {
+        return (b._count?.assignedLeads ?? 0) - (a._count?.assignedLeads ?? 0);
       }
       return 0;
     });
+
+  const inactiveCount = users.filter((u) => !u.isActive).length;
 
   if (loading) {
     return (
@@ -150,7 +195,7 @@ export function TeamManagementTab() {
           />
         </div>
 
-        <Select value={roleFilter} onValueChange={(v: any) => setRoleFilter(v)}>
+        <Select value={roleFilter} onValueChange={(v: "all" | "master" | "sales") => setRoleFilter(v)}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Filter by role" />
@@ -162,7 +207,7 @@ export function TeamManagementTab() {
           </SelectContent>
         </Select>
 
-        <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+        <Select value={sortBy} onValueChange={(v: "name" | "role" | "leads") => setSortBy(v)}>
           <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -172,6 +217,23 @@ export function TeamManagementTab() {
             <SelectItem value="leads">Sort by Leads</SelectItem>
           </SelectContent>
         </Select>
+
+        {/* Inactive toggle — only shown when there are inactive users */}
+        {inactiveCount > 0 && (
+          <Button
+            variant={showInactive ? "secondary" : "outline"}
+            onClick={() => setShowInactive(!showInactive)}
+            className="shrink-0"
+            title={showInactive ? "Hide inactive users" : "Show inactive users"}
+          >
+            {showInactive ? (
+              <EyeOff className="h-4 w-4 mr-2" />
+            ) : (
+              <Eye className="h-4 w-4 mr-2" />
+            )}
+            Inactive ({inactiveCount})
+          </Button>
+        )}
       </div>
 
       {/* User List */}
@@ -187,7 +249,11 @@ export function TeamManagementTab() {
             <UserPermissionCard
               key={user.id}
               user={user}
+              currentUserRole={currentUserRole}
               onUpdate={(updates) => handlePermissionUpdate(user.id, updates)}
+              onDeactivate={() => handleDeactivate(user.id)}
+              onReactivate={() => handleReactivate(user.id)}
+              onHardDelete={() => handleHardDelete(user.id)}
             />
           ))
         )}
