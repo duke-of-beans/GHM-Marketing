@@ -8,8 +8,8 @@ import { CompanyProfitabilityWidget } from "@/components/payments/company-profit
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import { QuickActions, RevenueMetricsWidget, GoalsWidget } from "@/components/dashboard/dashboard-widgets";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
-import { TeamFeedWidget } from "@/components/team-feed/TeamFeed";
 import { MasterDashboardGrid } from "@/components/dashboard/MasterDashboardGrid";
+import { MasterPageClient } from "@/components/dashboard/MasterPageClient";
 import type { ResponsiveLayouts } from "react-grid-layout";
 
 export default async function MasterDashboard() {
@@ -91,17 +91,22 @@ export default async function MasterDashboard() {
   );
 
   return (
-    <div className="pb-20 md:pb-4">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          {[
-            contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
-            contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
-          ].filter(Boolean).join(" · ") || `Good work, ${user.name.split(" ")[0]} — everything looks healthy`}
-        </p>
-      </div>
-
+    <MasterPageClient
+      users={teamUsers}
+      isMaster={isMaster}
+      currentUserId={parseInt(user.id)}
+      heading={
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            {[
+              contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
+              contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
+            ].filter(Boolean).join(" · ") || `Good work, ${user.name.split(" ")[0]} — everything looks healthy`}
+          </p>
+        </div>
+      }
+    >
       <MasterDashboardGrid
         savedLayout={savedLayout}
         showProfitability={isOwner}
@@ -120,13 +125,6 @@ export default async function MasterDashboard() {
           "quick-actions": <QuickActions />,
           "revenue": <RevenueMetricsWidget mrr={metrics.totalMRR} arr={metrics.totalARR} growth={mrrGrowth} />,
           "goals": goalsWidget,
-          "team-feed": (
-            <TeamFeedWidget
-              users={teamUsers}
-              isMaster={isMaster}
-              currentUserId={parseInt(user.id)}
-            />
-          ),
           "pipeline": <PipelineFunnel stats={funnelStats} />,
           "leaderboard": <RepLeaderboard reps={repData} />,
           "mgmt-fees": <ManagementFeesWidget />,
@@ -135,6 +133,6 @@ export default async function MasterDashboard() {
       </MasterDashboardGrid>
 
       <OnboardingTutorial userRole={isOwner ? "owner" : "master"} userName={user.name} />
-    </div>
+    </MasterPageClient>
   );
 }
