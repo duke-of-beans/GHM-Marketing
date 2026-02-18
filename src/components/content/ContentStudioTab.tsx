@@ -45,6 +45,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               panelKey="strategy"
               title="Content Strategy"
               description="Generate topic ideas and target keywords to plan your content calendar before writing"
+              defaultOpen={false}
             >
               <ContentStrategyPanel clientId={clientId} />
             </CollapsibleCard>
@@ -53,6 +54,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               panelKey="blog"
               title="Blog Post Generator"
               description="AI-powered content creation that researches your industry, analyzes competitors, and incorporates local market data to generate SEO-optimized blog posts"
+              defaultOpen={false}
             >
               <BlogGenerator
                 clientId={clientId}
@@ -64,6 +66,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               panelKey="social"
               title="Social Media Content"
               description="Generate platform-optimized posts with trending hashtags and engagement strategies designed to maximize reach and audience interaction"
+              defaultOpen={false}
             >
               <SocialMediaGenerator
                 clientId={clientId}
@@ -75,6 +78,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               panelKey="meta"
               title="Meta Description Generator"
               description="Create compelling, click-worthy meta descriptions optimized for search engines and designed to improve organic click-through rates"
+              defaultOpen={false}
             >
               <MetaDescriptionGenerator
                 clientId={clientId}
@@ -86,6 +90,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               panelKey="ppc"
               title="PPC Ad Copy Generator"
               description="Create Google Ads-formatted headlines and descriptions with multiple variants for A/B testing paid search campaigns"
+              defaultOpen={false}
             >
               <PPCGenerator clientId={clientId} />
             </CollapsibleCard>
