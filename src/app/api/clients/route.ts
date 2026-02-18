@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
   // Check permission
   const permissionError = await withPermission(request, "manage_clients");
   if (permissionError) return permissionError;
-  }
 
   try {
     const body = await request.json();
