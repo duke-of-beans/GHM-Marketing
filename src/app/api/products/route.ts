@@ -36,10 +36,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  try {
-    await requireMaster();
+export async function GET(req: NextRequest) {
+  // Check permission - products can be viewed by manage_products permission
+  const permissionError = await withPermission(req, "manage_products");
+  if (permissionError) return permissionError;
 
+  try {
     const products = await prisma.product.findMany({
       orderBy: [
         { isActive: "desc" },
