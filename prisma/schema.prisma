@@ -709,6 +709,7 @@ model BugReport {
   userName          String?  @map("user_name")
   
   // Bug details
+  type              String   @default("bug") // "bug" | "feature"
   title             String
   description       String   @db.Text
   category          String   // "content", "compensation", "scans", "clients", "leads", "ui", "performance", "other"

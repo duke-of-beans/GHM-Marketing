@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const {
+      type,
       title,
       description,
       category,
@@ -71,6 +72,8 @@ export async function POST(request: NextRequest) {
       recentActions,
       sessionData,
     } = body;
+
+    const reportType = type === "feature" ? "feature" : "bug";
 
     // Validate required fields
     if (!title || !description) {
@@ -109,15 +112,16 @@ export async function POST(request: NextRequest) {
       select: { id: true },
     });
 
-    // Create bug report
+    // Create bug/feature report
     const bugReport = await prisma.bugReport.create({
       data: {
+        type: reportType,
         title,
         description,
         category: autoCategory,
-        severity: severity || 'medium',
-        status: 'new',
-        priority: determinePriority(severity, autoCategory),
+        severity: reportType === "bug" ? (severity || "medium") : "low",
+        status: "new",
+        priority: reportType === "feature" ? "medium" : determinePriority(severity, autoCategory),
         
         userId,
         userEmail,
