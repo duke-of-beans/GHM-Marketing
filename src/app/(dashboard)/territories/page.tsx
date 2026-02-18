@@ -244,7 +244,7 @@ export default function TerritoriesPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="ghost" onClick={() => handleEdit(territory)}>Edit</Button>
-                  <Button size="sm" variant="ghost" className="text-destructive"
+                  <Button size="sm" variant="ghost" className="text-destructive dark:text-red-400 hover:text-destructive dark:hover:text-red-300"
                     onClick={() => handleDeactivate(territory.id)}>Deactivate</Button>
                 </div>
               </div>

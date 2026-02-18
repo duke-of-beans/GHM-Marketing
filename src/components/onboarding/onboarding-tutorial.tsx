@@ -197,6 +197,22 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     action: "Keep client health scores high — it drives retention",
   },
   {
+    title: "Content Studio — Competitive Intelligence",
+    description: "Every Content Studio panel shows a live competitive gap indicator driven by the latest scan. You'll know exactly what to work on the moment you open it.",
+    icon: <BarChart3 className="h-12 w-12 text-indigo-600" />,
+    route: "/clients",
+    tips: [
+      "Battery-bar indicators (5 segments) show urgency: red = urgent, yellow = moderate, green = good",
+      "Blog Generator: shows how many keywords are lost or declining — write to recover positions",
+      "Social Media: shows your review count gap vs. the strongest competitor",
+      "Meta Description: flags pages with slipping on-page signals that need a copy refresh",
+      "PPC Generator: shows domain authority gap — lower DR = higher CPCs in paid search",
+      "Content Strategy: shows total critical + warning alerts — tackle these first",
+      "Hover any badge for a plain-English tooltip explaining exactly what the number means",
+    ],
+    action: "Run a competitive scan first — badges populate automatically after each scan",
+  },
+  {
     title: "Team Management",
     description: "The Settings → Team tab is where you manage your reps: territories, compensation rates, permissions, and account status.",
     icon: <Filter className="h-12 w-12 text-orange-600" />,
@@ -305,12 +321,8 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     }
   }, []);
 
-  // Navigate to the relevant page when a step has a route
-  useEffect(() => {
-    if (isOpen && step.route) {
-      router.push(step.route);
-    }
-  }, [currentStep, isOpen]);
+  // Navigation is handled at completion only — per-step navigation
+  // was causing the dialog to unmount mid-tutorial due to route changes.
 
   const handleNext = () => {
     if (isLastStep) {

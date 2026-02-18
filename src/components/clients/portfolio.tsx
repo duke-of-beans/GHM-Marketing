@@ -298,12 +298,27 @@ export function ClientPortfolio({
                         {client.lead.city}, {client.lead.state}
                       </p>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`shrink-0 ${healthColor(client.healthScore)}`}
-                    >
-                      {client.healthScore}
-                    </Badge>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge
+                          variant="outline"
+                          className={`shrink-0 cursor-help ${healthColor(client.healthScore)}`}
+                        >
+                          {client.healthScore}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="max-w-[200px]">
+                        <p className="text-xs font-medium mb-1">Health Score</p>
+                        <p className="text-xs text-muted-foreground">
+                          {client.healthScore >= 75
+                            ? "Healthy — leading or competitive across all metrics."
+                            : client.healthScore >= 50
+                            ? "Competitive — gaps exist but within striking range."
+                            : "Needs attention — at least one metric is significantly behind."}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Hover the ? on Avg Health above for full methodology.</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">

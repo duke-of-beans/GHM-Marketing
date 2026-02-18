@@ -30,6 +30,7 @@ type User = {
   name: string;
   email: string;
   role: string;
+  isActive: boolean;
   territoryId: number | null;
   territory: { name: string } | null;
   permissionPreset: string | null;
@@ -170,8 +171,9 @@ export function PermissionManager() {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      user.isActive !== false &&
+      (user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   // Group permissions by category

@@ -500,11 +500,11 @@ export function ClientProfile({
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="domains">Domains</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
           <TabsTrigger value="content">Content Studio</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
 
         {/* TAB 1: COMPETITIVE SCORECARD */}

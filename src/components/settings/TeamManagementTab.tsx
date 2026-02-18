@@ -185,8 +185,8 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="space-y-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name or email..."
@@ -195,46 +195,47 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
             className="pl-10"
           />
         </div>
+        <div className="flex flex-wrap gap-3">
+          <Select value={roleFilter} onValueChange={(v: "all" | "master" | "sales") => setRoleFilter(v)}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="master">Master Only</SelectItem>
+              <SelectItem value="sales">Sales Only</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select value={roleFilter} onValueChange={(v: "all" | "master" | "sales") => setRoleFilter(v)}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filter by role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="master">Master Only</SelectItem>
-            <SelectItem value="sales">Sales Only</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select value={sortBy} onValueChange={(v: "name" | "role" | "leads") => setSortBy(v)}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Sort by Name</SelectItem>
+              <SelectItem value="role">Sort by Role</SelectItem>
+              <SelectItem value="leads">Sort by Leads</SelectItem>
+            </SelectContent>
+          </Select>
 
-        <Select value={sortBy} onValueChange={(v: "name" | "role" | "leads") => setSortBy(v)}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">Sort by Name</SelectItem>
-            <SelectItem value="role">Sort by Role</SelectItem>
-            <SelectItem value="leads">Sort by Leads</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Inactive toggle — only shown when there are inactive users */}
-        {inactiveCount > 0 && (
-          <Button
-            variant={showInactive ? "secondary" : "outline"}
-            onClick={() => setShowInactive(!showInactive)}
-            className="shrink-0"
-            title={showInactive ? "Hide inactive users" : "Show inactive users"}
-          >
-            {showInactive ? (
-              <EyeOff className="h-4 w-4 mr-2" />
-            ) : (
-              <Eye className="h-4 w-4 mr-2" />
-            )}
-            Inactive ({inactiveCount})
-          </Button>
-        )}
+          {/* Inactive toggle — only shown when there are inactive users */}
+          {inactiveCount > 0 && (
+            <Button
+              variant={showInactive ? "secondary" : "outline"}
+              onClick={() => setShowInactive(!showInactive)}
+              className="shrink-0"
+              title={showInactive ? "Hide inactive users" : "Show inactive users"}
+            >
+              {showInactive ? (
+                <EyeOff className="h-4 w-4 mr-2" />
+              ) : (
+                <Eye className="h-4 w-4 mr-2" />
+              )}
+              Inactive ({inactiveCount})
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* User List */}
