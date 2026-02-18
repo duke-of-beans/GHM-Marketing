@@ -185,7 +185,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         {/* Conversion Funnel */}
         <Card>
           <CardHeader>
-            <CardTitle>Pipeline Conversion: Where Leads Drop Off</CardTitle>
+            <CardTitle>Pipeline Stages: Active Lead Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -343,16 +343,20 @@ function calculateMetrics(data: AnalyticsData) {
     }
   }
 
-  // Conversion funnel
-  const newLeads = leads.filter((l) => l.status === "new").length;
-  const qualified = leads.filter((l) => l.status === "qualified").length;
+  // Conversion funnel — uses actual lead statuses
+  const available = leads.filter((l) => l.status === "available").length;
+  const scheduled = leads.filter((l) => l.status === "scheduled").length;
   const contacted = leads.filter((l) => l.status === "contacted").length;
-  const won = clients.length;
+  const followUp = leads.filter((l) => l.status === "follow_up").length;
+  const paperwork = leads.filter((l) => l.status === "paperwork").length;
+  const won = leads.filter((l) => l.status === "won").length;
 
   const funnel = [
-    { stage: "New Leads", count: newLeads },
-    { stage: "Qualified", count: qualified },
+    { stage: "Available", count: available },
+    { stage: "Scheduled", count: scheduled },
     { stage: "Contacted", count: contacted },
+    { stage: "Follow Up", count: followUp },
+    { stage: "Paperwork", count: paperwork },
     { stage: "Won", count: won },
   ];
 

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, X, DollarSign, Mail } from "lucide-react";
+import { toast } from "sonner";
 
 type Opportunity = {
   id?: number;
@@ -30,6 +32,7 @@ export function UpsellOpportunities({
   const [detectedOpps, setDetectedOpps] = useState<Opportunity[]>(opportunities);
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [emailingId, setEmailingId] = useState<number | null>(null);
+  const router = useRouter();
 
   const handleDetect = async () => {
     setIsDetecting(true);
@@ -62,7 +65,7 @@ export function UpsellOpportunities({
 
       if (response.ok) {
         setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
-        window.location.reload(); // Refresh to update notes
+        router.refresh();
       }
     } catch (error) {
       console.error("Failed to present opportunity:", error);
@@ -102,15 +105,15 @@ export function UpsellOpportunities({
       });
 
       if (response.ok) {
-        alert("Upsell notification sent successfully!");
+        toast.success("Upsell notification sent successfully!");
         setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
-        window.location.reload();
+        router.refresh();
       } else {
-        alert("Failed to send notification");
+        toast.error("Failed to send notification");
       }
     } catch (error) {
       console.error("Failed to send upsell email:", error);
-      alert("Failed to send notification");
+      toast.error("Failed to send notification");
     } finally {
       setEmailingId(null);
     }

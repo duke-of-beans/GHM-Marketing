@@ -195,7 +195,7 @@ export function ClientPortfolio({
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  Composite score (0-100) based on competitive position, ranking trends, and scan results. &lt;40 = needs attention, 60-80 = healthy, &gt;80 = leading position.
+                  Composite score (0–100) based on competitive position, ranking trends, and scan results. 75+ = healthy, 50–74 = competitive, &lt;50 = needs attention.
                 </p>
               </TooltipContent>
             </Tooltip>

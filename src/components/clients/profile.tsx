@@ -904,7 +904,8 @@ function AddNoteForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!content.trim()) return;
-    onSubmit(content, type, isPinned);
+    // "Client Standard" type is always pinned, regardless of checkbox state
+    onSubmit(content, type, isPinned || type === "standard");
     setContent("");
     setIsPinned(false);
   }

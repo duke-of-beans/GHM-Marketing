@@ -111,7 +111,7 @@ function ScanCard({ scan }: { scan: Scan }) {
   const totalAlerts = scan.alerts.critical.length + scan.alerts.warning.length + scan.alerts.info.length;
   
   const scoreColor = 
-    scan.healthScore >= 70 ? 'text-green-600' : 
+    scan.healthScore >= 75 ? 'text-green-600' : 
     scan.healthScore >= 50 ? 'text-yellow-600' : 
     'text-red-600';
   
