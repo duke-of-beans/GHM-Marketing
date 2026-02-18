@@ -39,6 +39,12 @@ import {
   Trash2,
   Zap,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -144,16 +150,28 @@ function ComposeMessage({
       />
       {!parentId && (
         <div className="flex flex-wrap gap-2">
-          <Select value={audienceType} onValueChange={setAudienceType}>
-            <SelectTrigger className="h-7 w-32 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Everyone</SelectItem>
-              <SelectItem value="role">By role</SelectItem>
-              <SelectItem value="user">Direct</SelectItem>
-            </SelectContent>
-          </Select>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Select value={audienceType} onValueChange={setAudienceType}>
+                    <SelectTrigger className="h-7 w-32 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Everyone</SelectItem>
+                      <SelectItem value="role">By role</SelectItem>
+                      <SelectItem value="user">Direct</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p className="font-medium text-xs">Who sees this message?</p>
+                <p className="text-muted-foreground text-xs mt-0.5">Everyone = all team • By role = masters or sales • Direct = one person</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {audienceType === "role" && (
             <Select value={audienceValue} onValueChange={setAudienceValue}>
               <SelectTrigger className="h-7 w-28 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
@@ -182,15 +200,24 @@ function ComposeMessage({
             </SelectContent>
           </Select>
           {isMaster && (
-            <Button
-              variant={isPinned ? "default" : "outline"}
-              size="sm"
-              className="h-7 text-xs px-2"
-              onClick={() => setIsPinned(!isPinned)}
-            >
-              <Pin className="h-3 w-3 mr-1" />
-              {isPinned ? "Pinned" : "Pin"}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={isPinned ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs px-2"
+                    onClick={() => setIsPinned(!isPinned)}
+                  >
+                    <Pin className="h-3 w-3 mr-1" />
+                    {isPinned ? "Pinned" : "Pin"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p className="text-xs">Pinned messages float to the top of everyone&apos;s feed and are always visible.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       )}
@@ -266,7 +293,18 @@ function MessageRow({
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-sm font-semibold">{msg.author.name}</span>
             <span className="text-xs text-muted-foreground">{audienceLabel(msg)}</span>
-            {msg.isPinned && <Pin className="h-3 w-3 text-amber-500" />}
+            {msg.isPinned && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Pin className="h-3 w-3 text-amber-500 cursor-default" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p className="text-xs">Pinned — always visible at the top of the feed</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             {priorityBadge(msg.priority)}
             {!isRead && <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />}
           </div>
@@ -484,9 +522,18 @@ export function TeamFeedWidget({
             <MessageSquare className="h-5 w-5" />
             Team Feed
             {unreadCount > 0 && (
-              <Badge className="bg-primary text-primary-foreground text-xs h-5 min-w-5 flex items-center justify-center rounded-full">
-                {unreadCount}
-              </Badge>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge className="bg-primary text-primary-foreground text-xs h-5 min-w-5 flex items-center justify-center rounded-full cursor-default">
+                      {unreadCount}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p className="text-xs">{unreadCount} unread {unreadCount === 1 ? "message" : "messages"} — click to open and mark as read</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </CardTitle>
           <TeamFeedPanel

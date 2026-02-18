@@ -3,15 +3,19 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowRight, 
-  ArrowLeft, 
-  TrendingUp, 
-  Users, 
+import {
+  ArrowRight,
+  ArrowLeft,
+  TrendingUp,
+  Users,
   DollarSign,
   CheckCircle2,
   Filter,
-  Target
+  Target,
+  MessageSquare,
+  LayoutDashboard,
+  UserCog,
+  BarChart3,
 } from "lucide-react";
 
 type TutorialStep = {
@@ -22,139 +26,238 @@ type TutorialStep = {
   action?: string;
 };
 
+// ─── Sales Rep Tutorial ───────────────────────────────────────────────────────
+
 const SALES_REP_TUTORIAL: TutorialStep[] = [
   {
     title: "Welcome to GHM Dashboard! 👋",
-    description: "Let's get you up to speed in 60 seconds. This quick tour will show you everything you need to start closing deals.",
+    description: "Let's get you up to speed in about 2 minutes. This tour covers everything you need to start claiming leads, moving deals, and tracking your income.",
     icon: <Target className="h-12 w-12 text-blue-600" />,
     tips: [
       "You can restart this tour anytime from the Help menu",
-      "Press ESC to skip the tutorial",
+      "Press ESC or click outside to skip",
     ],
   },
   {
     title: "Your Personal Dashboard",
-    description: "This is your command center. Track available leads in your territory, monitor your active pipeline, and see your wins and revenue at a glance.",
+    description: "This is your command center. Every number here is personalized to you — your territory, your pipeline, your money.",
     icon: <TrendingUp className="h-12 w-12 text-green-600" />,
     tips: [
-      "Available leads = ready to claim in your territory",
-      "My Active = leads you're currently working",
-      "Your earnings widget shows commissions + residuals",
+      "Available leads = unclaimed leads in your territory, ready to grab",
+      "My Active = leads you're currently working through the pipeline",
+      "Won deals = closed clients you've converted",
+      "Your earnings widget shows commissions earned + monthly residuals",
     ],
-    action: "Check your dashboard metrics daily",
+    action: "Check your dashboard every morning — it's your scoreboard",
   },
   {
     title: "Claiming Leads",
-    description: "Head to the Leads page to see all available opportunities. Click the 'Available' column to see unassigned leads in your territory. Click any lead card to claim it!",
+    description: "Head to the Leads page to see all available opportunities in your territory. Leads are first-come, first-served — don't sleep on them.",
     icon: <Users className="h-12 w-12 text-purple-600" />,
     tips: [
-      "Available leads = free to claim (first come, first served)",
-      "Use filters to find high-value targets",
-      "Drag leads across columns to update status",
+      "The 'Available' column shows unclaimed leads in your territory",
+      "Click any lead card to view details and claim it",
+      "Once claimed, it moves to your personal pipeline",
+      "Use filters (territory, value, date) to find the best targets",
     ],
     action: "Go claim your first lead now!",
   },
   {
-    title: "Moving Leads Through Pipeline",
-    description: "The Kanban board shows your sales pipeline. Drag leads from Available → Scheduled → Contacted → Follow Up → Paperwork → Won. Each column represents a stage in your sales process.",
+    title: "Working Your Pipeline",
+    description: "The Kanban board is your sales process visualized. Move leads from left to right as they progress through each stage.",
     icon: <Filter className="h-12 w-12 text-orange-600" />,
     tips: [
-      "Drag & drop to move leads between stages",
-      "Click a lead to add notes and update details",
-      "Won deals automatically become clients",
+      "Stages: Available → Scheduled → Contacted → Follow Up → Paperwork → Won",
+      "Drag & drop a lead card to move it to a new stage",
+      "Click a lead to add notes, update contact info, or attach details",
+      "Won leads automatically convert into active clients in the Clients tab",
     ],
-    action: "Keep your pipeline moving!",
+    action: "Keep leads moving — stale pipelines don't pay",
   },
   {
     title: "Track Your Earnings",
-    description: "Your earnings widget on the dashboard shows exactly how much you've made. You earn $1,000 commission when a client closes, plus $200/month residuals starting Month 2.",
+    description: "Your earnings widget shows exactly what you've made and what's on the way. Two income streams: upfront commissions and ongoing residuals.",
     icon: <DollarSign className="h-12 w-12 text-green-600" />,
     tips: [
-      "Commission: $1,000 one-time at client close",
-      "Residuals: $200/month from Month 2 onwards",
-      "Monthly recurring = your passive income",
+      "Commission: $1,000 one-time when a client closes (Month 1)",
+      "Residuals: $200/month per active client starting Month 2",
+      "The more clients you close and retain, the higher your monthly passive income",
+      "Your earnings widget shows total commissions + recurring monthly residuals",
     ],
-    action: "Close deals to grow your recurring revenue!",
+    action: "Every client you close pays you $200/month — forever",
+  },
+  {
+    title: "Your Goals",
+    description: "The Goals widget on your dashboard tracks progress toward your personal targets for the month. Use it to keep yourself on track.",
+    icon: <Target className="h-12 w-12 text-blue-600" />,
+    tips: [
+      "Goals are configured by your manager — check with them if something looks off",
+      "Progress bars update in real time as you close deals and move leads",
+      "Green = on track, yellow = behind pace, red = needs attention",
+    ],
+    action: "Know your numbers — hit your targets",
+  },
+  {
+    title: "Team Feed",
+    description: "The Team Feed widget keeps you connected with the rest of the team. Check here for announcements, updates, and direct messages from your manager.",
+    icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
+    tips: [
+      "Pinned messages (amber border) are important — read these first",
+      "Urgent and Important badges signal priority messages from management",
+      "Click 'View all' or the compose bar to open the full feed panel",
+      "You can reply to messages and send direct messages to team members",
+      "Unread messages show a blue dot — click the message to mark it read",
+    ],
+    action: "Check the Team Feed daily for updates from your manager",
+  },
+  {
+    title: "Your Profile",
+    description: "Keep your account info current. You can update your name, email, and password anytime from the My Profile page in the navigation.",
+    icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    tips: [
+      "Find 'My Profile' in the left sidebar navigation",
+      "Change your name or email without needing your manager",
+      "Password changes require your current password to confirm",
+    ],
   },
   {
     title: "You're Ready! 🚀",
-    description: "That's all you need to know to get started. Now go out there and close some deals! Remember: claim leads, move them through the pipeline, and watch your earnings grow.",
+    description: "That's everything you need to hit the ground running. Claim leads, work your pipeline, close deals, and watch your residual income grow every month.",
     icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
     tips: [
-      "Need help? Look for the ? icons throughout the app",
-      "Questions? Ask your manager or check the Help menu",
-      "You've got this!",
+      "Hover over any ? icon in the app for in-context explanations",
+      "Need help? Use the Help menu in the top right for support options",
+      "You can relaunch this tour anytime from the Help menu",
     ],
     action: "Start claiming leads →",
   },
 ];
 
+// ─── Master Tutorial ──────────────────────────────────────────────────────────
+
 const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "Welcome to GHM Dashboard! 👋",
-    description: "As a Master Manager, you have access to team analytics, client portfolio management, and company profitability tracking. Let's show you around.",
+    description: "As a Master Manager, you have full visibility into team performance, client health, and company financials. This tour covers all the tools at your disposal.",
     icon: <Target className="h-12 w-12 text-blue-600" />,
     tips: [
       "You can restart this tour anytime from the Help menu",
-      "Press ESC to skip the tutorial",
+      "Press ESC or click outside to skip",
     ],
   },
   {
-    title: "Master Dashboard",
-    description: "Your dashboard shows company-wide metrics: total leads, active pipeline, won deals, and MRR/ARR. Use the Pipeline Funnel and Rep Leaderboard to track team performance.",
-    icon: <TrendingUp className="h-12 w-12 text-green-600" />,
+    title: "Your Master Dashboard",
+    description: "Your dashboard gives you a live view of everything: company-wide metrics, pipeline health, team leaderboard, revenue trends, and your managed client earnings.",
+    icon: <LayoutDashboard className="h-12 w-12 text-green-600" />,
     tips: [
-      "Monitor conversion rates and pipeline health",
-      "Track which reps are performing best",
-      "Company profitability widget shows net profit (owners only)",
+      "Top metrics row: total leads, active pipeline, won deals, and MRR/ARR",
+      "Pipeline Funnel shows conversion at each sales stage",
+      "Rep Leaderboard ranks your team by deals closed and revenue",
+      "Management Fees widget shows your $240/month per-client earnings",
+      "Company Profitability widget is visible to owners only",
     ],
-    action: "Review team metrics daily",
+    action: "Review your dashboard every morning — know your team's health",
+  },
+  {
+    title: "Arrange Your Dashboard",
+    description: "Your dashboard is fully customizable. Move and resize any widget to match how you work. Your layout is saved per user, so it's yours alone.",
+    icon: <LayoutDashboard className="h-12 w-12 text-slate-600" />,
+    tips: [
+      "Click 'Arrange widgets' in the top right corner to enter edit mode",
+      "Drag widgets using the handle bar that appears at the top of each card",
+      "Resize widgets by dragging the handle at the bottom-right corner",
+      "Layout saves automatically — no need to click save",
+      "Click 'Reset to default' to restore the original layout anytime",
+    ],
+    action: "Customize your layout to match your daily workflow",
   },
   {
     title: "Client Portfolio",
-    description: "The Clients page shows all active clients. Use filters to find clients needing attention, track health scores, and monitor scan status.",
+    description: "The Clients tab is your full client roster. Monitor health scores, scan status, service details, and upcoming tasks all in one place.",
     icon: <Users className="h-12 w-12 text-purple-600" />,
     tips: [
-      "Health score: 75+ = healthy, 50-74 = competitive, <50 = needs attention",
-      "Filter by revenue, tasks, scan status",
-      "Click any client for detailed view and task management",
+      "Health score: 75+ = healthy, 50–74 = competitive pressure, below 50 = needs attention",
+      "Filter clients by revenue tier, health score, scan status, or assigned rep",
+      "Click any client to see full details, tasks, notes, and service history",
+      "Won leads automatically appear here once converted by a sales rep",
     ],
-    action: "Keep client health scores high!",
+    action: "Keep client health scores high — it drives retention",
   },
   {
     title: "Team Management",
-    description: "Assign territories, configure compensation rates, and manage master assignments. Set commission amounts, residual rates, and master fees for each team member.",
+    description: "The Settings → Team tab is where you manage your reps: territories, compensation rates, permissions, and account status.",
     icon: <Filter className="h-12 w-12 text-orange-600" />,
     tips: [
-      "Default: $1K commission, $200 residuals, $240 master fees",
-      "Override rates per client if needed",
-      "Owners don't pay themselves master fees",
+      "Default rates: $1,000 commission, $200 residuals, $240 master fees",
+      "Override compensation rates per rep or per client as needed",
+      "Permission presets (Sales, Master, Owner) control what each role can access",
+      "Deactivate inactive reps without deleting their data — reactivate any time",
+      "Hard delete removes a rep permanently and requires typing DELETE to confirm",
     ],
-    action: "Set up your team's compensation structure",
+    action: "Configure compensation before your team starts closing deals",
   },
   {
     title: "Your Earnings",
-    description: "As a Master Manager, you earn $240/month for each client you manage (starting Month 1). If you also sell, you earn commissions and residuals on your own deals.",
+    description: "As a Master Manager, you earn $240/month for every client under your management — from Month 1. If you also close deals, you earn commissions and residuals on top.",
     icon: <DollarSign className="h-12 w-12 text-green-600" />,
     tips: [
-      "Management fees: $240/month per managed client",
-      "These are separate from your sales commissions",
-      "Track earnings in your dashboard widgets",
+      "Management fees: $240/month per client you manage, starting Month 1",
+      "Sales commission: $1,000 one-time per deal you personally close",
+      "Sales residuals: $200/month per client from Month 2 if you sold them",
+      "All earnings are tracked in the Management Fees widget on your dashboard",
     ],
-    action: "Maximize value for your managed clients!",
+    action: "Grow your managed book — every client is $240/month",
+  },
+  {
+    title: "Team Feed",
+    description: "Team Feed is your broadcast and messaging channel. Communicate directly with your team without leaving the dashboard.",
+    icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
+    tips: [
+      "Post to Everyone, a specific role (masters/sales), or a single person (Direct)",
+      "Pin messages to float them to the top of everyone's feed permanently",
+      "Mark messages Urgent or Important to signal priority to your team",
+      "Team members can reply to messages — replies thread under the original",
+      "Read receipts show who has seen a message — useful for important announcements",
+      "Messages auto-refresh every 30 seconds — no need to reload",
+    ],
+    action: "Use Team Feed for announcements, kudos, and quick updates",
+  },
+  {
+    title: "Analytics & Reports",
+    description: "The Analytics tab provides deeper insights: conversion funnels, revenue trends, client health distribution, and rep performance breakdowns.",
+    icon: <BarChart3 className="h-12 w-12 text-blue-600" />,
+    tips: [
+      "Filter by date range, territory, or rep for granular views",
+      "Health score distribution shows the overall wellness of your client base",
+      "Rep performance table ranks by deals closed, revenue generated, and activity",
+      "Use trends over time to spot seasonal patterns or declining performance early",
+    ],
+    action: "Review analytics weekly to stay ahead of problems",
+  },
+  {
+    title: "Your Profile",
+    description: "Keep your account info current. Update your name, email, or password anytime from My Profile in the navigation — no need to go through settings.",
+    icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    tips: [
+      "Find 'My Profile' in the left sidebar navigation",
+      "Role, territory, and permissions changes are done in Settings → Team",
+      "Password changes require your current password to confirm",
+    ],
   },
   {
     title: "You're All Set! 🚀",
-    description: "You now know the key features for managing your team and clients. Focus on keeping client health high and supporting your reps to hit their targets.",
+    description: "You now know every tool in the dashboard. Focus on keeping client health high, supporting your reps, and growing your managed book.",
     icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
     tips: [
-      "Need help? Look for the ? icons throughout the app",
-      "Questions? Check the Help menu or ask leadership",
-      "Lead by example!",
+      "Hover over any ? icon in the app for in-context explanations",
+      "Need help? Use the Help menu for support options and to report bugs",
+      "You can relaunch this tour anytime from the Help menu",
     ],
-    action: "Let's grow the business together →",
+    action: "Let's build something great →",
   },
 ];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 type OnboardingTutorialProps = {
   userRole: "sales" | "master" | "owner";
@@ -172,7 +275,6 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
   const isLastStep = currentStep === steps.length - 1;
 
   useEffect(() => {
-    // Check if user has seen tutorial — runs once on mount only
     const seen = localStorage.getItem("tutorial-seen");
     if (!seen) {
       setHasSeenTutorial(false);
@@ -199,11 +301,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     setCurrentStep(0);
   };
 
-  const skipTutorial = () => {
-    completeTutorial();
-  };
-
-  // Expose function to restart tutorial (can be called from Help menu)
+  // Expose restart function to Help menu
   useEffect(() => {
     (window as any).restartTutorial = () => {
       setCurrentStep(0);
@@ -219,19 +317,15 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) completeTutorial(); }}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            {step.title}
-          </DialogTitle>
+          <DialogTitle className="text-xl">{step.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-5 py-3">
           {/* Icon */}
-          <div className="flex justify-center">
-            {step.icon}
-          </div>
+          <div className="flex justify-center">{step.icon}</div>
 
           {/* Description */}
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-muted-foreground leading-relaxed">
             {step.description}
           </p>
 
@@ -284,17 +378,29 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
           </div>
         </div>
 
-        {/* Progress Dots */}
-        <div className="flex justify-center gap-1.5 pb-2">
+        {/* Skip link on first step */}
+        {isFirstStep && (
+          <div className="text-center pb-1">
+            <button
+              onClick={completeTutorial}
+              className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+            >
+              Skip tour — I know what I&apos;m doing
+            </button>
+          </div>
+        )}
+
+        {/* Progress dots */}
+        <div className="flex justify-center gap-1.5 pb-1">
           {steps.map((_, idx) => (
             <div
               key={idx}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
+              className={`h-1.5 rounded-full transition-all ${
                 idx === currentStep
-                  ? "bg-blue-600"
+                  ? "w-4 bg-blue-600"
                   : idx < currentStep
-                  ? "bg-green-600"
-                  : "bg-gray-300"
+                  ? "w-1.5 bg-green-600"
+                  : "w-1.5 bg-gray-300"
               }`}
             />
           ))}

@@ -10,6 +10,12 @@ import React from "react";
 import { ResponsiveGridLayout, useContainerWidth } from "react-grid-layout";
 import type { Layout, ResponsiveLayouts } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // ─── Default layouts ──────────────────────────────────────────────────────────
 
@@ -110,26 +116,36 @@ export function MasterDashboardGrid({
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-end gap-3 mb-2">
-        {isEditMode && (
-          <button
-            onClick={resetLayout}
-            className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
-          >
-            Reset to default
-          </button>
-        )}
-        <button
-          onClick={() => setIsEditMode(!isEditMode)}
-          className={`text-xs px-3 py-1 rounded-md border transition-colors ${
-            isEditMode
-              ? "bg-primary text-primary-foreground border-primary"
-              : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-          }`}
-        >
-          {isEditMode ? "✓ Done arranging" : "⊹ Arrange widgets"}
-        </button>
-      </div>
+      <TooltipProvider>
+        <div className="flex items-center justify-end gap-3 mb-2">
+          {isEditMode && (
+            <button
+              onClick={resetLayout}
+              className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+            >
+              Reset to default
+            </button>
+          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setIsEditMode(!isEditMode)}
+                className={`text-xs px-3 py-1 rounded-md border transition-colors ${
+                  isEditMode
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                }`}
+              >
+                {isEditMode ? "✓ Done arranging" : "⊹ Arrange widgets"}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-xs">
+              <p className="font-medium mb-1">Customize your dashboard layout</p>
+              <p className="text-muted-foreground text-xs">Drag widgets by the handle at the top to reorder. Resize using the handle in the bottom-right corner. Your layout saves automatically.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
 
       <div ref={containerRef as React.RefObject<HTMLDivElement>}>
         <ResponsiveGridLayout
