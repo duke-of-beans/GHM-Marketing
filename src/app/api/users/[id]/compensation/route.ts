@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withPermission } from "@/lib/auth/api-permissions";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
@@ -88,6 +88,12 @@ export async function PUT(
     const permissionError = await withPermission(req, "manage_team");
     if (permissionError) return permissionError;
 
+    // Get current user for audit logging
+    const currentUser = await getCurrentUserWithPermissions();
+    if (!currentUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const userId = parseInt(params.id);
     if (isNaN(userId)) {
       return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
@@ -135,7 +141,7 @@ export async function PUT(
     await prisma.clientNote.create({
       data: {
         clientId: 1, // System note (we'll need a better approach for audit logs)
-        authorId: parseInt(session.user.id),
+        authorId: parseInt(currentUser.id),
         type: "system",
         content: `Updated compensation config for ${user.name}: Commission ${validated.commissionEnabled ? 'enabled' : 'disabled'} ($${validated.commissionAmount}), Residual ${validated.residualEnabled ? 'enabled' : 'disabled'} ($${validated.residualAmount}/mo starting month ${validated.residualStartMonth})`,
         isPinned: false,
