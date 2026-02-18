@@ -205,10 +205,21 @@ export function ClientPortfolio({
               <TooltipTrigger asChild>
                 <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help absolute top-2 right-2" />
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs">
-                <p className="text-sm">
-                  Composite score (0–100) based on competitive position, ranking trends, and scan results. 75+ = healthy, 50–74 = competitive, &lt;50 = needs attention.
-                </p>
+              <TooltipContent className="max-w-sm space-y-2 p-3">
+                <p className="text-sm font-semibold">Health Score — how it works</p>
+                <div className="text-xs space-y-1.5 text-muted-foreground">
+                  <p>Composite score (0–100) updated each time a competitive scan runs.</p>
+                  <div className="space-y-1 border-t pt-1.5">
+                    <p><span className="font-medium text-foreground">Momentum (25%)</span> — DR, reviews, and rankings vs. last scan</p>
+                    <p><span className="font-medium text-foreground">Competitive position (20%)</span> — average gap vs. tracked competitors</p>
+                    <p><span className="font-medium text-foreground">Domain authority (20%)</span> — Ahrefs Domain Rating (DR 50+ scores well)</p>
+                    <p><span className="font-medium text-foreground">Reviews (20%)</span> — count (200+ ideal) and average rating (4.5+)</p>
+                    <p><span className="font-medium text-foreground">Site speed (15%)</span> — PageSpeed score, mobile-weighted</p>
+                  </div>
+                  <div className="border-t pt-1.5">
+                    <p><span className="text-green-600 font-medium">75+</span> healthy · <span className="text-yellow-600 font-medium">50–74</span> competitive · <span className="text-red-600 font-medium">&lt;50</span> needs attention</p>
+                  </div>
+                </div>
               </TooltipContent>
             </Tooltip>
           </div>

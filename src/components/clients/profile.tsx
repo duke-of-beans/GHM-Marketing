@@ -336,18 +336,37 @@ export function ClientProfile({
                       Health: {client.healthScore}
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs space-y-2">
-                    <p className="text-sm font-medium">How this score is calculated</p>
-                    <div className="text-xs space-y-1 text-muted-foreground">
-                      <p>Composite score (0–100), updated each time a competitive scan runs.</p>
-                      <div className="pt-1 space-y-0.5 font-mono">
-                        <p>Momentum (vs last scan)  25%</p>
-                        <p>Domain authority         20%</p>
-                        <p>Competitive position     20%</p>
-                        <p>Review count + rating    20%</p>
-                        <p>Site speed               15%</p>
+                  <TooltipContent className="max-w-sm space-y-2 p-3">
+                    <p className="text-sm font-semibold">Health Score — {client.healthScore}/100</p>
+                    <div className="text-xs space-y-2 text-muted-foreground">
+                      <p>Composite score updated on each competitive scan. Higher = stronger market position.</p>
+                      <div className="space-y-1.5 border-t pt-2">
+                        <div>
+                          <span className="font-medium text-foreground">Momentum (25%)</span>
+                          <p>Did DR, reviews, and keyword rankings improve since the last scan?</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-foreground">Competitive Position (20%)</span>
+                          <p>Average DR and review gap vs. all tracked competitors. Smaller gap = higher score.</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-foreground">Domain Authority (20%)</span>
+                          <p>Ahrefs Domain Rating. DR 50+ scores well; below 15 scores near zero.</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-foreground">Reviews (20%)</span>
+                          <p>Combination of review count (200+ ideal) and average rating (4.5+ ideal).</p>
+                        </div>
+                        <div>
+                          <span className="font-medium text-foreground">Site Speed (15%)</span>
+                          <p>PageSpeed score (mobile weighted 60%, desktop 40%). 90+ scores full points.</p>
+                        </div>
                       </div>
-                      <p className="pt-1">75+ = healthy · 50–74 = competitive · &lt;50 = needs attention</p>
+                      <div className="border-t pt-2 space-y-0.5">
+                        <p><span className="text-green-600 font-medium">75–100</span> — Healthy. Leading or competitive across all metrics.</p>
+                        <p><span className="text-yellow-600 font-medium">50–74</span> — Competitive. Gaps exist but within striking range.</p>
+                        <p><span className="text-red-600 font-medium">0–49</span> — Needs attention. At least one metric is significantly behind.</p>
+                      </div>
                     </div>
                   </TooltipContent>
                 </Tooltip>
