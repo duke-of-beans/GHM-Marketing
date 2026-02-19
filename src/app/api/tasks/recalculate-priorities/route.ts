@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { calculateTaskPriority } from "@/lib/ai/task-intelligence";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const { clientId } = await req.json();
 
-    // Get tasks to prioritize
     const tasks = await prisma.clientTask.findMany({
       where: clientId ? { clientId } : {},
       include: {
@@ -24,11 +24,8 @@ export async function POST(req: NextRequest) {
     let updated = 0;
 
     for (const task of tasks) {
-      // Note: Scan relation not defined in schema
-      // Prioritize based on category and client health only
       const severity: string | undefined = undefined;
 
-      // Calculate priority
       const priority = calculateTaskPriority({
         category: task.category,
         severity,
@@ -36,13 +33,10 @@ export async function POST(req: NextRequest) {
         clientHealthScore: task.client.healthScore || undefined,
       });
 
-      // Update task
       await prisma.clientTask.update({
         where: { id: task.id },
         data: {
           priority: priority.priority,
-          // Store priority score in a note or metadata field
-          // For now, we'll just update the priority enum
         },
       });
 

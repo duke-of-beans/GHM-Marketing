@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
+
+  const user = await getCurrentUserWithPermissions();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const user = await requireMaster();
     const oppId = parseInt(params.id);
 
-    // Update opportunity status to presented
     const opportunity = await prisma.upsellOpportunity.update({
       where: { id: oppId },
       data: {
@@ -22,7 +28,6 @@ export async function POST(
       },
     });
 
-    // Create a note on the client profile
     await prisma.clientNote.create({
       data: {
         clientId: opportunity.clientId,

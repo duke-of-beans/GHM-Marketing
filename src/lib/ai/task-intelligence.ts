@@ -1,9 +1,9 @@
 /**
  * AI-Powered Brief Generation
- * Uses Claude API to generate detailed content briefs from scan alerts
+ * Routes through callAI() for model routing, cost tracking, and cascade retry.
  */
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!;
+import { callAI } from "@/lib/ai";
 
 export async function generateContentBrief(params: {
   title: string;
@@ -11,83 +11,42 @@ export async function generateContentBrief(params: {
   clientName: string;
   category: string;
   competitorInfo?: string;
+  clientId?: number;
 }): Promise<string> {
-  const { title, description, clientName, category, competitorInfo } = params;
+  const { title, description, clientName, category, competitorInfo, clientId } = params;
 
-  const prompt = `You are a content strategist creating a detailed brief for an SEO task.
-
-Client: ${clientName}
-Task Category: ${category}
+  const prompt = `Task Category: ${category}
 Task Title: ${title}
 Gap/Issue: ${description}
 ${competitorInfo ? `Competitor Context: ${competitorInfo}` : ""}
 
 Create a detailed, actionable content brief that includes:
 
-1. OBJECTIVE
-   - What we're trying to achieve
-   - Success criteria
-
-2. TARGET KEYWORDS
-   - Primary keyword (1)
-   - Secondary keywords (2-3)
-   - Long-tail variations (2-3)
-
-3. CONTENT OUTLINE
-   - H2 and H3 structure
-   - Key points to cover
-   - Word count target
-
-4. COMPETITIVE ANALYSIS
-   - What competitors are doing well
-   - Gaps we can exploit
-   - Differentiation strategy
-
-5. SEO REQUIREMENTS
-   - Meta title (55-60 chars)
-   - Meta description (150-160 chars)
-   - Internal linking opportunities
-   - External linking suggestions
-
-6. DELIVERABLES
-   - Final output format
-   - Assets needed (images, charts, etc.)
-   - Deadline considerations
+1. OBJECTIVE — What we're trying to achieve, success criteria
+2. TARGET KEYWORDS — Primary (1), secondary (2-3), long-tail (2-3)
+3. CONTENT OUTLINE — H2/H3 structure, key points, word count target
+4. COMPETITIVE ANALYSIS — What competitors do well, gaps to exploit, differentiation
+5. SEO REQUIREMENTS — Meta title (55-60 chars), meta description (150-160 chars), linking opportunities
+6. DELIVERABLES — Output format, assets needed, deadline considerations
 
 Keep it practical, specific, and actionable. Format in markdown.`;
 
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2000,
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      }),
-    });
+  const result = await callAI({
+    feature: "content_brief",
+    prompt,
+    context: {
+      feature: "content_brief",
+      clientId: clientId ?? 0,
+      clientName,
+    },
+    maxTokens: 2000,
+  });
 
-    if (!response.ok) {
-      throw new Error(`Claude API error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const brief = data.content?.[0]?.text || "";
-
-    return brief;
-  } catch (error) {
-    console.error("Failed to generate AI brief:", error);
-    throw error;
+  if (!result.ok) {
+    throw new Error(`AI brief generation failed: ${result.error}`);
   }
+
+  return result.content;
 }
 
 /**

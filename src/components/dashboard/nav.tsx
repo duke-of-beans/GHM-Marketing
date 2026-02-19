@@ -27,6 +27,7 @@ const allLinks: NavLink[] = [
   // Core workflow — everyone
   { href: "/master", label: "Dashboard", icon: "📊", permission: "view_analytics" },
   { href: "/sales", label: "Dashboard", icon: "📊" },
+  { href: "/tasks", label: "My Tasks", icon: "✅" },
   { href: "/discovery", label: "Find Leads", icon: "🔍", permission: "view_all_leads" },
   { href: "/leads", label: "Sales Pipeline", icon: "👥", permission: "manage_leads" },
   { href: "/clients", label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },

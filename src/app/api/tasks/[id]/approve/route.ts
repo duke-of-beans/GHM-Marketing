@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const taskId = parseInt(params.id);
     const body = await req.json();
 
-    // Update task status to approved
     const task = await prisma.clientTask.update({
       where: { id: taskId },
       data: {
@@ -21,8 +21,6 @@ export async function POST(
         updatedAt: new Date(),
       },
     });
-
-    // TODO: Create notification for client manager (future enhancement)
 
     return NextResponse.json({ success: true, task });
   } catch (error) {

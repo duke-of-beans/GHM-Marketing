@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_products");
+  if (permissionError) return permissionError;
+
   try {
-    await requireMaster();
     const productId = parseInt(params.id);
 
     const body = await req.json();
@@ -39,8 +41,10 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_products");
+  if (permissionError) return permissionError;
+
   try {
-    await requireMaster();
     const productId = parseInt(params.id);
 
     await prisma.product.delete({

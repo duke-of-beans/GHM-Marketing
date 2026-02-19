@@ -1,41 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { captureVoiceFromWebsite } from '@/lib/scrvnr/voice-capture';
-import { isElevated } from '@/lib/auth/session';
+import { withPermission } from '@/lib/auth/api-permissions';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const clientId = parseInt(params.id);
     if (isNaN(clientId)) {
       return NextResponse.json(
         { error: 'Invalid client ID' },
         { status: 400 }
-      );
-    }
-
-    // Check authentication and role
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { role: true },
-    });
-
-    // Only allow master managers to capture voice
-    if (!isElevated(user?.role ?? '')) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions. Only managers or admins can capture voice profiles.' },
-        { status: 403 }
       );
     }
 

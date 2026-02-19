@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { updateTaskStatus } from "@/lib/db/clients";
-import type { SessionUser } from "@/lib/auth/session";
-import { isElevated } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; taskId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (!isElevated(user.role)) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
-  }
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
 
   const { taskId } = await params;
   const body = await request.json();

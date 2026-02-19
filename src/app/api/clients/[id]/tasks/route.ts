@@ -3,22 +3,14 @@ import { auth } from "@/lib/auth";
 import { getClientTasks, createTask } from "@/lib/db/clients";
 import { prisma } from "@/lib/db";
 import { sendPushToUsers } from "@/lib/push";
-import type { SessionUser } from "@/lib/auth/session";
-import { isElevated } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (!isElevated(user.role)) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
-  }
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
 
   const { id } = await params;
   const searchParams = Object.fromEntries(request.nextUrl.searchParams);
@@ -36,14 +28,12 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
+
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (!isElevated(user.role)) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
   const { id } = await params;

@@ -1,22 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { enrichLeadsBatch } from "@/lib/enrichment";
-import type { SessionUser } from "@/lib/auth/session";
-import { isElevated } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = session.user as unknown as SessionUser;
-  if (!isElevated(user.role)) {
-    return NextResponse.json(
-      { success: false, error: "Elevated access required for batch enrichment" },
-      { status: 403 }
-    );
-  }
+  const permissionError = await withPermission(request, "manage_leads");
+  if (permissionError) return permissionError;
 
   const body = await request.json();
   const { leadIds, force = false } = body;

@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { generateContentBrief } from "@/lib/ai/task-intelligence";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
+
   try {
-    await requireMaster();
     const taskId = parseInt(params.id);
 
-    // Get task with client info
     const task = await prisma.clientTask.findUnique({
       where: { id: taskId },
       include: {
@@ -35,12 +36,10 @@ export async function POST(
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    // Build competitor context
     const competitorInfo = task.client.competitors
       .map((c) => `${c.businessName}${c.domain ? ` (${c.domain})` : ""}`)
       .join(", ");
 
-    // Generate AI brief
     const brief = await generateContentBrief({
       title: task.title,
       description: task.description || "",
@@ -49,7 +48,6 @@ export async function POST(
       competitorInfo: competitorInfo || undefined,
     });
 
-    // Update task with generated brief
     const updated = await prisma.clientTask.update({
       where: { id: taskId },
       data: {

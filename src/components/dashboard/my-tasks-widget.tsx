@@ -82,9 +82,11 @@ export function MyTasksWidget() {
           <CardTitle className="flex items-center gap-2 text-base">
             <CheckSquare className="h-4 w-4" /> My Tasks
           </CardTitle>
-          {total > 0 && (
-            <span className="text-xs text-muted-foreground">{total} active</span>
-          )}
+          <Link href="/tasks">
+            <Button variant="ghost" size="sm" className="text-xs h-7">
+              View all →
+            </Button>
+          </Link>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { sendReportEmail } from "@/lib/email/templates";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const { reportId } = await req.json();
 
     if (!reportId) {
@@ -16,7 +17,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get report with client info
     const report = await prisma.clientReport.findUnique({
       where: { id: reportId },
       include: {
@@ -44,10 +44,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate report URL (would be actual download/view link in production)
     const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/${reportId}/download`;
 
-    // Send email
     const result = await sendReportEmail({
       to: report.client.lead.email,
       clientName: report.client.lead.businessName,
@@ -64,7 +62,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Mark report as sent
     await prisma.clientReport.update({
       where: { id: reportId },
       data: {

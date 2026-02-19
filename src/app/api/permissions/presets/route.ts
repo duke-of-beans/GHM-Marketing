@@ -5,9 +5,8 @@
  * Returns all available permission presets with their metadata
  */
 
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { isElevated } from '@/lib/auth/session';
+import { NextRequest, NextResponse } from 'next/server';
+import { withPermission } from '@/lib/auth/api-permissions';
 import { 
   PERMISSION_PRESETS,
   PRESET_METADATA,
@@ -17,25 +16,10 @@ import {
   MASTER_ONLY_FEATURES
 } from '@/lib/permissions';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    const user = session?.user;
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    // Only masters can view preset configuration
-    if (!isElevated(user.role)) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
-    }
+    const permissionError = await withPermission(req, "manage_team");
+    if (permissionError) return permissionError;
     
     return NextResponse.json({
       success: true,

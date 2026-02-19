@@ -1,20 +1,27 @@
-GHM DASHBOARD — Session State (Feb 19, 2026 evening)
+GHM DASHBOARD — SESSION CLOSEOUT
+Last commit: e98ad00 (Feb 19, 2026 ~1:00am)
+Branch: main, pushed to origin
+TypeScript: clean (0 errors)
+Vercel: last deploy had edge middleware size issue — FIXED in 7ffb64a (split auth config, catch-all middleware matcher). Current commit e98ad00 not yet deploy-verified.
 
-CANONICAL STATUS: STATUS.md (single source of truth)
+WHAT JUST SHIPPED:
+- BUG-005: Dashboard widget staleness fixed (3-layer: revalidatePath + RefreshOnFocus + useRefetchOnFocus hook)
+- BUG-006: Back navigation added to /permissions and /audit pages
+- INTEGRATION_STRATEGY.md: Full spec with DataForSEO, NAP scraper architecture, report upgrade roadmap, cost projections, BrightLocal phase-out
+- STATUS.md: 7 new backlog items across Next Tier and Future Roadmap
 
-COMPLETED THIS SESSION:
-- BUG-002, BUG-003, BUG-004 all resolved
-- FEAT-003 My Tasks Widget shipped (API + component + both dashboards)
-- Website Studio P1-P5 verified complete
-- Domain Rating badge dark mode fix (lead-card.tsx)
-- All status files consolidated and cross-referenced
+WHAT'S READY TO BUILD (priority order from STATUS.md Next Tier):
+1. Permission System Phase 4-5 (replace role checks with permission checks app-wide)
+2. Commission System end-to-end validation
+3. Pipeline Filter UX improvements
+4. Content Library → Calendar scheduling
+5. Content CTA enforcement in AI prompts
+6. Task Pipeline UX Overhaul (needs design discussion first)
 
-ACTIVE SPRINT IS CLEAR — all items done.
+WHAT'S READY TO INTEGRATE (from INTEGRATION_STRATEGY.md):
+1. Ahrefs API (highest value, feeds competitive scan engine)
+2. DataForSEO SERP API (rank tracking, eliminates BrightLocal $150/mo)
+3. Google Business Profile API (needs agency application)
 
-NEXT TIER (from STATUS.md):
-- Permission system Phase 4-5
-- Commission end-to-end test
-- Pipeline filter UX improvements
-- TeamFeed multimedia
-
-TypeScript: CLEAN (0 errors)
+DEPLOY NOTE:
+Commit e98ad00 should deploy clean — the edge middleware fix from 7ffb64a is still in place. Verify on Vercel after push.

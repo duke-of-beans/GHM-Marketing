@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { sendUpsellNotification } from "@/lib/email/templates";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const { opportunityId } = await req.json();
 
     if (!opportunityId) {
@@ -16,7 +17,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get opportunity with client and product info
     const opportunity = await prisma.upsellOpportunity.findUnique({
       where: { id: opportunityId },
       include: {
@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Send email
     const result = await sendUpsellNotification({
       to: opportunity.client.lead.email,
       clientName: opportunity.client.lead.businessName,
@@ -72,7 +71,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update opportunity status (if not already presented)
     if (opportunity.status === "detected") {
       await prisma.upsellOpportunity.update({
         where: { id: opportunityId },

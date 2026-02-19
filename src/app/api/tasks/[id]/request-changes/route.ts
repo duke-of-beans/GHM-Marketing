@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
+
+  const user = await getCurrentUserWithPermissions();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const user = await requireMaster();
     const taskId = parseInt(params.id);
     const body = await req.json();
 
-    // Update task status back to in-progress
     const task = await prisma.clientTask.update({
       where: { id: taskId },
       data: {
@@ -30,8 +36,6 @@ export async function POST(
         content: `Editor feedback: ${body.feedback}`,
       },
     });
-
-    // TODO: Create notification for writer (future enhancement)
 
     return NextResponse.json({ success: true, task });
   } catch (error) {

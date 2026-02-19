@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { isElevated } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 // ============================================================================
 // VALIDATION SCHEMA
@@ -101,8 +101,11 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_payments");
+    if (permissionError) return permissionError;
+
     const session = await auth();
-    if (!session?.user || !isElevated(session.user.role)) {
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

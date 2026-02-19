@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 19, 2026 (late night — integration strategy + backlog update)
+**Last Updated:** February 20, 2026 (early AM — task pipeline fully complete)
 
 ---
 
@@ -33,7 +33,7 @@
 - System prompt builder for all 5 AI features
 - Unified `callAI()` entry point with cascade retry
 - `ai_cost_logs` table live
-- ⚠️ **Needs:** Migrate existing content brief API to use `callAI()` (10-min job)
+- ✅ Content brief API already uses `callAI()`
 
 ### Admin Role System (Feb 18-19, 2026)
 - 3-tier hierarchy: admin > master > sales
@@ -50,6 +50,16 @@
 - BugReportsTab in Settings (admin-only tab)
 - Auto-captures console errors, network errors, session data
 - 1 existing report in DB
+
+### Permission System — Full Migration (Feb 20, 2026)
+- 5-phase system: schema, API middleware, UI components, app-wide migration, documentation
+- Phases 1-3: permission schema, presets, `withPermission()` API guard, `requirePermission()` server guard, audit logging
+- Phase 4: All 16 API routes migrated from `requireMaster()`/`isElevated()` to `withPermission()` with proper 401/403 responses
+- Routes migrated: tasks (approve, reject, request-changes, generate-brief, recalculate-priorities), upsell (detect, present, dismiss), reports (html, preview, generate), products CRUD, email (send-upsell, send-report), discovery (search, import)
+- Client detail page migrated from `requireMaster()` to `requirePermission("manage_clients")`
+- Zero `requireMaster()` calls remain in API routes; `isElevated()` retained only for data-scoping (correct)
+- TypeScript: 0 errors
+- Phase 5 (tutorial/docs updates) deferred — low priority
 
 ---
 
@@ -86,11 +96,6 @@
 
 ## 🟡 NEXT TIER (After Sprint)
 
-### Permission System (Phase 4-5 remaining)
-- Phases 1-3 complete (schema, API, UI components)
-- Phase 4: Replace role-based checks with permission checks across app
-- Phase 5: Tutorial + documentation updates
-
 ### Commission System Validation
 - End-to-end test with live client
 - Manually trigger monthly cron to verify residual generation
@@ -120,13 +125,29 @@
 - Add CTA template selection to content review queue
 
 ### Task Pipeline UX Overhaul (DISCUSSION NEEDED)
-- Current task system lacks the visceral, satisfying flow that the sales pipeline kanban has. Tasks move through people and roles but the movement isn't visible or gratifying.
-- **Core tension:** Some tasks are single-person (fix a bug), some are multi-person handoff chains (sales rep builds wireframe → manager approves/rejects with corrections → deployment). The current system doesn't distinguish these or make the handoff feel like forward momentum.
-- **Vision:** A unified personal work queue that pulls from ALL sources — scheduled leads needing follow-up, urgent client management tasks, bug reports assigned to you, feature requests, stale leads, content awaiting review, wireframes awaiting approval. One place, prioritized, with clear "what's next" energy.
-- **The handoff chain problem:** Website Studio already has a path (rep builds → admin approves → deploy), but it doesn't feel like a pipeline. Need kanban-style columns or a status progression that makes completing a step and kicking to the next person feel like movement. Visual feedback, maybe animations, definitely clear ownership transfer.
-- **Role-aware task routing:** Tasks should know who can do what. A wireframe approval can only go to admin/master. A content brief can be assigned to any rep. Bug fixes route to admin. The queue should be smart about what shows up for whom.
-- **Engagement hooks:** Progress indicators, streak tracking, completion celebrations, daily digest of "here's your plate today." Make people want to clear their queue.
-- **Status:** Needs design discussion before implementation. This touches task system, notification system, role permissions, and potentially a new "workflow" abstraction layer.
+- **Schema:** ✅ DONE — `assignedToUserId`, `assignedByUserId`, `startedAt`, `completedAt`, `statusChangedAt`, `estimatedMinutes`, `sortOrder` added to ClientTask; new `TaskTransition` model for status history; proper User FK relations; all pushed to Neon
+- **Status Machine:** ✅ DONE — `src/lib/tasks/status-machine.ts` — 9 statuses (queued → in_progress → review → approved → deployed → measuring → complete, plus rejected/cancelled), validated transitions with role-based permissions, comment requirements for rejections/reopens
+- **API - Queue:** ✅ DONE — `GET /api/tasks/queue` — personal queue with view modes (mine/team/unassigned), multi-sort (priority/due_date/updated/sort_order), status/priority filters, pagination, overdue detection, inline transition options per task
+- **API - Transition:** ✅ DONE — `PATCH /api/tasks/[id]/transition` — status machine enforcer, validates transitions against rules, records TaskTransition history, sets timestamps (startedAt, completedAt, deployedAt) automatically
+- **API - Assign:** ✅ DONE — `PATCH /api/tasks/[id]/assign` — role-aware assignment (sales can self-assign unassigned, managers can assign anyone)
+- **API - Reorder:** ✅ DONE — `PATCH /api/tasks/reorder` — batch sort order update for drag-and-drop
+- **UI - My Queue page:** ✅ DONE — `/tasks` route, server page + client component, list view + board (kanban) view, stats bar, filters (view/status/sort), view mode toggle
+- **UI - Board (kanban) view:** ✅ DONE — 4-column kanban (Queued → In Progress → In Review → Approved), task cards with priority/category/overdue indicators
+- **UI - Task detail sheet:** ✅ DONE — Slide-out Sheet with full task meta, description, timeline, all transition buttons, comment input for rejections/reopens, self-assign, transition history timeline
+- **UI - Drag-and-drop reorder:** ✅ DONE — dnd-kit sortable rows in list view, persists via PATCH /api/tasks/reorder, "Manual Order" sort option
+- **UI - Task creation form:** ✅ DONE — Dialog with client picker, title, description, category, priority, due date, estimate. POST /api/tasks auto-assigns to creator, records initial transition
+- **UI - Transition history:** ✅ DONE — GET /api/tasks/[id]/history returns all transitions with user names. Detail sheet shows vertical timeline with from→to badges, comments, timestamps
+- **Nav link:** ✅ DONE — "My Tasks" added to left nav (visible to all roles, between Dashboard and Find Leads)
+- **Dashboard widget:** ✅ DONE — "View all →" link wired to `/tasks` page
+
+### Voice System — Sardonic Micro-Copy Layer
+- Centralized `src/lib/voice.ts` with all user-facing micro-copy (toasts, empty states, confirmations, loading, push notifications, tutorial copy)
+- Tone: deadpan, sardonic, break-the-4th-wall. Never mean, never corny. Professional UI labels stay clean — voice lives ONLY in reward messages, toasts, tutorials, empty states, confirmations, loading moments.
+- Replace browser `alert()`/`confirm()` with Sonner toasts + dialog components
+- Randomized variant pools per category (same action ≠ same quip every time)
+- Rewrite onboarding tutorial copy (20+ steps across sales/master flows)
+- Wire push notification templates through voice system
+- Priority: Low
 
 ### TeamFeed Multimedia
 - Emoji picker inline

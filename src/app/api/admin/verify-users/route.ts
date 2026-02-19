@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { isElevated } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 /**
  * ADMIN ENDPOINT - Get all users with IDs
@@ -9,12 +8,10 @@ import { isElevated } from "@/lib/auth/session";
  * 
  * Call: GET /api/admin/verify-users
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user || !isElevated(session.user.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const permissionError = await withPermission(req, "manage_team");
+    if (permissionError) return permissionError;
 
     const users = await prisma.user.findMany({
       select: {

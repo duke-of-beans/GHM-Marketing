@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 
 const OUTSCRAPER_API_KEY = process.env.OUTSCRAPER_API_KEY!;
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_leads");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { keyword, location, minReviews = 10, minRating = 3.5, limit = 50 } = body;
 
@@ -17,7 +18,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Call Outscraper Maps API
     const query = `${keyword} in ${location}`;
     const outscraperUrl = `https://api.app.outscraper.com/maps/search-v3?query=${encodeURIComponent(query)}&limit=${limit}&language=en&region=us`;
 
@@ -34,13 +34,10 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
     const businesses = data.data?.[0] || [];
 
-    // Qualify and filter results
     const qualified = businesses
       .map((business: any) => {
         const reviewCount = business.reviews || 0;
         const rating = business.rating || 0;
-
-        // Calculate qualification score
         const qualScore = calculateQualificationScore(business);
 
         return {
@@ -54,7 +51,7 @@ export async function POST(req: NextRequest) {
           category: business.category || business.type || "Unknown",
           qualificationScore: qualScore.score,
           reasons: qualScore.reasons,
-          rawData: business, // Store for import
+          rawData: business,
         };
       })
       .filter((b: any) => b.reviewCount >= minReviews && b.rating >= minRating)
@@ -74,17 +71,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * Calculate qualification score (0-100) based on business characteristics
- */
 function calculateQualificationScore(business: any): {
   score: number;
   reasons: string[];
 } {
-  let score = 50; // Base score
+  let score = 50;
   const reasons: string[] = [];
 
-  // Review count impact (max +20)
   const reviews = business.reviews || 0;
   if (reviews >= 100) {
     score += 20;
@@ -96,7 +89,6 @@ function calculateQualificationScore(business: any): {
     score += 10;
   }
 
-  // Rating impact (max +15)
   const rating = business.rating || 0;
   if (rating >= 4.5) {
     score += 15;
@@ -108,7 +100,6 @@ function calculateQualificationScore(business: any): {
     score += 5;
   }
 
-  // Has website (+10)
   if (business.site) {
     score += 10;
     reasons.push("Has website");
@@ -116,17 +107,14 @@ function calculateQualificationScore(business: any): {
     reasons.push("⚠️ No website");
   }
 
-  // Recent activity (+5)
   if (business.working_hours || business.popular_times) {
     score += 5;
   }
 
-  // Business status
   if (business.status === "OPERATIONAL") {
     score += 5;
   }
 
-  // Verified business (+5)
   if (business.verified) {
     score += 5;
     reasons.push("Verified");

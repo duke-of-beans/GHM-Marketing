@@ -10,23 +10,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { executeScan, executeBatchScan } from '@/lib/competitive-scan';
-import { isElevated } from '@/lib/auth/session';
+import { withPermission } from '@/lib/auth/api-permissions';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    // Auth check
-    const session = await auth();
-    if (!session?.user || !isElevated(session.user.role)) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Elevated access required.' },
-        { status: 401 }
-      );
-    }
+    const permissionError = await withPermission(req, "manage_clients");
+    if (permissionError) return permissionError;
     
     const body = await req.json();
     const { clientId, clientIds, scanDue } = body;

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { detectUpsellOpportunities, saveUpsellOpportunities } from "@/lib/upsell/detector";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { clientId, scanId } = body;
 
@@ -16,11 +17,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Detect opportunities
     const opportunities = await detectUpsellOpportunities(clientId, scanId);
 
-    // Save to database if scan ID provided
-    let savedOpportunities = [];
+    let savedOpportunities: unknown[] = [];
     if (scanId && opportunities.length > 0) {
       savedOpportunities = await saveUpsellOpportunities(clientId, scanId, opportunities);
     }

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 
 export async function POST(req: NextRequest) {
-  try {
-    const user = await requireMaster();
+  const permissionError = await withPermission(req, "manage_leads");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { leads } = body;
 
@@ -22,8 +23,6 @@ export async function POST(req: NextRequest) {
 
     for (const lead of leads) {
       try {
-        // Check if lead already exists by place_id or phone
-        // Check for duplicates by phone
         const existing = lead.phone
           ? await prisma.lead.findFirst({
               where: { phone: lead.phone },
@@ -35,15 +34,13 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        // Extract city, state, zip from address
         const addressParts = parseAddress(lead.address);
 
-        // Create lead
         await prisma.lead.create({
           data: {
             businessName: lead.name,
             phone: lead.phone || "",
-            email: null, // Not available from Maps
+            email: null,
             website: lead.website || null,
             city: addressParts.city || "Unknown",
             state: addressParts.state || "Unknown",
@@ -76,10 +73,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * Parse address string into city, state, zip
- * Example: "123 Main St, Austin, TX 78701, USA"
- */
 function parseAddress(address: string): {
   city: string | null;
   state: string | null;
@@ -95,18 +88,15 @@ function parseAddress(address: string): {
   let state: string | null = null;
   let zip: string | null = null;
 
-  // Common format: "Street, City, State Zip, Country"
   if (parts.length >= 3) {
     city = parts[parts.length - 3] || null;
 
-    // Extract state and zip from "State Zip" format
     const stateZipPart = parts[parts.length - 2];
     const stateZipMatch = stateZipPart?.match(/([A-Z]{2})\s+(\d{5})/);
     if (stateZipMatch) {
       state = stateZipMatch[1];
       zip = stateZipMatch[2];
     } else {
-      // Try just state
       state = stateZipPart || null;
     }
   }

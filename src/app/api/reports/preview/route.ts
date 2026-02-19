@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { generateReportHTML } from "@/lib/reports/template";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { reportId } = body;
 
@@ -17,7 +18,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get report from database
     const report = await prisma.clientReport.findUnique({
       where: { id: reportId },
     });
@@ -29,7 +29,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate HTML from stored content
     const html = generateReportHTML(report.content);
 
     return NextResponse.json({ html });

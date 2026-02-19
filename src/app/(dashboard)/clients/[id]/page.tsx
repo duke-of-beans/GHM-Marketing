@@ -1,4 +1,4 @@
-import { requireMaster } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/permissions";
 import { getClient } from "@/lib/db/clients";
 import { notFound } from "next/navigation";
 import { ClientProfile } from "@/components/clients/profile";
@@ -36,7 +36,7 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   try {
-    await requireMaster();
+    await requirePermission("manage_clients");
     const { id } = await params;
     const clientId = parseInt(id);
     if (isNaN(clientId)) notFound();

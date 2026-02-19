@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { generateReportHTML } from "@/lib/reports/template";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const reportId = parseInt(params.id);
 
     const report = await prisma.clientReport.findUnique({
@@ -23,7 +24,6 @@ export async function GET(
       );
     }
 
-    // Regenerate HTML from stored data
     const html = generateReportHTML(report.content);
 
     return NextResponse.json({ html });

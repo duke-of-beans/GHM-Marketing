@@ -54,6 +54,10 @@ model User {
   // Dashboard personalization
   dashboardLayout       Json?      @map("dashboard_layout")  // react-grid-layout serialized state
   
+  // Task Pipeline relations
+  assignedTasks         ClientTask[] @relation("TaskAssignee")
+  createdTasks          ClientTask[] @relation("TaskAssigner")
+  
   // Team messaging
   sentMessages          TeamMessage[] @relation("MessageAuthor")
   receivedMessages      TeamMessage[] @relation("MessageRecipient")
@@ -411,7 +415,7 @@ model ClientTask {
   priority        String        @default("P3")
   status          String        @default("queued")
   source          String        @default("manual")
-  assignedTo      String?       @map("assigned_to")
+  assignedTo      String?       @map("assigned_to")          // DEPRECATED — use assignedToUserId
   targetKeywords  Json?         @map("target_keywords")
   competitorRef   String?       @map("competitor_ref")
   contentBrief    Json?         @map("content_brief")
@@ -426,12 +430,30 @@ model ClientTask {
   updatedAt       DateTime      @updatedAt @map("updated_at")
   deployedAt      DateTime?     @map("deployed_at")
   measuredAt      DateTime?     @map("measured_at")
-  notes           ClientNote[]
-  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // ── Task Pipeline additions ────────────────────────────────────────────────
+  assignedToUserId  Int?        @map("assigned_to_user_id")   // Proper FK — who owns this task right now
+  assignedByUserId  Int?        @map("assigned_by_user_id")   // Who created or assigned
+  startedAt         DateTime?   @map("started_at")            // When work actually began
+  completedAt       DateTime?   @map("completed_at")          // When finished (approved/deployed/done)
+  statusChangedAt   DateTime    @default(now()) @map("status_changed_at") // Last status transition
+  estimatedMinutes  Int?        @map("estimated_minutes")     // Time estimate for queue planning
+  sortOrder         Int         @default(0) @map("sort_order")// Manual queue ordering (lower = higher priority)
+  
+  // Relations
+  notes             ClientNote[]
+  transitions       TaskTransition[]
+  client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  assignedToUser    User?         @relation("TaskAssignee", fields: [assignedToUserId], references: [id])
+  assignedByUser    User?         @relation("TaskAssigner", fields: [assignedByUserId], references: [id])
 
   @@index([clientId, status])
   @@index([clientId, category])
   @@index([clientId, priority])
+  @@index([assignedToUserId, status])
+  @@index([assignedToUserId, priority])
+  @@index([status, priority])
+  @@index([dueDate])
   @@map("client_tasks")
 }
 
@@ -454,6 +476,27 @@ model ClientNote {
   @@index([clientId, isPinned])
   @@index([taskId])
   @@map("client_notes")
+}
+
+// ============================================================================
+// TASK PIPELINE — STATUS TRANSITION HISTORY
+// ============================================================================
+
+model TaskTransition {
+  id          Int        @id @default(autoincrement())
+  taskId      Int        @map("task_id")
+  fromStatus  String?    @map("from_status")   // null for initial creation
+  toStatus    String     @map("to_status")
+  userId      Int?       @map("user_id")        // Who made the transition
+  comment     String?                           // Optional note (rejection reason, etc.)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  
+  task        ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  @@index([taskId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("task_transitions")
 }
 
 model CompetitiveScan {

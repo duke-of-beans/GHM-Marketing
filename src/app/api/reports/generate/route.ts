@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireMaster } from "@/lib/auth/session";
+import { withPermission } from "@/lib/auth/api-permissions";
 import { generateMonthlyReportData } from "@/lib/reports/generator";
 import { generateReportHTML } from "@/lib/reports/template";
 
 export async function POST(req: NextRequest) {
-  try {
-    await requireMaster();
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
 
+  try {
     const body = await req.json();
     const { clientId, type = "monthly" } = body;
 
@@ -18,7 +19,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Calculate period based on type
     const now = new Date();
     const periodEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
@@ -31,17 +31,14 @@ export async function POST(req: NextRequest) {
       periodStart = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
     }
 
-    // Generate report data
     const reportData = await generateMonthlyReportData(
       clientId,
       periodStart,
       periodEnd
     );
 
-    // Generate HTML
     const html = generateReportHTML(reportData);
 
-    // Save report to database
     const report = await prisma.clientReport.create({
       data: {
         clientId,
@@ -49,7 +46,7 @@ export async function POST(req: NextRequest) {
         periodStart,
         periodEnd,
         content: reportData as any,
-        pdfUrl: null, // Will be null until we implement PDF generation
+        pdfUrl: null,
         sentToClient: false,
       },
     });
@@ -57,7 +54,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       reportId: report.id,
-      html, // Return HTML so frontend can display it
+      html,
     });
   } catch (error) {
     console.error("Failed to generate report:", error);
