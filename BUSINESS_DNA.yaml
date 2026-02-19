@@ -1,77 +1,112 @@
-# GHM Digital Marketing — Business DNA
-# This file defines the business identity and strategic context for AI assistants.
-
 identity:
-  name: GHM Digital Marketing
-  type: SEO & digital marketing agency
-  owner: David Kirsch
-  role: Founder / Operations
-  entity_status: active
+  name: "GHM Digital Marketing"
+  tagline: "All-inclusive SEO dominance, no contracts, no excuses"
+  mission: "Help businesses achieve and maintain #1 search position through satellite site clusters, competitive intelligence, and relentless optimization"
 
-service_model:
-  core_offering: Local SEO services for small/medium businesses
-  delivery: Monthly retainer (recurring revenue)
-  pricing_models:
-    - monthly_recurring (MRR)
-    - annual_contract (ARR)
-    - one_time_setup
-  target_market: Local businesses (contractors, medical, legal, restaurants, etc.)
-  geographic_focus: US-based, territory-organized
+market:
+  segment: "SMBs doing $500K-$5M/year revenue seeking SEO dominance"
+  size: "Massive - every local business needs SEO"
+  competition: "Generic SEO agencies (lock-in contracts, tiered pricing, underdelivery)"
+  proven_vertical: "European auto repair shops"
+  open_to: "All industries/verticals"
 
-revenue_mechanics:
-  acquisition: Territory-based lead gen → enrichment → sales pipeline → close
-  retention: Competitive monitoring → content production → reporting → upsell
-  key_metrics:
-    - MRR / ARR / LTV per client
-    - Client health score (competitive position)
-    - Pipeline conversion rate
-    - Territory coverage
+positioning:
+  differentiation: "Month-to-month no lock-in, all-inclusive $2,400/mo, satellite site cluster methodology, best-in-class competitive reporting"
+  pricing: "$2,400/month all-inclusive, month-to-month"
+  upsells:
+    - "Basic website build: $3,500"
+    - "Advanced website build: $5,000"
+    - "Business consultation: $1,000/day"
+  unique_angle: "Easiest to sign up, most prominent methodology, best reporting, no lock-in"
 
-team_structure:
-  roles:
-    master: Full access, all territories, admin controls
-    rep: Territory-scoped, own leads/clients only
-  hierarchy: Master → Rep (territory-assigned)
+operations:
+  revenue_model: "$2,400/mo recurring retainer per client + website/consultation upsells"
+  key_capabilities:
+    - "Satellite site cluster architecture"
+    - "Domain acquisition and management"
+    - "Backlink building"
+    - "Standard PPC campaigns"
+    - "Active rank monitoring and defense"
+    - "Detailed monthly competitive reporting"
+    - "Lead generation engine (proprietary)"
+    - "Competitive audit generation (sales tool)"
+    - "Interactive demo generation (sales tool)"
+    - "Full dashboard: pipeline, commissions, content studio, website studio"
+  
+  tech_stack:
+    dashboard: "Next.js 14 + Prisma + Neon PostgreSQL (LIVE)"
+    enrichment: "Ahrefs ($130/mo), Outscraper (free tier), BrightLocal (phasing out)"
+    ai: "Claude API (~$50/mo)"
+    domains: "GoDaddy (~$20/mo)"
+    automation: "Dashboard handles satellite posting, reporting, monitoring"
 
-technology:
-  platform: GHM Dashboard (Next.js 14 / Vercel / PostgreSQL)
-  repo: duke-of-beans/GHM-Marketing
-  path: D:\Work\SEO-Services\ghm-dashboard
-  status_file: PROJECT_STATUS.md
+  team:
+    gavin: "Owner — stepping back from operations entirely"
+    david: "COO (effective) — manages all operations, sales team, systems, strategy"
+    sales_reps: "W-4 contracted, commission-only (hiring 4)"
+    content_manager: "Future hire at 12-15 active clients"
 
-operational_cycles:
-  front_cycle:
-    name: Sales Pipeline
-    purpose: Lead acquisition through deal close
-    stages: Available → Scheduled → Contacted → Follow Up → Paperwork → Won
-    tools: Kanban board, enrichment APIs, work order generation
-    
-  back_cycle:
-    name: Client Service Delivery
-    purpose: Post-sale competitive monitoring, content production, reporting
-    stages: Onboard → Monitor → Produce → Report → Upsell
-    tools: Competitive scan engine, task workflow, client portal
-    
-  bridge: Won-lead trigger auto-creates client profile (front → back handoff)
+current_state:
+  phase: "Sales Launch"
+  status: "Dashboard production-ready, sales operations defined, hiring imminent"
+  monthly_revenue: "~$21,600 (9 clients × $2,400)"
+  active_clients: "9 (7 retained 2+ years)"
+  retention_rate: "~97% monthly (historical)"
 
-competitive_advantages:
-  - Competitive intelligence as a service (not just SEO work)
-  - Automated gap detection → task generation (scan-driven workflow)
-  - Health score tracking gives clients visible ROI
-  - Territory model scales with rep hiring
+sales_operations:
+  canonical_doc: "D:\\Work\\SEO-Services\\SALES_OPERATIONS.md"
+  comp_spec: "D:\\Work\\SEO-Services\\ghm-dashboard\\COMMISSION_SYSTEM_SPEC.md"
+  close_bonus: "$1,000 per signed client"
+  upsell_commission: "10% on all upsells"
+  residual: "Tiered $200-$300/mo locked at close based on monthly volume"
+  territory: "Geographic (default) or national vertical (exception)"
+  min_production: "2 closes/mo rolling 90-day average"
+  - "Customer lifetime value"
+  - "Cost per acquisition"
 
-strategic_priorities:
-  current: Build competitive scan engine (back cycle phase 2)
-  next:
-    - Content review queue (editor workflow)
-    - Client-facing reports (monthly PDF)
-    - Upsell detection from scan data
-  future:
-    - Discovery engine (automated lead sourcing)
-    - Voice profile system (brand-consistent content)
-    - Client portal (self-service reporting)
+work_in_progress:
+  lead_gen_engine: "COMPLETE - can generate leads"
+  enrichment_services: "RESEARCH - which services provide best ROI"
+  sales_dashboard: "DESIGN - this session"
+  work_order_system: "PLANNED - automation to generate competitor analysis"
+  
+notes: |
+  Key insight from lead gen build: Paid enrichment services can drastically improve
+  lead quality AND enable creation of valuable work orders showing exact path to
+  beat competitors. This becomes the sales hook.
+  
+  One service had $130 lifetime deal - massive ROI if it provides the right data.
+  
+  Sales team needs simple, interactive dashboard to manage pipeline from lead → won.
+  Once won, client moves to Gavin for support (out of sales scope).
+  
+  Budget-conscious approach: maximize information richness while staying affordable.
+  Looking for sweet spot of "best possible intelligence at reasonable cost."
+immediate_priorities:
+  1: "Draft and post sales rep job ad"
+  2: "Build prospect audit generator (dashboard feature)"
+  3: "Build interactive demo generator (dashboard feature)"
+  4: "Create digital brochure / one-pager"
+  5: "Create recruiting comp sheet with earnings projections"
+  6: "Define initial territory map for first 4 reps"
+  7: "Draft sales agreement template (contractor terms)"
+  8: "Hire 4 commissioned sales professionals"
 
-naming_conventions:
-  project_reference: "GHM Dashboard"
-  business_reference: "GHM Digital Marketing"
-  internal_shorthand: "GHM"
+key_metrics:
+  - "Monthly closes per rep"
+  - "Client retention rate (monthly churn)"
+  - "Rep residual book value"  
+  - "Average client lifetime value"
+  - "Sales cycle length (days to close)"
+  - "Competitive audit to close conversion rate"
+  - "Territory penetration rate"
+
+notes: |
+  GHM Digital Marketing is Gavin's company. David operates as effective COO
+  managing all operations, sales team, and strategy. David's current comp is
+  $240/mo per client managed. David plans to negotiate increased compensation
+  at 10+ clients based on demonstrated value. Long-term trajectory is toward
+  near-parity with owner given complete operational ownership.
+  
+  Full sales operations details: D:\Work\SEO-Services\SALES_OPERATIONS.md
+  Commission system spec: D:\Work\SEO-Services\ghm-dashboard\COMMISSION_SYSTEM_SPEC.md

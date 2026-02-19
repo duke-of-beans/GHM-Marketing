@@ -96,6 +96,22 @@
 
 ## 🟡 NEXT TIER (After Sprint)
 
+### Sales Launch Tools (Priority — See SALES_OPERATIONS.md)
+| Priority | Item | Status |
+|----------|------|--------|
+| S1 | Prospect Audit Generator — "Generate Audit" button in dashboard, outputs branded competitive report from prospect domain | 🔴 TODO |
+| S2 | Interactive Demo Generator — "Create Demo" button, spins up branded HTML demo with prospect's real data in ~2 min, used selectively on hot calls | 🔴 TODO |
+| S3 | Digital Brochure — one-pager hitting differentiators, phone/Zoom optimized | 🔴 TODO |
+| S4 | Recruiting Comp Sheet — one-pager with earnings projections for candidate recruitment | 🔴 TODO |
+| S5 | Territory Map — initial territory definitions for first 4 reps | 🔴 TODO |
+| S6 | Sales Agreement Template — contractor terms, comp structure, territory rules, residual terms | 🔴 TODO |
+| S7 | Job Ad — draft and post to Indeed, LinkedIn, CommissionCrowd | 🔴 TODO |
+
+### Commission System Updates (Dashboard)
+- Update residual tiers in CompensationConfigSection to support tiered structure ($200/$250/$300 locked at close)
+- Add upsell commission tracking (10% on website builds and consultations)
+- Ensure sales role dashboard shows: pipeline, residual book, territory leads, audit/demo tools
+
 ### Commission System Validation
 - End-to-end test with live client
 - Manually trigger monthly cron to verify residual generation

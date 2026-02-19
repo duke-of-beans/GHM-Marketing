@@ -20,21 +20,36 @@ Need to track and display commission/residual payments for sales reps and master
 
 ## 📊 PAYMENT STRUCTURE
 
-### Sales Rep Payments (Standard)
+### Sales Rep Payments (Updated Feb 20, 2026)
 ```yaml
 commission:
   amount: $1000
   trigger: "Client signed & onboarded"
   timing: "One-time at close"
-  
+
+upsell_commission:
+  rate: 10%
+  applies_to:
+    - Basic website build ($3,500) = $350
+    - Advanced website build ($5,000) = $500
+    - Business consultation ($1,000/day) = $100/day
+
 residual:
-  amount: $200/month
+  type: "Tiered, locked at close"
+  tiers:
+    - closes_1_to_3: $200/client/month
+    - closes_4_to_6: $250/client/month
+    - closes_7_plus: $300/client/month
+  lock_rule: "Rate permanently set based on rep's close volume in the month client was signed. Never recalculated."
   trigger: "Client paying monthly retainer"
   timing: "Starting Month 2, ongoing"
   conditions:
     - Client status = "active"
     - Client paid current month
+    - Rep meets minimum production threshold (2/mo rolling 90-day avg)
 ```
+
+**See also:** `D:\Work\SEO-Services\SALES_OPERATIONS.md` for full sales comp, territory, and hiring details.
 
 ### Master Manager Payments (David)
 ```yaml
