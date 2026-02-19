@@ -5,11 +5,12 @@ export default NextAuth(authConfig).auth;
 
 export const config = {
   matcher: [
-    "/master/:path*",
-    "/sales/:path*",
-    "/leads/:path*",
-    "/reports/:path*",
-    "/login",
-    "/api/((?!auth).*)",
+    /*
+     * Match all routes EXCEPT:
+     * - _next (static files, images, etc.)
+     * - favicon.ico, robots.txt, manifest, icons
+     * - Public API auth endpoints
+     */
+    "/((?!_next|favicon\\.ico|robots\\.txt|manifest\\.json|icons/).*)",
   ],
 };
