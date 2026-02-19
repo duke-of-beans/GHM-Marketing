@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { addClientNote } from "@/lib/db/clients";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { isElevated } from "@/lib/auth/session";
 
 export async function GET(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
   }
 
   const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
+  if (!isElevated(user.role)) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -48,7 +49,7 @@ export async function POST(
   }
 
   const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
+  if (!isElevated(user.role)) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 

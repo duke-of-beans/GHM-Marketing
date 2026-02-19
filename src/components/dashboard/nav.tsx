@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
+import { isElevated } from "@/lib/auth/roles";
 import { HelpMenu } from "@/components/onboarding/help-menu";
 
 type NavUser = {
@@ -48,7 +49,7 @@ export function DashboardNav({
   const links = allLinks.filter((link) => {
     // Special handling for dashboard links
     if (link.href === "/master") {
-      return user.role === "master" && (!link.permission || permissions[link.permission]);
+      return isElevated(user.role) && (!link.permission || permissions[link.permission]);
     }
     if (link.href === "/sales") {
       return user.role === "sales";
@@ -68,7 +69,7 @@ export function DashboardNav({
       {/* Desktop sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-gray-50/50 dark:bg-gray-950 p-4 overflow-hidden">
         <div className="mb-3 flex-shrink-0">
-          <Link href={user.role === "master" ? "/master" : "/sales"}>
+          <Link href={isElevated(user.role) ? "/master" : "/sales"}>
             <Image
               src="/logo.png"
               alt="GHM Digital Marketing"

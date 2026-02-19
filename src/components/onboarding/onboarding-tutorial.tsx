@@ -246,7 +246,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
     route: "/master",
     tips: [
-      "Post to Everyone, a specific role (masters/sales), or a single person (Direct)",
+      "Post to Everyone, a specific role (managers/sales), or a single person (Direct)",
       "Pin messages to float them to the top of everyone's feed permanently",
       "Mark messages Urgent or Important to signal priority to your team",
       "Team members can reply to messages — replies thread under the original",

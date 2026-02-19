@@ -6,22 +6,21 @@
 import { UserPermissions, UserWithPermissions } from './types';
 import { SALES_BASIC_PRESET } from './presets';
 
+/** True for admin or master roles. */
+function isElevated(role: string): boolean {
+  return role === 'admin' || role === 'master';
+}
+
 /**
- * Check if a user has a specific permission
+ * Check if a user has a specific permission.
+ * Elevated users (admin/master) default to true for any permission.
  */
 export function hasPermission(
   user: UserWithPermissions | null | undefined,
   permission: keyof UserPermissions
 ): boolean {
   if (!user) return false;
-  
-  // Owner role has all permissions (except master-only features handled elsewhere)
-  if (user.role === 'master') {
-    // Masters get all permissions by default
-    return user.permissions[permission] ?? true;
-  }
-  
-  // Sales reps check their specific permissions
+  if (isElevated(user.role)) return user.permissions[permission] ?? true;
   return user.permissions[permission] ?? false;
 }
 
@@ -46,26 +45,29 @@ export function hasAllPermissions(
 }
 
 /**
- * Check if user is a master (for hard-coded master-only features)
+ * Check if user has elevated access (admin or master).
+ * Replaces isMaster() — use this for manager-level gates.
  */
 export function isMaster(user: UserWithPermissions | null | undefined): boolean {
-  return user?.role === 'master';
+  return isElevated(user?.role ?? '');
+}
+
+/**
+ * Check if user is admin (owner-level only).
+ */
+export function isAdmin(user: UserWithPermissions | null | undefined): boolean {
+  return user?.role === 'admin';
 }
 
 /**
  * Get safe permissions object with defaults
  */
-export function getSafePermissions(
-  permissions: unknown
-): UserPermissions {
-  // If permissions is invalid or empty, return default
+export function getSafePermissions(permissions: unknown): UserPermissions {
   if (!permissions || typeof permissions !== 'object') {
     return SALES_BASIC_PRESET;
   }
-  
+
   const perms = permissions as Partial<UserPermissions>;
-  
-  // Return with defaults for any missing keys
   return {
     canViewAllClients: perms.canViewAllClients ?? false,
     canEditClients: perms.canEditClients ?? false,
@@ -97,40 +99,26 @@ export function filterUsersByPermission(
 
 /**
  * Check if user can view a specific client
- * (either owns it, or has canViewAllClients)
  */
 export function canViewClient(
   user: UserWithPermissions | null | undefined,
   clientUserId: number | null
 ): boolean {
   if (!user) return false;
-  
-  // Masters can view all clients
-  if (user.role === 'master') return true;
-  
-  // Can view all clients permission
+  if (isElevated(user.role)) return true;
   if (hasPermission(user, 'canViewAllClients')) return true;
-  
-  // Can view own clients
   return clientUserId === user.id;
 }
 
 /**
  * Check if user can edit a specific client
- * (either owns it, or has canEditClients for all)
  */
 export function canEditClient(
   user: UserWithPermissions | null | undefined,
   clientUserId: number | null
 ): boolean {
   if (!user) return false;
-  
-  // Masters can edit all clients
-  if (user.role === 'master') return true;
-  
-  // Can edit all clients permission
+  if (isElevated(user.role)) return true;
   if (hasPermission(user, 'canEditClients')) return true;
-  
-  // Can edit own clients (if they're assigned to them)
   return clientUserId === user.id;
 }

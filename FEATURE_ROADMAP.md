@@ -1,4 +1,6 @@
 # GHM DASHBOARD - FEATURE ROADMAP & PRIORITIES
+> ⚠️ **ARCHIVED** — Current status lives in `STATUS.md`. This file is kept for historical reference. Backlog items at the bottom (Feb 18 additions) are still tracked in STATUS.md.
+
 **Date:** February 17, 2026  
 **Status:** Planning complete, ready for implementation
 

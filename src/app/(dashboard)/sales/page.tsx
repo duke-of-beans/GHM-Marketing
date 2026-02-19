@@ -9,6 +9,7 @@ import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial"
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Target, TrendingUp, DollarSign, Zap } from "lucide-react";
+import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
 
 export default async function SalesDashboard() {
   const user = await getCurrentUser();
@@ -138,6 +139,9 @@ export default async function SalesDashboard() {
         {/* My Earnings */}
         <MyEarningsWidget />
       </div>
+
+      {/* My Tasks */}
+      <MyTasksWidget />
 
       {/* Needs Attention */}
       <Card>

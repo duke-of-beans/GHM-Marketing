@@ -1,4 +1,5 @@
 # GHM Dashboard — Operational Status
+> ⚠️ **ARCHIVED** — Current status lives in `STATUS.md`.
 
 > Last updated: 2026-02-16
 > Update this file at the end of each working session.

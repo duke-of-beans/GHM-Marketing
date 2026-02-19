@@ -7,6 +7,7 @@ import { ManagementFeesWidget } from "@/components/payments/management-fees-widg
 import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import { QuickActions, RevenueMetricsWidget, GoalsWidget } from "@/components/dashboard/dashboard-widgets";
+import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
 import { MasterDashboardGrid } from "@/components/dashboard/MasterDashboardGrid";
 import { MasterPageClient } from "@/components/dashboard/MasterPageClient";
@@ -124,6 +125,7 @@ export default async function MasterDashboard() {
           "goals": goalsWidget,
           "pipeline": <PipelineFunnel stats={funnelStats} />,
           "leaderboard": <RepLeaderboard reps={repData} />,
+          "my-tasks": <MyTasksWidget />,
           "mgmt-fees": <ManagementFeesWidget />,
           "profitability": <CompanyProfitabilityWidget />,
         }}

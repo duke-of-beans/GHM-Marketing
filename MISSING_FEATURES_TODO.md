@@ -1,4 +1,6 @@
 # GHM DASHBOARD - MISSING FEATURES & TODO LIST
+> ⚠️ **ARCHIVED** — Current status lives in `STATUS.md`. This file is kept for historical reference only.
+
 **Generated:** February 17, 2026  
 **Status:** Comprehensive audit of incomplete work
 

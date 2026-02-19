@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { callAI } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,9 +38,7 @@ export async function POST(request: NextRequest) {
     const keywordList = keywords?.trim() ? `Target keywords: ${keywords}` : '';
     const ctaNote = callToAction?.trim() ? `Preferred call to action: ${callToAction}` : '';
 
-    const prompt = `You are a Google Ads copywriter specializing in local service businesses.
-
-Create 3 Google Ads ad copy variants for ${client.businessName}.
+    const prompt = `Create 3 Google Ads ad copy variants for ${client.businessName}.
 
 Service/Campaign: ${service}
 ${keywordList}
@@ -69,21 +63,29 @@ Return ONLY a JSON array with no extra text or markdown. Format:
   }
 ]`;
 
-    const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
+    const result = await callAI({
+      feature: 'ppc_ads',
+      prompt,
+      context: {
+        feature: 'ppc_ads',
+        clientId,
+        clientName: client.businessName,
+      },
+      constraints: { maxCost: 0.005 },
     });
 
-    const raw = message.content[0].type === 'text' ? message.content[0].text : '[]';
-    const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+
+    const cleaned = result.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
     let results: unknown[];
     try {
       results = JSON.parse(cleaned);
     } catch {
       return NextResponse.json(
-        { error: 'Failed to parse AI response', raw },
+        { error: 'Failed to parse AI response', raw: result.content },
         { status: 500 }
       );
     }

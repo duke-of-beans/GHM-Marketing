@@ -1,37 +1,20 @@
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 PHASE 4 CONTINUATION - START HERE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GHM DASHBOARD — Session State (Feb 19, 2026 evening)
 
-COPY THIS PROMPT TO START NEXT SESSION:
+CANONICAL STATUS: STATUS.md (single source of truth)
 
-Continue Phase 4 Dashboard Enhancements for GHM Marketing Dashboard. 
+COMPLETED THIS SESSION:
+- BUG-002, BUG-003, BUG-004 all resolved
+- FEAT-003 My Tasks Widget shipped (API + component + both dashboards)
+- Website Studio P1-P5 verified complete
+- Domain Rating badge dark mode fix (lead-card.tsx)
+- All status files consolidated and cross-referenced
 
-**STATUS:**
-✅ COMPLETE: Option A (Enhanced filtering), Option B (First-time tutorial)
-⏳ PENDING: Options E → D → C → F (execute in this exact order)
+ACTIVE SPRINT IS CLEAR — all items done.
 
-**YOUR TASK:**
-Complete the remaining Phase 4 options in this sequence:
-1. E - Content Generation Workflows (AI-powered blog/social/meta content)
-2. D - Task Automation (auto-generate tasks, smart reminders, templates)
-3. C - Client Portal Improvements (dashboard enhancements, PDF reports, approvals)
-4. F - Performance Optimization (build time, queries, caching, bundle size)
+NEXT TIER (from STATUS.md):
+- Permission system Phase 4-5
+- Commission end-to-end test
+- Pipeline filter UX improvements
+- TeamFeed multimedia
 
-**CRITICAL INSTRUCTIONS:**
-- Read full specs in: D:\Work\SEO-Services\ghm-dashboard\PHASE4_CONTINUATION.md
-- Use frequent checkpoints (every 3-5 tool calls) to avoid crashes
-- Commit incrementally after EACH component (don't batch at end)
-- Fix ESLint errors immediately (escaped apostrophes, unused imports)
-- Test locally before pushing (catch errors early)
-- Start with Option E (Content Generation Workflows)
-
-**PROJECT PATH:**
-D:\Work\SEO-Services\ghm-dashboard
-
-**LAST COMMIT:**
-32c5126 - Add Phase 4 continuation handoff: E->D->C->F roadmap with detailed specs
-
-**START COMMAND:**
-Begin with Option E - Content Generation Workflows. Create the ClientContent database model first, then build the Content Studio UI component by component. Use the Anthropic API for AI generation. Checkpoint after each of the 4 components.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TypeScript: CLEAN (0 errors)

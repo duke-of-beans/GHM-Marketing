@@ -27,12 +27,17 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { UserPermissionCard } from "./UserPermissionCard";
+import { CompensationConfigSection } from "@/components/team/compensation-config";
+import { Separator } from "@/components/ui/separator";
+import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
+
+type AppRole = "admin" | "master" | "sales";
 
 interface User {
   id: number;
   name: string;
   email: string;
-  role: "master" | "sales";
+  role: AppRole;
   isActive: boolean;
   permissions: Record<string, boolean>;
   permissionPreset: string;
@@ -41,14 +46,14 @@ interface User {
 }
 
 interface TeamManagementTabProps {
-  currentUserRole?: "master" | "sales";
+  currentUserRole?: AppRole;
 }
 
 export function TeamManagementTab({ currentUserRole = "master" }: TeamManagementTabProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"all" | "master" | "sales">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | AppRole>("all");
   const [sortBy, setSortBy] = useState<"name" | "role" | "leads">("name");
   const [showInactive, setShowInactive] = useState(false);
 
@@ -91,6 +96,24 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
       loadUsers();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update permissions");
+    }
+  }
+
+  async function handleRoleChange(userId: number, role: AppRole) {
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update role");
+      }
+      toast.success(`Role updated to ${ROLE_LABELS[role]}`);
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update role");
     }
   }
 
@@ -140,7 +163,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
       const matchesSearch =
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesRole = roleFilter === "all" || user.role === roleFilter;
+      const matchesRole = roleFilter === "all" || user.role === (roleFilter as string);
       const matchesActive = showInactive ? true : user.isActive;
       return matchesSearch && matchesRole && matchesActive;
     })
@@ -148,7 +171,8 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "role") {
         if (a.role === b.role) return a.name.localeCompare(b.name);
-        return a.role === "master" ? -1 : 1;
+        const order: Record<string, number> = { admin: 0, master: 1, sales: 2 };
+        return (order[a.role] ?? 9) - (order[b.role] ?? 9);
       }
       if (sortBy === "leads") {
         return (b._count?.assignedLeads ?? 0) - (a._count?.assignedLeads ?? 0);
@@ -196,15 +220,18 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
           />
         </div>
         <div className="flex flex-wrap gap-3">
-          <Select value={roleFilter} onValueChange={(v: "all" | "master" | "sales") => setRoleFilter(v)}>
+          <Select value={roleFilter} onValueChange={(v: "all" | AppRole) => setRoleFilter(v)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="master">Master Only</SelectItem>
-              <SelectItem value="sales">Sales Only</SelectItem>
+              {currentUserRole === "admin" && (
+                <SelectItem value="admin">{ROLE_LABELS.admin} Only</SelectItem>
+              )}
+              <SelectItem value="master">{ROLE_LABELS.master} Only</SelectItem>
+              <SelectItem value="sales">{ROLE_LABELS.sales} Only</SelectItem>
             </SelectContent>
           </Select>
 
@@ -253,6 +280,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
               user={user}
               currentUserRole={currentUserRole}
               onUpdate={(updates) => handlePermissionUpdate(user.id, updates)}
+              onRoleChange={(role) => handleRoleChange(user.id, role)}
               onDeactivate={() => handleDeactivate(user.id)}
               onReactivate={() => handleReactivate(user.id)}
               onHardDelete={() => handleHardDelete(user.id)}
@@ -260,6 +288,18 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
           ))
         )}
       </div>
+
+      {/* Compensation Configuration — elevated users only */}
+      {isElevated(currentUserRole) && users.filter((u) => u.isActive).length > 0 && (
+        <>
+          <Separator />
+          <CompensationConfigSection
+            users={users
+              .filter((u) => u.isActive)
+              .map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role }))}
+          />
+        </>
+      )}
     </div>
   );
 }

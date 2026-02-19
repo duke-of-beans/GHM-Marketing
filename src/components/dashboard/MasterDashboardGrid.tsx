@@ -27,8 +27,9 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
     { i: "goals",         x: 8,  y: 3,  w: 4,  h: 7,  minW: 3, minH: 5 },
     { i: "pipeline",      x: 0,  y: 10, w: 6,  h: 10, minW: 3, minH: 7 },
     { i: "leaderboard",   x: 6,  y: 10, w: 6,  h: 10, minW: 3, minH: 7 },
-    { i: "mgmt-fees",     x: 0,  y: 20, w: 6,  h: 9,  minW: 4, minH: 7 },
-    { i: "profitability", x: 6,  y: 20, w: 6,  h: 9,  minW: 4, minH: 7 },
+    { i: "my-tasks",      x: 0,  y: 20, w: 6,  h: 9,  minW: 3, minH: 6 },
+    { i: "mgmt-fees",     x: 6,  y: 20, w: 6,  h: 9,  minW: 4, minH: 7 },
+    { i: "profitability", x: 0,  y: 29, w: 12, h: 9,  minW: 4, minH: 7 },
   ],
   md: [
     { i: "metrics",       x: 0, y: 0,  w: 10, h: 3,  minW: 6, minH: 3, maxH: 3 },
@@ -37,8 +38,9 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
     { i: "goals",         x: 7, y: 3,  w: 3,  h: 7,  minW: 3, minH: 5 },
     { i: "pipeline",      x: 0, y: 10, w: 5,  h: 10, minW: 3, minH: 7 },
     { i: "leaderboard",   x: 5, y: 10, w: 5,  h: 10, minW: 3, minH: 7 },
-    { i: "mgmt-fees",     x: 0, y: 20, w: 5,  h: 9,  minW: 3, minH: 7 },
-    { i: "profitability", x: 5, y: 20, w: 5,  h: 9,  minW: 4, minH: 7 },
+    { i: "my-tasks",      x: 0, y: 20, w: 5,  h: 9,  minW: 3, minH: 6 },
+    { i: "mgmt-fees",     x: 5, y: 20, w: 5,  h: 9,  minW: 3, minH: 7 },
+    { i: "profitability", x: 0, y: 29, w: 10, h: 9,  minW: 4, minH: 7 },
   ],
   sm: [
     { i: "metrics",       x: 0, y: 0,  w: 6, h: 5,  minH: 4 },
@@ -47,8 +49,9 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
     { i: "goals",         x: 0, y: 12, w: 6, h: 7,  minH: 5 },
     { i: "pipeline",      x: 0, y: 19, w: 6, h: 9,  minH: 7 },
     { i: "leaderboard",   x: 0, y: 28, w: 6, h: 9,  minH: 7 },
-    { i: "mgmt-fees",     x: 0, y: 37, w: 6, h: 9,  minH: 7 },
-    { i: "profitability", x: 0, y: 46, w: 6, h: 9,  minH: 7 },
+    { i: "my-tasks",      x: 0, y: 37, w: 6, h: 9,  minH: 6 },
+    { i: "mgmt-fees",     x: 0, y: 46, w: 6, h: 9,  minH: 7 },
+    { i: "profitability", x: 0, y: 55, w: 6, h: 9,  minH: 7 },
   ],
   xs: [
     { i: "metrics",       x: 0, y: 0,  w: 4, h: 6 },
@@ -57,8 +60,9 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
     { i: "goals",         x: 0, y: 20, w: 4, h: 7 },
     { i: "pipeline",      x: 0, y: 27, w: 4, h: 9 },
     { i: "leaderboard",   x: 0, y: 36, w: 4, h: 9 },
-    { i: "mgmt-fees",     x: 0, y: 45, w: 4, h: 9 },
-    { i: "profitability", x: 0, y: 54, w: 4, h: 9 },
+    { i: "my-tasks",      x: 0, y: 45, w: 4, h: 9 },
+    { i: "mgmt-fees",     x: 0, y: 54, w: 4, h: 9 },
+    { i: "profitability", x: 0, y: 63, w: 4, h: 9 },
   ],
 };
 

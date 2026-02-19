@@ -7,6 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { isElevated } from '@/lib/auth/session';
 import { 
   PERMISSION_PRESETS,
   PRESET_METADATA,
@@ -29,7 +30,7 @@ export async function GET() {
     }
     
     // Only masters can view preset configuration
-    if (user.role !== 'master') {
+    if (!isElevated(user.role)) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }

@@ -1,71 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
-export async function GET(request: NextRequest) {
+/**
+ * POST /api/bug-reports
+ * Submit a bug report or feature request. Any authenticated user.
+ */
+export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Only master users can view bug reports
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { role: true },
-    });
-
-    if (user?.role !== 'master') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const category = searchParams.get('category');
-
-    const bugs = await prisma.bugReport.findMany({
-      where: {
-        ...(status && { status }),
-        ...(category && { category }),
-      },
-      include: {
-        user: {
-          select: { name: true, email: true },
-        },
-      },
-      orderBy: [
-        { priority: 'desc' },
-        { createdAt: 'desc' },
-      ],
-      take: 100,
-    });
-
-    return NextResponse.json({ bugs });
-
-  } catch (error) {
-    console.error('Error fetching bug reports:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch bug reports' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
-    const body = await request.json();
-
+    const body = await req.json();
     const {
-      type,
+      type = "bug",
       title,
       description,
-      category,
-      severity,
-      pageUrl,
-      userAgent,
-      screenResolution,
+      category = "other",
+      severity = "medium",
+      pageUrl = "",
+      userAgent = "",
+      screenResolution = "",
       browserInfo,
       consoleErrors,
       networkErrors,
@@ -73,126 +30,92 @@ export async function POST(request: NextRequest) {
       sessionData,
     } = body;
 
-    const reportType = type === "feature" ? "feature" : "bug";
-
-    // Validate required fields
-    if (!title || !description) {
+    if (!title?.trim() || !description?.trim()) {
       return NextResponse.json(
-        { error: 'Title and description are required' },
+        { error: "Title and description are required" },
         { status: 400 }
       );
     }
 
-    // Get user info from session
-    let userId = null;
-    let userEmail = null;
-    let userName = null;
-    
-    if (session?.user?.email) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { id: true, name: true, email: true },
-      });
-      
-      if (user) {
-        userId = user.id;
-        userEmail = user.email;
-        userName = user.name;
-      }
-    }
-
-    // Auto-categorize if not provided
-    const autoCategory = category || detectCategory(pageUrl, description);
-
-    // Find David Kirsch's user ID (master user)
-    const davidKirsch = await prisma.user.findFirst({
-      where: { 
-        role: 'master',
-      },
-      select: { id: true },
-    });
-
-    // Create bug/feature report
-    const bugReport = await prisma.bugReport.create({
+    const report = await prisma.bugReport.create({
       data: {
-        type: reportType,
-        title,
-        description,
-        category: autoCategory,
-        severity: reportType === "bug" ? (severity || "medium") : "low",
-        status: "new",
-        priority: reportType === "feature" ? "medium" : determinePriority(severity, autoCategory),
-        
-        userId,
-        userEmail,
-        userName,
-        
-        pageUrl: pageUrl || 'unknown',
-        userAgent: userAgent || 'unknown',
-        screenResolution: screenResolution || 'unknown',
-        
-        browserInfo: browserInfo || {},
-        consoleErrors: consoleErrors || [],
-        networkErrors: networkErrors || [],
-        recentActions: recentActions || [],
-        sessionData: sessionData || {},
-        
-        assignedTo: davidKirsch?.id || null,
+        userId: parseInt(session.user.id),
+        userEmail: session.user.email ?? "",
+        userName: session.user.name ?? "",
+        type,
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        severity,
+        pageUrl,
+        userAgent,
+        screenResolution,
+        browserInfo: browserInfo ?? undefined,
+        consoleErrors: consoleErrors ?? undefined,
+        networkErrors: networkErrors ?? undefined,
+        recentActions: recentActions ?? undefined,
+        sessionData: sessionData ?? undefined,
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      bugReport: {
-        id: bugReport.id,
-        title: bugReport.title,
-        category: bugReport.category,
-      },
-    });
-
+    return NextResponse.json({ data: { id: report.id } }, { status: 201 });
   } catch (error) {
-    console.error('Error creating bug report:', error);
+    console.error("Bug report submission error:", error);
     return NextResponse.json(
-      { error: 'Failed to submit bug report' },
+      { error: "Failed to submit bug report" },
       { status: 500 }
     );
   }
 }
 
-// Helper: Auto-detect category based on URL and description
-function detectCategory(url: string, description: string): string {
-  const urlLower = url.toLowerCase();
-  const descLower = description.toLowerCase();
-  
-  if (urlLower.includes('/content') || descLower.includes('content') || descLower.includes('blog') || descLower.includes('social')) {
-    return 'content';
-  }
-  if (urlLower.includes('/compensation') || descLower.includes('commission') || descLower.includes('residual')) {
-    return 'compensation';
-  }
-  if (urlLower.includes('/scan') || descLower.includes('scan') || descLower.includes('competitive')) {
-    return 'scans';
-  }
-  if (urlLower.includes('/client') || descLower.includes('client profile')) {
-    return 'clients';
-  }
-  if (urlLower.includes('/lead') || descLower.includes('lead')) {
-    return 'leads';
-  }
-  if (descLower.includes('slow') || descLower.includes('performance') || descLower.includes('loading')) {
-    return 'performance';
-  }
-  if (descLower.includes('button') || descLower.includes('layout') || descLower.includes('display')) {
-    return 'ui';
-  }
-  
-  return 'other';
-}
+/**
+ * GET /api/bug-reports
+ * List bug reports. Admin only.
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-// Helper: Determine priority
-function determinePriority(severity: string | undefined, category: string): string {
-  if (severity === 'critical') return 'top';
-  if (severity === 'high') return 'high';
-  if (category === 'compensation' || category === 'clients') return 'high';
-  return 'high';
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(session.user.id) },
+      select: { role: true },
+    });
+
+    if (user?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { searchParams } = req.nextUrl;
+    const status = searchParams.get("status");
+    const type = searchParams.get("type");
+    const category = searchParams.get("category");
+    const severity = searchParams.get("severity");
+
+    const where: any = {};
+    if (status && status !== "all") where.status = status;
+    if (type && type !== "all") where.type = type;
+    if (category && category !== "all") where.category = category;
+    if (severity && severity !== "all") where.severity = severity;
+
+    const reports = await prisma.bugReport.findMany({
+      where,
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        assignee: { select: { id: true, name: true } },
+        resolver: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ data: reports });
+  } catch (error) {
+    console.error("Bug report list error:", error);
+    return NextResponse.json(
+      { error: "Failed to load bug reports" },
+      { status: 500 }
+    );
+  }
 }

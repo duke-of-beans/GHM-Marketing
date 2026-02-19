@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { updateTaskStatus } from "@/lib/db/clients";
 import type { SessionUser } from "@/lib/auth/session";
+import { isElevated } from "@/lib/auth/session";
 
 export async function PATCH(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function PATCH(
   }
 
   const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
+  if (!isElevated(user.role)) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 

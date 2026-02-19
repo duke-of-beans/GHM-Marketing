@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { bulkCreateLeads, type BulkLeadInput } from "@/lib/db/leads";
 import type { SessionUser } from "@/lib/auth/session";
+import { isElevated } from "@/lib/auth/session";
 import * as XLSX from "xlsx";
 
 // ============================================================================
@@ -201,8 +202,8 @@ export async function POST(request: NextRequest) {
   }
 
   const user = session.user as unknown as SessionUser;
-  if (user.role !== "master") {
-    return NextResponse.json({ success: false, error: "Only master users can import leads" }, { status: 403 });
+  if (!isElevated(user.role)) {
+    return NextResponse.json({ success: false, error: "Elevated access required to import leads" }, { status: 403 });
   }
 
   const formData = await request.formData();

@@ -133,8 +133,8 @@ export function getPreset(presetName: PermissionPreset): UserPermissions | null 
   return PERMISSION_PRESETS[presetName];
 }
 
-export function getDefaultPermissionsForRole(role: 'master' | 'sales'): UserPermissions {
-  return role === 'master' ? MASTER_FULL_PRESET : SALES_BASIC_PRESET;
+export function getDefaultPermissionsForRole(role: string): UserPermissions {
+  return (role === 'master' || role === 'admin') ? MASTER_FULL_PRESET : SALES_BASIC_PRESET;
 }
 
 export function matchesPreset(

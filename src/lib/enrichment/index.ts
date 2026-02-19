@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 
 // ============================================================================
 // Outscraper - Google My Business data (reviews, rating, hours, photos)
@@ -18,7 +19,11 @@ type OutscraperResult = {
   longitude: number;
 };
 
-async function fetchOutscraper(businessName: string, city: string, state: string): Promise<OutscraperResult | null> {
+async function fetchOutscraper(
+  businessName: string,
+  city: string,
+  state: string
+): Promise<OutscraperResult | null> {
   const apiKey = process.env.OUTSCRAPER_API_KEY;
   if (!apiKey) {
     console.warn("OUTSCRAPER_API_KEY not set, skipping GMB enrichment");
@@ -122,10 +127,10 @@ type PageSpeedResult = {
   accessibility_score: number;
   seo_score: number;
   best_practices_score: number;
-  fcp: number; // First Contentful Paint (ms)
-  lcp: number; // Largest Contentful Paint (ms)
-  cls: number; // Cumulative Layout Shift
-  tbt: number; // Total Blocking Time (ms)
+  fcp: number;
+  lcp: number;
+  cls: number;
+  tbt: number;
   speed_index: number;
 };
 
@@ -140,7 +145,7 @@ async function fetchPageSpeed(url: string): Promise<PageSpeedResult | null> {
     const target = url.startsWith("http") ? url : `https://${url}`;
     const res = await fetch(
       `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(target)}&strategy=mobile&key=${apiKey}`,
-      { signal: AbortSignal.timeout(30000) } // PageSpeed can be slow
+      { signal: AbortSignal.timeout(30000) }
     );
 
     if (!res.ok) {
@@ -170,7 +175,7 @@ async function fetchPageSpeed(url: string): Promise<PageSpeedResult | null> {
 }
 
 // ============================================================================
-// Enrichment Orchestrator - runs all providers, saves to competitive_intel
+// Enrichment Orchestrator
 // ============================================================================
 
 export type EnrichmentResult = {
@@ -179,9 +184,20 @@ export type EnrichmentResult = {
   ahrefs: AhrefsResult | null;
   pageSpeed: PageSpeedResult | null;
   errors: string[];
+  skipped?: boolean;
+  lastEnrichedAt?: Date | null;
 };
 
-export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
+// Leads enriched within this window are skipped unless force=true
+export const ENRICHMENT_COOLDOWN_DAYS = 7;
+
+// Approximate cost per enrichment call (Outscraper ~$0.005 + Ahrefs ~$0.02 + PageSpeed free)
+const COST_PER_ENRICHMENT = new Prisma.Decimal("0.025");
+
+export async function enrichLead(
+  leadId: number,
+  force = false
+): Promise<EnrichmentResult> {
   const lead = await prisma.lead.findUnique({
     where: { id: leadId },
     select: {
@@ -190,19 +206,35 @@ export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
       city: true,
       state: true,
       website: true,
+      intelLastUpdated: true,
     },
   });
 
-  if (!lead) {
-    throw new Error(`Lead ${leadId} not found`);
+  if (!lead) throw new Error(`Lead ${leadId} not found`);
+
+  // Duplicate-billing guard: skip if enriched recently (unless forced)
+  if (!force && lead.intelLastUpdated) {
+    const daysSince = (Date.now() - lead.intelLastUpdated.getTime()) / 86_400_000;
+    if (daysSince < ENRICHMENT_COOLDOWN_DAYS) {
+      return {
+        leadId,
+        outscraper: null,
+        ahrefs: null,
+        pageSpeed: null,
+        errors: [],
+        skipped: true,
+        lastEnrichedAt: lead.intelLastUpdated,
+      };
+    }
   }
 
   const errors: string[] = [];
 
-  // Run all enrichment providers in parallel
   const [outscraper, ahrefs, pageSpeed] = await Promise.allSettled([
     fetchOutscraper(lead.businessName, lead.city, lead.state),
-    lead.website ? fetchAhrefs(lead.website.replace(/^https?:\/\//, "").replace(/\/.*$/, "")) : Promise.resolve(null),
+    lead.website
+      ? fetchAhrefs(lead.website.replace(/^https?:\/\//, "").replace(/\/.*$/, ""))
+      : Promise.resolve(null),
     lead.website ? fetchPageSpeed(lead.website) : Promise.resolve(null),
   ]);
 
@@ -214,9 +246,19 @@ export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
   if (ahrefs.status === "rejected") errors.push(`Ahrefs: ${ahrefs.reason}`);
   if (pageSpeed.status === "rejected") errors.push(`PageSpeed: ${pageSpeed.reason}`);
 
-  // Upsert competitive intel record with actual schema fields
+  const now = new Date();
+
+  // Calculate cost based on which APIs actually fired
+  const cost = new Prisma.Decimal(
+    (outscraperData ? 0.005 : 0) +
+    (ahrefsData ? 0.02 : 0) +
+    (pageSpeedData ? 0 : 0) // PageSpeed is free
+  );
+
+  // Upsert competitive intel
   const intelData: Record<string, unknown> = {
-    fetchedAt: new Date(),
+    fetchedAt: now,
+    apiCosts: cost.greaterThan(0) ? cost : COST_PER_ENRICHMENT,
   };
 
   if (ahrefsData) {
@@ -224,15 +266,13 @@ export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
     intelData.currentRank = ahrefsData.ahrefs_rank;
     intelData.backlinks = ahrefsData.backlinks;
   }
-
   if (outscraperData) {
     intelData.reviewCount = outscraperData.reviews;
     intelData.reviewAvg = outscraperData.rating;
   }
-
   if (pageSpeedData) {
     intelData.siteSpeedMobile = pageSpeedData.performance_score;
-    intelData.siteSpeedDesktop = pageSpeedData.seo_score; // Using SEO score for desktop metric
+    intelData.siteSpeedDesktop = pageSpeedData.seo_score;
   }
 
   await prisma.competitiveIntel.upsert({
@@ -241,29 +281,25 @@ export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
     update: intelData,
   });
 
-  // Update lead's SEO fields from enrichment data
-  const leadUpdate: Record<string, unknown> = {};
+  // Update lead fields + stamp intelLastUpdated
+  const leadUpdate: Record<string, unknown> = {
+    intelLastUpdated: now,
+    intelNeedsRefresh: false,
+  };
 
   if (ahrefsData) {
     leadUpdate.domainRating = ahrefsData.domain_rating;
     leadUpdate.currentRank = ahrefsData.ahrefs_rank;
   }
-
   if (outscraperData) {
     leadUpdate.reviewCount = outscraperData.reviews;
     leadUpdate.reviewAvg = outscraperData.rating;
-    // Backfill website if missing
     if (!lead.website && outscraperData.site) {
       leadUpdate.website = outscraperData.site;
     }
   }
 
-  if (Object.keys(leadUpdate).length > 0) {
-    await prisma.lead.update({
-      where: { id: leadId },
-      data: leadUpdate,
-    });
-  }
+  await prisma.lead.update({ where: { id: leadId }, data: leadUpdate });
 
   return {
     leadId,
@@ -271,30 +307,44 @@ export async function enrichLead(leadId: number): Promise<EnrichmentResult> {
     ahrefs: ahrefsData,
     pageSpeed: pageSpeedData,
     errors,
+    lastEnrichedAt: now,
   };
 }
 
 // ============================================================================
-// Batch Enrichment - process multiple leads with rate limiting
+// Batch Enrichment - respects cooldown, reports skips
 // ============================================================================
+
+export type BatchEnrichmentResult = {
+  results: EnrichmentResult[];
+  summary: {
+    total: number;
+    enriched: number;
+    skipped: number;
+    errors: number;
+    providers: { outscraper: number; ahrefs: number; pageSpeed: number };
+  };
+};
 
 export async function enrichLeadsBatch(
   leadIds: number[],
+  force = false,
   onProgress?: (completed: number, total: number) => void
-): Promise<EnrichmentResult[]> {
+): Promise<BatchEnrichmentResult> {
   const results: EnrichmentResult[] = [];
-  const batchSize = 3; // Concurrent limit to respect API rate limits
+  const batchSize = 3;
 
   for (let i = 0; i < leadIds.length; i += batchSize) {
     const batch = leadIds.slice(i, i + batchSize);
     const batchResults = await Promise.all(
       batch.map((id) =>
-        enrichLead(id).catch((err) => ({
+        enrichLead(id, force).catch((err) => ({
           leadId: id,
           outscraper: null,
           ahrefs: null,
           pageSpeed: null,
           errors: [String(err)],
+          skipped: false,
         }))
       )
     );
@@ -302,11 +352,22 @@ export async function enrichLeadsBatch(
     results.push(...batchResults);
     onProgress?.(results.length, leadIds.length);
 
-    // Rate limiting pause between batches
     if (i + batchSize < leadIds.length) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
-  return results;
+  const summary = {
+    total: results.length,
+    enriched: results.filter((r) => !r.skipped && r.errors.length === 0).length,
+    skipped: results.filter((r) => r.skipped).length,
+    errors: results.filter((r) => r.errors.length > 0).length,
+    providers: {
+      outscraper: results.filter((r) => r.outscraper !== null).length,
+      ahrefs: results.filter((r) => r.ahrefs !== null).length,
+      pageSpeed: results.filter((r) => r.pageSpeed !== null).length,
+    },
+  };
+
+  return { results, summary };
 }

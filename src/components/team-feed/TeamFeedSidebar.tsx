@@ -72,7 +72,10 @@ function priorityBadge(priority: string) {
 
 function audienceLabel(msg: TeamMessageData) {
   if (msg.audienceType === "user" && msg.recipient) return `→ ${msg.recipient.name}`;
-  if (msg.audienceType === "role") return `→ All ${msg.audienceValue}s`;
+  if (msg.audienceType === "role" && msg.audienceValue) {
+    const labels: Record<string, string> = { admin: "Admins", master: "Managers", sales: "Sales Reps" };
+    return `→ All ${labels[msg.audienceValue] ?? msg.audienceValue}`;
+  }
   return "→ Everyone";
 }
 
@@ -157,7 +160,7 @@ function ComposeBox({
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p className="text-xs font-medium">Who sees this?</p>
-                <p className="text-muted-foreground text-xs mt-0.5">Everyone · By role (masters/sales) · Direct (one person)</p>
+                <p className="text-muted-foreground text-xs mt-0.5">Everyone · By role (managers/sales) · Direct (one person)</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -165,8 +168,8 @@ function ComposeBox({
             <Select value={audienceValue} onValueChange={setAudienceValue}>
               <SelectTrigger className="h-7 w-24 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="master">Masters</SelectItem>
-                <SelectItem value="sales">Sales reps</SelectItem>
+                <SelectItem value="master">Managers</SelectItem>
+                <SelectItem value="sales">Sales Reps</SelectItem>
               </SelectContent>
             </Select>
           )}

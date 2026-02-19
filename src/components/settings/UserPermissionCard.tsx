@@ -29,14 +29,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PermissionEditor } from "./PermissionEditor";
 import { PresetSelector } from "./PresetSelector";
+import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
+
+type AppRole = "admin" | "master" | "sales";
 
 interface User {
   id: number;
   name: string;
   email: string;
-  role: "master" | "sales";
+  role: AppRole;
   isActive: boolean;
   permissions: Record<string, boolean>;
   permissionPreset: string;
@@ -46,11 +56,12 @@ interface User {
 
 interface UserPermissionCardProps {
   user: User;
-  currentUserRole: "master" | "sales";
+  currentUserRole: AppRole;
   onUpdate: (updates: {
     permissionPreset?: string;
     permissions?: Record<string, boolean>;
   }) => void;
+  onRoleChange: (role: AppRole) => void;
   onDeactivate: () => void;
   onReactivate: () => void;
   onHardDelete: () => void;
@@ -60,6 +71,7 @@ export function UserPermissionCard({
   user,
   currentUserRole,
   onUpdate,
+  onRoleChange,
   onDeactivate,
   onReactivate,
   onHardDelete,
@@ -69,14 +81,21 @@ export function UserPermissionCard({
   const [hardDeleteDialogOpen, setHardDeleteDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
 
-  const isMaster = currentUserRole === "master";
+  const viewerIsElevated = isElevated(currentUserRole);
+  const viewerIsAdmin = currentUserRole === "admin";
   const hasActiveRecords =
     (user._count?.assignedLeads ?? 0) > 0 || (user._count?.salesRepClients ?? 0) > 0;
 
-  const roleColor =
-    user.role === "master"
-      ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-      : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+  const roleColors: Record<AppRole, string> = {
+    admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    master: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    sales: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  };
+
+  // Roles the current viewer is allowed to assign
+  const assignableRoles: AppRole[] = viewerIsAdmin
+    ? ["admin", "master", "sales"]
+    : ["master", "sales"];
 
   return (
     <>
@@ -96,8 +115,8 @@ export function UserPermissionCard({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold text-lg">{user.name}</h3>
-                  <Badge className={roleColor}>
-                    {user.role === "master" ? "Master" : "Sales Rep"}
+                  <Badge className={roleColors[user.role]}>
+                    {ROLE_LABELS[user.role]}
                   </Badge>
                   {!user.isActive && (
                     <Badge variant="outline" className="text-xs text-muted-foreground border-dashed">
@@ -129,6 +148,25 @@ export function UserPermissionCard({
             </div>
 
             <div className="flex items-center gap-1 ml-2 shrink-0">
+              {/* Role selector — elevated viewers only */}
+              {viewerIsElevated && user.isActive && (
+                <Select
+                  value={user.role}
+                  onValueChange={(v) => onRoleChange(v as AppRole)}
+                >
+                  <SelectTrigger className="w-[130px] h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {assignableRoles.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {ROLE_LABELS[r]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
               {/* Deactivate / Reactivate */}
               {user.isActive ? (
                 <Button
@@ -152,8 +190,8 @@ export function UserPermissionCard({
                 </Button>
               )}
 
-              {/* Hard delete — masters only, only on inactive users */}
-              {isMaster && !user.isActive && (
+              {/* Hard delete — elevated users only, only on inactive */}
+              {viewerIsElevated && !user.isActive && (
                 <Button
                   variant="ghost"
                   size="sm"

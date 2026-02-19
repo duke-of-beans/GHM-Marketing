@@ -3,9 +3,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
+import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -17,11 +18,12 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "territories", "permissions", "audit"];
+const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const currentUserRole = (session?.user as any)?.role ?? "master";
+  const isAdmin = currentUserRole === "admin";
   const [activeTab, setActiveTab] = useState("general");
 
   useEffect(() => {
@@ -59,6 +61,11 @@ export default function SettingsPage() {
           <TabsTrigger value="audit" className="gap-1.5">
             <FileText className="h-4 w-4" />Audit Log
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="bugs" className="gap-1.5">
+              <Bug className="h-4 w-4" />Bug Reports
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="general">
@@ -114,6 +121,12 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="bugs">
+            <BugReportsTab />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

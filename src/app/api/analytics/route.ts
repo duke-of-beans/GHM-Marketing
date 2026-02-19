@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { territoryFilter } from "@/lib/auth/session";
+import { territoryFilter, isElevated } from "@/lib/auth/session";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   }));
 
   // 2. Leads created over time (daily)
-  const leadsOverTimeQuery = user.role !== "master" && user.territoryId
+  const leadsOverTimeQuery = !isElevated(user.role) && user.territoryId
     ? prisma.$queryRaw<{ date: string; count: bigint }[]>`
         SELECT DATE(created_at) as date, COUNT(*) as count 
         FROM leads 

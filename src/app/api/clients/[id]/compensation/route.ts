@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { isElevated } from "@/lib/auth/session";
 
 // ============================================================================
 // VALIDATION SCHEMA
@@ -101,7 +102,7 @@ export async function PUT(
 ) {
   try {
     const session = await auth();
-    if (!session?.user || session.user.role !== "master") {
+    if (!session?.user || !isElevated(session.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

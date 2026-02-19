@@ -79,9 +79,16 @@ function priorityBadge(priority: string) {
   return null;
 }
 
+const AUDIENCE_ROLE_LABELS: Record<string, string> = {
+  admin: "Admins",
+  master: "Managers",
+  sales: "Sales Reps",
+};
+
 function audienceLabel(msg: TeamMessageData) {
   if (msg.audienceType === "user" && msg.recipient) return `→ ${msg.recipient.name}`;
-  if (msg.audienceType === "role") return `→ All ${msg.audienceValue}s`;
+  if (msg.audienceType === "role" && msg.audienceValue)
+    return `→ All ${AUDIENCE_ROLE_LABELS[msg.audienceValue] ?? msg.audienceValue}`;
   return "→ Everyone";
 }
 
@@ -168,7 +175,7 @@ function ComposeMessage({
               </TooltipTrigger>
               <TooltipContent side="top">
                 <p className="font-medium text-xs">Who sees this message?</p>
-                <p className="text-muted-foreground text-xs mt-0.5">Everyone = all team • By role = masters or sales • Direct = one person</p>
+                <p className="text-muted-foreground text-xs mt-0.5">Everyone = all team • By role = managers or sales • Direct = one person</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -176,8 +183,8 @@ function ComposeMessage({
             <Select value={audienceValue} onValueChange={setAudienceValue}>
               <SelectTrigger className="h-7 w-28 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="master">Masters</SelectItem>
-                <SelectItem value="sales">Sales reps</SelectItem>
+                <SelectItem value="master">Managers</SelectItem>
+                <SelectItem value="sales">Sales Reps</SelectItem>
               </SelectContent>
             </Select>
           )}

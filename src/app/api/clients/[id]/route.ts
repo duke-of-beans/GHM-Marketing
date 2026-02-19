@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import { calculateCommission, getFirstDayOfMonth } from '@/lib/payments/calculations';
 
 // Validation schema for edit request
 const editClientSchema = z.object({
@@ -107,6 +108,72 @@ export async function PATCH(
         where: { id: clientId },
         data: clientUpdates,
       });
+
+      // Commission trigger: fire one-time commission when client first goes active
+      const isNewlyActive =
+        clientUpdates.status === 'active' &&
+        existingClient.status !== 'active';
+
+      if (isNewlyActive && existingClient.salesRepId) {
+        try {
+          const salesConfig = await prisma.userCompensationConfig.findUnique({
+            where: { userId: existingClient.salesRepId },
+          });
+          const override = await prisma.clientCompensationOverride.findUnique({
+            where: {
+              clientId_userId: {
+                clientId,
+                userId: existingClient.salesRepId,
+              },
+            },
+          });
+
+          if (salesConfig) {
+            const updatedClient = {
+              ...existingClient,
+              status: 'active',
+              onboardedMonth: existingClient.onboardedMonth ?? getFirstDayOfMonth(),
+            };
+            const commission = calculateCommission(salesConfig, override ?? null, updatedClient);
+
+            if (commission.shouldPay) {
+              // Idempotency check — don't double-create if re-activated
+              const alreadyExists = await prisma.paymentTransaction.findFirst({
+                where: {
+                  clientId,
+                  userId: existingClient.salesRepId,
+                  type: 'commission',
+                },
+              });
+
+              if (!alreadyExists) {
+                await prisma.paymentTransaction.create({
+                  data: {
+                    clientId,
+                    userId: existingClient.salesRepId,
+                    type: 'commission',
+                    amount: commission.amount,
+                    month: getFirstDayOfMonth(),
+                    status: 'pending',
+                    notes: commission.reason,
+                  },
+                });
+
+                // Stamp onboardedMonth if not already set
+                if (!existingClient.onboardedMonth) {
+                  await prisma.clientProfile.update({
+                    where: { id: clientId },
+                    data: { onboardedMonth: getFirstDayOfMonth() },
+                  });
+                }
+              }
+            }
+          }
+        } catch (commissionError) {
+          // Non-fatal: log and continue — client update already succeeded
+          console.error('[clients PATCH] Commission trigger failed:', commissionError);
+        }
+      }
     }
 
     // Create audit trail (system note) if changes were made

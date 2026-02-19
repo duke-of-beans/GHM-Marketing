@@ -4,11 +4,12 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { createAuditLog } from "@/lib/audit-log";
+import { isElevated } from "@/lib/auth/session";
 
 const updateUserSchema = z.object({
   email: z.string().email().optional(),
   name: z.string().min(1).max(100).optional(),
-  role: z.enum(["master", "sales"]).optional(),
+  role: z.enum(["admin", "master", "sales"]).optional(),
   territoryId: z.number().int().positive().nullable().optional(),
   password: z.string().min(8).optional(),
   isActive: z.boolean().optional(),
@@ -106,9 +107,9 @@ export async function DELETE(
   const permanent = req.nextUrl.searchParams.get("permanent") === "true";
 
   // Hard delete: masters only
-  if (permanent && currentUser.role !== "master") {
+  if (permanent && !isElevated(currentUser.role)) {
     return NextResponse.json(
-      { success: false, error: "Only master users can permanently delete accounts" },
+      { success: false, error: "Only elevated users can permanently delete accounts" },
       { status: 403 }
     );
   }

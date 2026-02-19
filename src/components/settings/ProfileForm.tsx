@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Save, KeyRound, User } from "lucide-react";
 import { toast } from "sonner";
+import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
+import type { AppRole } from "@/lib/auth/roles";
 
 type ProfileData = {
   id: number;
@@ -37,6 +39,13 @@ export function ProfileForm() {
 
   useEffect(() => {
     loadProfile();
+  }, []);
+
+  // Re-fetch profile when tab regains focus (catches role changes made elsewhere)
+  useEffect(() => {
+    function onFocus() { loadProfile(); }
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   async function loadProfile() {
@@ -144,8 +153,8 @@ export function ProfileForm() {
               <CardDescription>Update your name and email address</CardDescription>
             </div>
             <div className="flex flex-col items-end gap-1">
-              <Badge variant={profile.role === "master" ? "default" : "secondary"}>
-                {profile.role === "master" ? "Master" : "Sales Rep"}
+              <Badge variant={isElevated(profile.role) ? "default" : "secondary"}>
+                {ROLE_LABELS[profile.role as AppRole] ?? profile.role}
               </Badge>
               {profile.territory && (
                 <span className="text-xs text-muted-foreground">

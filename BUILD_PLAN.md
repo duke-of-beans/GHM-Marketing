@@ -1,4 +1,6 @@
 # GHM DASHBOARD - MASTER BUILD PLAN
+> ⚠️ **Current status lives in `STATUS.md`** — This file contains confirmed decisions, specs, and architecture. For what's done vs what's next, read STATUS.md.
+
 **Project:** GHM Dashboard - SEO Services Platform  
 **Date:** February 17, 2026  
 **Status:** Active Development
@@ -211,6 +213,52 @@ Low Impact  │                  │
 - ✅ Quick win (Edit Client - doing now)
 - 🔴 Strategic investment (Commission, Website - high value)
 - ⚪ Nice to have (SENTRY, Enrichment - optimize later)
+
+---
+
+---
+
+## Phase 12: Commission System — Transaction Engine ✅
+
+**Session:** Feb 2026
+**Status:** Complete — TypeScript clean, zero new errors
+
+### What Was Missing
+
+The commission system had complete schema, calculation engine, 3 payment read APIs, and all dashboard widgets — but no mechanism to actually *create* transactions. Every widget was reading from a table that could never have rows in it.
+
+Three pieces were missing in dependency order:
+
+**1. Monthly cron job** (`src/app/api/cron/generate-payments/route.ts`)
+- Runs 1st of every month at 12:01 AM UTC (vercel.json updated)
+- Fetches all active clients + compensation configs in two queries
+- Idempotency check via Set: skips `clientId-userId-type` combos already created this month
+- Generates residuals (salesRepId + config + month eligibility check)
+- Generates master fees (masterManagerId + config + non-owner check)
+- Batch insert via `createMany` — atomic, safe to re-run
+- Returns `{ created, skipped, clientsProcessed, duration }` for observability
+
+**2. CompensationConfigSection wired into TeamManagementTab**
+- Component existed but was never mounted
+- Added import + `Separator` import to `TeamManagementTab.tsx`
+- Mounted below user list, master-role-only, passes active users filtered from existing state
+- Admins can now set per-user commission/residual/master-fee config before the cron fires
+
+**3. Commission trigger on client onboard** (clients `[id]/route.ts`)
+- Detects `status → "active"` transition in the existing PATCH handler
+- Fires a one-time commission transaction for the salesRep immediately
+- Idempotency check: skips if a commission already exists for that client (handles re-activation)
+- Auto-stamps `onboardedMonth` on ClientProfile if not already set (residual eligibility depends on it)
+- Non-fatal: commission failure logs and continues — the client update already succeeded
+
+### Files Changed
+
+| File | Change |
+|---|---|
+| `src/app/api/cron/generate-payments/route.ts` | NEW — monthly payment generation cron |
+| `vercel.json` | Added `generate-payments` cron schedule (`1 0 1 * *`) |
+| `src/components/settings/TeamManagementTab.tsx` | Mounted `CompensationConfigSection` below user list |
+| `src/app/api/clients/[id]/route.ts` | Added commission trigger on status → active transition |
 
 ---
 
@@ -467,3 +515,198 @@ When resuming work, check:
 **Status:** All decisions made, ready to execute  
 **Last Updated:** February 17, 2026  
 **Next Action:** Finish Edit Client Details integration (3 lines of code)
+
+
+---
+
+## 🏗️ WEBSITE STUDIO — BUILD STATUS (Added Feb 18, 2026)
+
+### Foundation Complete ✅
+All layers built and build passing (exit code 0, zero new TS errors).
+
+**Types:** `src/types/website-studio.ts` — all entities typed (WebProperty, DnaCapture, DnaTokenOverride, BuildJob, ComposerPage, ScrvnrGateResult, matrix types, adapter contract)
+
+**Schema:** 6 Prisma models added, `db push` applied, client regenerated
+- WebProperty, DnaCapture, DnaTokenOverride, BuildJob, ComposerPage, ScrvnrGateResult
+- `webProperties` relation added to ClientProfile
+
+**DB lib:** `src/lib/db/website-studio.ts`
+- getWebPropertyMatrix, getWebProperty, createWebProperty
+- getActiveDnaCapture, createDnaCapture, addDnaTokenOverride
+- getActiveBuildJob, getAllBuildJobs, createBuildJob, updateBuildJobStage, updateBuildJobPageCounts
+- getComposerPages, getComposerPage, createComposerPages, updatePageSections, updatePageScrvnrStatus, updatePageReviewStatus
+- recordScrvnrResult, getScrvnrHistory
+
+**API routes:**
+- `GET/POST /api/website-studio/[clientId]` — matrix + build queue, scaffold new property
+- `POST /api/website-studio/[clientId]/scrvnr` — run SCRVNR gate (Python subprocess)
+- `GET/PATCH /api/website-studio/[clientId]/pages/[pageId]` — sections + review status
+- `GET/POST/PATCH /api/website-studio/[clientId]/dna` — DNA captures + token overrides
+
+**Python:** `scrvnr/ws_gate_runner.py` — stdin/stdout subprocess bridge to SCRVNR adapter
+
+**UI components** (`src/components/clients/website-studio/`):
+- `WebsiteStudioTab.tsx` — orchestrator, matrix/composer view switcher
+- `PropertyMatrix.tsx` — tier-colored grid, gap cells, status dots, progress bars
+- `BuildQueue.tsx` — active jobs with stage indicators
+- `NewPropertyModal.tsx` — 2-step tier selector → config form
+- `PageComposer.tsx` — section editor, debounced autosave, inline SCRVNR feedback, gate badge, override prompt
+
+**Profile integration:** "Website Studio" tab added to client profile between Content Studio and Reports.
+
+---
+
+### Website Studio — Remaining Build Items ⏳
+
+**Priority 1 — Deploy Button**
+- UI: Button in PageComposer toolbar (enabled when all pages approved)
+- Calls Vercel API via existing Vercel MCP or direct REST
+- Updates `deployStatus`, `lastDeployedAt`, `vercelProjectId` on WebProperty
+- Shows deploy error if Vercel fails
+
+**Priority 2 — Verify `check_section` on adapter**
+- `website_studio_adapter.py` needs a `check_section(property_slug, section_name, text, override, override_note)` method
+- SCRVNR API route calls it for live single-section debounce checks
+- Confirm signature matches or add the method
+
+**Priority 3 — DNA Lab UI**
+- API routes exist (`/api/website-studio/[clientId]/dna`)
+- DB functions exist
+- Need: URL input → scrape → extract → token review panel → save capture
+- Override panel: per-token Accept/Override/Recapture/Lock with required note
+- Token confidence badges (high/medium/low)
+
+**Priority 4 — Live Sites Panel**
+- Status board: all live WebProperties across all clients
+- Staleness alerts (lastDeployedAt > threshold)
+- SSL expiry warnings
+- Basic traffic data column (Vercel analytics or placeholder)
+
+**Priority 5 — PageComposer data fetch efficiency**
+- Currently re-fetches the main studio endpoint to find job+pages
+- Should have a dedicated `GET /api/website-studio/[clientId]/jobs/[jobId]` route
+- Prevents fragile dependency on buildJobs array population
+
+---
+
+## 🐛 BUG BACKLOG & FEATURE REQUESTS (Added Feb 18, 2026)
+
+### Bugs — Fix Priority
+
+**BUG-001: Account type badge doesn't update in My Profile after role change**
+- Changing user from sales → master updates DB but badge in profile tab still shows "Sales Rep"
+- Needs: global role refresh (likely re-fetch session or invalidate auth cache after role update)
+- Affects: all role-based badging, not just profile tab
+- Priority: HIGH
+
+**BUG-002: Login page renders incorrectly in dark mode after logout**
+- Login page should always be light mode regardless of system preference
+- Fix: Force `light` class on login page layout, clear any dark mode cache on auth logout
+- Priority: MEDIUM
+
+**BUG-003: Help button misaligned in left nav panel**
+- Slightly off-axis vs other nav items (text + icon baseline misalignment)
+- Priority: LOW (polish)
+
+**BUG-004: Sales pipeline status badge colors broken in dark mode**
+- Available, Scheduled, Contacted, Follow Up, Paperwork colors are unreadable in dark
+- Need dark-mode-specific color overrides in LEAD_STATUS_CONFIG or via Tailwind dark: variants
+- Priority: MEDIUM
+
+### Features — Build Priority
+
+**FEAT-001: Admin account tier (above Master/Manager)**
+- New role: `admin` — sits above current "master" role
+- Current "master" → rename to `manager`
+- Hierarchy: admin > manager > sales
+- Admin = David only (initially), sees everything, all clients, all financials
+- Needs: schema enum update, all role checks updated globally, nav + badge coherence
+
+**FEAT-002: Bug report + feature request visibility for Admin**
+- Bug reports and feature request submissions currently go nowhere visible
+- Build: Admin-only ticket queue (separate from bug tracking used internally)
+- Show: ticket type, submitter, date, description, status
+- Allow Admin to update ticket status (open → in progress → resolved → closed)
+- Notify submitting user of status change (in-app notification or email)
+- Priority: HIGH — currently David can't see user-submitted issues
+
+**FEAT-003: My Tasks widget on dashboard, personalized by account type**
+- Widget shows tasks relevant to logged-in user's role
+- Sales: their assigned leads + follow-up reminders
+- Manager: team task overview + overdue items
+- Admin: platform-wide queue + any flagged items
+- Should respect existing dashboard layout personalization system
+
+
+
+---
+
+## Phase 11: AI Client Layer ✅
+
+**Session:** Feb 2026
+**Status:** Complete — TypeScript clean, schema migrated, zero new errors
+
+### Architecture
+
+Extracted and reshaped from GREGORE's orchestration engine. GHM AI layer lives at `src/lib/ai/`.
+
+**Files:**
+
+| File | Origin | Change |
+|---|---|---|
+| `router/types.ts` | GREGORE types.ts | Extended: GHM domains (seo, copywriting, competitive), GHM intents (website_copy, brief_generation, scrvnr_eval), FeatureContext + CostRecord |
+| `router/model-benchmarks.ts` | GREGORE model-benchmarks.ts | Updated model IDs + pricing to current Anthropic API (Feb 2026) |
+| `router/complexity-analyzer.ts` | GREGORE complexity-analyzer.ts | GHM domains + intents added to detection; core 4-factor weighted scoring preserved |
+| `router/model-router.ts` | GREGORE model-router.ts | Free Energy = Uncertainty × Cost preserved; Tribunal/Parallel strategies removed; returns flat RouterOutput (no Result<T> wrapper) |
+| `cost-tracker.ts` | GREGORE metabolism-engine.ts | "Cognitive tokens" abstraction removed; stateless DB writes via Prisma; per-client/per-feature USD analytics |
+| `context/system-prompt-builder.ts` | NEW | Feature-specific protocol scaffolding for all 5 AI features |
+| `client.ts` | NEW | Unified entry point: routing → prompt assembly → API call → cascade retry → cost logging |
+| `index.ts` | NEW | Clean public exports |
+
+**Left behind from GREGORE:** `WorkingSet` (stateful in-memory attention model), `homeostasis/`, `self-model/`, `world/` — GREGORE identity layer, wrong shape for stateless API routes.
+
+### How It Works
+
+Every AI call in the dashboard goes through `callAI()`:
+1. Query is classified (complexity + intent + domain via ComplexityAnalyzer)
+2. Model router picks optimal model using Free Energy minimization
+3. System prompt is assembled for the specific feature + client context
+4. Anthropic API is called
+5. If `cascade` strategy and response is malformed JSON → auto-escalate to Opus
+6. Cost recorded to `AICostLog` table (non-blocking, fire-and-forget)
+
+### Usage Pattern
+
+```typescript
+import { callAI } from "@/lib/ai";
+
+const result = await callAI({
+  feature: "content_brief",
+  prompt: userInstruction,
+  context: {
+    feature: "content_brief",
+    clientId: client.id,
+    clientName: client.businessName,
+    industry: client.industry,
+    taskContext: { title, category, targetKeywords },
+  },
+});
+
+if (result.ok) {
+  const brief = JSON.parse(result.content);
+}
+```
+
+### Database
+
+New table: `ai_cost_logs` — append-only log of all AI calls.
+Fields: feature, clientId, modelId, inputTokens, outputTokens, costUSD, estimatedCostUSD, latencyMs, qualityScore.
+Indexed on clientId, feature, timestamp.
+
+### Next Steps for AI Layer
+
+- **Migrate existing content brief API** — replace direct Anthropic call with `callAI()` (10-minute job)
+- **Wire Website Studio PageComposer SCRVNR** — already calls `/api/website-studio/[clientId]/scrvnr`; that route needs to use `callAI({ feature: "scrvnr_gate" })`
+- **Voice profile injection** — `buildSystemPrompt()` accepts `voiceProfileSlug` but doesn't yet fetch/inject the actual profile tokens; wire to DnaCapture when DNA Lab UI is built
+- **Performance history** — `ModelRouter` accepts `ModelPerformance[]` but nothing feeds it yet; once cost logs accumulate, query them and pass in for better routing
+- **Admin cost analytics view** — `getCostByClient()` and `getCostByFeature()` are ready; just needs a UI panel

@@ -2,7 +2,43 @@
 
 All notable changes to the GHM Dashboard project.
 
-## [2.0.0] - 2026-02-17
+## [Unreleased] - 2026-02-18
+
+### Lead Enrichment — Duplicate Detection
+
+- 7-day cooldown (`ENRICHMENT_COOLDOWN_DAYS`) prevents re-billing recently enriched leads
+- `enrichLead(leadId, force)` returns `{ skipped: true }` if enriched within window unless `force=true`
+- API returns 409 with `code: "RECENTLY_ENRICHED"`, `lastEnrichedAt`, `cooldownDays`
+- Batch enrichment returns `{ enriched, skipped, errors }` summary counts
+- UI: single-lead button shows "Force Re-enrich" toast action on 409
+- UI: batch button surfaces skip count in confirmation toast
+
+### FEAT-001: Admin Role Tier
+
+- Added `admin` to `UserRole` enum in Prisma schema; `db push` applied
+- Role hierarchy: `admin` > `master` > `sales`
+- `src/lib/auth/session.ts`:
+  - `isElevated(role)` — returns true for `admin | master`
+  - `requireAdmin()` — admin-only gate with redirect
+  - `ROLE_LABELS` — maps enum values to display strings (Admin / Manager / Sales Rep)
+  - `requireMaster()` and `territoryFilter()` updated to use `isElevated()`
+- `src/lib/permissions/checker.ts`:
+  - `isMaster()` now calls `isElevated()` for backward compatibility
+  - `isAdmin()` added for owner-level checks
+- `src/lib/permissions/types.ts`: `UserWithPermissions.role` widened to `'admin' | 'master' | 'sales'`
+- `src/lib/permissions/presets.ts`: `getDefaultPermissionsForRole()` signature widened to `string`
+- `src/lib/auth/permissions.ts`: all three redirect checks updated to `isElevated()`
+- 17 API gate checks across 9 route files updated from `role !== "master"` to `!isElevated(role)`
+- `PATCH /api/users/[id]`: `updateUserSchema` now accepts `"admin"` as assignable role value
+- `scripts/make-admin.ts`: bootstrap script for first admin promotion via `npx tsx`
+- TypeScript: 0 errors
+
+**Pending (next session):**
+- Privilege escalation guard in PATCH /api/users/[id] (if body.role === "admin", require requester to be admin)
+- UI role dropdown: conditionally show "Admin" option only for admin viewers
+- UI role badges: use ROLE_LABELS everywhere instead of hardcoded strings
+
+
 
 ### 🚀 Major Feature Sprint - 13 Features Complete
 

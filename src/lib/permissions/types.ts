@@ -198,7 +198,7 @@ export function isUserPermissions(obj: unknown): obj is UserPermissions {
  */
 export interface UserWithPermissions {
   id: number;
-  role: 'master' | 'sales';
+  role: 'admin' | 'master' | 'sales';
   permissions: UserPermissions;
   permissionPreset: PermissionPreset;
 }

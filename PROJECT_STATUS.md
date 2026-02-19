@@ -1,6 +1,7 @@
 # GHM Marketing Dashboard - Project Status
+> ⚠️ **ARCHIVED** — Current status lives in `STATUS.md`. This file is kept for historical reference only.
 
-**Last Updated:** February 16, 2026 - 5:00 PM PST
+**Last Updated:** February 18, 2026
 
 ## 🎉 **ALL 9 PHASES COMPLETE** 🎉
 
@@ -734,3 +735,46 @@ A complete, enterprise-grade B2B SaaS platform for SEO agencies with:
 **Production Status:** ✅ LIVE & OPERATIONAL  
 **Technical Debt:** ⚪ ZERO  
 **Next Action:** 🚀 DEPLOY, SCALE, WIN
+
+
+---
+
+## 🏗️ PHASE 10: WEBSITE STUDIO (IN PROGRESS — Feb 18, 2026)
+
+**Status:** Foundation complete, core flow functional, not yet production-ready
+
+### What's Built:
+- ✅ Full type system (`src/types/website-studio.ts`)
+- ✅ Prisma schema (6 models), db pushed
+- ✅ DB lib (all CRUD functions)
+- ✅ API layer (4 route groups)
+- ✅ SCRVNR Python subprocess bridge
+- ✅ UI: PropertyMatrix, BuildQueue, NewPropertyModal, PageComposer
+- ✅ Tab wired into ClientProfile ("Website Studio" between Content Studio and Reports)
+- ✅ Build passes, zero new TS errors
+
+### What's Remaining:
+- ⏳ Deploy button (Vercel API integration)
+- ⏳ `check_section` method verification on SCRVNR adapter
+- ⏳ DNA Lab UI (capture flow + override panel)
+- ⏳ Live Sites panel
+- ⏳ PageComposer dedicated job detail route (efficiency)
+
+See `BUILD_PLAN.md` for full remaining item specs.
+
+---
+
+## 🔧 KNOWN ISSUES & PENDING FEATURES (Feb 18, 2026)
+
+See `BUILD_PLAN.md` BUG BACKLOG section for full detail. Summary:
+
+| ID | Type | Description | Priority |
+|----|------|-------------|----------|
+| BUG-001 | Bug | Role badge doesn't update in My Profile after role change | HIGH |
+| BUG-002 | Bug | Login page looks wrong in dark mode after logout | MEDIUM |
+| BUG-003 | Bug | Help button misaligned in left nav | LOW |
+| BUG-004 | Bug | Pipeline status badge colors broken in dark mode | MEDIUM |
+| FEAT-001 | Feature | Admin role tier (above master/manager) | ✅ COMPLETE (Feb 18) |
+| FEAT-002 | Feature | Bug/feature request ticket visibility for Admin | HIGH |
+| FEAT-003 | Feature | My Tasks dashboard widget, role-personalized | MEDIUM |
+

@@ -35,6 +35,7 @@ import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
 import { ClientCompensationSection } from "./client-compensation";
 import { ContentStudioTab } from "../content/ContentStudioTab";
+import { WebsiteStudioTab } from "./website-studio/WebsiteStudioTab";
 import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
 import { Mic, Sparkles } from "lucide-react";
 
@@ -501,6 +502,7 @@ export function ClientProfile({
             )}
           </TabsTrigger>
           <TabsTrigger value="content">Content Studio</TabsTrigger>
+          <TabsTrigger value="websites">Website Studio</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
@@ -812,7 +814,12 @@ export function ClientProfile({
           <ContentStudioTab clientId={client.id} />
         </TabsContent>
 
-        {/* TAB 6: REPORTS */}
+        {/* TAB 6: WEBSITE STUDIO */}
+        <TabsContent value="websites" className="space-y-4">
+          <WebsiteStudioTab clientId={client.id} businessName={client.businessName} />
+        </TabsContent>
+
+        {/* TAB 7: REPORTS */}
         <TabsContent value="reports" className="space-y-4">
           <ClientReportsTab
             clientId={client.id}

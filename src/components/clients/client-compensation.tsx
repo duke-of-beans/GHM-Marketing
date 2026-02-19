@@ -302,6 +302,32 @@ export function ClientCompensationSection({ clientId, users }: Props) {
           )}
         </div>
 
+        {/* Onboarded Month */}
+        <div className="space-y-2">
+          <Label htmlFor="onboarded-month">Onboarded Month</Label>
+          <Input
+            id="onboarded-month"
+            type="month"
+            value={
+              data.onboardedMonth
+                ? new Date(data.onboardedMonth).toISOString().slice(0, 7)
+                : ""
+            }
+            onChange={(e) =>
+              setData({
+                ...data,
+                onboardedMonth: e.target.value
+                  ? new Date(e.target.value + "-01")
+                  : null,
+              })
+            }
+          />
+          <p className="text-xs text-muted-foreground">
+            Controls when residuals start. Auto-set on first activation — correct
+            here if the date is wrong.
+          </p>
+        </div>
+
         {/* Compensation Overrides */}
         <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">

@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { executeScan, executeBatchScan } from '@/lib/competitive-scan';
+import { isElevated } from '@/lib/auth/session';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,9 +21,9 @@ export async function POST(req: NextRequest) {
   try {
     // Auth check
     const session = await auth();
-    if (!session?.user || session.user.role !== 'master') {
+    if (!session?.user || !isElevated(session.user.role)) {
       return NextResponse.json(
-        { error: 'Unauthorized. Master role required.' },
+        { error: 'Unauthorized. Elevated access required.' },
         { status: 401 }
       );
     }

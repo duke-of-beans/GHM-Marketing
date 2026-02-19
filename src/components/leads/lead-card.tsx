@@ -81,10 +81,10 @@ export function LeadCard({ lead, onClick, onStatusChange }: LeadCardProps) {
                     className={cn(
                       "flex-shrink-0 text-xs font-mono px-1.5 py-0.5 rounded cursor-help",
                       lead.domainRating >= 30
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/70 dark:text-green-200"
                         : lead.domainRating >= 15
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/70 dark:text-yellow-200"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/70 dark:text-red-200"
                     )}
                   >
                     DR {lead.domainRating}

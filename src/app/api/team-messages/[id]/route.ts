@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { isElevated } from "@/lib/auth/session";
 
 // POST /api/team-messages/[id]/read — mark a message as read
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -25,7 +26,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const userRole = (session.user as any).role;
-  if (userRole !== "master") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!isElevated(userRole)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const messageId = parseInt(params.id);
   const body = await req.json();
@@ -54,7 +55,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   const message = await prisma.teamMessage.findUnique({ where: { id: messageId } });
   if (!message) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (message.authorId !== userId && userRole !== "master") {
+  if (message.authorId !== userId && !isElevated(userRole)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

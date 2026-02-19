@@ -201,7 +201,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
 
   const [batchEnriching, setBatchEnriching] = useState(false);
 
-  const handleBatchEnrich = async () => {
+  const handleBatchEnrich = async (force = false) => {
     const leadIds = filteredLeads.map((l) => l.id);
     if (leadIds.length === 0) return;
     const batch = leadIds.slice(0, 50);
@@ -210,13 +210,24 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       const res = await fetch("/api/leads/enrich-batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leadIds: batch }),
+        body: JSON.stringify({ leadIds: batch, force }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(
-          `Enriched ${data.data.summary.successful} of ${batch.length} leads`
-        );
+        const { enriched, skipped } = data.data.summary;
+        if (skipped > 0 && enriched === 0) {
+          toast.warning(`All ${skipped} leads were enriched within the last 7 days — skipped to save API credits.`, {
+            action: {
+              label: "Force Re-enrich",
+              onClick: () => handleBatchEnrich(true),
+            },
+            duration: 10000,
+          });
+        } else if (skipped > 0) {
+          toast.success(`Enriched ${enriched} leads · ${skipped} skipped (fresh data)`);
+        } else {
+          toast.success(`Enriched ${enriched} of ${batch.length} leads`);
+        }
         router.refresh();
       } else {
         toast.error(data.error || "Batch enrichment failed");
@@ -245,7 +256,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
           <div className="flex gap-2">
             <button
               className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
-              onClick={handleBatchEnrich}
+              onClick={() => handleBatchEnrich()}
               disabled={batchEnriching || filteredLeads.length === 0}
             >
               {batchEnriching ? "Enriching..." : `🔍 Enrich (${Math.min(filteredLeads.length, 50)})`}

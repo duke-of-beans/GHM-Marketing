@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser, SessionUser } from "./session";
+import { getCurrentUser, SessionUser, isElevated } from "./session";
 
 /**
  * Permission categories matching the UI permission management system
@@ -212,7 +212,7 @@ export async function requireAnyPermission(...permissions: PermissionKey[]): Pro
   };
 
   if (!hasAnyPermission(userWithPermissions, ...permissions)) {
-    redirect(user.role === "master" ? "/master" : "/sales");
+    redirect(isElevated(user.role) ? "/master" : "/sales");
   }
 
   return user;
@@ -245,7 +245,7 @@ export async function requireAllPermissions(...permissions: PermissionKey[]): Pr
   };
 
   if (!hasAllPermissions(userWithPermissions, ...permissions)) {
-    redirect(user.role === "master" ? "/master" : "/sales");
+    redirect(isElevated(user.role) ? "/master" : "/sales");
   }
 
   return user;

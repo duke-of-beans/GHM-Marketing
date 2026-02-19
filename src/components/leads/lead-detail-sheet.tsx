@@ -407,15 +407,27 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
   const [enriching, setEnriching] = useState(false);
   const [generatingWO, setGeneratingWO] = useState(false);
 
-  const handleEnrich = async () => {
+  const handleEnrich = async (force = false) => {
     if (!leadId) return;
     setEnriching(true);
     try {
-      const res = await fetch(`/api/leads/${leadId}/enrich`, { method: "POST" });
+      const res = await fetch(`/api/leads/${leadId}/enrich`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force }),
+      });
       const data = await res.json();
       if (data.success) {
         toast.success("Lead enriched with latest data");
         fetchLead();
+      } else if (data.code === "RECENTLY_ENRICHED") {
+        toast.warning(data.error, {
+          action: {
+            label: "Force Re-enrich",
+            onClick: () => handleEnrich(true),
+          },
+          duration: 8000,
+        });
       } else {
         toast.error(data.error || "Enrichment failed");
       }
@@ -657,7 +669,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={handleEnrich}
+                    onClick={() => handleEnrich()}
                       disabled={enriching}
                     >
                       <Search className="h-4 w-4 mr-1.5" />

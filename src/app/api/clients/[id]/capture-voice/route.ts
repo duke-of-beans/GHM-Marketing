@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { captureVoiceFromWebsite } from '@/lib/scrvnr/voice-capture';
+import { isElevated } from '@/lib/auth/session';
 
 export async function POST(
   request: NextRequest,
@@ -31,9 +32,9 @@ export async function POST(
     });
 
     // Only allow master managers to capture voice
-    if (user?.role !== 'master') {
+    if (!isElevated(user?.role ?? '')) {
       return NextResponse.json(
-        { error: 'Insufficient permissions. Only master managers can capture voice profiles.' },
+        { error: 'Insufficient permissions. Only managers or admins can capture voice profiles.' },
         { status: 403 }
       );
     }

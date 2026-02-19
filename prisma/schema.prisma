@@ -356,6 +356,11 @@ model ClientProfile {
   compensationOverrides ClientCompensationOverride[]
   paymentTransactions   PaymentTransaction[]
 
+  // Website Studio
+  webProperties         WebProperty[]
+  // AI Cost Tracking
+  aiCostLogs            AICostLog[]
+
   @@map("client_profiles")
 }
 
@@ -612,8 +617,9 @@ model PaymentTransaction {
 }
 
 enum UserRole {
-  master
-  sales
+  admin   // Super-admin: can manage masters, full system access
+  master  // Manager-level: territory management, team ops
+  sales   // Sales rep: territory-scoped access
 }
 
 enum LeadStatus {
@@ -942,3 +948,170 @@ model PushSubscription {
 // PUSH NOTIFICATION SUBSCRIPTIONS
 // ============================================================================
 
+
+// ============================================================================
+// WEBSITE STUDIO
+// ============================================================================
+
+model WebProperty {
+  id                     Int       @id @default(autoincrement())
+  clientId               Int       @map("client_id")
+  slug                   String                        // e.g. "gad-bmw-t1"
+  tier                   String                        // "tier1" | "tier2" | "tier3"
+  brandSegment           String    @map("brand_segment")   // e.g. "BMW", "Audi"
+  targetUrl              String    @map("target_url")       // Final domain or subdomain
+  vercelProjectId        String?   @map("vercel_project_id")
+  voiceProfileSlug       String?   @map("voice_profile_slug") // Matches scrvnr/profiles/*.json stem
+  deployStatus           String    @default("scaffolded") @map("deploy_status")
+  lastDeployedAt         DateTime? @map("last_deployed_at")
+  dnsVerified            Boolean   @default(false) @map("dns_verified")
+  sslActive              Boolean   @default(false) @map("ssl_active")
+  sslExpiresAt           DateTime? @map("ssl_expires_at")
+  stalenessThresholdDays Int       @default(90) @map("staleness_threshold_days")
+  isArchived             Boolean   @default(false) @map("is_archived")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  client      ClientProfile      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  dnaCaptures DnaCapture[]
+  buildJobs   BuildJob[]
+
+  @@unique([clientId, slug])
+  @@index([clientId])
+  @@index([clientId, brandSegment])
+  @@index([deployStatus])
+  @@map("web_properties")
+}
+
+model DnaCapture {
+  id            Int       @id @default(autoincrement())
+  propertyId    Int       @map("property_id")
+  sourceUrl     String    @map("source_url")
+  capturedAt    DateTime  @default(now()) @map("captured_at")
+  capturedBy    String?   @map("captured_by")
+  tokenBlob     Json      @map("token_blob")   // Full DnaTokenBlob JSON
+  overrideCount Int       @default(0) @map("override_count")
+  isSuperseded  Boolean   @default(false) @map("is_superseded")
+
+  property  WebProperty       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  overrides DnaTokenOverride[]
+
+  @@index([propertyId])
+  @@index([propertyId, isSuperseded])
+  @@map("dna_captures")
+}
+
+model DnaTokenOverride {
+  id             Int       @id @default(autoincrement())
+  captureId      Int       @map("capture_id")
+  tokenKey       String    @map("token_key")       // e.g. "colors.primary"
+  originalValue  String    @db.Text @map("original_value")  // JSON-serialized
+  overrideValue  String    @db.Text @map("override_value")  // JSON-serialized
+  note           String    @db.Text                // Required — operator explains the change
+  operatorName   String    @map("operator_name")
+  isLocked       Boolean   @default(false) @map("is_locked")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  capture DnaCapture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+
+  @@index([captureId])
+  @@index([captureId, tokenKey])
+  @@map("dna_token_overrides")
+}
+
+model BuildJob {
+  id               Int       @id @default(autoincrement())
+  propertyId       Int       @map("property_id")
+  stage            String    @default("scaffolded")  // BuildStage enum
+  assignedTo       String?   @map("assigned_to")
+  scaffoldManifest Json?     @map("scaffold_manifest")
+  pageCount        Int       @default(0) @map("page_count")
+  pagesCleared     Int       @default(0) @map("pages_cleared")
+  pagesApproved    Int       @default(0) @map("pages_approved")
+  deployAttempts   Int       @default(0) @map("deploy_attempts")
+  lastDeployError  String?   @db.Text @map("last_deploy_error")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  property WebProperty    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  pages    ComposerPage[]
+
+  @@index([propertyId])
+  @@index([propertyId, stage])
+  @@map("build_jobs")
+}
+
+model ComposerPage {
+  id              Int       @id @default(autoincrement())
+  jobId           Int       @map("job_id")
+  slug            String                        // e.g. "common-problems"
+  title           String
+  filePath        String    @map("file_path")   // Relative to scaffold root
+  sections        Json      @default("{}")      // { sectionName: copyText }
+  scrvnrStatus    String    @default("unprocessed") @map("scrvnr_status")
+  lastScrvnrResult Json?    @map("last_scrvnr_result")  // ScrvnrResultSummary
+  reviewStatus    String    @default("pending") @map("review_status")
+  reviewNote      String?   @db.Text @map("review_note")
+  pageOrder       Int       @default(0) @map("page_order")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  job           BuildJob          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  scrvnrResults ScrvnrGateResult[]
+
+  @@index([jobId])
+  @@index([jobId, scrvnrStatus])
+  @@index([jobId, reviewStatus])
+  @@map("composer_pages")
+}
+
+model ScrvnrGateResult {
+  id                  Int       @id @default(autoincrement())
+  pageId              Int       @map("page_id")
+  propertySlug        String    @map("property_slug")
+  voiceProfileSlug    String?   @map("voice_profile_slug")
+  gateOpen            Boolean   @map("gate_open")
+  gateStatus          String    @map("gate_status")   // "PASS" | "FAIL" | "OVERRIDE" | "ERROR"
+  overrideApplied     Boolean   @default(false) @map("override_applied")
+  overrideNote        String?   @db.Text @map("override_note")
+  pass1Score          Float     @map("pass1_score")
+  pass1Pass           Boolean   @map("pass1_pass")
+  pass2Score          Float?    @map("pass2_score")
+  pass2Pass           Boolean?  @map("pass2_pass")
+  sectionsEvaluated   String[]  @map("sections_evaluated")
+  failedSections      String[]  @map("failed_sections")
+  rawResult           Json      @map("raw_result")    // Full adapter response
+  evaluatedAt         DateTime  @default(now()) @map("evaluated_at")
+
+  page ComposerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@index([pageId, evaluatedAt(sort: Desc)])
+  @@map("scrvnr_gate_results")
+}
+
+
+// ── AI Cost Logging ────────────────────────────────────────────────────────────
+// Adapted from GREGORE metabolism engine — reshaped for USD/per-client tracking
+
+model AICostLog {
+  id               Int      @id @default(autoincrement())
+  timestamp        DateTime @default(now())
+  feature          String   // AIFeature enum values
+  clientId         Int      @map("client_id")
+  modelId          String   @map("model_id")
+  inputTokens      Int      @map("input_tokens")
+  outputTokens     Int      @map("output_tokens")
+  costUSD          Float    @map("cost_usd")
+  estimatedCostUSD Float?   @map("estimated_cost_usd")  // For accuracy tracking
+  latencyMs        Int      @map("latency_ms")
+  qualityScore     Float?   @map("quality_score")       // Set retroactively (e.g., if SCRVNR passes)
+
+  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([feature])
+  @@index([timestamp(sort: Desc)])
+  @@index([clientId, timestamp(sort: Desc)])
+  @@map("ai_cost_logs")
+}
