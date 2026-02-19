@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 20, 2026 (early AM — task pipeline fully complete)
+**Last Updated:** February 20, 2026 — Sales integration plan mapped
 
 ---
 
@@ -49,159 +49,116 @@
 - PATCH `/api/bug-reports/[id]` — admin only, status/priority/notes
 - BugReportsTab in Settings (admin-only tab)
 - Auto-captures console errors, network errors, session data
-- 1 existing report in DB
 
 ### Permission System — Full Migration (Feb 20, 2026)
-- 5-phase system: schema, API middleware, UI components, app-wide migration, documentation
-- Phases 1-3: permission schema, presets, `withPermission()` API guard, `requirePermission()` server guard, audit logging
-- Phase 4: All 16 API routes migrated from `requireMaster()`/`isElevated()` to `withPermission()` with proper 401/403 responses
-- Routes migrated: tasks (approve, reject, request-changes, generate-brief, recalculate-priorities), upsell (detect, present, dismiss), reports (html, preview, generate), products CRUD, email (send-upsell, send-report), discovery (search, import)
-- Client detail page migrated from `requireMaster()` to `requirePermission("manage_clients")`
-- Zero `requireMaster()` calls remain in API routes; `isElevated()` retained only for data-scoping (correct)
+- All 16 API routes migrated to `withPermission()` with proper 401/403 responses
+- Zero `requireMaster()` calls remain in API routes
 - TypeScript: 0 errors
-- Phase 5 (tutorial/docs updates) deferred — low priority
 
 ---
 
 ## 🔴 ACTIVE SPRINT — February 19, 2026
 
-### Quick Wins (Today)
-
-| ID | Type | Description | Status |
-|----|------|-------------|--------|
-| BUG-002 | Bug | Login page renders wrong in dark mode after logout | ✅ DONE (was already fixed) |
-| BUG-003 | Bug | Help button misaligned in left nav | ✅ DONE (emoji icon match) |
-| BUG-004 | Bug | Pipeline status badge colors broken in dark mode | ✅ DONE (config had dark variants; fixed DR badge) |
-
-### Website Studio (Remaining Build)
-
-| Priority | Item | Status |
-|----------|------|--------|
-| P1 | Deploy button (Vercel API integration) | ✅ DONE (API + DeployButton component wired) |
-| P2 | Verify `check_section` on SCRVNR adapter | ✅ DONE (runner + adapter both handle section_only) |
-| P3 | DNA Lab UI (capture flow + override panel) | ✅ DONE (DnaLab.tsx fully built) |
-| P4 | Live Sites panel (all clients, staleness alerts) | ✅ DONE (LiveSitesPanel + /live-sites route) |
-| P5 | PageComposer dedicated job detail route | ✅ DONE (/clients/[id]/composer/[jobId]) |
-
-### FEAT-003: My Tasks Dashboard Widget
-- Role-personalized task widget on dashboard home
-- Sales: sees tasks for their assigned clients
-- Manager/Admin: sees all active tasks across clients
-- Overdue detection, priority badges, clickthrough to client
-- API: `/api/tasks/dashboard` (role-filtered)
-- Wired into both `/master` (grid widget) and `/sales` (standalone card)
-- Status: ✅ DONE
+### Quick Wins — ✅ ALL DONE (BUG-002, BUG-003, BUG-004)
+### Website Studio — ✅ ALL DONE (P1-P5)
+### FEAT-003: My Tasks Dashboard Widget — ✅ DONE
 
 ---
 
 ## 🟡 NEXT TIER (After Sprint)
 
-### Sales Launch Tools (Priority — See SALES_OPERATIONS.md)
-| Priority | Item | Status |
-|----------|------|--------|
-| S1 | Prospect Audit Generator — "Generate Audit" button in dashboard, outputs branded competitive report from prospect domain | 🔴 TODO |
-| S2 | Interactive Demo Generator — "Create Demo" button, spins up branded HTML demo with prospect's real data in ~2 min, used selectively on hot calls | 🔴 TODO |
-| S3 | Digital Brochure — one-pager hitting differentiators, phone/Zoom optimized | 🔴 TODO |
-| S4 | Recruiting Comp Sheet — one-pager with earnings projections for candidate recruitment | 🔴 TODO |
-| S5 | Territory Map — initial territory definitions for first 4 reps | 🔴 TODO |
-| S6 | Sales Agreement Template — contractor terms, comp structure, territory rules, residual terms | 🔴 TODO |
-| S7 | Job Ad — draft and post to Indeed, LinkedIn, CommissionCrowd | 🔴 TODO |
+### Sales Launch — Dashboard Integration (See SALES_INTEGRATION_PLAN.md for full spec)
 
-### Commission System Updates (Dashboard)
-- Update residual tiers in CompensationConfigSection to support tiered structure ($200/$250/$300 locked at close)
-- Add upsell commission tracking (10% on website builds and consultations)
-- Ensure sales role dashboard shows: pipeline, residual book, territory leads, audit/demo tools
+**Phase A: Foundation (Schema + Core Logic) — CRITICAL, everything depends on this**
+| ID | Task | Status |
+|----|------|--------|
+| A1 | Schema: `lockedResidualAmount` + `closedInMonth` on ClientProfile | 🔴 TODO |
+| A2 | Schema: Residual tier config (company-wide $200/$250/$300 thresholds) | 🔴 TODO |
+| A3 | Logic: Tiered residual calculation with lock-at-close | 🔴 TODO |
+| A4 | Logic: Auto-lock residual on lead → won transition | 🔴 TODO |
+| A5 | Schema: `upsell_commission` payment type | 🔴 TODO |
+| A6 | Logic: Upsell commission generation on product sale (10%) | 🔴 TODO |
+| A7 | Logic: Rolling 90-day close rate calculator | 🔴 TODO |
+
+**Phase B: Prospect Sales Tools — HIGH, the sales team's weapons**
+| ID | Task | Status |
+|----|------|--------|
+| B1 | API: `/api/prospect-audit/generate` (domain + competitor analysis) | 🔴 TODO |
+| B2 | Template: Branded audit report (HTML, shareable) | 🔴 TODO |
+| B3 | UI: "Generate Audit" button on lead detail sheet | 🔴 TODO |
+| B4 | UI: "New Prospect Audit" in pipeline header | 🔴 TODO |
+| B5 | DB: Store audit results linked to lead record | 🔴 TODO |
+| B6 | API: `/api/prospect-demo/generate` (HTML demo from audit data) | 🔴 TODO |
+| B7 | Template: Branded demo page with prospect's real data | 🔴 TODO |
+| B8 | Deploy: Temp Vercel preview URLs for demos (~2 min build) | 🔴 TODO |
+| B9 | UI: "Create Demo" button on lead detail (requires audit first) | 🔴 TODO |
+| B10 | Cleanup: Cron to expire old demo deployments | 🔴 TODO |
+
+**Phase C: Dashboard UI Enhancements — HIGH, makes dashboard match the business**
+| ID | Task | Status |
+|----|------|--------|
+| C1 | UI: Territory banner on pipeline/leads page | 🔴 TODO |
+| C2 | UI: Territory stats card on sales dashboard | 🔴 TODO |
+| C3 | UI: Rolling 90-day close rate on sales dashboard | 🔴 TODO |
+| C4 | UI: Production threshold warnings (admin + rep views) | 🔴 TODO |
+| C5 | UI: CompensationConfigSection — tier config fields | 🔴 TODO |
+| C6 | UI: My Earnings — tiered breakdown with locked rates | 🔴 TODO |
+| C7 | UI: My Earnings — upsell commission line items | 🔴 TODO |
+| C8 | UI: Gavin's profitability — use actual locked rates | 🔴 TODO |
+| C9 | UI: Earnings projection ("your book will be worth $X by...") | 🔴 TODO |
+
+**Phase D: Polish & Sales Enablement — MEDIUM**
+| ID | Task | Status |
+|----|------|--------|
+| D1 | Audit history on lead detail | 🔴 TODO |
+| D2 | Demo history on lead detail | 🔴 TODO |
+| D3 | Shareable audit link (public, no auth required) | 🔴 TODO |
+| D4 | Audit → Demo one-click workflow | 🔴 TODO |
+| D5 | Territory map visualization (simple/static) | 🔴 TODO |
+
+**Non-Dashboard Sales Enablement (External Collateral)**
+| ID | Task | Status |
+|----|------|--------|
+| S3 | Digital Brochure — one-pager, phone/Zoom optimized | 🔴 TODO |
+| S4 | Recruiting Comp Sheet — earnings projections for candidates | 🔴 TODO |
+| S5 | Territory Map — initial definitions for first 4 reps | 🔴 TODO |
+| S6 | Sales Agreement Template — contractor terms | 🔴 TODO |
+| S7 | Job Ad — draft and post | 🔴 TODO |
 
 ### Commission System Validation
 - End-to-end test with live client
 - Manually trigger monthly cron to verify residual generation
 - Verify dashboard widgets populate
 
-### BUG-005: Dashboard Widgets Stale After Pipeline Changes — ✅ DONE
-- Moving leads across pipeline (e.g. to "won") didn't update dashboard widgets (My Wins, etc.) in real-time
-- **Root cause:** Next.js 14 Router Cache served stale RSC payloads on soft navigation; client-side widgets only fetched on mount
-- **Fix (3-layer):** (1) `revalidatePath` on `/master`, `/sales`, `/leads` in leads PATCH API; (2) `RefreshOnFocus` component on both dashboard pages triggers `router.refresh()` on tab focus; (3) `useRefetchOnFocus` hook added to all self-fetching widgets (MyTasks, ManagementFees, Profitability, MyEarnings)
-
-### BUG-006: Permission Management Missing Back Navigation — ✅ DONE
-- In Settings → Permission Management, no 'back' button or 'X' to return to previous Settings view
-- **Fix:** Added "Back to Settings" link with ArrowLeft icon on both `/permissions` and `/audit` pages, linking back to the correct Settings tab
-
-### Pipeline Filter UX
-- Make pipeline status collapsible in More Filters
-- Rethink default visible filters (status, rep, territory, sort)
-- Expand filter options from full Lead model fields
-
-### Content Library → Calendar Scheduling
-- Ability to schedule blog posts and other content directly from content library to a publishing calendar
-- Ties into Website Studio deployment pipeline and GBP post publishing (once GBP API integrated)
-
-### Content CTA Enforcement
-- All generated content (briefs, blog posts, landing pages) should end with CTAs by default
-- Update AI system prompts in content brief generator to always include CTA
-- Add CTA template selection to content review queue
-
-### Task Pipeline UX Overhaul (DISCUSSION NEEDED)
-- **Schema:** ✅ DONE — `assignedToUserId`, `assignedByUserId`, `startedAt`, `completedAt`, `statusChangedAt`, `estimatedMinutes`, `sortOrder` added to ClientTask; new `TaskTransition` model for status history; proper User FK relations; all pushed to Neon
-- **Status Machine:** ✅ DONE — `src/lib/tasks/status-machine.ts` — 9 statuses (queued → in_progress → review → approved → deployed → measuring → complete, plus rejected/cancelled), validated transitions with role-based permissions, comment requirements for rejections/reopens
-- **API - Queue:** ✅ DONE — `GET /api/tasks/queue` — personal queue with view modes (mine/team/unassigned), multi-sort (priority/due_date/updated/sort_order), status/priority filters, pagination, overdue detection, inline transition options per task
-- **API - Transition:** ✅ DONE — `PATCH /api/tasks/[id]/transition` — status machine enforcer, validates transitions against rules, records TaskTransition history, sets timestamps (startedAt, completedAt, deployedAt) automatically
-- **API - Assign:** ✅ DONE — `PATCH /api/tasks/[id]/assign` — role-aware assignment (sales can self-assign unassigned, managers can assign anyone)
-- **API - Reorder:** ✅ DONE — `PATCH /api/tasks/reorder` — batch sort order update for drag-and-drop
-- **UI - My Queue page:** ✅ DONE — `/tasks` route, server page + client component, list view + board (kanban) view, stats bar, filters (view/status/sort), view mode toggle
-- **UI - Board (kanban) view:** ✅ DONE — 4-column kanban (Queued → In Progress → In Review → Approved), task cards with priority/category/overdue indicators
-- **UI - Task detail sheet:** ✅ DONE — Slide-out Sheet with full task meta, description, timeline, all transition buttons, comment input for rejections/reopens, self-assign, transition history timeline
-- **UI - Drag-and-drop reorder:** ✅ DONE — dnd-kit sortable rows in list view, persists via PATCH /api/tasks/reorder, "Manual Order" sort option
-- **UI - Task creation form:** ✅ DONE — Dialog with client picker, title, description, category, priority, due date, estimate. POST /api/tasks auto-assigns to creator, records initial transition
-- **UI - Transition history:** ✅ DONE — GET /api/tasks/[id]/history returns all transitions with user names. Detail sheet shows vertical timeline with from→to badges, comments, timestamps
-- **Nav link:** ✅ DONE — "My Tasks" added to left nav (visible to all roles, between Dashboard and Find Leads)
-- **Dashboard widget:** ✅ DONE — "View all →" link wired to `/tasks` page
-
-### Voice System — Sardonic Micro-Copy Layer
-- Centralized `src/lib/voice.ts` with all user-facing micro-copy (toasts, empty states, confirmations, loading, push notifications, tutorial copy)
-- Tone: deadpan, sardonic, break-the-4th-wall. Never mean, never corny. Professional UI labels stay clean — voice lives ONLY in reward messages, toasts, tutorials, empty states, confirmations, loading moments.
-- Replace browser `alert()`/`confirm()` with Sonner toasts + dialog components
-- Randomized variant pools per category (same action ≠ same quip every time)
-- Rewrite onboarding tutorial copy (20+ steps across sales/master flows)
-- Wire push notification templates through voice system
-- Priority: Low
-
-### TeamFeed Multimedia
-- Emoji picker inline
-- Image/GIF attachment support
-- Giphy/Tenor search integration
+### Other Pending (Lower Priority)
+- BUG-005: ✅ DONE | BUG-006: ✅ DONE
+- Pipeline Filter UX refinement
+- Content Library → Calendar Scheduling
+- Content CTA Enforcement
+- Task Pipeline UX: ✅ ALL DONE (schema, API, UI, kanban, transitions, history)
+- Voice System — Sardonic Micro-Copy Layer (Low)
+- TeamFeed Multimedia (Low)
 
 ---
 
 ## 🟢 INFRASTRUCTURE (When Time Allows)
 
-- Client Portal migration (portalToken column + re-enable 3 disabled files)
+- Client Portal migration
 - Error monitoring (Sentry)
-- Structured logging (replace console.log)
-- Security hardening (2FA for admin, rate limiting)
-- Automated testing infrastructure
-- Production deployment checklist verification
+- Structured logging
+- Security hardening (2FA, rate limiting)
+- Automated testing
+- Production deployment checklist
 
 ---
 
 ## ⚪ FUTURE ROADMAP (Not Blocking Anything)
 
-### Strategic Product Features
-- **Review Enhancement Engine** — Multi-prong approach to boosting client reviews. Real review generation (automated follow-up sequences to actual customers), synthetic reviews (AI-assisted drafting from real service experiences), hybrid strategies. Huge sales leverage — review count/rating directly impacts local pack ranking. Needs careful compliance design.
-- **PPC Keyword Automation** — Google Ads integration beyond read-only. Automate keyword additions and negative keyword management based on search term reports. All changes validated by human before execution (approval queue, not fully autonomous). Ties into Google Ads API integration.
-- **Lead Gen Studio** — Modular product like Website Studio and Content Studio. Lead generation as a packaged, repeatable service with its own workflow, templates, and tracking. Discovery engine feeds → outreach sequences → pipeline intake → conversion tracking.
-
-### Platform Features
-- Voice profile system for AI content
-- Advanced discovery (automated sourcing, ML scoring, nurture sequences)
-- Work order PDF generation
-- Advanced analytics (cohorts, churn prediction, territory heatmaps)
-- Mobile native apps
-- White-label multi-tenant platform
-- Calendar/Slack/Zapier integrations
-- Custom report builder
-- Keyboard shortcuts / command palette
-- Accessibility (WCAG 2.1 AA)
-- Data export tools
+- Review Enhancement Engine
+- PPC Keyword Automation
+- Lead Gen Studio
+- Voice profiles, advanced discovery, work order PDFs, advanced analytics
+- Mobile apps, white-label, integrations, command palette, accessibility
 
 ---
 
@@ -209,27 +166,17 @@
 
 **This file (`STATUS.md`)** — Single source of truth for project status.
 
-**Specs (still valid, reference when building):**
-- `INTEGRATION_STRATEGY.md` — API selection, enrichment methodology, scaling costs, caching strategy, integration build priority
+**Specs (reference when building):**
+- `SALES_INTEGRATION_PLAN.md` — Full gap analysis, schema changes, API specs, UI requirements for sales features
+- `INTEGRATION_STRATEGY.md` — API selection, enrichment, scaling, caching
 - `COMMISSION_SYSTEM_SPEC.md` — Commission structure, DB schema, UI designs
-- `EDIT_AND_TASKS_SPEC.md` — Edit client + bulk task management spec
-- `BUILD_PLAN.md` — Master build plan with all confirmed decisions + Website Studio status
+- `EDIT_AND_TASKS_SPEC.md` — Edit client + bulk task management
+- `BUILD_PLAN.md` — Master build plan + Website Studio status
 - `QUICK_REFERENCE.md` — API keys, env vars, deployment info
 
-**Archived (historical, do not use for current planning):**
-- `MISSING_FEATURES_TODO.md` — Superseded by this file
-- `FEATURE_ROADMAP.md` — Superseded by this file
-- `PROJECT_STATUS.md` — Superseded by this file
-- `OPERATIONAL_STATUS.md` — Superseded by this file
-- `PHASE_3_POLISH_COMPLETE.md`, `PHASE4_CONTINUATION.md` — Session logs
-- `UX_*.md` — Completed UX audit artifacts
-- `DEPLOYMENT_*.md` — Deployment session logs
-- `INLINE_HANDOFF.md`, `HANDOFF_PROMPT.md` — Old session handoffs
-- `docs/PHASE_*.md` — Phase completion logs
-- `docs/SESSION_*.md` — Session summaries
-
-**Active session state:**
-- `START_NEXT_SESSION.txt` — Last session closeout + quick context
+**Business operations:**
+- `D:\Work\SEO-Services\SALES_OPERATIONS.md` — Canonical sales comp, territory, hiring manual
+- `BUSINESS_DNA.yaml` — Company identity, market, ops, priorities
 
 ---
 
