@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getLeadById, updateLeadStatus } from "@/lib/db/leads";
@@ -62,6 +63,12 @@ export async function PATCH(
     if (!lead) {
       return NextResponse.json({ success: false, error: "Lead not found or access denied" }, { status: 404 });
     }
+
+    // Bust cached server components so dashboard widgets reflect the change immediately
+    revalidatePath("/master");
+    revalidatePath("/sales");
+    revalidatePath("/leads");
+
     return NextResponse.json({ success: true, data: lead });
   }
 

@@ -11,6 +11,7 @@ import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
 import { MasterDashboardGrid } from "@/components/dashboard/MasterDashboardGrid";
 import { MasterPageClient } from "@/components/dashboard/MasterPageClient";
+import { RefreshOnFocus } from "@/components/dashboard/refresh-on-focus";
 import type { ResponsiveLayouts } from "react-grid-layout";
 
 export default async function MasterDashboard() {
@@ -132,6 +133,7 @@ export default async function MasterDashboard() {
       </MasterDashboardGrid>
 
       <OnboardingTutorial userRole={isOwner ? "owner" : "master"} userName={user.name} />
+      <RefreshOnFocus />
     </MasterPageClient>
   );
 }

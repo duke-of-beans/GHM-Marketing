@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, HelpCircle } from "lucide-react";
+import { useRefetchOnFocus } from "@/lib/hooks/use-refetch-on-focus";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import {
   Tooltip,
@@ -24,11 +25,7 @@ export function MyEarningsWidget() {
   const [data, setData] = useState<EarningsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchEarnings();
-  }, []);
-
-  const fetchEarnings = async () => {
+  const fetchEarnings = useCallback(async () => {
     try {
       const res = await fetch("/api/payments/my-earnings");
       const json = await res.json();
@@ -40,7 +37,10 @@ export function MyEarningsWidget() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => { fetchEarnings(); }, [fetchEarnings]);
+  useRefetchOnFocus(fetchEarnings);
 
   if (loading) {
     return (

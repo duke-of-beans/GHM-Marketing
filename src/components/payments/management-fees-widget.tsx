@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, DollarSign, HelpCircle } from "lucide-react";
+import { useRefetchOnFocus } from "@/lib/hooks/use-refetch-on-focus";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import {
   Tooltip,
@@ -22,11 +23,7 @@ export function ManagementFeesWidget() {
   const [data, setData] = useState<ManagementFeesData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchFees();
-  }, []);
-
-  const fetchFees = async () => {
+  const fetchFees = useCallback(async () => {
     try {
       const res = await fetch("/api/payments/management-fees");
       const json = await res.json();
@@ -38,7 +35,10 @@ export function ManagementFeesWidget() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => { fetchFees(); }, [fetchFees]);
+  useRefetchOnFocus(fetchFees);
 
   if (loading) {
     return (

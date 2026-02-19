@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { getLeads } from "@/lib/db/leads";
 import { leadFilterSchema, createLeadSchema } from "@/lib/validations";
@@ -60,6 +61,11 @@ export async function POST(request: NextRequest) {
       assignedUser: { select: { id: true, name: true } },
     },
   });
+
+  // Bust dashboard caches so new lead counts are reflected
+  revalidatePath("/master");
+  revalidatePath("/sales");
+  revalidatePath("/leads");
 
   return NextResponse.json({ success: true, data: lead }, { status: 201 });
 }

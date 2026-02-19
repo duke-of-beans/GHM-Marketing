@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Target, TrendingUp, DollarSign, Zap } from "lucide-react";
 import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
+import { RefreshOnFocus } from "@/components/dashboard/refresh-on-focus";
 
 export default async function SalesDashboard() {
   const user = await getCurrentUser();
@@ -196,6 +197,7 @@ export default async function SalesDashboard() {
 
       {/* Onboarding Tutorial */}
       <OnboardingTutorial userRole="sales" userName={user.name} />
+      <RefreshOnFocus />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function MyTasksWidget() {
   const [stats, setStats] = useState<TaskStats>({ queued: 0, in_progress: 0, overdue: 0 });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchTasks = () => {
     fetch("/api/tasks/dashboard")
       .then((r) => r.json())
       .then((json) => {
@@ -47,6 +47,15 @@ export function MyTasksWidget() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchTasks();
+
+    // Refetch when tab regains focus so data stays fresh after pipeline changes
+    const onFocus = () => fetchTasks();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   if (loading) {
