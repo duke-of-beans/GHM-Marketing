@@ -17,7 +17,7 @@ type AuthUser = {
 };
 
 // Paths that don't require authentication
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/welcome", "/brochure"];
 
 // Paths that require master/admin role
 const ELEVATED_PATHS = ["/master", "/permissions", "/audit"];

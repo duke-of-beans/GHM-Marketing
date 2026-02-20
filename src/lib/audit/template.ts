@@ -74,6 +74,12 @@ export function generateAuditHTML(data: AuditData): string {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>
+    // Auto-print if ?autoprint=1 is in the URL
+    if (new URLSearchParams(window.location.search).get('autoprint') === '1') {
+      window.addEventListener('load', () => setTimeout(() => window.print(), 400));
+    }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1f2937; background: #f9fafb; }
