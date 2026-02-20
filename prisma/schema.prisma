@@ -64,6 +64,10 @@ model User {
   // Onboarding Portal
   generatedOnboardingTokens OnboardingToken[] @relation("OnboardingTokenCreator")
   
+  // Rep onboarding flow
+  repOnboardingCompletedAt  DateTime?  @map("rep_onboarding_completed_at")
+  repOnboardingStep         Int        @default(0) @map("rep_onboarding_step") // last completed step (0 = not started)
+
   // Team messaging
   sentMessages          TeamMessage[] @relation("MessageAuthor")
   receivedMessages      TeamMessage[] @relation("MessageRecipient")

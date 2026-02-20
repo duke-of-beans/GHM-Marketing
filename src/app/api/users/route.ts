@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
         territoryId: true,
         permissionPreset: true,
         permissions: true,
+        repOnboardingCompletedAt: true,
         territory: {
           select: {
             name: true,

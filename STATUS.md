@@ -249,6 +249,98 @@
 
 ---
 
+---
+
+## 🟠 QUEUED — NOT YET STARTED
+
+### FEAT-010: Rep Dashboard View
+**Priority:** HIGH — needed before first rep onboards
+**Scope:** Sales role gets a purpose-built dashboard showing exactly what matters to them and nothing else
+
+**Rep dashboard should include:**
+- Territory banner (name, claimed date, threshold status green/yellow/red)
+- My Pipeline: active leads, hot leads flagged, recent activity
+- My Book: active clients count, total monthly residual, projected 90-day churn-adjusted value
+- Close rate widget: rolling 90-day closes vs. threshold (2/mo), visual progress bar
+- Earnings this month: close bonuses earned + residual income total + upsell commissions
+- Earnings projection: book value at 6 months, 12 months (live calc based on current trajectory)
+- Quick actions: Generate Audit, Create Demo, Add Lead, View Brochure, View Comp Sheet
+- Recent activity feed: last 5 actions (closes, demos created, enrichments run)
+
+**Key constraint:** Rep sees ONLY their own data — their territory, their leads, their book, their earnings. No team view unless elevated.
+
+**Files:**
+- `src/app/(dashboard)/sales/page.tsx` — likely exists, needs full rebuild
+- `src/components/sales/rep-dashboard/` — new component folder
+- `src/app/api/payments/my-earnings/route.ts` — likely exists, verify
+- `src/app/api/territories/` — verify territory data available
+
+---
+
+### FEAT-011: Rep Onboarding Flow
+**Priority:** HIGH — needed for first hire
+**Scope:** When a new sales rep account is created and they log in for the first time, walk them through setup and orientation. Not a tutorial overlay — a real sequential onboarding flow with discrete steps they complete.
+
+**Steps:**
+1. Welcome screen — who GHM is, what the role is, what success looks like
+2. Profile setup — name, phone, preferred contact (pre-filled from invite)
+3. Territory claim — show territory map, pick their territory (or confirm if pre-assigned)
+4. Tool orientation — 3 short cards: what Leads page does, what Audit PDF is, what Live Demo does
+5. First lead — prompt them to either import a lead or find one via Discovery
+6. Resources — links to: Brochure, Comp Sheet, Territory Map, Partner Agreement (from Document Vault once built)
+7. Done — "You're live. Go close something."
+
+**Admin side:**
+- Master/admin can trigger rep onboarding manually from Team settings (resend first-login state)
+- Onboarding completion tracked in DB (`repOnboardingCompletedAt` on User)
+- Admin sees onboarding status per rep in Team tab
+
+**Files:**
+- `src/app/(onboarding)/rep-setup/page.tsx` — new multi-step flow
+- `src/components/onboarding/rep-onboarding-wizard.tsx` — stepper component
+- Schema: add `repOnboardingCompletedAt DateTime?` to User model
+
+---
+
+### FEAT-012: Document Vault
+**Priority:** MEDIUM-HIGH — needed once reps are onboarded
+**Scope:** Shared file repository with public (everyone) and private (per-user) spaces. Natural, intuitive, useful — not a dumping ground.
+
+**Spaces:**
+- **Shared** — manager-curated. Current versions of contracts, comp sheet, brochure, territory map, onboarding packet, policy docs. Read access for all, write/upload for admin/master only. Organized by category (Sales Resources, Legal, Templates, Reports).
+- **Private** — per-user personal stash. Notes, prospect research, personal drafts. Only visible to owner. Full upload/delete for the owner.
+- **Client Reports** — auto-populated. Every generated client report (historical) lives here, organized by client. Managers and the assigned rep can access. No manual upload needed — generation auto-saves here.
+- **Signed Contracts** — auto-populated + manual upload. Signed partner agreements and client agreements land here. Searchable by name/date.
+
+**Interactions:**
+- Upload to either space from any page (drag-drop or file picker) — a floating "Save to Vault" affordance
+- Transfer file from Private → Shared in one click (manager confirms if the file is going public)
+- Transfer file from TeamFeed message → Vault: any file attachment in TeamFeed gets a "Save to Vault" button that opens a modal (choose space + category)
+- Transfer file from Vault → TeamFeed: attach from Vault when composing a team message
+- Every generated artifact (report PDF, audit PDF, demo HTML, work order) offers "Save to Vault" on generation
+- Search across all accessible files (name, category, uploader, date range)
+
+**Organization:**
+- Shared space uses manager-defined categories (default: Sales Resources, Legal, Templates, Client Reports, Signed Contracts, Misc)
+- Private space is flat — user-defined tags optional
+- Recent files surfaced at top of each space
+- File versioning for Shared space — uploading a new version of a contract keeps old version accessible but marks new as current
+
+**File storage:**
+- Use Vercel Blob or S3-compatible storage (not DB blobs)
+- DB stores metadata: name, space, category, uploader, size, mime type, blob URL, version, created/updated
+- Signed URLs for secure access (files are not publicly addressable)
+
+**Files:**
+- `prisma/schema.prisma` — new `VaultFile` model
+- `src/app/(dashboard)/vault/page.tsx` — main vault page
+- `src/components/vault/` — VaultShared, VaultPrivate, VaultUploadModal, VaultSearch, VaultFileTile
+- `src/app/api/vault/` — upload, list, delete, transfer, presigned-url routes
+- TeamFeed integration — "Save to Vault" on file attachments
+- Storage: Vercel Blob (already available in this stack)
+
+---
+
 ## 🟢 INFRASTRUCTURE (When Time Allows)
 
 - Client Portal migration

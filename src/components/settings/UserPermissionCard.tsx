@@ -52,6 +52,7 @@ interface User {
   permissionPreset: string;
   territory?: { id: number; name: string } | null;
   _count?: { assignedLeads: number; salesRepClients?: number };
+  repOnboardingCompletedAt?: string | null;
 }
 
 interface UserPermissionCardProps {
@@ -121,6 +122,11 @@ export function UserPermissionCard({
                   {!user.isActive && (
                     <Badge variant="outline" className="text-xs text-muted-foreground border-dashed">
                       Inactive
+                    </Badge>
+                  )}
+                  {user.role === "sales" && !user.repOnboardingCompletedAt && user.isActive && (
+                    <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 dark:border-amber-700">
+                      Setup pending
                     </Badge>
                   )}
                 </div>
