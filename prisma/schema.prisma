@@ -383,6 +383,8 @@ model ClientProfile {
   webProperties         WebProperty[]
   // AI Cost Tracking
   aiCostLogs            AICostLog[]
+  // Rank tracking
+  keywordTrackers       KeywordTracker[]
 
   @@map("client_profiles")
 }
@@ -1375,4 +1377,65 @@ model EnrichmentCostLog {
   @@index([provider, createdAt])
   @@index([clientId, createdAt])
   @@map("enrichment_cost_logs")
+}
+
+
+// ============================================================================
+// RANK TRACKING — DataForSEO local SERP tracking
+// ============================================================================
+
+model KeywordTracker {
+  id            Int       @id @default(autoincrement())
+  clientId      Int       @map("client_id")
+  keyword       String
+  searchVolume  Int?      @map("search_volume")
+  difficulty    Int?
+  targetUrl     String?   @map("target_url")
+  category      String?
+  isActive      Boolean   @default(true) @map("is_active")
+  addedAt       DateTime  @default(now()) @map("added_at")
+
+  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  snapshots     RankSnapshot[]
+
+  @@unique([clientId, keyword])
+  @@index([clientId, isActive])
+  @@map("keyword_trackers")
+}
+
+model RankSnapshot {
+  id                  Int       @id @default(autoincrement())
+  keywordId           Int       @map("keyword_id")
+  clientId            Int       @map("client_id")
+  scanDate            DateTime  @default(now()) @map("scan_date")
+  organicPosition     Int?      @map("organic_position")
+  localPackPosition   Int?      @map("local_pack_position")
+  rankingUrl          String?   @map("ranking_url")
+  localPackBusiness   String?   @map("local_pack_business")
+  serpFeatures        Json?     @map("serp_features")
+  zipCode             String    @map("zip_code")
+  previousOrganic     Int?      @map("previous_organic")
+  previousLocalPack   Int?      @map("previous_local_pack")
+
+  keyword             KeywordTracker @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@index([keywordId, scanDate(sort: Desc)])
+  @@index([clientId, scanDate(sort: Desc)])
+  @@map("rank_snapshots")
+}
+
+// Tracks pending DataForSEO task IDs waiting for results
+model PendingRankTask {
+  id          Int       @id @default(autoincrement())
+  taskId      String    @unique @map("task_id")   // DataForSEO task ID
+  clientId    Int       @map("client_id")
+  keywordId   Int       @map("keyword_id")
+  zipCode     String    @map("zip_code")
+  keyword     String
+  postedAt    DateTime  @default(now()) @map("posted_at")
+  resolvedAt  DateTime? @map("resolved_at")
+
+  @@index([resolvedAt])
+  @@index([postedAt])
+  @@map("pending_rank_tasks")
 }
