@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Search, FileText, Mail } from "lucide-react";
+import { Search, FileText, Mail, ClipboardList } from "lucide-react";
 import { LEAD_STATUS_CONFIG } from "@/types";
 import { toast } from "sonner";
 import type { LeadStatus } from "@prisma/client";
@@ -407,6 +407,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
 
   const [enriching, setEnriching] = useState(false);
   const [generatingWO, setGeneratingWO] = useState(false);
+  const [generatingAudit, setGeneratingAudit] = useState(false);
 
   const handleEnrich = async (force = false) => {
     if (!leadId) return;
@@ -466,6 +467,19 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
       toast.error("Failed to generate work order");
     } finally {
       setGeneratingWO(false);
+    }
+  };
+
+  const handleGenerateAudit = async () => {
+    if (!leadId) return;
+    setGeneratingAudit(true);
+    try {
+      // Open audit in new tab — rep uses browser Print → Save as PDF
+      const url = `/api/leads/${leadId}/audit?autoprint=1`;
+      window.open(url, "_blank", "noopener,noreferrer");
+      toast.success("Audit opened — use Print → Save as PDF to download");
+    } finally {
+      setGeneratingAudit(false);
     }
   };
 
@@ -665,6 +679,22 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
             {/* Action buttons */}
             <TooltipProvider>
               <div className="flex flex-wrap gap-2 py-3">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleGenerateAudit}
+                      disabled={generatingAudit}
+                    >
+                      <ClipboardList className="h-4 w-4 mr-1.5" />
+                      {generatingAudit ? "Building..." : "Audit PDF"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Generates a branded prospect audit report with live keyword rankings, citation health, review scores, and PageSpeed data. Opens in a new tab — use Print → Save as PDF to download.</p>
+                  </TooltipContent>
+                </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
