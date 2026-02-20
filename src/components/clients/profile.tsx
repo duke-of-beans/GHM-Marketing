@@ -40,6 +40,7 @@ import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
 import { BillingTab } from "./billing/BillingTab";
 import { RankingsTab } from "./rankings/RankingsTab";
 import { CitationsTab } from "./citations/CitationsTab";
+import { LocalPresenceTab } from "./local-presence/LocalPresenceTab";
 import { Mic, Sparkles } from "lucide-react";
 
 // ============================================================================
@@ -506,6 +507,7 @@ export function ClientProfile({
           </TabsTrigger>
           <TabsTrigger value="rankings">Rankings</TabsTrigger>
           <TabsTrigger value="citations">Citations</TabsTrigger>
+          <TabsTrigger value="local-presence">Local Presence</TabsTrigger>
           <TabsTrigger value="content">Content Studio</TabsTrigger>
           <TabsTrigger value="websites">Website Studio</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -838,6 +840,11 @@ export function ClientProfile({
         {/* CITATIONS TAB */}
         <TabsContent value="citations">
           <CitationsTab clientId={client.id} />
+        </TabsContent>
+
+        {/* LOCAL PRESENCE TAB */}
+        <TabsContent value="local-presence">
+          <LocalPresenceTab clientId={client.id} />
         </TabsContent>
 
         {/* TAB 7: REPORTS */}

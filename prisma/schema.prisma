@@ -387,6 +387,8 @@ model ClientProfile {
   keywordTrackers       KeywordTracker[]
   // Citation scans
   citationScans         CitationScan[]
+  // Google Business Profile
+  gbpConnection         GBPConnection?
 
   @@map("client_profiles")
 }
@@ -1477,4 +1479,33 @@ model DirectoryHealth {
   lastCheckedAt       DateTime? @map("last_checked_at")
 
   @@map("directory_health")
+}
+
+// ============================================================================
+// GOOGLE BUSINESS PROFILE — OAuth credentials + connection
+// ============================================================================
+
+model GBPConnection {
+  id              Int       @id @default(autoincrement())
+  clientId        Int       @unique @map("client_id")
+  
+  // Encrypted OAuth tokens (AES-256-GCM)
+  accessTokenEnc  String    @map("access_token_enc")   // encrypted
+  refreshTokenEnc String    @map("refresh_token_enc")  // encrypted
+  expiresAt       DateTime  @map("expires_at")
+  
+  // GBP resource identifiers
+  accountId       String    @map("account_id")         // e.g. "accounts/123456"
+  locationId      String    @map("location_id")        // e.g. "locations/987654321" (numeric, for Performance API)
+  locationName    String    @map("location_name")      // human-readable name
+  
+  // Connection metadata
+  googleEmail     String    @map("google_email")       // which Google account authorized
+  connectedAt     DateTime  @default(now()) @map("connected_at")
+  lastSyncAt      DateTime? @map("last_sync_at")
+  isActive        Boolean   @default(true) @map("is_active")
+
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("gbp_connections")
 }
