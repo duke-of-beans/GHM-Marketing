@@ -34,7 +34,7 @@ export async function GET(req: Request) {
     },
     select: {
       id: true,
-      lead: { select: { website: true, city: true, state: true } },
+      lead: { select: { website: true, city: true, state: true, zipCode: true } },
       keywordTrackers: {
         where: { isActive: true },
         select: { id: true, keyword: true },
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     // Get zip from city/state — use stored zipCode field if present, else skip
     // Zip should be stored on lead or clientProfile; for now we derive from city/state
     // TODO: add zipCode field to Lead in future pass
-    const zipCode = "90210"; // placeholder — will be client-specific once zip field added
+    const zipCode = client.lead.zipCode ?? client.lead.city ?? "00000";
 
     const tasks = client.keywordTrackers.map((kw) => ({
       keyword: kw.keyword,

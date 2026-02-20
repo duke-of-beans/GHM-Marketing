@@ -98,9 +98,9 @@
 
 | Sprint | Tasks | Hours | Status |
 |--------|-------|-------|--------|
-| I1. Provider Refactor + Cache | Extract providers, shared cache + cost tracking | 6 | 🔴 TODO |
-| I2. DataForSEO SERP | Local rank tracking, Keywords tab, rank clusters | 12 | 🔴 TODO |
-| I3. NAP Citation Scraper | 35 directory adapters, Citations tab, health sentry | 10 | 🔴 TODO |
+| I1. Provider Refactor + Cache | Extract providers, shared cache + cost tracking | 6 | ✅ DONE |
+| I2. DataForSEO SERP | Local rank tracking, Keywords tab, rank clusters | 12 | ✅ DONE |
+| I3. NAP Citation Scraper | 35 directory adapters, Citations tab, health sentry | 10 | ✅ DONE |
 | I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | 🔴 TODO (needs Google approval) |
 | I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | 🔴 TODO |
 | I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | 🔴 TODO |

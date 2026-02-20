@@ -24,7 +24,7 @@ export async function POST(
     where: { id: clientId },
     select: {
       id: true,
-      lead: { select: { website: true, city: true, state: true } },
+      lead: { select: { website: true, city: true, state: true, zipCode: true } },
       keywordTrackers: {
         where: { isActive: true },
         select: { id: true, keyword: true },
@@ -39,7 +39,7 @@ export async function POST(
 
   const domain =
     client.lead.website?.replace(/^https?:\/\//, "").replace(/\/.*$/, "") ?? "";
-  const zipCode = "90210"; // TODO: use client's actual zip when field added to Lead
+  const zipCode = client.lead.zipCode ?? "00000";
 
   const tasks = client.keywordTrackers.map((kw) => ({
     keyword: kw.keyword,
