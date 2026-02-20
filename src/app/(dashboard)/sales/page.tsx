@@ -17,6 +17,18 @@ import { Button } from "@/components/ui/button";
 
 export default async function SalesDashboard() {
   const user = await getCurrentUser();
+
+  // First-login redirect: sales reps who haven't completed onboarding go to setup wizard
+  if (user.role === "sales") {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: Number(user.id) },
+      select: { repOnboardingCompletedAt: true },
+    });
+    if (!dbUser?.repOnboardingCompletedAt) {
+      redirect("/rep-setup");
+    }
+  }
+
   const filter = territoryFilter(user);
   const userId = Number(user.id);
 
