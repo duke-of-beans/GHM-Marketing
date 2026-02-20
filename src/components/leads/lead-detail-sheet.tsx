@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Search, FileText, Mail, ClipboardList } from "lucide-react";
+import { Search, FileText, Mail, ClipboardList, MonitorPlay } from "lucide-react";
 import { LEAD_STATUS_CONFIG } from "@/types";
 import { toast } from "sonner";
 import type { LeadStatus } from "@prisma/client";
@@ -409,6 +409,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
   const [enriching, setEnriching] = useState(false);
   const [generatingWO, setGeneratingWO] = useState(false);
   const [generatingAudit, setGeneratingAudit] = useState(false);
+  const [generatingDemo, setGeneratingDemo] = useState(false);
 
   const handleEnrich = async (force = false) => {
     if (!leadId) return;
@@ -497,6 +498,31 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
       }
     } finally {
       setGeneratingAudit(false);
+    }
+  };
+
+  const handleGenerateDemo = async () => {
+    if (!leadId || !lead) return;
+    setGeneratingDemo(true);
+    try {
+      const fetchedAt = lead.competitiveIntel?.fetchedAt
+        ? new Date(lead.competitiveIntel.fetchedAt)
+        : null;
+      const ageDays = fetchedAt
+        ? Math.floor((Date.now() - fetchedAt.getTime()) / 86400000)
+        : null;
+
+      if (!fetchedAt) {
+        toast.warning("No enrichment data — generating demo with live rankings only. Run Enrich Data first for full competitor context.");
+      } else if (ageDays !== null && ageDays > 30) {
+        toast.warning(`Intel is ${ageDays} days old — demo will use live rankings but cached domain data.`);
+      }
+
+      const url = `/api/leads/${leadId}/demo`;
+      window.open(url, "_blank", "noopener,noreferrer");
+      toast.success("Demo opened — share this URL with your prospect during the call");
+    } finally {
+      setGeneratingDemo(false);
     }
   };
 
@@ -710,6 +736,22 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
                     <p className="text-sm">Generates a branded prospect audit report with live keyword rankings, citation health, review scores, and PageSpeed data. Opens in a new tab — use Print → Save as PDF to download.</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleGenerateDemo}
+                      disabled={generatingDemo}
+                    >
+                      <MonitorPlay className="h-4 w-4 mr-1.5" />
+                      {generatingDemo ? "Building..." : "Live Demo"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Creates a live branded demo showing the prospect exactly what their GHM account would look like — projected rankings, satellite cluster, ROI estimate. Use only on hot calls likely to close.</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
