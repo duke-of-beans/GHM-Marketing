@@ -366,6 +366,7 @@ type LeadDetail = {
     outscraper: unknown;
     ahrefs: unknown;
     pageSpeed: unknown;
+    fetchedAt: string | null;
   } | null;
 };
 
@@ -471,13 +472,29 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
   };
 
   const handleGenerateAudit = async () => {
-    if (!leadId) return;
+    if (!leadId || !lead) return;
     setGeneratingAudit(true);
     try {
+      // Check intel freshness — warn if missing or older than 30 days
+      const fetchedAt = lead.competitiveIntel?.fetchedAt
+        ? new Date(lead.competitiveIntel.fetchedAt)
+        : null;
+      const ageDays = fetchedAt
+        ? Math.floor((Date.now() - fetchedAt.getTime()) / 86400000)
+        : null;
+
+      if (!fetchedAt) {
+        toast.warning("No enrichment data found — run Enrich Data first for a complete audit. Generating with live rankings only.");
+      } else if (ageDays !== null && ageDays > 30) {
+        toast.warning(`Intel is ${ageDays} days old — consider re-enriching for accurate domain and review data.`);
+      }
+
       // Open audit in new tab — rep uses browser Print → Save as PDF
       const url = `/api/leads/${leadId}/audit?autoprint=1`;
       window.open(url, "_blank", "noopener,noreferrer");
-      toast.success("Audit opened — use Print → Save as PDF to download");
+      if (fetchedAt) {
+        toast.success("Audit opened — use Print → Save as PDF to download");
+      }
     } finally {
       setGeneratingAudit(false);
     }
