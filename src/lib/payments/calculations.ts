@@ -515,7 +515,8 @@ export interface CloseRateResult {
  * Close rate = won / (won + lost) * 100
  */
 export async function calculateRolling90DayCloseRate(
-  prismaClient: { leadHistory: { findMany: Function } },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  prismaClient: { leadHistory: { findMany: (args: any) => Promise<Array<{ leadId: number; newStatus: string }>> } },
   userId: number,
   asOf: Date = new Date()
 ): Promise<CloseRateResult> {
