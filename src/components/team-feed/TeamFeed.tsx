@@ -38,6 +38,9 @@ import {
   Reply,
   Trash2,
   Zap,
+  Paperclip,
+  HardDriveDownload,
+  CheckCircle,
 } from "lucide-react";
 import {
   Tooltip,
@@ -63,6 +66,12 @@ type TeamMessageData = {
   createdAt: string;
   reads: { readAt: string }[];
   replies: Array<Omit<TeamMessageData, "replies"> & { reads: { readAt: string }[] }>;
+  // Attachment fields
+  attachmentUrl?: string | null;
+  attachmentName?: string | null;
+  attachmentSize?: number | null;
+  attachmentMimeType?: string | null;
+  attachmentVaultId?: number | null;
 };
 
 type TeamUser = { id: number; name: string; role: string };
@@ -239,6 +248,84 @@ function ComposeMessage({
   );
 }
 
+// ─── Attachment Block ─────────────────────────────────────────────────────────
+
+function AttachmentBlock({ msg }: { msg: Pick<TeamMessageData, "id" | "attachmentUrl" | "attachmentName" | "attachmentSize" | "attachmentMimeType" | "attachmentVaultId"> }) {
+  const [saving, setSaving] = useState(false);
+  const [savedId, setSavedId] = useState<number | null>(msg.attachmentVaultId ?? null);
+
+  if (!msg.attachmentUrl) return null;
+
+  const name = msg.attachmentName ?? "attachment";
+  const size = msg.attachmentSize
+    ? msg.attachmentSize < 1024 * 1024
+      ? `${(msg.attachmentSize / 1024).toFixed(1)} KB`
+      : `${(msg.attachmentSize / (1024 * 1024)).toFixed(1)} MB`
+    : null;
+
+  async function saveToVault(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (savedId) {
+      toast.info("Already saved to Vault");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/vault/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId: msg.id, targetSpace: "private" }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSavedId(json.file.id);
+        toast.success("Saved to your Vault (My Files)");
+      } else {
+        toast.error(json.error ?? "Save failed");
+      }
+    } catch {
+      toast.error("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div
+      className="mt-2 flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 max-w-sm"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Paperclip className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <a
+          href={msg.attachmentUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-medium truncate hover:underline block"
+          title={name}
+        >
+          {name}
+        </a>
+        {size && <p className="text-[11px] text-muted-foreground">{size}</p>}
+      </div>
+      <button
+        onClick={saveToVault}
+        disabled={saving || !!savedId}
+        title={savedId ? "Saved to Vault" : "Save to Vault"}
+        className="flex-shrink-0 text-muted-foreground hover:text-primary disabled:opacity-50 transition-colors"
+      >
+        {savedId ? (
+          <CheckCircle className="h-4 w-4 text-green-500" />
+        ) : saving ? (
+          <span className="text-[10px]">…</span>
+        ) : (
+          <HardDriveDownload className="h-4 w-4" />
+        )}
+      </button>
+    </div>
+  );
+}
+
 // ─── Single Message Row ───────────────────────────────────────────────────────
 
 function MessageRow({
@@ -316,6 +403,7 @@ function MessageRow({
             {!isRead && <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />}
           </div>
           <p className="text-sm mt-1 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+          <AttachmentBlock msg={msg} />
           <div className="flex items-center gap-3 mt-2">
             <span className="text-[11px] text-muted-foreground">
               {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}

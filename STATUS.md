@@ -315,8 +315,18 @@
 
 ---
 
-### FEAT-012: Document Vault
-**Priority:** MEDIUM-HIGH — needed once reps are onboarded
+### FEAT-012: Document Vault — ✅ COMPLETE (Feb 20, 2026)
+**Commit:** 56f8135
+- 4 spaces: Shared (everyone, manager-upload), Private (per-user), Client Reports (auto-populated), Signed Contracts
+- Shared space: categorized view (Sales Resources, Legal, Templates, Onboarding, Misc) with version management
+- Upload: drag-and-drop dialog with space/category selectors, elevated-only guard for shared spaces
+- Transfer: private → shared in one click (with category prompt); TeamFeed attachment → Vault via API
+- File tiles: open/download on click, dropdown for delete/transfer, mobile-friendly
+- Search across all files in active tab
+- Schema: VaultFile model + TeamMessage attachment fields (attachmentUrl, attachmentName, attachmentSize, attachmentMimeType, attachmentVaultId)
+- Nav: Document Vault added to sidebar (visible to all roles)
+- APIs: POST /api/vault/upload, GET/DELETE /api/vault/files, POST /api/vault/transfer
+- **TODO (next session):** TeamFeed UI — "Save to Vault" button on file attachments in messages
 **Scope:** Shared file repository with public (everyone) and private (per-user) spaces. Natural, intuitive, useful — not a dumping ground.
 
 **Spaces:**
