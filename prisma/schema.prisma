@@ -360,6 +360,10 @@ model ClientProfile {
   masterManagerId Int?     @map("master_manager_id")
   onboardedMonth  DateTime? @map("onboarded_month") @db.Date
 
+  // Phase A: Lock-at-close residual tracking
+  lockedResidualAmount  Decimal?  @map("locked_residual_amount") @db.Decimal(10, 2)
+  closedInMonth         DateTime? @map("closed_in_month") @db.Date
+
   // Wave billing fields
   waveCustomerId    String?   @map("wave_customer_id")
   invoiceDay        Int       @default(1) @map("invoice_day")
@@ -866,7 +870,20 @@ model GlobalSettings {
   defaultCommission     Float    @default(0.15) @map("default_commission")       // 15%
   defaultResidual       Float    @default(0.05) @map("default_residual")         // 5%
   masterManagerFee      Float    @default(240) @map("master_manager_fee")        // $240/mo
-  
+
+  // Phase A: Upsell commission rate
+  upsellCommissionRate  Float    @default(0.10) @map("upsell_commission_rate")   // 10% of product price
+
+  // Phase A: Tiered residual thresholds (retainer amount → residual payout)
+  // Tier 1: retainer < tier2Threshold → residualTier1Amount
+  // Tier 2: retainer < tier3Threshold → residualTier2Amount
+  // Tier 3: retainer >= tier3Threshold → residualTier3Amount
+  residualTier1Amount   Float    @default(200) @map("residual_tier1_amount")     // $200/mo (base)
+  residualTier2Amount   Float    @default(250) @map("residual_tier2_amount")     // $250/mo
+  residualTier3Amount   Float    @default(300) @map("residual_tier3_amount")     // $300/mo
+  residualTier2Threshold Float   @default(3000) @map("residual_tier2_threshold") // retainer >= $3000 → tier 2
+  residualTier3Threshold Float   @default(4000) @map("residual_tier3_threshold") // retainer >= $4000 → tier 3
+
   // Feature Toggles
   contentStudioEnabled  Boolean  @default(true) @map("content_studio_enabled")
   scanningEnabled       Boolean  @default(true) @map("scanning_enabled")

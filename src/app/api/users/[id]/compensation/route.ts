@@ -51,6 +51,7 @@ export async function GET(
     // If no config exists, return defaults
     if (!user.compensationConfig) {
       return NextResponse.json({
+        success: true,
         data: {
           userId,
           commissionEnabled: true,
@@ -65,7 +66,7 @@ export async function GET(
       });
     }
 
-    return NextResponse.json({ data: user.compensationConfig });
+    return NextResponse.json({ success: true, data: user.compensationConfig });
   } catch (error) {
     console.error("Error fetching compensation config:", error);
     return NextResponse.json(
@@ -148,9 +149,8 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({ data: config });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+    return NextResponse.json({ success: true, data: config });
+  } catch (error) {    if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid data", details: error.issues },
         { status: 400 }
@@ -164,3 +164,6 @@ export async function PUT(
     );
   }
 }
+
+// PATCH alias — same as PUT, for client compatibility
+export { PUT as PATCH };

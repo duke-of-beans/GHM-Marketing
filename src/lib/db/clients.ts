@@ -144,6 +144,7 @@ export async function getClient(id: number) {
 /**
  * Create a client profile when a lead is won.
  * Copies baseline data from the lead's competitive intel.
+ * Phase A: Locks residual amount at close based on retainer tier.
  */
 export async function createClientFromWonLead(leadId: number) {
   const lead = await prisma.lead.findUnique({
@@ -151,6 +152,9 @@ export async function createClientFromWonLead(leadId: number) {
     include: {
       competitiveIntel: true,
       clientProfile: true,
+      assignedUser: {
+        include: { compensationConfig: true },
+      },
     },
   });
 
@@ -181,12 +185,42 @@ export async function createClientFromWonLead(leadId: number) {
   const nextScanAt = new Date();
   nextScanAt.setDate(nextScanAt.getDate() + 14);
 
+  // Phase A: Calculate and lock residual amount at close
+  // Use retainerAmount from lead (dealValueMonthly is the recurring component)
+  // Fall back to mrr if dealValueMonthly not set
+  const retainerForTiering = lead.dealValueMonthly.greaterThan(0)
+    ? lead.dealValueMonthly
+    : lead.mrr;
+
+  // Load tier config from GlobalSettings (uses defaults if not configured)
+  const globalSettings = await prisma.globalSettings.findFirst();
+  const tierConfig = globalSettings
+    ? {
+        tier1Amount: globalSettings.residualTier1Amount,
+        tier2Amount: globalSettings.residualTier2Amount,
+        tier3Amount: globalSettings.residualTier3Amount,
+        tier2Threshold: globalSettings.residualTier2Threshold,
+        tier3Threshold: globalSettings.residualTier3Threshold,
+      }
+    : undefined;
+
+  const { calculateTieredResidual } = await import("@/lib/payments/calculations");
+  const lockedResidualAmount = calculateTieredResidual(retainerForTiering, tierConfig);
+  const closedInMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
   return prisma.clientProfile.create({
     data: {
       leadId: lead.id,
       businessName: lead.businessName,
+      retainerAmount: retainerForTiering.greaterThan(0) ? retainerForTiering : 2400,
       healthScore,
       nextScanAt,
+      // Commission system: wire up the assigned rep and onboarded month
+      salesRepId: lead.assignedTo ?? null,
+      onboardedMonth: closedInMonth,
+      // Phase A: Lock residual at close
+      lockedResidualAmount,
+      closedInMonth,
       competitors: competitors
         ? {
             createMany: {

@@ -111,43 +111,34 @@
 
 ### Sales Launch — Dashboard Integration (See SALES_INTEGRATION_PLAN.md for full spec)
 
-**Phase A: Foundation (Schema + Core Logic) — CRITICAL, everything depends on this**
+**Phase A: Foundation (Schema + Core Logic) — ✅ COMPLETE (Feb 20, 2026)**
 | ID | Task | Status |
 |----|------|--------|
-| A1 | Schema: `lockedResidualAmount` + `closedInMonth` on ClientProfile | 🔴 TODO |
-| A2 | Schema: Residual tier config (company-wide $200/$250/$300 thresholds) | 🔴 TODO |
-| A3 | Logic: Tiered residual calculation with lock-at-close | 🔴 TODO |
-| A4 | Logic: Auto-lock residual on lead → won transition | 🔴 TODO |
-| A5 | Schema: `upsell_commission` payment type | 🔴 TODO |
-| A6 | Logic: Upsell commission generation on product sale (10%) | 🔴 TODO |
-| A7 | Logic: Rolling 90-day close rate calculator | 🔴 TODO |
+| A1 | Schema: `lockedResidualAmount` + `closedInMonth` on ClientProfile | ✅ DONE |
+| A2 | Schema: Residual tier config (company-wide $200/$250/$300 thresholds) in GlobalSettings | ✅ DONE |
+| A3 | Logic: Tiered residual calculation with lock-at-close (`calculateTieredResidual`) | ✅ DONE |
+| A4 | Logic: Auto-lock residual on lead → won (`createClientFromWonLead`) | ✅ DONE |
+| A5 | Schema: `upsell_commission` payment type (string field, no enum change needed) | ✅ DONE |
+| A6 | Logic: Upsell commission generation on product sale (10%, products route) | ✅ DONE |
+| A7 | Logic: Rolling 90-day close rate (`calculateRolling90DayCloseRate` + `/api/users/[id]/close-rate`) | ✅ DONE |
 
-**Phase B: Prospect Sales Tools — HIGH, the sales team's weapons**
+**Phase B: Prospect Sales Tools — ✅ COMPLETE (Feb 20, 2026)**
 | ID | Task | Status |
 |----|------|--------|
-| B1 | API: `/api/prospect-audit/generate` (domain + competitor analysis) | 🔴 TODO |
-| B2 | Template: Branded audit report (HTML, shareable) | 🔴 TODO |
-| B3 | UI: "Generate Audit" button on lead detail sheet | 🔴 TODO |
-| B4 | UI: "New Prospect Audit" in pipeline header | 🔴 TODO |
-| B5 | DB: Store audit results linked to lead record | 🔴 TODO |
-| B6 | API: `/api/prospect-demo/generate` (HTML demo from audit data) | 🔴 TODO |
-| B7 | Template: Branded demo page with prospect's real data | 🔴 TODO |
-| B8 | Deploy: Temp Vercel preview URLs for demos (~2 min build) | 🔴 TODO |
-| B9 | UI: "Create Demo" button on lead detail (requires audit first) | 🔴 TODO |
-| B10 | Cleanup: Cron to expire old demo deployments | 🔴 TODO |
+| B1-B10 | Audit PDF, Demo Generator, Brochure, Comp Sheet, Territory Map — all built and deployed | ✅ DONE |
 
-**Phase C: Dashboard UI Enhancements — HIGH, makes dashboard match the business**
+**Phase C: Dashboard UI Enhancements — PARTIAL**
 | ID | Task | Status |
 |----|------|--------|
-| C1 | UI: Territory banner on pipeline/leads page | 🔴 TODO |
-| C2 | UI: Territory stats card on sales dashboard | 🔴 TODO |
-| C3 | UI: Rolling 90-day close rate on sales dashboard | 🔴 TODO |
-| C4 | UI: Production threshold warnings (admin + rep views) | 🔴 TODO |
-| C5 | UI: CompensationConfigSection — tier config fields | 🔴 TODO |
-| C6 | UI: My Earnings — tiered breakdown with locked rates | 🔴 TODO |
-| C7 | UI: My Earnings — upsell commission line items | 🔴 TODO |
-| C8 | UI: Gavin's profitability — use actual locked rates | 🔴 TODO |
-| C9 | UI: Earnings projection ("your book will be worth $X by...") | 🔴 TODO |
+| C1 | UI: Territory banner on pipeline/leads page | ✅ DONE |
+| C2 | UI: Territory stats card on sales dashboard | ✅ DONE |
+| C3 | UI: Rolling 90-day close rate on sales dashboard | ✅ DONE |
+| C4 | UI: Production threshold warnings (admin + rep views) | ✅ DONE |
+| C5 | UI: CompensationConfigSection — tier config fields (admin can edit tier thresholds/amounts) | ✅ DONE |
+| C6 | UI: My Earnings — tiered breakdown with locked rates | ✅ DONE |
+| C7 | UI: My Earnings — upsell commission line items | ✅ DONE |
+| C8 | UI: Gavin's profitability — use actual locked rates | ✅ DONE |
+| C9 | UI: Earnings projection ("your book will be worth $X by...") | ✅ DONE (My Book widget) |
 
 **Phase D: Polish & Sales Enablement — MEDIUM**
 | ID | Task | Status |

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { addDealProductSchema } from "@/lib/validations";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
+import { evaluateUpsellCommission, getFirstDayOfMonth } from "@/lib/payments/calculations";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export async function POST(
   request: NextRequest,
@@ -33,10 +35,10 @@ export async function POST(
   const user = session.user as unknown as SessionUser;
   const baseFilter = territoryFilter(user);
 
-  // Verify lead access
+  // Verify lead access — fetch status so we can trigger upsell commission on won clients
   const lead = await prisma.lead.findFirst({
     where: { id: leadId, ...baseFilter },
-    select: { id: true },
+    select: { id: true, status: true, assignedTo: true },
   });
   if (!lead) {
     return NextResponse.json({ success: false, error: "Lead not found" }, { status: 404 });
@@ -69,6 +71,61 @@ export async function POST(
   });
 
   // Note: DB trigger recalculates lead.dealValueTotal/mrr/arr/ltv
+
+  // Phase A (A6): Generate upsell commission if this lead is a won/active client
+  if (lead.status === "won" && lead.assignedTo) {
+    try {
+      const clientProfile = await prisma.clientProfile.findUnique({
+        where: { leadId },
+        select: { id: true, status: true, salesRepId: true },
+      });
+
+      if (clientProfile?.status === "active" && clientProfile.salesRepId) {
+        const globalSettings = await prisma.globalSettings.findFirst({
+          select: { upsellCommissionRate: true },
+        });
+        const rate = globalSettings?.upsellCommissionRate ?? 0.10;
+
+        const result = evaluateUpsellCommission(
+          clientProfile.salesRepId,
+          new Decimal(finalPrice),
+          "active",
+          rate
+        );
+
+        if (result.shouldPay) {
+          const currentMonth = getFirstDayOfMonth();
+          // Check idempotency — avoid duplicate for same client/user/month/type
+          const existing = await prisma.paymentTransaction.findFirst({
+            where: {
+              clientId: clientProfile.id,
+              userId: clientProfile.salesRepId,
+              type: "upsell_commission",
+              month: currentMonth,
+              notes: { contains: `product:${parsed.data.productId}` },
+            },
+          });
+
+          if (!existing) {
+            await prisma.paymentTransaction.create({
+              data: {
+                clientId: clientProfile.id,
+                userId: clientProfile.salesRepId,
+                type: "upsell_commission",
+                amount: result.amount,
+                month: currentMonth,
+                status: "pending",
+                notes: `${result.reason} | product:${parsed.data.productId} | dealProduct:${dealProduct.id}`,
+              },
+            });
+          }
+        }
+      }
+    } catch (err) {
+      // Non-fatal — log but don't fail the product add
+      console.error("[UpsellCommission] Failed to generate upsell commission:", err);
+    }
+  }
 
   return NextResponse.json({ success: true, data: dealProduct }, { status: 201 });
 }

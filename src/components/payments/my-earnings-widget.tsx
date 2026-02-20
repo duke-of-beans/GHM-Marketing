@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, HelpCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { DollarSign, TrendingUp, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useRefetchOnFocus } from "@/lib/hooks/use-refetch-on-focus";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import {
@@ -12,26 +13,50 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+interface ClientBreakdownItem {
+  id: number;
+  businessName: string;
+  retainerAmount: number;
+  lockedResidualAmount: number | null;
+  closedInMonth: string | null;
+  onboardedMonth: string | null;
+}
+
+interface UpsellLineItem {
+  id: number;
+  amount: number;
+  status: string;
+  month: string;
+  clientName: string;
+  notes: string;
+}
+
 interface EarningsData {
   totalCommissionEarned: number;
   totalResidualEarned: number;
+  totalUpsellEarned: number;
   monthlyResidual: number;
   activeClients: number;
   pendingCommissions: number;
+  pendingUpsell: number;
   projectedMonthly: number;
+  clientBreakdown: ClientBreakdownItem[];
+  upsellLineItems: UpsellLineItem[];
+  thisMonthResidualsPaid: number;
+  thisMonthResidualsPending: number;
 }
 
 export function MyEarningsWidget() {
   const [data, setData] = useState<EarningsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showBookBreakdown, setShowBookBreakdown] = useState(false);
+  const [showUpsell, setShowUpsell] = useState(false);
 
   const fetchEarnings = useCallback(async () => {
     try {
       const res = await fetch("/api/payments/my-earnings");
       const json = await res.json();
-      if (json.success) {
-        setData(json.data);
-      }
+      if (json.success) setData(json.data);
     } catch (error) {
       console.error("Failed to fetch earnings:", error);
     } finally {
@@ -77,7 +102,8 @@ export function MyEarningsWidget() {
     );
   }
 
-  const totalEarned = data.totalCommissionEarned + data.totalResidualEarned;
+  const totalEarned = data.totalCommissionEarned + data.totalResidualEarned + data.totalUpsellEarned;
+  const totalPending = data.pendingCommissions + data.pendingUpsell;
 
   return (
     <TooltipProvider>
@@ -94,84 +120,173 @@ export function MyEarningsWidget() {
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  Your total earnings from commissions (paid at client close) and monthly residuals. Commissions are one-time payments of $1,000 per new client. Residuals start Month 2 at $200/month per active client.
+                  Total paid earnings from commissions, residuals, and upsell commissions.
+                  Residual rates are locked at the retainer amount when the deal was closed.
                 </p>
               </TooltipContent>
             </Tooltip>
           </div>
         </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Total Earned */}
-        <div>
-          <div className="flex items-baseline justify-between">
-            <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(totalEarned)}
-            </p>
-            <p className="text-xs text-muted-foreground">Total Paid</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-            <div>
-              <p className="text-muted-foreground">Commissions</p>
-              <p className="font-medium">{formatCurrency(data.totalCommissionEarned)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Residuals</p>
-              <p className="font-medium">{formatCurrency(data.totalResidualEarned)}</p>
-            </div>
-          </div>
-        </div>
+        <CardContent className="space-y-4">
 
-        {/* Monthly Recurring */}
-        <div className="pt-3 border-t">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-              <p className="text-sm font-medium">Monthly Recurring</p>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="text-sm">
-                    Your expected monthly residual income from active clients. This is recurring revenue that continues as long as clients remain active.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+          {/* Total Earned */}
+          <div>
+            <div className="flex items-baseline justify-between">
+              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalEarned)}</p>
+              <p className="text-xs text-muted-foreground">Total Paid</p>
             </div>
-            <p className="text-lg font-bold text-blue-600">
-              {formatCurrency(data.monthlyResidual)}
-            </p>
+            <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
+              <div>
+                <p className="text-muted-foreground">Commissions</p>
+                <p className="font-medium">{formatCurrency(data.totalCommissionEarned)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Residuals</p>
+                <p className="font-medium">{formatCurrency(data.totalResidualEarned)}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Upsells</p>
+                <p className="font-medium">{formatCurrency(data.totalUpsellEarned)}</p>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            From {data.activeClients} active {data.activeClients === 1 ? "client" : "clients"}
-          </p>
-        </div>
 
-        {/* Pending */}
-        {data.pendingCommissions > 0 && (
+
+          {/* Monthly Book — locked rates breakdown */}
           <div className="pt-3 border-t">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="text-sm">
-                      Commission payments that have been generated but not yet marked as paid. These will be processed in the next payment cycle.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-blue-600" />
+                <p className="text-sm font-medium">Monthly Book</p>
               </div>
-              <p className="text-sm font-medium text-orange-600">
-                {formatCurrency(data.pendingCommissions)}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-lg font-bold text-blue-600">
+                  {formatCurrency(data.monthlyResidual)}
+                </p>
+                <button
+                  onClick={() => setShowBookBreakdown(!showBookBreakdown)}
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Toggle book breakdown"
+                >
+                  {showBookBreakdown ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {data.activeClients} active clients · locked rates at close
+            </p>
+
+            {showBookBreakdown && data.clientBreakdown.length > 0 && (
+              <div className="mt-3 space-y-1.5 max-h-48 overflow-y-auto">
+                {data.clientBreakdown.map((c) => (
+                  <div key={c.id} className="flex items-center justify-between text-xs py-1 border-b last:border-0">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{c.businessName}</p>
+                      <p className="text-muted-foreground">${c.retainerAmount.toLocaleString()}/mo retainer</p>
+                    </div>
+                    <div className="text-right ml-2 shrink-0">
+                      {c.lockedResidualAmount !== null ? (
+                        <Badge variant="secondary" className="text-xs">
+                          {formatCurrency(c.lockedResidualAmount)}/mo
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-muted-foreground">
+                          legacy
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {showBookBreakdown && data.clientBreakdown.length === 0 && (
+              <p className="text-xs text-muted-foreground mt-2">No active clients yet.</p>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+
+          {/* This month residual status */}
+          {(data.thisMonthResidualsPaid > 0 || data.thisMonthResidualsPending > 0) && (
+            <div className="pt-3 border-t">
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">This Month</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {data.thisMonthResidualsPaid > 0 && (
+                  <div>
+                    <p className="text-muted-foreground">Residuals Paid</p>
+                    <p className="font-medium text-green-600">{formatCurrency(data.thisMonthResidualsPaid)}</p>
+                  </div>
+                )}
+                {data.thisMonthResidualsPending > 0 && (
+                  <div>
+                    <p className="text-muted-foreground">Residuals Pending</p>
+                    <p className="font-medium text-orange-600">{formatCurrency(data.thisMonthResidualsPending)}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Upsell Commissions */}
+          {(data.totalUpsellEarned > 0 || data.pendingUpsell > 0 || data.upsellLineItems.length > 0) && (
+            <div className="pt-3 border-t">
+              <button
+                onClick={() => setShowUpsell(!showUpsell)}
+                className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
+              >
+                <span>Upsell Commissions</span>
+                <div className="flex items-center gap-1">
+                  {data.pendingUpsell > 0 && (
+                    <Badge variant="outline" className="text-xs text-orange-600 border-orange-300">
+                      {formatCurrency(data.pendingUpsell)} pending
+                    </Badge>
+                  )}
+                  {showUpsell ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </div>
+              </button>
+
+              {showUpsell && (
+                <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto">
+                  {data.upsellLineItems.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No upsell commissions yet.</p>
+                  ) : (
+                    data.upsellLineItems.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b last:border-0">
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{item.clientName}</p>
+                          <p className="text-muted-foreground">
+                            {new Date(item.month).toLocaleDateString("en-US", { month: "short", year: "2-digit" })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+                          <span className="font-medium">{formatCurrency(item.amount)}</span>
+                          <Badge
+                            variant={item.status === "paid" ? "secondary" : "outline"}
+                            className={`text-xs ${item.status === "pending" ? "text-orange-600 border-orange-300" : ""}`}
+                          >
+                            {item.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Pending total */}
+          {totalPending > 0 && (
+            <div className="pt-3 border-t">
+              <div className="flex items-center justify-between text-sm">
+                <p className="text-muted-foreground">Total Pending</p>
+                <p className="font-medium text-orange-600">{formatCurrency(totalPending)}</p>
+              </div>
+            </div>
+          )}
+
+        </CardContent>
+      </Card>
     </TooltipProvider>
   );
 }
