@@ -37,6 +37,7 @@ import { ClientCompensationSection } from "./client-compensation";
 import { ContentStudioTab } from "../content/ContentStudioTab";
 import { WebsiteStudioTab } from "./website-studio/WebsiteStudioTab";
 import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
+import { BillingTab } from "./billing/BillingTab";
 import { Mic, Sparkles } from "lucide-react";
 
 // ============================================================================
@@ -506,6 +507,7 @@ export function ClientProfile({
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
 
@@ -745,6 +747,11 @@ export function ClientProfile({
               ))}
             </div>
           )}
+        </TabsContent>
+
+        {/* TAB: BILLING */}
+        <TabsContent value="billing" className="space-y-4">
+          <BillingTab clientId={client.id} businessName={client.businessName} />
         </TabsContent>
 
         {/* TAB 4: NOTES & MEMORY */}

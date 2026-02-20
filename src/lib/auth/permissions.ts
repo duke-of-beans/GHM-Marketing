@@ -97,6 +97,13 @@ export const PERMISSION_PRESETS: Record<string, UserPermissions> = {
  * Combines preset permissions with custom overrides
  */
 export function getUserPermissions(user: SessionUser & { permissions?: unknown; permissionPreset?: string }): UserPermissions {
+  // Admin role always gets all permissions — no preset or override needed
+  if ((user as any).role === "admin") {
+    return Object.fromEntries(
+      (Object.keys(PERMISSION_PRESETS.master_full) as PermissionKey[]).map((k) => [k, true])
+    ) as UserPermissions;
+  }
+
   // Start with preset permissions
   const preset = user.permissionPreset || "sales_basic";
   const basePermissions = PERMISSION_PRESETS[preset] || PERMISSION_PRESETS.sales_basic;

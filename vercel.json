@@ -7,6 +7,14 @@
     {
       "path": "/api/cron/generate-payments",
       "schedule": "1 0 1 * *"
+    },
+    {
+      "path": "/api/cron/invoice-monthly",
+      "schedule": "5 0 1 * *"
+    },
+    {
+      "path": "/api/cron/payment-check",
+      "schedule": "0 14 * * *"
     }
   ]
 }

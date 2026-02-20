@@ -23,6 +23,7 @@ import { Search, FileText, Mail } from "lucide-react";
 import { LEAD_STATUS_CONFIG } from "@/types";
 import { toast } from "sonner";
 import type { LeadStatus } from "@prisma/client";
+import { OnboardingPanel } from "@/components/leads/onboarding-panel";
 
 // ============================================================================
 // Add Product Form - inline component for attaching products to a deal
@@ -718,6 +719,9 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
             </TooltipProvider>
 
             <Separator />
+
+            {/* Onboarding link generation */}
+            <OnboardingPanel leadId={lead.id} leadStatus={lead.status} />
 
             {/* Tabs: Notes, Products, History */}
             <Tabs defaultValue="notes" className="pt-4">

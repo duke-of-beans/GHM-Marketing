@@ -45,6 +45,9 @@ model User {
   assignedBugs          BugReport[] @relation("BugAssignee")
   resolvedBugs          BugReport[] @relation("BugResolver")
   
+  // Wave vendor (for partner payments)
+  waveVendorId          String?   @map("wave_vendor_id")
+
   // Settings relations
   settingsUpdates       GlobalSettings[] @relation("SettingsUpdater")
   
@@ -57,6 +60,9 @@ model User {
   // Task Pipeline relations
   assignedTasks         ClientTask[] @relation("TaskAssignee")
   createdTasks          ClientTask[] @relation("TaskAssigner")
+
+  // Onboarding Portal
+  generatedOnboardingTokens OnboardingToken[] @relation("OnboardingTokenCreator")
   
   // Team messaging
   sentMessages          TeamMessage[] @relation("MessageAuthor")
@@ -135,6 +141,8 @@ model Lead {
   wealthScore       String?           @map("wealth_score")
   clientProfile     ClientProfile?
   competitiveIntel  CompetitiveIntel?
+  onboardingTokens  OnboardingToken[]
+  onboardingSubmissions OnboardingSubmission[]
   dealProducts      DealProduct[]
   leadHistory       LeadHistory[]
   assignedUser      User?             @relation("AssignedTo", fields: [assignedTo], references: [id])
@@ -342,6 +350,17 @@ model ClientProfile {
   salesRepId      Int?     @map("sales_rep_id")
   masterManagerId Int?     @map("master_manager_id")
   onboardedMonth  DateTime? @map("onboarded_month") @db.Date
+
+  // Wave billing fields
+  waveCustomerId    String?   @map("wave_customer_id")
+  invoiceDay        Int       @default(1) @map("invoice_day")
+  paymentTermsDays  Int       @default(7) @map("payment_terms_days")
+  lastInvoiceDate   DateTime? @map("last_invoice_date")
+  lastPaymentDate   DateTime? @map("last_payment_date")
+  paymentStatus     String    @default("current") @map("payment_status")
+  // "current" | "grace" | "overdue" | "paused" | "collections" | "terminated"
+
+  invoiceRecords    InvoiceRecord[]
   
   competitors         ClientCompetitor[]
   domains             ClientDomain[]
@@ -646,6 +665,14 @@ model PaymentTransaction {
   status          String   @default("pending") // "pending" | "paid" | "held" | "cancelled"
   paidAt          DateTime? @map("paid_at")
   notes           String?
+
+  // Wave integration
+  waveInvoiceId   String?   @map("wave_invoice_id")
+  waveBillId      String?   @map("wave_bill_id")
+  waveCustomerId  String?   @map("wave_customer_id")
+  wavePaymentId   String?   @map("wave_payment_id")
+  paymentMethod   String?   @map("payment_method")   // "ach" | "credit_card" | "check" | "manual"
+  processingFee   Decimal?  @map("processing_fee") @db.Decimal(10, 2)
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -1137,6 +1164,115 @@ model ScrvnrGateResult {
 // ── AI Cost Logging ────────────────────────────────────────────────────────────
 // Adapted from GREGORE metabolism engine — reshaped for USD/per-client tracking
 
+// ============================================================================
+// ONBOARDING PORTAL
+// ============================================================================
+
+model OnboardingToken {
+  id            Int       @id @default(autoincrement())
+  token         String    @unique                          // UUID v4, used in URL
+  leadId        Int       @map("lead_id")
+  generatedBy   Int       @map("generated_by")             // Partner user ID
+
+  status        String    @default("pending")              // "pending" | "in_progress" | "completed" | "expired"
+
+  currentStep   Int       @default(1) @map("current_step")
+  formData      Json?     @map("form_data")                // Partial saves between steps
+
+  completedAt   DateTime? @map("completed_at")
+  submittedData Json?     @map("submitted_data")           // Final submission snapshot
+
+  expiresAt     DateTime  @map("expires_at")               // 30 days from generation
+  lastAccessedAt DateTime? @map("last_accessed_at")
+  accessCount   Int       @default(0) @map("access_count")
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  lead          Lead      @relation(fields: [leadId], references: [id])
+  generatedByUser User    @relation("OnboardingTokenCreator", fields: [generatedBy], references: [id])
+  submission    OnboardingSubmission?
+
+  @@index([token])
+  @@index([leadId])
+  @@index([status])
+  @@map("onboarding_tokens")
+}
+
+model OnboardingSubmission {
+  id              Int       @id @default(autoincrement())
+  tokenId         Int       @unique @map("token_id")
+  leadId          Int       @map("lead_id")
+
+  // Section 1: Business Identity
+  businessName    String    @map("business_name")
+  address         String
+  city            String
+  state           String
+  zipCode         String    @map("zip_code")
+  phone           String
+  website         String?
+  businessDescription String? @map("business_description")
+  primaryServices Json?     @map("primary_services")        // Array of strings
+  serviceAreas    String?   @map("service_areas")
+  multiLocation   Boolean   @default(false) @map("multi_location")
+  locationCount   Int?      @map("location_count")
+
+  // Section 2: Contacts
+  primaryContactName    String  @map("primary_contact_name")
+  primaryContactTitle   String? @map("primary_contact_title")
+  primaryContactEmail   String  @map("primary_contact_email")
+  primaryContactPhone   String  @map("primary_contact_phone")
+  preferredContactMethod String? @map("preferred_contact_method")
+
+  billingSameAsPrimary  Boolean @default(true) @map("billing_same_as_primary")
+  billingContactName    String? @map("billing_contact_name")
+  billingContactEmail   String? @map("billing_contact_email")
+  billingContactPhone   String? @map("billing_contact_phone")
+  paymentMethod         String? @map("payment_method")
+  requiresPO            Boolean @default(false) @map("requires_po")
+  poNumber              String? @map("po_number")
+
+  // Section 3: Technical Access (JSON blob)
+  technicalAccess Json     @map("technical_access")
+
+  // Section 4: Competitive Landscape + Content Prefs
+  competitors       Json?
+  competitorPains   Json?   @map("competitor_pains")
+  competitorNotes   String? @map("competitor_notes")
+  contentFocusTopics String? @map("content_focus_topics")
+  contentAvoidTopics String? @map("content_avoid_topics")
+  tonePreference    String? @map("tone_preference")
+  contentReviewPref String? @map("content_review_pref")
+
+  // Section 5: Brand + Online Presence
+  hasLogo           Boolean @default(false) @map("has_logo")
+  hasBrandGuidelines Boolean @default(false) @map("has_brand_guidelines")
+  hasPhotography    Boolean @default(false) @map("has_photography")
+  socialProfiles    Json?   @map("social_profiles")
+  directoryListings String? @map("directory_listings")
+  previousSEO       Boolean @default(false) @map("previous_seo")
+  previousSEONotes  String? @map("previous_seo_notes")
+
+  additionalNotes   String? @map("additional_notes")
+
+  // Ops tracking
+  opsChecklist      Json?   @map("ops_checklist")
+  onboardingComplete Boolean  @default(false) @map("onboarding_complete")
+  onboardedAt        DateTime? @map("onboarded_at")
+  onboardedBy        Int?      @map("onboarded_by")
+
+  submittedAt   DateTime  @default(now()) @map("submitted_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  token         OnboardingToken @relation(fields: [tokenId], references: [id])
+  lead          Lead            @relation(fields: [leadId], references: [id])
+
+  @@index([leadId])
+  @@index([onboardingComplete])
+  @@map("onboarding_submissions")
+}
+
 model AICostLog {
   id               Int      @id @default(autoincrement())
   timestamp        DateTime @default(now())
@@ -1157,4 +1293,86 @@ model AICostLog {
   @@index([timestamp(sort: Desc)])
   @@index([clientId, timestamp(sort: Desc)])
   @@map("ai_cost_logs")
+}
+
+
+// ============================================================================
+// WAVE PAYMENTS — INVOICE MIRROR
+// ============================================================================
+
+model InvoiceRecord {
+  id              Int       @id @default(autoincrement())
+  clientId        Int       @map("client_id")
+  waveInvoiceId   String    @unique @map("wave_invoice_id")
+  invoiceNumber   String?   @map("invoice_number")
+  amount          Decimal   @db.Decimal(10, 2)
+  status          String    @default("draft")
+  // "draft" | "sent" | "viewed" | "paid" | "overdue" | "cancelled"
+  issuedDate      DateTime  @map("issued_date")
+  dueDate         DateTime  @map("due_date")
+  paidDate        DateTime? @map("paid_date")
+  paidAmount      Decimal?  @map("paid_amount") @db.Decimal(10, 2)
+  paymentMethod   String?   @map("payment_method")
+  waveViewUrl     String?   @map("wave_view_url")
+  lineItems       Json?     @map("line_items")
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, status])
+  @@index([dueDate])
+  @@index([status])
+  @@map("invoice_records")
+}
+
+// ============================================================================
+// APP SETTINGS — key/value store for runtime config
+// ============================================================================
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+// ============================================================================
+// ENRICHMENT CACHE — shared TTL cache across all providers
+// ============================================================================
+
+model EnrichmentCache {
+  id          Int      @id @default(autoincrement())
+  provider    String
+  cacheKey    String   @map("cache_key")
+  data        Json
+  costUsd     Decimal? @map("cost_usd") @db.Decimal(10, 6)
+  fetchedAt   DateTime @default(now()) @map("fetched_at")
+  expiresAt   DateTime @map("expires_at")
+
+  @@unique([provider, cacheKey])
+  @@index([provider, expiresAt])
+  @@map("enrichment_cache")
+}
+
+// ============================================================================
+// ENRICHMENT COST LOG — per-call cost tracking for all providers
+// ============================================================================
+
+model EnrichmentCostLog {
+  id          Int      @id @default(autoincrement())
+  provider    String
+  operation   String
+  clientId    Int?     @map("client_id")
+  cacheHit    Boolean  @default(false) @map("cache_hit")
+  costUsd     Decimal  @map("cost_usd") @db.Decimal(10, 6)
+  latencyMs   Int?     @map("latency_ms")
+  success     Boolean  @default(true)
+  errorMsg    String?  @map("error_msg")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([provider, createdAt])
+  @@index([clientId, createdAt])
+  @@map("enrichment_cost_logs")
 }

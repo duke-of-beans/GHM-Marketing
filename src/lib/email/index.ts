@@ -167,3 +167,129 @@ export async function sendStatusNotification(params: {
     return { success: false, error: String(err) };
   }
 }
+
+// ============================================================================
+// Onboarding submission — notify ops team
+// ============================================================================
+
+export async function sendOpsOnboardingNotification(params: {
+  submissionId: number;
+  businessName: string;
+  partnerName: string;
+  opsEmails: string[];
+  dashboardUrl?: string;
+}) {
+  const { submissionId, businessName, partnerName, opsEmails, dashboardUrl } = params;
+  if (!process.env.RESEND_API_KEY || opsEmails.length === 0) {
+    console.warn("Ops onboarding notification skipped — no RESEND_API_KEY or no recipients");
+    return { success: false, error: "Not configured" };
+  }
+
+  const viewUrl = dashboardUrl ?? `https://app.ghmdigital.com/clients/onboarding/${submissionId}`;
+
+  try {
+    const { error } = await getResend()!.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: opsEmails,
+      subject: `🎉 New onboarding completed — ${businessName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9fafb;">
+          <div style="background: #1a1a2e; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: #fff; margin: 0; font-size: 20px;">New Client Onboarding Received</h1>
+          </div>
+          <div style="background: #fff; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+            <p style="color: #374151; font-size: 16px; margin-top: 0;">
+              <strong>${businessName}</strong> has completed their onboarding form.
+            </p>
+            <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280; width: 40%;">Business</td>
+                <td style="padding: 8px 0; color: #111827; font-weight: 600;">${businessName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Partner / Sales rep</td>
+                <td style="padding: 8px 0; color: #111827; font-weight: 600;">${partnerName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Submission ID</td>
+                <td style="padding: 8px 0; color: #111827;">#${submissionId}</td>
+              </tr>
+            </table>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${viewUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 15px; font-weight: 600;">
+                View Submission + Checklist →
+              </a>
+            </div>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 0;">
+              The ops checklist is ready for you. Work through each item to complete client onboarding.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: String(err) };
+  }
+}
+
+// ============================================================================
+// Onboarding submission — notify the partner who generated the link
+// ============================================================================
+
+export async function sendPartnerOnboardingNotification(params: {
+  partnerEmail: string;
+  partnerName: string;
+  businessName: string;
+  submissionId: number;
+  dashboardUrl?: string;
+}) {
+  const { partnerEmail, partnerName, businessName, submissionId, dashboardUrl } = params;
+  if (!process.env.RESEND_API_KEY) {
+    return { success: false, error: "Not configured" };
+  }
+
+  const viewUrl = dashboardUrl ?? `https://app.ghmdigital.com/clients/onboarding/${submissionId}`;
+
+  try {
+    const { error } = await getResend()!.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: partnerEmail,
+      subject: `🎉 ${businessName} completed onboarding!`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9fafb;">
+          <div style="background: #1a1a2e; padding: 20px 24px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: #fff; margin: 0; font-size: 20px;">GHM Marketing</h1>
+          </div>
+          <div style="background: #fff; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+            <p style="color: #374151; font-size: 16px; margin-top: 0;">Hi ${partnerName},</p>
+            <p style="color: #374151; font-size: 16px;">
+              Great news — <strong>${businessName}</strong> just completed their onboarding form. The ops team has been notified and will begin setting up their account.
+            </p>
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 16px; margin: 20px 0;">
+              <p style="margin: 0; color: #166534; font-size: 14px; font-weight: 600;">✅ What happens next</p>
+              <ul style="color: #166534; font-size: 14px; margin: 8px 0 0 0; padding-left: 20px; line-height: 1.8;">
+                <li>Ops team reviews the submission and begins account setup</li>
+                <li>Technical access is collected and verified</li>
+                <li>First work order is issued and invoicing begins</li>
+              </ul>
+            </div>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${viewUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 15px; font-weight: 600;">
+                View Submission
+              </a>
+            </div>
+            <p style="color: #6b7280; font-size: 13px; margin-bottom: 0;">
+              Questions? Reply to this email or reach out to the ops team directly.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: String(err) };
+  }
+}

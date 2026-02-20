@@ -35,6 +35,10 @@ const PERMISSION_CATEGORIES = {
     { key: "canReportBugs", label: "Report Bugs", description: "Bug reporting system" },
     { key: "canAccessOwnDashboard", label: "Access Own Dashboard", description: "Personal metrics" },
   ],
+  "Payments & Wave": [
+    { key: "view_payments", label: "View Payments", description: "See the Payments page and client billing status" },
+    { key: "manage_payments", label: "Manage Payments", description: "Generate invoices, run partner payouts, and access Wave integration" },
+  ],
 };
 
 interface PermissionEditorProps {
@@ -89,7 +93,7 @@ export function PermissionEditor({ permissions, onChange }: PermissionEditorProp
 
       <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
         <p className="text-xs text-amber-900 dark:text-amber-100">
-          <strong>Note:</strong> Some features (Settings, Compensation, User Management) are restricted to Master role only and cannot be toggled here.
+          <strong>Note:</strong> Settings, User Management, and Territories are restricted to Master role and above. Payments permissions default to off — grant explicitly per user.
         </p>
       </div>
     </div>

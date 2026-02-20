@@ -7,6 +7,7 @@ import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowR
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
+import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -18,7 +19,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs"];
+const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs", "wave"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -64,6 +65,11 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="bugs" className="gap-1.5">
               <Bug className="h-4 w-4" />Bug Reports
+            </TabsTrigger>
+          )}
+          {isAdmin && (
+            <TabsTrigger value="wave" className="gap-1.5">
+              💳 Wave
             </TabsTrigger>
           )}
         </TabsList>
@@ -125,6 +131,12 @@ export default function SettingsPage() {
         {isAdmin && (
           <TabsContent value="bugs">
             <BugReportsTab />
+          </TabsContent>
+        )}
+
+        {isAdmin && (
+          <TabsContent value="wave">
+            <WaveSettingsTab />
           </TabsContent>
         )}
       </Tabs>

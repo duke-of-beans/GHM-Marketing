@@ -34,6 +34,7 @@ const allLinks: NavLink[] = [
   { href: "/review", label: "Content Review", icon: "✍️", permission: "manage_clients" },
   { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
   { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
+  { href: "/payments", label: "Payments", icon: "💳", permission: "manage_payments" },
   // Admin items live in Settings tabs — not separate nav items
 ];
 
