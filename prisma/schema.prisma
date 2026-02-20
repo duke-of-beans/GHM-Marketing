@@ -389,6 +389,7 @@ model ClientProfile {
   citationScans         CitationScan[]
   // Google Business Profile
   gbpConnection         GBPConnection?
+  googleAdsConnection   GoogleAdsConnection?
 
   @@map("client_profiles")
 }
@@ -1482,6 +1483,33 @@ model DirectoryHealth {
 }
 
 // ============================================================================
+// GOOGLE ADS — OAuth credentials + connection
+// ============================================================================
+
+model GoogleAdsConnection {
+  id              Int       @id @default(autoincrement())
+  clientId        Int       @unique @map("client_id")
+
+  // Encrypted OAuth tokens (AES-256-GCM)
+  accessTokenEnc  String    @map("access_token_enc")
+  refreshTokenEnc String    @map("refresh_token_enc")
+  expiresAt       DateTime  @map("expires_at")
+
+  // Google Ads resource identifiers
+  customerId      String    @map("customer_id")   // 10-digit, e.g. "1234567890"
+  accountName     String    @map("account_name")  // human-readable
+
+  // Connection metadata
+  googleEmail     String    @map("google_email")
+  connectedAt     DateTime  @default(now()) @map("connected_at")
+  lastSyncAt      DateTime? @map("last_sync_at")
+  isActive        Boolean   @default(true) @map("is_active")
+
+  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("google_ads_connections")
+}
+
 // GOOGLE BUSINESS PROFILE — OAuth credentials + connection
 // ============================================================================
 

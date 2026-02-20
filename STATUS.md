@@ -183,6 +183,72 @@
 
 ---
 
+## 📥 BACKLOG — Added February 20, 2026
+
+### ITEM-001: Google Ads & PPC — Surface in All Materials
+**Priority:** HIGH — affects contracts, onboarding, dashboard, demos, reporting
+**Context:** The $2,400/month standard package includes both Google Ads management AND Google PPC management. Clients pay ad spend directly; GHM manages both under the same package fee.
+
+**Dashboard work needed:**
+- I7 (Google Ads sprint) is already in the API Integration Ecosystem above — ensure it surfaces campaign metrics (impressions, clicks, CTR, spend, ROAS) in the client detail view and monthly reports
+- Add a "Campaigns" section to the client-facing report template alongside the existing rank/citation/GBP sections
+- Add Google Ads account linking to the client onboarding portal form (so clients can grant access during signup)
+- Dashboard should help ops team make decisions: flag underperforming campaigns, spend pacing alerts, keyword performance trends
+
+**Materials/contracts needed:**
+- `CLIENT_AGREEMENT.md` — add explicit language: "Package includes Google Ads campaign management and Google PPC management. Client is responsible for direct ad spend billed by Google. GHM manages all campaign setup, optimization, and reporting at no additional management fee."
+- `CLIENT_ONBOARDING_FORM.md` — add Google Ads account ID field + access grant instructions
+- Digital brochure (S3) — highlight Ads + PPC management as included value
+- Sales audit PDF (I6) — add a "Paid Search Opportunity" section analyzing whether prospect is running Ads and how much they're leaving on the table
+- Demo pages (B6/B7) — include mock Ads campaign metrics to show what they'd see as a client
+
+---
+
+### ITEM-002: GHM is an "Inc" not "LLC"
+**Priority:** HIGH — legal/brand accuracy, must fix before any external materials go out
+**Scope:** Global find-and-replace across all files that might say "LLC"
+
+**Files to audit and fix:**
+- `D:\Work\SEO-Services\CLIENT_AGREEMENT.md` — contract header
+- `D:\Work\SEO-Services\ghm-dashboard\BUSINESS_DNA.yaml` — company identity
+- Any PDF templates, work order headers, email templates in `src/lib/email/templates.ts`
+- Work order PDF template (`src/lib/pdf/work-order-template.tsx`) — company name in header
+- Client portal — any footer/branding text
+- Onboarding form — any GHM entity references
+- `README.md`, `OWNER_CONFIG.md`, `QUICK_REFERENCE.md` — anywhere GHM is named formally
+
+**Search pattern to run:** grep for "GHM.*LLC", "G.H.M.*LLC", "llc" (case-insensitive) across entire project before closing this item.
+
+---
+
+### ITEM-003: Per-Page Tutorial System (Replace Global Onboarding Tutorial)
+**Priority:** MEDIUM — UX improvement, important as app grows
+**Context:** Current `onboarding-tutorial.tsx` is a single monolithic walkthrough shown to new users. As pages and features accumulate, this will overwhelm users and become impossible to maintain. Replace with a per-page approach.
+
+**Proposed architecture:**
+- Each page that warrants a tutorial gets its own tutorial component or config array: steps specific to that page's elements
+- First-visit detection: check `localStorage` (or a `UserSettings` DB flag) for `"tutorial_seen_[page_slug]"` — show tutorial on first visit, never again unless reset
+- Global tutorial reset option in user profile/settings ("Reset all page tours")
+- Tutorial trigger button on each page (e.g., a `?` icon) so users can re-run the tour for that page anytime
+- Tutorial steps should be data-driven (array of `{ target, title, content }`) not hardcoded JSX, so adding steps to any page doesn't require touching shared components
+
+**Pages to build tutorials for (in priority order):**
+1. Leads / Pipeline (most complex, most used by reps)
+2. Client Detail (tabs, scan history, actions)
+3. Discovery (search + import flow)
+4. Content Studio (briefs, review queue)
+5. Reports (generate + preview)
+6. Settings / Team (admin only)
+7. Analytics
+8. Onboarding Portal (client-facing)
+
+**Implementation notes:**
+- Can use an existing library (Driver.js, Intro.js, Shepherd.js) or build a lightweight custom component — evaluate bundle size trade-off
+- Kill the global `onboarding-tutorial.tsx` once per-page system is live for the top 3 pages
+- Coordinate with the permission system — don't show tutorials for features a user can't access
+
+---
+
 ## 🟢 INFRASTRUCTURE (When Time Allows)
 
 - Client Portal migration

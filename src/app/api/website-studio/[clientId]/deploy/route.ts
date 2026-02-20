@@ -5,6 +5,7 @@ import {
   updateWebPropertyDeployStatus,
 } from "@/lib/db/website-studio";
 import { prisma } from "@/lib/db";
+import { pointToVercel } from "@/lib/enrichment/providers/godaddy/dns";
 
 // POST /api/website-studio/[clientId]/deploy
 // Deploys an approved build job. Updates property + job status.
@@ -114,6 +115,25 @@ export async function POST(
       ...(vercelProjectId ? { vercelProjectId } : {}),
     });
 
+    // Attempt GoDaddy DNS if credentials exist and targetUrl looks like a bare domain
+    let dnsPointed = false;
+    const targetUrl = job.property.targetUrl;
+    const godaddyConfigured = !!(process.env.GODADDY_API_KEY && process.env.GODADDY_API_SECRET);
+
+    if (godaddyConfigured && targetUrl && !targetUrl.startsWith("http")) {
+      // targetUrl is a bare domain (e.g. "clientsite.com"), not an external URL
+      try {
+        await pointToVercel(targetUrl);
+        dnsPointed = true;
+        await updateWebPropertyDeployStatus(job.property.id, "live", {
+          dnsVerified: true,
+        });
+      } catch (dnsErr: any) {
+        // Non-fatal — DNS can be set manually, log and continue
+        console.warn(`[deploy] GoDaddy DNS skipped for ${targetUrl}:`, dnsErr.message);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -122,6 +142,7 @@ export async function POST(
         stage: "live",
         deployUrl: vercelDeployUrl ?? `https://${job.property.targetUrl}`,
         vercelConnected: !!vercelToken,
+        dnsPointed,
       },
     });
   } catch (err: any) {
