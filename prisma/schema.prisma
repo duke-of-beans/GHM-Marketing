@@ -68,6 +68,10 @@ model User {
   repOnboardingCompletedAt  DateTime?  @map("rep_onboarding_completed_at")
   repOnboardingStep         Int        @default(0) @map("rep_onboarding_step") // last completed step (0 = not started)
 
+  // Document Vault
+  vaultUploads          VaultFile[]  @relation("VaultUploads")
+  vaultPrivateFiles     VaultFile[]  @relation("VaultOwned")
+
   // Team messaging
   sentMessages          TeamMessage[] @relation("MessageAuthor")
   receivedMessages      TeamMessage[] @relation("MessageRecipient")
@@ -154,6 +158,7 @@ model Lead {
   territory         Territory?        @relation(fields: [territoryId], references: [id])
   notes             Note[]
   workOrders        WorkOrder[]
+  vaultFiles        VaultFile[]
 
   @@index([territoryId])
   @@index([assignedTo])
@@ -394,6 +399,8 @@ model ClientProfile {
   // Google Business Profile
   gbpConnection         GBPConnection?
   googleAdsConnection   GoogleAdsConnection?
+  // Document Vault
+  vaultFiles            VaultFile[]
 
   @@map("client_profiles")
 }
@@ -978,6 +985,13 @@ model TeamMessage {
   
   // Priority: "normal" | "important" | "urgent"
   priority        String   @default("normal")
+
+  // File attachments (stored in Vercel Blob, optionally promoted to Vault)
+  attachmentUrl      String?  @map("attachment_url")
+  attachmentName     String?  @map("attachment_name")
+  attachmentSize     Int?     @map("attachment_size")
+  attachmentMimeType String?  @map("attachment_mime_type")
+  attachmentVaultId  Int?     @map("attachment_vault_id")   // set if promoted to vault
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -1540,4 +1554,45 @@ model GBPConnection {
   client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("gbp_connections")
+}
+
+// ─── Document Vault ──────────────────────────────────────────────────────────
+
+model VaultFile {
+  id           Int       @id @default(autoincrement())
+  name         String
+  originalName String    @map("original_name")
+  mimeType     String    @map("mime_type")
+  size         Int
+  blobUrl      String    @map("blob_url")
+  space        VaultSpace
+  category     String?
+  uploadedBy   Int       @map("uploaded_by")
+  uploader     User      @relation("VaultUploads", fields: [uploadedBy], references: [id])
+  ownerId      Int?      @map("owner_id")
+  owner        User?     @relation("VaultOwned", fields: [ownerId], references: [id])
+  clientId     Int?      @map("client_id")
+  client       ClientProfile? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  leadId       Int?      @map("lead_id")
+  lead         Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  version      Int       @default(1)
+  isLatest     Boolean   @default(true) @map("is_latest")
+  supersededBy Int?      @map("superseded_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  @@index([space, category])
+  @@index([uploadedBy])
+  @@index([ownerId])
+  @@index([clientId])
+  @@index([leadId])
+  @@map("vault_files")
+}
+
+enum VaultSpace {
+  shared
+  private
+  client_reports
+  signed_contracts
 }

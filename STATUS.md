@@ -253,8 +253,21 @@
 
 ## 🟠 QUEUED — NOT YET STARTED
 
-### FEAT-010: Rep Dashboard View
-**Priority:** HIGH — needed before first rep onboards
+### FEAT-010: Rep Dashboard View — ✅ COMPLETE (Feb 20, 2026)
+**Commit:** b72fc37
+- Territory health banner (green/amber/red, progress bar, rolling 90-day avg vs 2/mo threshold)
+- My Book widget (current monthly residual, 6 + 12 month churn-adjusted projections, avg per client)
+- Sales Tools Panel (7 quick-access buttons: Pipeline, Claim Leads, Audit PDF, Live Demo, Brochure, Comp Sheet, Territory Map)
+- Enhanced metrics: Available leads, Active leads, My Book (active clients), All-time wins + value
+- Needs Attention list with stale lead highlighting (5+ days in stage = amber)
+
+### FEAT-011: Rep Onboarding Flow — ✅ COMPLETE (Feb 20, 2026)
+**Commit:** e613280
+- 7-step wizard: Welcome → Role → Territory → Tools → First Lead → Resources → Done
+- Progress tracking persisted to DB (repOnboardingStep, repOnboardingCompletedAt)
+- First-login redirect: /sales page auto-redirects reps who haven't completed onboarding to /rep-setup
+- Admin can reset onboarding from team settings by clearing repOnboardingCompletedAt
+- API: GET/PATCH /api/users/onboarding
 **Scope:** Sales role gets a purpose-built dashboard showing exactly what matters to them and nothing else
 
 **Rep dashboard should include:**
