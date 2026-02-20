@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Generate HTML template for client monthly report
  */
 export function generateReportHTML(reportData: any): string {
@@ -13,6 +13,7 @@ export function generateReportHTML(reportData: any): string {
     rankTracking,
     citationHealth,
     gbpPerformance,
+    ppcPerformance,
   } = reportData;
 
   const formatDate = (date: Date) => {
@@ -233,19 +234,6 @@ export function generateReportHTML(reportData: any): string {
     `).join("") : "<p>No tasks deployed this period.</p>"}
   </div>
 
-  <div class="section">
-    <h3>✅ Work Completed</h3>
-    ${tasks.list.length > 0 ? tasks.list.map((task: any) => `
-      <div class="list-item">
-        <div class="title">${task.title}</div>
-        <div class="description">
-          ${task.category} • Deployed ${formatDate(task.deployedAt)}
-          ${task.deployedUrl ? `• <a href="${task.deployedUrl}" target="_blank">${task.deployedUrl}</a>` : ""}
-        </div>
-      </div>
-    `).join("") : "<p>No tasks deployed this period.</p>"}
-  </div>
-
   ${rankTracking?.hasData ? `
   <div class="section">
     <h3>📈 Keyword Rankings</h3>
@@ -383,6 +371,70 @@ export function generateReportHTML(reportData: any): string {
       </div>`).join("")}` : ""}` : ""}
     ${gbpPerformance.posts ? `
     <p style="font-size:13px; color:#6b7280; margin-top:12px;">📢 Posts published this period: <strong>${gbpPerformance.posts.publishedInPeriod}</strong></p>` : ""}
+  </div>` : ""}
+
+  ${ppcPerformance?.hasData ? `
+  <div class="section">
+    <h3>💰 Google Ads Performance</h3>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:12px;">${ppcPerformance.accountName} &nbsp;·&nbsp; ${ppcPerformance.dateRange.startDate} – ${ppcPerformance.dateRange.endDate}</p>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Ad Spend</div>
+        <div class="kpi-value">$${ppcPerformance.totals.spend.toFixed(2)}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Impressions</div>
+        <div class="kpi-value">${ppcPerformance.totals.impressions.toLocaleString()}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Clicks</div>
+        <div class="kpi-value">${ppcPerformance.totals.clicks.toLocaleString()}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Conversions</div>
+        <div class="kpi-value">${ppcPerformance.totals.conversions.toLocaleString()}</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">CTR</div>
+        <div class="kpi-value">${(ppcPerformance.totals.ctr * 100).toFixed(2)}%</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Cost / Conversion</div>
+        <div class="kpi-value">${ppcPerformance.totals.cpa > 0 ? "$" + ppcPerformance.totals.cpa.toFixed(2) : "—"}</div>
+      </div>
+    </div>
+    ${ppcPerformance.campaigns.length > 0 ? `
+    <p style="font-weight:600; margin:12px 0 6px;">Campaigns</p>
+    <table class="data-table">
+      <thead><tr><th>Campaign</th><th>Spend</th><th>Clicks</th><th>CTR</th><th>Conv.</th><th>CPA</th></tr></thead>
+      <tbody>${ppcPerformance.campaigns.map((c: any) => `
+        <tr>
+          <td>${c.name}</td>
+          <td>$${c.spend.toFixed(2)}</td>
+          <td>${c.clicks.toLocaleString()}</td>
+          <td>${(c.ctr * 100).toFixed(2)}%</td>
+          <td>${c.conversions}</td>
+          <td>${c.cpa > 0 ? "$" + c.cpa.toFixed(2) : "—"}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>` : ""}
+    ${ppcPerformance.topKeywords.length > 0 ? `
+    <p style="font-weight:600; margin:16px 0 6px;">Top Keywords</p>
+    <table class="data-table">
+      <thead><tr><th>Keyword</th><th>Match</th><th>Clicks</th><th>CTR</th><th>Avg CPC</th><th>Conv.</th></tr></thead>
+      <tbody>${ppcPerformance.topKeywords.map((k: any) => `
+        <tr>
+          <td>${k.keyword}</td>
+          <td><span class="badge badge-gray">${k.matchType}</span></td>
+          <td>${k.clicks.toLocaleString()}</td>
+          <td>${(k.ctr * 100).toFixed(2)}%</td>
+          <td>$${k.cpc.toFixed(2)}</td>
+          <td>${k.conversions}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>` : ""}
   </div>` : ""}
 
   <div class="footer">

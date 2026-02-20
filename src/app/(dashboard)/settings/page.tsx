@@ -3,11 +3,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
+import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -19,7 +20,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs", "wave"];
+const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -70,6 +71,11 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="wave" className="gap-1.5">
               💳 Wave
+            </TabsTrigger>
+          )}
+          {isAdmin && (
+            <TabsTrigger value="integrations" className="gap-1.5">
+              <Zap className="h-4 w-4" />Integrations
             </TabsTrigger>
           )}
         </TabsList>
@@ -137,6 +143,12 @@ export default function SettingsPage() {
         {isAdmin && (
           <TabsContent value="wave">
             <WaveSettingsTab />
+          </TabsContent>
+        )}
+
+        {isAdmin && (
+          <TabsContent value="integrations">
+            <IntegrationsTab />
           </TabsContent>
         )}
       </Tabs>

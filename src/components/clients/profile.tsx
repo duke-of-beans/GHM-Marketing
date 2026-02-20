@@ -41,6 +41,7 @@ import { BillingTab } from "./billing/BillingTab";
 import { RankingsTab } from "./rankings/RankingsTab";
 import { CitationsTab } from "./citations/CitationsTab";
 import { LocalPresenceTab } from "./local-presence/LocalPresenceTab";
+import { ClientIntegrationsTab } from "./integrations/ClientIntegrationsTab";
 import { Mic, Sparkles } from "lucide-react";
 
 // ============================================================================
@@ -514,6 +515,7 @@ export function ClientProfile({
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
 
@@ -758,6 +760,11 @@ export function ClientProfile({
         {/* TAB: BILLING */}
         <TabsContent value="billing" className="space-y-4">
           <BillingTab clientId={client.id} businessName={client.businessName} />
+        </TabsContent>
+
+        {/* TAB: INTEGRATIONS */}
+        <TabsContent value="integrations" className="space-y-4">
+          <ClientIntegrationsTab clientId={client.id} />
         </TabsContent>
 
         {/* TAB 4: NOTES & MEMORY */}

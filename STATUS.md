@@ -104,8 +104,8 @@
 | I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | 🔴 TODO (needs Google approval) |
 | I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | 🔴 TODO |
 | I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | 🔴 TODO |
-| I7. Google Ads + GoDaddy | Campaign data + domain deployment | 6 | 🔴 TODO |
-| I8. Settings + Admin Dashboard | Integration health, cost dashboard, cache stats | 4 | 🔴 TODO |
+| I7. Google Ads + GoDaddy | Campaign data + domain deployment | 6 | ✅ DONE |
+| I8. Settings + Admin Dashboard | Integration health, cost dashboard, cache stats | 4 | ✅ DONE |
 
 **BrightLocal cancellation gate:** After I2 + I3 verified (rank data matching + NAP scraper working)
 
