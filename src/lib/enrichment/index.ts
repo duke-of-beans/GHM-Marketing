@@ -63,7 +63,7 @@ export async function enrichLead(leadId: number, force = false): Promise<Enrichm
   // --- Outscraper ---
   const outscraperKey = `outscraper:gmb:${lead.businessName}:${lead.city}:${lead.state}`.toLowerCase();
   let outscraperData = await getCached<Awaited<ReturnType<typeof fetchGMBFull>>>("outscraper", outscraperKey);
-  let outscraperCacheHit = outscraperData !== null;
+  const outscraperCacheHit = outscraperData !== null;
 
   if (!outscraperData) {
     const t0 = Date.now();
@@ -81,7 +81,7 @@ export async function enrichLead(leadId: number, force = false): Promise<Enrichm
   // --- Ahrefs ---
   const ahrefsKey = `ahrefs:domain:${domain}`;
   let ahrefsData = domain ? await getCached<Awaited<ReturnType<typeof fetchDomainOverview>>>("ahrefs", ahrefsKey) : null;
-  let ahrefsCacheHit = ahrefsData !== null;
+  const ahrefsCacheHit = ahrefsData !== null;
 
   if (!ahrefsData && domain) {
     const t0 = Date.now();

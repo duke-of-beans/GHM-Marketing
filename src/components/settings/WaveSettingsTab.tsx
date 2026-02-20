@@ -227,7 +227,7 @@ export function WaveSettingsTab() {
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Don't see your product?{" "}
+            Don&apos;t see your product?{" "}
             <a
               href="https://app.waveapps.com/accounting/products"
               target="_blank"
