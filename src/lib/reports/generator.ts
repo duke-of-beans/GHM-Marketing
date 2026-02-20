@@ -1,4 +1,7 @@
 import { prisma } from "@/lib/db";
+import { generateRankTrackingSection } from "./sections/rank-tracking";
+import { generateCitationHealthSection } from "./sections/citation-health";
+import { generateGBPPerformanceSection } from "./sections/gbp-performance";
 
 /**
  * Generate monthly report data for a client
@@ -102,6 +105,13 @@ export async function generateMonthlyReportData(
     recommendation: alert.action,
   }));
 
+  // Run new section generators in parallel
+  const [rankTracking, citationHealth, gbpPerformance] = await Promise.all([
+    generateRankTrackingSection(clientId, periodStart, periodEnd),
+    generateCitationHealthSection(clientId, periodStart, periodEnd),
+    generateGBPPerformanceSection(clientId, periodStart, periodEnd),
+  ]);
+
   return {
     client: {
       id: client.id,
@@ -133,5 +143,8 @@ export async function generateMonthlyReportData(
     },
     wins,
     gaps,
+    rankTracking,
+    citationHealth,
+    gbpPerformance,
   };
 }
