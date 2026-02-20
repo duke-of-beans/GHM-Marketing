@@ -272,3 +272,5 @@ Related files:
 - `COMMISSION_SYSTEM_SPEC.md` — Commission structure that Wave API will feed
 - `QUICK_REFERENCE.md` — API keys, env vars, deployment info
 - `src/lib/enrichment/` — Current enrichment implementation (Outscraper, Ahrefs, PageSpeed)
+- `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` — Full build blueprint with schema, wireframes, 56-hour task breakdown
+- `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` — Wave payments integration blueprint

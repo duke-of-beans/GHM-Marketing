@@ -193,26 +193,7 @@ D:\SCRVNR\
 
 ---
 
-## 📊 BUILD PRIORITY MATRIX
-
-```
-High Impact │ 2. Commission    │ 1. Edit Client
-            │    System        │    Details ✅
-            │ 4. Website       │
-            │    Pipeline      │
-            ├──────────────────┼──────────────
-Medium      │ 5. SENTRY        │ 3. Lead
-Impact      │    Intelligence  │    Enrichment
-            │                  │
-Low Impact  │                  │
-            └──────────────────┴──────────────
-              High Effort    →    Low Effort
-```
-
-**Legend:**
-- ✅ Quick win (Edit Client - doing now)
-- 🔴 Strategic investment (Commission, Website - high value)
-- ⚪ Nice to have (SENTRY, Enrichment - optimize later)
+## 📊 BUILD PRIORITY MATRIX (Superseded — see updated matrix above §8)
 
 ---
 
@@ -259,6 +240,119 @@ Three pieces were missing in dependency order:
 | `vercel.json` | Added `generate-payments` cron schedule (`1 0 1 * *`) |
 | `src/components/settings/TeamManagementTab.tsx` | Mounted `CompensationConfigSection` below user list |
 | `src/app/api/clients/[id]/route.ts` | Added commission trigger on status → active transition |
+
+---
+
+### 7. CLIENT ONBOARDING PORTAL ✅ SPEC COMPLETE
+**Status:** Full spec with wireframes, data model, task breakdown — ready to build
+**Priority:** HIGH (blocks partner launch — partner generates link → client fills form → ops processes)
+**Effort:** ~27 hours across 5 phases
+**Spec:** `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md`
+
+**What It Does:**
+- Partner generates token-based onboarding link from lead detail page
+- Client fills 5-step form (business info, contacts, technical access, market/content, review)
+- No login required — UUID token auth, 30-day expiry
+- Pre-fills from lead record, auto-saves progress
+- Ops receives submission in queue with checklist
+- Triggers first invoice on completion
+
+**Key Technical Decisions:**
+- New Prisma models: `OnboardingToken`, `OnboardingSubmission`
+- Public route group `(onboarding)/welcome/[token]` — no dashboard layout
+- Credential security: v1 captures access *method* only, no passwords stored
+- Mobile-first (client fills on phone after sales meeting)
+
+**Build Phases:**
+1. Foundation (4 hrs): Schema + layout + step wizard shell
+2. APIs (5 hrs): Token generation, form load/save/submit
+3. Client form (9 hrs): All 5 steps + auto-save + confirmation
+4. Dashboard (7.5 hrs): Partner link gen, ops queue, submission detail + checklist
+5. Polish (4.5 hrs): Notifications, mobile pass, error handling
+
+---
+
+### 8. WAVE PAYMENTS INTEGRATION ✅ SPEC COMPLETE
+**Status:** Full blueprint with wireframes, schema, library arch, task breakdown — ready to build
+**Priority:** HIGH (enables automated billing, partner payments, kills Gusto)
+**Effort:** ~34 hours across 7 phases
+**Spec:** `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md`
+**Audit:** `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md`
+
+**What It Does:**
+- Automated monthly client invoicing via Wave GraphQL API
+- Payment received → webhook → dashboard updates (health score, payment status)
+- Automated payment escalation per contract §3.3 (grace → overdue → pause → collections)
+- Partner bills pushed to Wave for contractor direct deposit
+- Financial overview dashboard (AR, AP, cash flow, profitability)
+- Client billing tab on detail page (invoice history, status, quick actions)
+- Enhanced partner earnings with payment history + 1099 YTD
+- Replaces Gusto entirely
+
+**Key Technical Decisions:**
+- Wave GraphQL API (not REST) — create customers, invoices, vendors, bills
+- New Prisma model: `InvoiceRecord` (local mirror, avoids hitting Wave on every query)
+- Wave fields added to: `PaymentTransaction`, `ClientProfile`, `User`
+- Dashboard owns calculation logic; Wave owns money movement + tax compliance
+- BofA connects to Wave as funding source — dashboard never touches bank directly
+- Webhook-driven: Wave fires events → dashboard reacts
+
+**Build Phases:**
+1. W1 — Wave Setup (2 hrs): Manual account config, BofA connection, API credentials
+2. W2 — Schema + Library (4 hrs): Prisma changes + `lib/wave/` GraphQL client
+3. W3 — Invoice Automation / AR (8 hrs): Monthly invoicing, webhooks, overdue detection
+4. W4 — Partner Payments / AP (4 hrs): Bill generation, cron integration, vendor sync
+5. W5 — Dashboard UI (12 hrs): Financial overview, billing tab, enhanced earnings
+6. W6 — Settings + Polish (3 hrs): Sync status widget, error handling, constants
+7. W7 — Kill Gusto (1 hr): Verify, migrate, cancel
+
+**Critical Path:** W1 → W2 → W3 + W4 parallel → W5 → W6 → W7
+
+**Contract Audit Result (Feb 20, 2026):**
+- 14 major technical claims: all verified ✅ exist in codebase
+- 3 items spec'd but not built: onboarding portal (spec'd), client portal (parked), NAP scraper (enhancement)
+- 4 items need attention: operational process commitments (response SLA, backlink methodology, PPC scope, client comms channel)
+- Conclusion: contracts are honest, no capability gaps blocking launch
+
+---
+
+---
+
+## 📊 BUILD PRIORITY MATRIX (Updated Feb 20, 2026)
+
+```
+High Impact │ 8. Wave Payments  │ 7. Onboarding
+            │    Integration    │    Portal
+            │ 4. Website        │ 2. Commission
+            │    Pipeline       │    System ✅
+            ├──────────────────┼──────────────
+Medium      │ 5. SENTRY         │ 3. Lead
+Impact      │    Intelligence   │    Enrichment
+            │                   │
+Low Impact  │                   │
+            └──────────────────┴──────────────
+              High Effort    →    Low Effort
+```
+
+**Current Priority Stack:**
+1. 🔴 Onboarding Portal — blocks partner launch (~27 hrs)
+2. 🔴 Wave Payments — enables billing, kills Gusto (~34 hrs)
+3. 🔴 API Integration Ecosystem — completes intelligence engine, kills BrightLocal (~56 hrs)
+4. 🟡 Sales Launch Features — Phases A-D from SALES_INTEGRATION_PLAN
+5. 🟡 Website Studio remaining items — deploy button, DNA Lab
+6. ⚪ SENTRY Intelligence
+7. ⚪ Lead Enrichment enhancements
+
+### 9. API INTEGRATION ECOSYSTEM ✅ SPEC COMPLETE
+**Spec:** `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` (1,124 lines)
+- Provider refactor (extract Ahrefs/Outscraper/PageSpeed into modules)
+- DataForSEO SERP rank tracking (100 kw × zip × local pack)
+- NAP Citation Scraper (35 directory adapters + health sentry)
+- Google Business Profile (OAuth + reviews + insights + posts)
+- Google Ads (read-only campaign data) + GoDaddy (domain/DNS)
+- Report generator upgrades + prospect audit enrichment
+- 7 new Prisma models, 4 new crons, 8 build sprints
+- BrightLocal fully eliminated: $150/mo → $3/mo DataForSEO
 
 ---
 
@@ -355,6 +449,32 @@ All specifications are located in: `D:\Work\SEO-Services\ghm-dashboard\`
    - Outscraper API key
    - Anthropic API key
    - Vercel configuration
+
+6. **ONBOARDING_PORTAL_SPEC.md** (850 lines) — `D:\Work\SEO-Services\specs\`
+   - Token-based client onboarding form
+   - 2 new Prisma models, 7 API endpoints
+   - 8 wireframes (all form steps + ops views)
+   - 21-task breakdown, 27 hours estimated
+
+7. **WAVE_PAYMENTS_BLUEPRINT.md** (630 lines) — `D:\Work\SEO-Services\specs\`
+   - Wave GraphQL API integration
+   - Schema changes + InvoiceRecord model
+   - 5 dashboard wireframes (financial overview, billing tab, earnings, escalation banners, sync widget)
+   - 30-task breakdown, 34 hours estimated
+
+8. **CONTRACT_AUDIT_AND_PAYMENTS.md** — `D:\Work\SEO-Services\specs\`
+   - Contract claims vs. codebase reality (14 verified, 3 spec'd, 4 need attention)
+   - Payments architecture narrative
+   - Wave vs. Gusto comparison
+
+9. **API_INTEGRATION_BLUEPRINT.md** (1,124 lines) — `D:\Work\SEO-Services\specs\`
+   - Provider layer architecture with shared cache + cost tracking
+   - DataForSEO SERP rank tracking (schema, crons, Rankings tab wireframe)
+   - NAP Citation Scraper (35 adapters, fuzzy matcher, health sentry, Citations tab wireframe)
+   - Google Business Profile (OAuth, reviews, insights, posts, Local Presence wireframe)
+   - Google Ads + GoDaddy integration specs
+   - Report generator + prospect audit upgrade paths
+   - 56-hour task breakdown across 8 sprints
 
 ### Current Session
 6. **THIS FILE** - Master build plan
@@ -490,6 +610,16 @@ npx prisma generate
 ---
 
 ## 🔄 VERSION HISTORY
+
+**v2.0** - February 20, 2026
+- Added §7: Client Onboarding Portal (spec complete, 27 hrs, 21 tasks)
+- Added §8: Wave Payments Integration (spec complete, 34 hrs, 30 tasks)
+- Added §9: API Integration Ecosystem (spec complete, 56 hrs, 8 sprints)
+- Contract audit completed — 14 claims verified, 0 capability gaps blocking launch
+- Updated priority matrix — onboarding + payments + integrations now top of stack
+- Updated documentation index with 4 new spec files
+- Decision: Wave replaces Gusto for all payments, payroll, and accounting
+- Decision: DataForSEO + NAP scraper replace BrightLocal ($150/mo → $3/mo)
 
 **v1.0** - February 17, 2026
 - Initial master build plan

@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 20, 2026 — Sales integration plan mapped
+**Last Updated:** February 20, 2026 — API integration ecosystem blueprinted (DataForSEO + NAP + GBP + Ads + GoDaddy)
 
 ---
 
@@ -66,6 +66,50 @@
 ---
 
 ## 🟡 NEXT TIER (After Sprint)
+
+### Client Onboarding Portal — SPEC COMPLETE, READY TO BUILD
+**Spec:** `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md` (850 lines)
+**Effort:** ~27 hours | **Priority:** HIGH — blocks partner launch
+
+| Phase | Tasks | Hours | Status |
+|-------|-------|-------|--------|
+| 1. Foundation | Schema (OnboardingToken, OnboardingSubmission) + layout + wizard shell | 4 | 🔴 TODO |
+| 2. APIs | Token gen, form load/save/submit, pre-fill from lead | 5 | 🔴 TODO |
+| 3. Client Form | Steps 1-5 + auto-save + confirmation page | 9 | 🔴 TODO |
+| 4. Dashboard | Partner link gen, ops queue, submission detail + checklist | 7.5 | 🔴 TODO |
+| 5. Polish | Notifications, mobile responsiveness, error states | 4.5 | 🔴 TODO |
+
+### Wave Payments Integration — SPEC COMPLETE, READY TO BUILD
+**Spec:** `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` (630 lines)
+**Audit:** `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md`
+**Effort:** ~34 hours | **Priority:** HIGH — enables billing, kills Gusto
+
+| Phase | Tasks | Hours | Status |
+|-------|-------|-------|--------|
+| W1. Wave Setup | Manual: account, BofA, payroll, API creds | 2 | 🔴 TODO (David/Gavin) |
+| W2. Schema + Library | Prisma changes + lib/wave/ GraphQL client | 4 | 🔴 TODO |
+| W3. Invoice Automation (AR) | Monthly invoicing, webhooks, overdue escalation | 8 | 🔴 TODO |
+| W4. Partner Payments (AP) | Bill gen, vendor sync, cron integration | 4 | 🔴 TODO |
+| W5. Dashboard UI | Financial overview, billing tab, enhanced earnings | 12 | 🔴 TODO |
+| W6. Settings + Polish | Sync status, error handling, constants | 3 | 🔴 TODO |
+| W7. Kill Gusto | Verify, migrate, cancel | 1 | 🔴 TODO (after W4 verified) |
+
+### API Integration Ecosystem — SPEC COMPLETE, READY TO BUILD
+**Spec:** `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` (1,124 lines)
+**Effort:** ~56 hours | **Priority:** HIGH — completes intelligence engine, eliminates BrightLocal
+
+| Sprint | Tasks | Hours | Status |
+|--------|-------|-------|--------|
+| I1. Provider Refactor + Cache | Extract providers, shared cache + cost tracking | 6 | 🔴 TODO |
+| I2. DataForSEO SERP | Local rank tracking, Keywords tab, rank clusters | 12 | 🔴 TODO |
+| I3. NAP Citation Scraper | 35 directory adapters, Citations tab, health sentry | 10 | 🔴 TODO |
+| I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | 🔴 TODO (needs Google approval) |
+| I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | 🔴 TODO |
+| I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | 🔴 TODO |
+| I7. Google Ads + GoDaddy | Campaign data + domain deployment | 6 | 🔴 TODO |
+| I8. Settings + Admin Dashboard | Integration health, cost dashboard, cache stats | 4 | 🔴 TODO |
+
+**BrightLocal cancellation gate:** After I2 + I3 verified (rank data matching + NAP scraper working)
 
 ### Sales Launch — Dashboard Integration (See SALES_INTEGRATION_PLAN.md for full spec)
 
@@ -173,9 +217,15 @@
 - `EDIT_AND_TASKS_SPEC.md` — Edit client + bulk task management
 - `BUILD_PLAN.md` — Master build plan + Website Studio status
 - `QUICK_REFERENCE.md` — API keys, env vars, deployment info
+- `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md` — Client onboarding portal (token-auth form, wireframes, 21 tasks)
+- `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` — Wave payments integration (schema, wireframes, 30 tasks)
+- `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md` — Contract claims audit + payments architecture narrative
+- `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` — API ecosystem (DataForSEO, NAP, GBP, Ads, GoDaddy, 56 hrs)
 
 **Business operations:**
 - `D:\Work\SEO-Services\SALES_OPERATIONS.md` — Canonical sales comp, territory, hiring manual
+- `D:\Work\SEO-Services\CLIENT_AGREEMENT.md` — Client service agreement (month-to-month, $2,400/mo)
+- `D:\Work\SEO-Services\CLIENT_ONBOARDING_FORM.md` — Onboarding form content (source for portal spec)
 - `BUSINESS_DNA.yaml` — Company identity, market, ops, priorities
 
 ---
