@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 20, 2026 — API integration ecosystem blueprinted (DataForSEO + NAP + GBP + Ads + GoDaddy)
+**Last Updated:** February 20, 2026 — Onboarding Portal complete (all 5 phases), Wave Payments complete (W1-W6), W7 deferred
 
 ---
 
@@ -67,32 +67,30 @@
 
 ## 🟡 NEXT TIER (After Sprint)
 
-### Client Onboarding Portal — SPEC COMPLETE, READY TO BUILD
-**Spec:** `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md` (850 lines)
-**Effort:** ~27 hours | **Priority:** HIGH — blocks partner launch
+### Client Onboarding Portal — ✅ COMPLETE (Feb 20, 2026)
+**Spec:** `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md`
 
-| Phase | Tasks | Hours | Status |
-|-------|-------|-------|--------|
-| 1. Foundation | Schema (OnboardingToken, OnboardingSubmission) + layout + wizard shell | 4 | 🔴 TODO |
-| 2. APIs | Token gen, form load/save/submit, pre-fill from lead | 5 | 🔴 TODO |
-| 3. Client Form | Steps 1-5 + auto-save + confirmation page | 9 | 🔴 TODO |
-| 4. Dashboard | Partner link gen, ops queue, submission detail + checklist | 7.5 | 🔴 TODO |
-| 5. Polish | Notifications, mobile responsiveness, error states | 4.5 | 🔴 TODO |
+| Phase | Tasks | Status |
+|-------|-------|--------|
+| 1. Foundation | Schema (OnboardingToken, OnboardingSubmission) + layout | ✅ DONE |
+| 2. APIs | Token gen, form load/save/submit, pre-fill from lead | ✅ DONE |
+| 3. Client Form | 5-step wizard + auto-save + confirmation + expiry UX | ✅ DONE |
+| 4. Dashboard | Partner link gen, ops queue, submission detail + checklist | ✅ DONE |
+| 5. Polish | Notifications, mobile responsiveness, refresh-token flow | ✅ DONE |
 
-### Wave Payments Integration — SPEC COMPLETE, READY TO BUILD
-**Spec:** `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` (630 lines)
-**Audit:** `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md`
-**Effort:** ~34 hours | **Priority:** HIGH — enables billing, kills Gusto
+### Wave Payments Integration — ✅ W1-W6 COMPLETE (Feb 20, 2026)
+**Spec:** `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md`
+**W7 deferred:** Running Gusto in parallel 1-2 weeks to identify gaps before canceling
 
-| Phase | Tasks | Hours | Status |
-|-------|-------|-------|--------|
-| W1. Wave Setup | Manual: account, BofA, payroll, API creds | 2 | 🔴 TODO (David/Gavin) |
-| W2. Schema + Library | Prisma changes + lib/wave/ GraphQL client | 4 | 🔴 TODO |
-| W3. Invoice Automation (AR) | Monthly invoicing, webhooks, overdue escalation | 8 | 🔴 TODO |
-| W4. Partner Payments (AP) | Bill gen, vendor sync, cron integration | 4 | 🔴 TODO |
-| W5. Dashboard UI | Financial overview, billing tab, enhanced earnings | 12 | 🔴 TODO |
-| W6. Settings + Polish | Sync status, error handling, constants | 3 | 🔴 TODO |
-| W7. Kill Gusto | Verify, migrate, cancel | 1 | 🔴 TODO (after W4 verified) |
+| Phase | Status |
+|-------|--------|
+| W1. Wave Setup — account, BofA, API creds, Business ID | ✅ DONE |
+| W2. Schema + lib/wave/ GraphQL client (8 files) | ✅ DONE |
+| W3. Invoice automation AR — monthly cron, webhooks, overdue escalation | ✅ DONE |
+| W4. Partner payments AP — vendor sync, bill gen, payout cron | ✅ DONE |
+| W5. Dashboard UI — financial overview page, billing tab on client detail | ✅ DONE |
+| W6. Settings — Wave tab (admin-only), AppSetting model, product picker | ✅ DONE |
+| W7. Kill Gusto | ⏸ DEFERRED |
 
 ### API Integration Ecosystem — SPEC COMPLETE, READY TO BUILD
 **Spec:** `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` (1,124 lines)
