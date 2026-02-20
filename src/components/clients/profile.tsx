@@ -39,6 +39,7 @@ import { WebsiteStudioTab } from "./website-studio/WebsiteStudioTab";
 import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
 import { BillingTab } from "./billing/BillingTab";
 import { RankingsTab } from "./rankings/RankingsTab";
+import { CitationsTab } from "./citations/CitationsTab";
 import { Mic, Sparkles } from "lucide-react";
 
 // ============================================================================
@@ -504,6 +505,7 @@ export function ClientProfile({
             )}
           </TabsTrigger>
           <TabsTrigger value="rankings">Rankings</TabsTrigger>
+          <TabsTrigger value="citations">Citations</TabsTrigger>
           <TabsTrigger value="content">Content Studio</TabsTrigger>
           <TabsTrigger value="websites">Website Studio</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -831,6 +833,11 @@ export function ClientProfile({
         {/* RANKINGS TAB */}
         <TabsContent value="rankings">
           <RankingsTab clientId={client.id} />
+        </TabsContent>
+
+        {/* CITATIONS TAB */}
+        <TabsContent value="citations">
+          <CitationsTab clientId={client.id} />
         </TabsContent>
 
         {/* TAB 7: REPORTS */}

@@ -385,6 +385,8 @@ model ClientProfile {
   aiCostLogs            AICostLog[]
   // Rank tracking
   keywordTrackers       KeywordTracker[]
+  // Citation scans
+  citationScans         CitationScan[]
 
   @@map("client_profiles")
 }
@@ -1438,4 +1440,41 @@ model PendingRankTask {
   @@index([resolvedAt])
   @@index([postedAt])
   @@map("pending_rank_tasks")
+}
+
+
+// ============================================================================
+// NAP CITATION SCRAPER — Directory consistency auditing
+// ============================================================================
+
+model CitationScan {
+  id            Int       @id @default(autoincrement())
+  clientId      Int       @map("client_id")
+  scanDate      DateTime  @default(now()) @map("scan_date")
+  totalChecked  Int       @map("total_checked")
+  matches       Int
+  mismatches    Int
+  missing       Int
+  errors        Int
+  healthScore   Int       @map("health_score")
+  results       Json                            // Per-directory detail array
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, scanDate(sort: Desc)])
+  @@map("citation_scans")
+}
+
+model DirectoryHealth {
+  id                  Int       @id @default(autoincrement())
+  directoryKey        String    @unique @map("directory_key")
+  displayName         String    @map("display_name")
+  lastSuccess         DateTime? @map("last_success")
+  lastFailure         DateTime? @map("last_failure")
+  consecutiveFailures Int       @default(0) @map("consecutive_failures")
+  isDegraded          Boolean   @default(false) @map("is_degraded")
+  lastCheckedAt       DateTime? @map("last_checked_at")
+
+  @@map("directory_health")
 }
