@@ -5,10 +5,11 @@ import { ReviewQueue } from "@/components/review/review-queue";
 export default async function ReviewPage() {
   await requirePermission("manage_clients");
 
-  // Get all tasks in review status
+  // ── Task-based reviews ───────────────────────────────────────────────────
+  // BUG-008 FIX: Status machine stores "review" (no hyphen). Was querying "in-review" — never matched.
   const tasksInReview = await prisma.clientTask.findMany({
     where: {
-      status: "in-review",
+      status: "review",
     },
     include: {
       client: {
@@ -19,21 +20,48 @@ export default async function ReviewPage() {
       },
     },
     orderBy: [
-      { priority: "asc" }, // P1, P2, P3
+      { priority: "asc" },
       { createdAt: "desc" },
     ],
   });
 
-  // Count tasks waiting more than 5 days
+  // ── Content-based reviews ────────────────────────────────────────────────
+  // BUG-007 FIX: Content Studio items submitted for review live in ClientContent, not ClientTask.
+  // The review queue must show both so approval reaches the correct record in each system.
+  const contentInReview = await prisma.clientContent.findMany({
+    where: {
+      status: "review",
+    },
+    include: {
+      client: {
+        select: {
+          id: true,
+          businessName: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const totalItems = tasksInReview.length + contentInReview.length;
+
   const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
-  const staleCount = tasksInReview.filter(
+  const staleTaskCount = tasksInReview.filter(
     (t) => new Date(t.updatedAt) < fiveDaysAgo
   ).length;
+  const staleContentCount = contentInReview.filter(
+    (c) => new Date(c.updatedAt) < fiveDaysAgo
+  ).length;
+  const staleCount = staleTaskCount + staleContentCount;
 
-  const subtitle = tasksInReview.length === 0
-    ? "No tasks awaiting review right now"
+  const subtitle = totalItems === 0
+    ? "No items awaiting review right now"
     : [
-        `${tasksInReview.length} ${tasksInReview.length === 1 ? "task" : "tasks"} awaiting review`,
+        `${totalItems} ${totalItems === 1 ? "item" : "items"} awaiting review`,
+        tasksInReview.length > 0 && `${tasksInReview.length} task ${tasksInReview.length === 1 ? "draft" : "drafts"}`,
+        contentInReview.length > 0 && `${contentInReview.length} content ${contentInReview.length === 1 ? "piece" : "pieces"}`,
         staleCount > 0 && `⚠️ ${staleCount} waiting over 5 days`,
       ].filter(Boolean).join(" · ");
 
@@ -46,7 +74,7 @@ export default async function ReviewPage() {
         </p>
       </div>
 
-      <ReviewQueue tasks={tasksInReview} />
+      <ReviewQueue tasks={tasksInReview} contentItems={contentInReview} />
     </div>
   );
 }
