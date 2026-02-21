@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReviewTaskModal } from "./review-task-modal";
-import { CheckCircle, FileText, ClipboardList } from "lucide-react";
+import { CheckCircle, FileText, Share2, Tag } from "lucide-react";
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Task items (human-written deliverables via ClientTask pipeline) ─────────
 
 type Task = {
   id: number;
@@ -25,13 +25,14 @@ type Task = {
   };
 };
 
+// ── Content items (AI-generated content via ClientContent / Content Studio) ──
+
 type ContentItem = {
   id: number;
   contentType: string;
   title: string | null;
-  content: string;
-  keywords: string[];
   status: string;
+  keywords: string[];
   createdAt: Date;
   updatedAt: Date;
   client: {
@@ -40,145 +41,26 @@ type ContentItem = {
   };
 };
 
-// ── Task card ──────────────────────────────────────────────────────────────
+// ── Props ──────────────────────────────────────────────────────────────────
 
-function TaskReviewCard({
-  task,
-  onSelect,
-  onQuickApprove,
-}: {
-  task: Task;
-  onSelect: (t: Task) => void;
-  onQuickApprove: (id: number) => void;
-}) {
-  return (
-    <Card className="hover:border-primary/50 transition-colors">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs gap-1">
-                <ClipboardList className="h-3 w-3" />
-                Task Draft
-              </Badge>
-              <CardTitle className="text-base">{task.title}</CardTitle>
-              <Badge
-                variant={task.priority === "P1" ? "destructive" : task.priority === "P2" ? "default" : "secondary"}
-              >
-                {task.priority}
-              </Badge>
-              <Badge variant="outline">{task.category}</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">Client: {task.client.businessName}</p>
-            {task.description && <p className="text-sm">{task.description}</p>}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Submitted: {new Date(task.createdAt).toLocaleDateString()}
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => onSelect(task)}>
-              Review
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
-              onClick={() => onQuickApprove(task.id)}
-            >
-              <CheckCircle className="h-4 w-4 mr-1" />
-              Quick Approve
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ── Content item card ──────────────────────────────────────────────────────
-
-const CONTENT_TYPE_LABELS: Record<string, string> = {
-  blog: "Blog Post",
-  social: "Social Posts",
-  meta: "Meta Description",
-  ppc: "PPC Ads",
-};
-
-function ContentReviewCard({
-  item,
-  onQuickApprove,
-}: {
-  item: ContentItem;
-  onQuickApprove: (id: number) => void;
-}) {
-  const typeLabel = CONTENT_TYPE_LABELS[item.contentType] ?? item.contentType;
-
-  return (
-    <Card className="hover:border-primary/50 transition-colors">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs gap-1">
-                <FileText className="h-3 w-3" />
-                {typeLabel}
-              </Badge>
-              <CardTitle className="text-base">{item.title ?? "Untitled"}</CardTitle>
-            </div>
-            <p className="text-sm text-muted-foreground">Client: {item.client.businessName}</p>
-            {item.keywords.length > 0 && (
-              <div className="flex gap-1 flex-wrap">
-                {item.keywords.slice(0, 4).map((kw, i) => (
-                  <Badge key={i} variant="outline" className="text-xs">
-                    {kw}
-                  </Badge>
-                ))}
-                {item.keywords.length > 4 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{item.keywords.length - 4}
-                  </Badge>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Generated: {new Date(item.createdAt).toLocaleDateString()}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
-              onClick={() => onQuickApprove(item.id)}
-            >
-              <CheckCircle className="h-4 w-4 mr-1" />
-              Approve
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ── Main export ────────────────────────────────────────────────────────────
-
-export function ReviewQueue({
-  tasks,
-  contentItems,
-}: {
+interface ReviewQueueProps {
   tasks: Task[];
   contentItems: ContentItem[];
-}) {
+}
+
+// ── Content type display helpers ───────────────────────────────────────────
+
+const CONTENT_TYPE_META: Record<string, { label: string; icon: React.ElementType }> = {
+  blog: { label: "Blog Post", icon: FileText },
+  social: { label: "Social Media", icon: Share2 },
+  meta: { label: "Meta Description", icon: Tag },
+};
+
+// ── Main component ─────────────────────────────────────────────────────────
+
+export function ReviewQueue({ tasks, contentItems }: ReviewQueueProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const totalItems = tasks.length + contentItems.length;
 
@@ -188,59 +70,204 @@ export function ReviewQueue({
         <CardContent className="py-12 text-center text-muted-foreground">
           <p className="font-medium mb-2">No items in review queue</p>
           <p className="text-sm">
-            Items appear here when content drafts are submitted for review. You&apos;ll
-            review and either approve or request changes.
+            Items appear here when task drafts or Content Studio pieces are submitted for review.
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  async function handleTaskQuickApprove(taskId: number) {
+  async function handleQuickApproveTask(taskId: number) {
+    const key = `task-${taskId}`;
+    setApprovingId(key);
     try {
       const res = await fetch(`/api/tasks/${taskId}/approve`, { method: "POST" });
       if (res.ok) window.location.reload();
     } catch (error) {
       console.error("Failed to approve task:", error);
+    } finally {
+      setApprovingId(null);
     }
   }
 
-  // BUG-007 FIX: Approve content items via ClientContent API, not task API.
-  // These are separate records — approving must write to the correct model.
-  async function handleContentQuickApprove(contentId: number) {
+  async function handleApproveContent(contentId: number) {
+    const key = `content-${contentId}`;
+    setApprovingId(key);
     try {
-      const res = await fetch("/api/content/list", {
-        method: "PATCH",
+      const res = await fetch("/api/content/review", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentId, status: "approved" }),
+        body: JSON.stringify({ contentId, action: "approve" }),
       });
       if (res.ok) window.location.reload();
     } catch (error) {
       console.error("Failed to approve content:", error);
+    } finally {
+      setApprovingId(null);
+    }
+  }
+
+  async function handleRejectContent(contentId: number) {
+    const key = `content-reject-${contentId}`;
+    setApprovingId(key);
+    try {
+      const res = await fetch("/api/content/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentId, action: "reject" }),
+      });
+      if (res.ok) window.location.reload();
+    } catch (error) {
+      console.error("Failed to reject content:", error);
+    } finally {
+      setApprovingId(null);
     }
   }
 
   return (
     <>
       <div className="grid gap-4">
-        {/* Task drafts first (human-written, higher urgency) */}
-        {tasks.map((task) => (
-          <TaskReviewCard
-            key={`task-${task.id}`}
-            task={task}
-            onSelect={setSelectedTask}
-            onQuickApprove={handleTaskQuickApprove}
-          />
-        ))}
 
-        {/* Content Studio items */}
-        {contentItems.map((item) => (
-          <ContentReviewCard
-            key={`content-${item.id}`}
-            item={item}
-            onQuickApprove={handleContentQuickApprove}
-          />
-        ))}
+        {/* ── Task-based review items ───────────────────────────────────── */}
+        {tasks.length > 0 && (
+          <div className="space-y-3">
+            {tasks.length > 0 && contentItems.length > 0 && (
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">
+                Task Deliverables
+              </p>
+            )}
+            {tasks.map((task) => (
+              <Card key={`task-${task.id}`} className="hover:border-primary/50 transition-colors">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-lg">{task.title}</CardTitle>
+                        <Badge
+                          variant={
+                            task.priority === "P1" ? "destructive" :
+                            task.priority === "P2" ? "default" : "secondary"
+                          }
+                        >
+                          {task.priority}
+                        </Badge>
+                        <Badge variant="outline">{task.category}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {task.client.businessName}
+                      </p>
+                      {task.description && (
+                        <p className="text-sm">{task.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      Submitted: {new Date(task.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedTask(task)}
+                      >
+                        Review
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                        disabled={approvingId === `task-${task.id}`}
+                        onClick={() => handleQuickApproveTask(task.id)}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        {approvingId === `task-${task.id}` ? "Approving…" : "Quick Approve"}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* ── Content Studio review items ───────────────────────────────── */}
+        {contentItems.length > 0 && (
+          <div className="space-y-3">
+            {tasks.length > 0 && contentItems.length > 0 && (
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1">
+                Content Studio
+              </p>
+            )}
+            {contentItems.map((item) => {
+              const meta = CONTENT_TYPE_META[item.contentType] ?? { label: item.contentType, icon: FileText };
+              const Icon = meta.icon;
+              return (
+                <Card key={`content-${item.id}`} className="hover:border-primary/50 transition-colors">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <CardTitle className="text-lg">
+                            {item.title || `Untitled ${meta.label}`}
+                          </CardTitle>
+                          <Badge variant="outline">{meta.label}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {item.client.businessName}
+                        </p>
+                        {item.keywords.length > 0 && (
+                          <div className="flex gap-1 flex-wrap">
+                            {item.keywords.slice(0, 4).map((kw, i) => (
+                              <Badge key={i} variant="secondary" className="text-[10px]">
+                                {kw}
+                              </Badge>
+                            ))}
+                            {item.keywords.length > 4 && (
+                              <Badge variant="secondary" className="text-[10px]">
+                                +{item.keywords.length - 4}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-muted-foreground">
+                        Submitted: {new Date(item.updatedAt).toLocaleDateString()}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={approvingId === `content-reject-${item.id}`}
+                          onClick={() => handleRejectContent(item.id)}
+                        >
+                          Send Back
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          disabled={approvingId === `content-${item.id}`}
+                          onClick={() => handleApproveContent(item.id)}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          {approvingId === `content-${item.id}` ? "Approving…" : "Approve"}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {selectedTask && (

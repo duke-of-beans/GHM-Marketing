@@ -335,7 +335,13 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 
 ---
 
-### BUG-007: Content Review Quick Approve Does Not Sync to Content Studio
+### BUG-007: Content Review Quick Approve Does Not Sync — ✅ FIXED (February 21, 2026)
+**Root cause:** Two completely decoupled systems with no FK link. Content Studio stores items in `ClientContent`; the review queue only queried `ClientTask`. Approving a task never touched `ClientContent`. Content Studio's "Submit for Review" updated `ClientContent.status` but items never appeared in the review queue.
+**Fix:** Review page now queries both `ClientTask` (status='review') and `ClientContent` (status='review'). `ReviewQueue` component handles both types. Each card's approve action routes to the correct model — tasks via `/api/tasks/[id]/approve`, content items via `PATCH /api/content/list`. No FK needed; the two item types are rendered separately and approved via their own APIs.
+
+### BUG-008: Completed Tasks Not Removed from Content Review — ✅ FIXED (February 21, 2026)
+**Root cause:** Status string mismatch. Status machine and transition route store `status: "review"` (no hyphen). Review page queried `status: "in-review"` — never matched anything. The queue was permanently empty regardless of actual task states.
+**Fix:** Changed query to `status: "review"`. Also hardened the approve route: now validates task is actually in `"review"` before approving, runs status update + `TaskTransition` audit entry in a single `$transaction`, and sets `completedAt` timestamp. Tasks correctly exit the queue on approval.
 **Priority:** HIGH — data integrity issue, reps think they approved something but studio state is unchanged
 **Problem:** Clicking "Quick Approve" on an item in the Content Review queue marks it approved in the review queue's local state but does not update the corresponding record in Content Studio. The two views are reading from the same data source but the approval write is only updating one side.
 **Fix:** The approve action must write to the canonical content item status field, and both Content Review and Content Studio must read from that same field. Likely a state update is happening in the component but not persisting to DB, or persisting to a different field than Content Studio reads.
