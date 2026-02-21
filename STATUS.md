@@ -1,6 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
-**Single source of truth. All other status files are archived.**  
-**Last Updated:** February 21, 2026 — UX-001, UX-002, UX-003, UX-004 all complete. Nav grouped, studios promoted, client detail decomposed.
+**Single source of truth for build progress. All other status files are archived.**
+**Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
+**Last Updated:** February 21, 2026 — UX-001, UX-002, UX-003, UX-004 all complete. Nav grouped, studios promoted, client detail decomposed. VISION.md written as new product gospel.
 
 ---
 

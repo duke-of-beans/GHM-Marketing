@@ -101,6 +101,53 @@ key_metrics:
   - "Competitive audit to close conversion rate"
   - "Territory penetration rate"
 
+product_vision:
+  core_identity: >
+    GHM Dashboard is not an SEO tool, a CRM, a billing system, or a project management app.
+    It is a unified agency intelligence platform — the single operating environment that
+    eliminates context switching entirely. Individual modules are entry points into one
+    connected data layer. The product's value lives at the seams between modules, where
+    no competitor currently operates.
+
+  design_law: >
+    Context never breaks. Every UI decision is evaluated against: "Does this require the
+    user to open another tab to complete the thought?" If yes, it is a context break.
+    We eliminate them.
+
+  build_philosophy: >
+    Use it at GHM. Break it until it is hard to break. Then think about SaaS
+    productization. We do not sell until every module works flawlessly.
+
+  competitive_positioning: >
+    We do not compete module-by-module against specialists. Pipedrive, FreshBooks,
+    ClickUp, Surfer SEO, Webflow — specialists always beat generalists on their own
+    turf. We wrap around them. Agencies paying $400-600/month across GoHighLevel +
+    ClickUp + Ahrefs + FreshBooks + a website builder. GHM replaces all five.
+    The comparison is not feature-by-feature — it is context-break-by-context-break.
+
+  cross_module_flows:
+    - "Lead source → invoiced revenue attribution (true channel ROI)"
+    - "Task completion → Wave invoice auto-generation"
+    - "Website performance → content recommendations → task creation"
+    - "Client Health Score: 5-module composite visible everywhere a client appears"
+    - "Content → lead capture → conversion and revenue attribution"
+
+  client_health_score: >
+    The most important cross-module feature. A single green/yellow/red dot visible
+    everywhere a client appears. Inputs: task completion rate, payment timeliness,
+    ranking trend, content output rate, communication recency, website health.
+    Output: answers "who needs attention today" without clicking anything.
+
+  module_build_order:
+    1: "Tasks + Billing (simultaneous) — proves the task→invoice architecture"
+    2: "Client Health Score — launches with billing, connective tissue"
+    3: "Content Studio — AI differentiator via SEO API integration"
+    4: "Lead Generation — pipeline kanban, convert-to-client data carry-through"
+    5: "Website Studio — last, most expensive, done once and done right"
+
+  vision_document: "D:\\Work\\SEO-Services\\ghm-dashboard\\VISION.md"
+  last_updated: "February 21, 2026 — post competitive research session"
+
 notes: |
   GHM Digital Marketing is Gavin's company. David operates as effective COO
   managing all operations, sales team, and strategy. David's current comp is
