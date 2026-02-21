@@ -31,7 +31,7 @@ const allLinks: NavLink[] = [
   { href: "/discovery", label: "Find Leads", icon: "🔍", permission: "view_all_leads" },
   { href: "/leads", label: "Sales Pipeline", icon: "👥", permission: "manage_leads" },
   { href: "/clients", label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
-  { href: "/review", label: "Content Review", icon: "✍️", permission: "manage_clients" },
+  // Content Review merged into /tasks?tab=approvals (UX-004, Feb 21 2026)
   { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
   { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
   { href: "/payments", label: "Payments", icon: "💳", permission: "manage_payments" },

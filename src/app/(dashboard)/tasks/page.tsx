@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { TaskQueueClient } from "@/components/tasks/task-queue-client";
+import { TasksPageClient } from "@/components/tasks/tasks-page-client";
 
 export default async function TasksPage() {
   const session = await auth();
@@ -8,7 +8,7 @@ export default async function TasksPage() {
 
   return (
     <div className="space-y-4 pb-20 md:pb-0">
-      <TaskQueueClient
+      <TasksPageClient
         currentUserId={parseInt(session.user.id)}
         currentUserRole={session.user.role}
       />
