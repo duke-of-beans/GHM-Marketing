@@ -317,7 +317,10 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 
 ---
 
-### UX-004: Content Review + Content Studio — Architecture Decision
+### UX-004: Content Review + Content Studio — ✅ DONE (February 21, 2026)
+**Implemented:** Content Review merged into Tasks as two-tab layout. Work tab = assigned tasks (unchanged). Approvals tab = both ClientTask and ClientContent items in "review" status. Tab state synced to URL (?tab=approvals). Approvals tab only visible to elevated users. Old /review page redirected permanently. Nav entry removed. New: TasksPageClient shell, ApprovalsTab component, GET /api/review/content-queue, redirect at /review.
+
+### UX-004: Content Review + Content Studio — Architecture Decision (original below)
 **Priority:** HIGH — affects information architecture before UX-001/UX-002 can be finalized
 **Problem:** Content Review is currently a separate nav/page item, but it only has meaning if a client has Content Studio active. Its presence in the top-level nav as a permanent item creates confusion for users who don't have any content pipeline.
 
