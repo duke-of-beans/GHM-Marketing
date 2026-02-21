@@ -1,14 +1,37 @@
 "use client";
 
+/**
+ * DashboardNav — grouped, collapsible sidebar navigation.
+ *
+ * UX-003 (Feb 21, 2026): Replaced flat link list with collapsible groups.
+ * Groups reflect the actual workflow model. State persisted to localStorage
+ * per-group. Active route auto-expands its parent group.
+ *
+ * Groups:
+ *   Prospects  — Discovery, Sales Pipeline
+ *   Clients    — Client Portfolio, My Tasks, Content Studio*, Website Studio*
+ *   Insights   — Analytics
+ *   Finance    — Payments
+ *   Team       — Service Catalog, Document Vault  (elevated only for some)
+ *
+ * * = UX-002 entries, added here as placeholders pending route creation
+ *
+ * Dashboard link stays pinned above the groups (role-specific, not a group).
+ */
+
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
 import { isElevated } from "@/lib/auth/roles";
 import { HelpMenu } from "@/components/onboarding/help-menu";
+
+// ── Types ──────────────────────────────────────────────────────────────────
 
 type NavUser = {
   name: string;
@@ -20,59 +43,216 @@ type NavLink = {
   href: string;
   label: string;
   icon: string;
-  permission?: keyof UserPermissions; // Optional permission required to see this link
+  permission?: keyof UserPermissions;
+  elevatedOnly?: boolean;
 };
 
-const allLinks: NavLink[] = [
-  // Core workflow — everyone
-  { href: "/master", label: "Dashboard", icon: "📊", permission: "view_analytics" },
-  { href: "/sales", label: "Dashboard", icon: "📊" },
-  { href: "/tasks", label: "My Tasks", icon: "✅" },
-  { href: "/discovery", label: "Find Leads", icon: "🔍", permission: "view_all_leads" },
-  { href: "/leads", label: "Sales Pipeline", icon: "👥", permission: "manage_leads" },
-  { href: "/clients", label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
-  // Content Review merged into /tasks?tab=approvals (UX-004, Feb 21 2026)
-  { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
-  { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
-  { href: "/payments", label: "Payments", icon: "💳", permission: "manage_payments" },
-  { href: "/vault", label: "Document Vault", icon: "🗄️" },
-  // Admin items live in Settings tabs — not separate nav items
+type NavGroup = {
+  id: string;
+  label: string;
+  elevatedOnly?: boolean;   // entire group hidden for non-elevated users
+  defaultExpanded?: boolean;
+  links: NavLink[];
+};
+
+// ── Nav structure ──────────────────────────────────────────────────────────
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    id: "prospects",
+    label: "Prospects",
+    defaultExpanded: true,
+    links: [
+      { href: "/discovery", label: "Find Leads",       icon: "🔍", permission: "view_all_leads" },
+      { href: "/leads",     label: "Sales Pipeline",   icon: "👥", permission: "manage_leads" },
+    ],
+  },
+  {
+    id: "clients",
+    label: "Clients",
+    defaultExpanded: true,
+    links: [
+      { href: "/clients",        label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
+      { href: "/tasks",          label: "My Tasks",         icon: "✅" },
+      // UX-002 entries — routes created in UX-002 sprint
+      { href: "/content-studio", label: "Content Studio",   icon: "✍️", permission: "manage_clients" },
+      { href: "/website-studio", label: "Website Studio",   icon: "🌐", permission: "manage_clients" },
+    ],
+  },
+  {
+    id: "insights",
+    label: "Insights",
+    defaultExpanded: false,
+    links: [
+      { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
+    ],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    defaultExpanded: false,
+    links: [
+      { href: "/payments", label: "Payments", icon: "💳", permission: "manage_payments" },
+    ],
+  },
+  {
+    id: "team",
+    label: "Team",
+    defaultExpanded: false,
+    links: [
+      { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
+      { href: "/vault",    label: "Document Vault",  icon: "🗄️" },
+    ],
+  },
 ];
 
-export function DashboardNav({ 
-  user, 
-  permissions = {} 
-}: { 
-  user: NavUser; 
+// Bottom nav links (mobile) — flat, most important only
+const MOBILE_NAV_LINKS: NavLink[] = [
+  { href: "/tasks",    label: "Tasks",    icon: "✅" },
+  { href: "/clients",  label: "Clients",  icon: "🏢", permission: "view_all_clients" },
+  { href: "/leads",    label: "Pipeline", icon: "👥", permission: "manage_leads" },
+  { href: "/analytics",label: "Analytics",icon: "📈", permission: "view_analytics" },
+];
+
+// ── localStorage helpers ────────────────────────────────────────────────────
+
+const LS_KEY = (groupId: string) => `sidebar_group_${groupId}_expanded`;
+
+function readExpanded(groupId: string, defaultValue: boolean): boolean {
+  if (typeof window === "undefined") return defaultValue;
+  const stored = window.localStorage.getItem(LS_KEY(groupId));
+  if (stored === null) return defaultValue;
+  return stored === "true";
+}
+
+function writeExpanded(groupId: string, value: boolean) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(LS_KEY(groupId), String(value));
+}
+
+// ── NavGroupSection ─────────────────────────────────────────────────────────
+
+function NavGroupSection({
+  group,
+  pathname,
+  permissions,
+  elevated,
+  isActivePath,
+}: {
+  group: NavGroup;
+  pathname: string;
+  permissions: UserPermissions;
+  elevated: boolean;
+  isActivePath: (href: string) => boolean;
+}) {
+  // Filter links by permission
+  const visibleLinks = group.links.filter((link) => {
+    if (link.elevatedOnly && !elevated) return false;
+    if (!link.permission) return true;
+    return permissions[link.permission] === true;
+  });
+
+  if (visibleLinks.length === 0) return null;
+
+  // Auto-expand if any child is active — always override stored state
+  const hasActive = visibleLinks.some((l) => isActivePath(l.href));
+
+  const [open, setOpen] = useState<boolean>(() => {
+    if (hasActive) return true;
+    return readExpanded(group.id, group.defaultExpanded ?? false);
+  });
+
+  // If the active route changes and lands in this group, auto-open
+  useEffect(() => {
+    if (hasActive && !open) {
+      setOpen(true);
+      writeExpanded(group.id, true);
+    }
+  }, [hasActive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function toggle() {
+    const next = !open;
+    setOpen(next);
+    writeExpanded(group.id, next);
+  }
+
+  return (
+    <div>
+      {/* Group header */}
+      <button
+        onClick={toggle}
+        className={cn(
+          "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors",
+          "text-muted-foreground/70 hover:text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+        )}
+        aria-expanded={open}
+      >
+        {group.label}
+        <ChevronDown
+          className={cn("h-3.5 w-3.5 transition-transform duration-200", open ? "rotate-0" : "-rotate-90")}
+        />
+      </button>
+
+      {/* Group links */}
+      {open && (
+        <div className="mt-0.5 space-y-0.5 pl-1">
+          {visibleLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+                isActivePath(link.href)
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+              )}
+            >
+              <span>{link.icon}</span>
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main export ─────────────────────────────────────────────────────────────
+
+export function DashboardNav({
+  user,
+  permissions = {},
+}: {
+  user: NavUser;
   permissions?: UserPermissions;
 }) {
   const pathname = usePathname();
-  
-  // Filter links based on permissions
-  const links = allLinks.filter((link) => {
-    // Special handling for dashboard links
-    if (link.href === "/master") {
-      return isElevated(user.role) && (!link.permission || permissions[link.permission]);
-    }
-    if (link.href === "/sales") {
-      return user.role === "sales";
-    }
-    
-    // If link has no permission requirement, show it
-    if (!link.permission) {
-      return true;
-    }
-    
-    // Check if user has the required permission
+  const elevated = isElevated(user.role);
+
+  const dashboardHref = elevated ? "/master" : "/sales";
+
+  // Active path: exact match OR prefix match for nested routes (/clients/123)
+  const isActivePath = useCallback(
+    (href: string) => {
+      if (href === "/") return pathname === "/";
+      return pathname === href || pathname.startsWith(href + "/");
+    },
+    [pathname]
+  );
+
+  // Mobile nav: filter by permission
+  const mobileLinks = MOBILE_NAV_LINKS.filter((link) => {
+    if (!link.permission) return true;
     return permissions[link.permission] === true;
   });
 
   return (
     <>
-      {/* Desktop sidebar */}
+      {/* ── Desktop sidebar ─────────────────────────────────────────────── */}
       <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-gray-50/50 dark:bg-gray-950 p-4 overflow-hidden">
-        <div className="mb-3 flex-shrink-0">
-          <Link href={isElevated(user.role) ? "/master" : "/sales"}>
+        {/* Logo + user */}
+        <div className="mb-4 flex-shrink-0">
+          <Link href={dashboardHref}>
             <Image
               src="/logo.png"
               alt="GHM Digital Marketing"
@@ -85,30 +265,43 @@ export function DashboardNav({
           <p className="text-xs text-muted-foreground">{user.name}</p>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto min-h-0">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                pathname === link.href
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
-              )}
-            >
-              <span>{link.icon}</span>
-              {link.label}
-            </Link>
+        {/* Dashboard pinned link (role-specific, outside groups) */}
+        <div className="mb-3 flex-shrink-0">
+          <Link
+            href={dashboardHref}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              isActivePath(dashboardHref)
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+            )}
+          >
+            <span>📊</span>
+            Dashboard
+          </Link>
+        </div>
+
+        {/* Grouped nav */}
+        <nav className="flex-1 space-y-2 overflow-y-auto min-h-0">
+          {NAV_GROUPS.filter((g) => !g.elevatedOnly || elevated).map((group) => (
+            <NavGroupSection
+              key={group.id}
+              group={group}
+              pathname={pathname}
+              permissions={permissions}
+              elevated={elevated}
+              isActivePath={isActivePath}
+            />
           ))}
         </nav>
 
+        {/* Bottom actions */}
         <div className="flex-shrink-0 space-y-1 border-t pt-3 mt-3">
           <Link
             href="/profile"
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-              pathname === "/profile"
+              isActivePath("/profile")
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
             )}
@@ -121,7 +314,7 @@ export function DashboardNav({
               href="/settings"
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                pathname.startsWith("/settings")
+                isActivePath("/settings")
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
               )}
@@ -141,15 +334,15 @@ export function DashboardNav({
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
+      {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex justify-around py-2 safe-area-bottom">
-        {links.map((link) => (
+        {mobileLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
               "flex flex-col items-center gap-0.5 px-3 py-1 text-xs touch-target justify-center",
-              pathname === link.href
+              isActivePath(link.href)
                 ? "text-primary font-medium"
                 : "text-muted-foreground"
             )}
