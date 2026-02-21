@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 21, 2026 — D3 verified complete; 9 new items added (UX-001–004, BUG-007–009, FEAT-013, ITEM-004)
+**Last Updated:** February 21, 2026 — UX-001, UX-002, UX-003, UX-004 all complete. Nav grouped, studios promoted, client detail decomposed.
 
 ---
 
@@ -244,6 +244,9 @@
 ---
 
 ### UX-001: Client Detail Card — Panel Layout Rethink
+**Status: ✅ COMPLETE — February 21, 2026**
+profile.tsx decomposed from 1057-line monolith to 489-line orchestrator. Tasks, Notes, and Domains extracted to standalone components. URL tab sync added (?tab=...). All 13 tabs delegate to imported components.
+
 **Priority:** HIGH — affects every rep interaction with active clients daily
 **Problem:** The client detail view (`/clients/[id]`) renders all panels (Scorecard, Tasks, Rankings, Citations, Reports, Billing, etc.) as stacked sections inside a single scrollable container. In split-screen or responsive viewports, both vertical and horizontal scrollbars appear simultaneously, which breaks flow and feels broken. Reps don't know what they're looking for or where to find it.
 
@@ -270,6 +273,9 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 ---
 
 ### UX-002: Website Studio + Content Studio — Left Panel Promotion
+**Status: ✅ COMPLETE — February 21, 2026**
+Both studios promoted to top-level nav entries in Clients group. New routes /content-studio and /website-studio with StudioClientPicker component. Supports ?clientId= deep links from client records. Permission-gated (manage_clients).
+
 **Priority:** HIGH — discoverability directly affects upsell conversion
 **Problem:** Website Studio and Content Studio are currently buried inside the client detail view, only accessible after navigating to a specific client. This is correct for client-level work, but wrong for awareness — reps and admins don't know these features exist unless they're deep in a client record. As paid upsell modules (alongside Lead Gen, Task Management, Payments), they need their own top-level presence.
 
@@ -289,6 +295,9 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 ---
 
 ### UX-003: Left Panel — Smart Group Navigation with Expand/Collapse
+**Status: ✅ COMPLETE — February 21, 2026**
+Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finance, Team. State persisted to localStorage. Active route auto-expands parent group. Dashboard pinned above groups. NavGroupSection component with aria-expanded and keyboard support.
+
 **Priority:** MEDIUM-HIGH — will become critical as nav items grow past ~12
 **Problem:** As upsell modules, studios, admin tools, and new features get added to the left panel, it will become a flat wall of links. No mental model. No hierarchy. Hard to scan.
 
