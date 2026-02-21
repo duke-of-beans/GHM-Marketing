@@ -59,6 +59,8 @@ function buildFeatureSection(ctx: FeatureContext): string {
       return buildCompetitiveScanProtocol(ctx);
     case "upsell_detection":
       return buildUpsellProtocol(ctx);
+    case "voice_capture":
+      return buildVoiceCaptureProtocol(ctx);
     // Content Studio: lean system prompt — detailed instructions live in the user prompt
     case "seo_strategy":
       return `FEATURE: SEO Strategy\nYou are an expert SEO strategist. Follow the instructions in the user message exactly. Return only what is asked — no preamble, no explanations outside the requested format.`;
@@ -182,6 +184,29 @@ Do not manufacture urgency. Do not recommend services that aren't warranted.
 For each opportunity: describe the gap, quantify the impact if possible, and name the service that addresses it.`;
 }
 
+function buildVoiceCaptureProtocol(ctx: FeatureContext): string {
+  return `FEATURE: Brand Voice Capture
+
+You are analyzing scraped website content to extract a precise, actionable brand voice profile for ${ctx.clientName}.
+
+ANALYSIS OBJECTIVE:
+Extract the authentic brand voice so that AI-generated content written for this client sounds indistinguishable from their own writing. This profile will be used to tune all future content generation for this account.
+
+ANALYSIS METHODOLOGY:
+- Read the content holistically before scoring — look for patterns, not exceptions
+- Vocabulary: pull actual repeated terms and phrases from the text — do not invent them
+- Sentence structure: note real observed patterns (length, subordinate clauses, fragments, questions)
+- Formality: 1 = "hey, what's up!" casual / 10 = legal brief formal
+- Enthusiasm: 1 = dry and matter-of-fact / 10 = exclamation points everywhere
+- Technicality: 1 = plain everyday language / 10 = assumes deep domain expertise
+- Brevity: 1 = long discursive paragraphs / 10 = terse bullet-point style
+
+QUALITY STANDARDS:
+- Tonality must be specific. "Professional yet approachable" is too generic — describe HOW they achieve that.
+- Vocabulary must contain actual terms from the text, not generic industry words.
+- Every score must be defensible from the content provided. If the content is insufficient to determine a dimension, score it 5 (neutral) and note the uncertainty in tonality.`;
+}
+
 // ── Output format contracts ───────────────────────────────────────────────────
 
 function buildOutputContract(feature: AIFeature): string {
@@ -235,6 +260,22 @@ Schema:
       return `OUTPUT FORMAT:
 Respond with a JSON array only. No preamble. No markdown backticks.
 Schema: [{ "service": string, "gap": string, "impact": string, "urgency": "high"|"medium"|"low" }]`;
+
+    case "voice_capture":
+      return `OUTPUT FORMAT:
+Respond with a JSON object only. No preamble. No markdown backticks. No \`\`\`json fences.
+Schema:
+{
+  "tonality": string,
+  "vocabulary": string[],
+  "sentenceStructure": string,
+  "characteristics": {
+    "formality": number,
+    "enthusiasm": number,
+    "technicality": number,
+    "brevity": number
+  }
+}`;
 
     // Content Studio — detailed format instructions are inline in user prompt; no contract needed here
     case "seo_strategy":

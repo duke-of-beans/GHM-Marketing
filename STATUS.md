@@ -331,7 +331,7 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 
 **Alternative (keep separate):** Keep Content Review as its own left-panel item, but move it inside the Clients group (UX-003) and only show it when at least one client has Content Studio active. Show a count badge so it's useful at a glance.
 
-**Decision needed from David before implementation.** This choice gates UX-001, UX-002, and UX-003 final structure.
+**Decision — CONFIRMED February 21, 2026:** Merge Content Review into My Tasks as two tabs: **Work** (assigned tasks) and **Approvals** (content review queue). Approvals tab shows empty state if no studios active. Content Studio goes to left nav as top-level creation/management entry. Review/approval surfaces in Tasks only. This gates UX-001, UX-002, UX-003 final structure — all can now proceed.
 
 ---
 
@@ -380,7 +380,22 @@ Replace the long scroll with a full-height tabbed layout where the viewport itse
 
 ---
 
-### ITEM-004: AI Wrapper Audit — Verify Comprehensive Coverage
+### ITEM-004: AI Wrapper Audit — ✅ COMPLETE (February 21, 2026)
+**Result:** One raw call found and migrated. All AI calls now route through `callAI()`.
+
+**Audit findings:**
+- `src/lib/scrvnr/voice-capture.ts` — was using `new Anthropic()` + `anthropic.messages.create()` directly. **Migrated.**
+- `src/app/api/settings/integrations/route.ts` — references Anthropic only to ping the health endpoint (`/v1/models`), not for inference. **Correct as-is.**
+- All Content Studio, competitive scan, upsell detection, content brief routes — already using `callAI()`.
+
+**Enhancements applied:**
+- Added `voice_capture` to `AIFeature` type union
+- Added `voice_capture` system prompt to `system-prompt-builder.ts` with detailed brand voice extraction methodology and scoring rubrics
+- Added `voice_capture` output contract (JSON schema enforced)
+- Added `voice_capture` to cascade escalation JSON-feature list (will escalate to Opus if Sonnet returns malformed JSON)
+- Default max tokens: 1,200 (sufficient for structured JSON + quality vocabulary extraction)
+- `captureVoiceFromWebsite()` now accepts `clientId` + `clientName` for cost tracking attribution — all voice capture calls logged to `ai_cost_logs`
+- Model routing: voice capture is moderate complexity + copywriting domain → routes to Sonnet by default, escalates to Opus on JSON parse failure
 **Priority:** MEDIUM — architectural quality; we have the layer, need to confirm everything routes through it
 **Context:** Phase 11 (AI Client Layer) implemented a unified `callAI()` entry point with model routing, complexity analysis, cost tracking, system prompt builder, cascade retry, and per-feature prompt engineering. This is the right architecture. The question is whether it's fully applied — or whether any later-added features are making raw `anthropic.messages.create()` calls that bypass the wrapper.
 

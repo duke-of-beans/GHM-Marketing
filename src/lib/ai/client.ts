@@ -79,6 +79,8 @@ const DEFAULT_MAX_TOKENS: Record<AIFeature, number> = {
   // Analytics
   competitive_scan:  1500,
   upsell_detection:   600,
+  // SCRVNR / Voice
+  voice_capture:     1200,
 };
 
 // ── Singleton client ──────────────────────────────────────────────────────────
@@ -212,7 +214,7 @@ function shouldEscalate(result: { content: string }, feature: AIFeature): boolea
   // JSON-output features: check parse validity
   const jsonFeatures: AIFeature[] = [
     "content_brief", "scrvnr_gate", "competitive_scan", "upsell_detection",
-    "seo_strategy", "social_posts", "ppc_ads",
+    "seo_strategy", "social_posts", "ppc_ads", "voice_capture",
   ];
   if (jsonFeatures.includes(feature)) {
     try {

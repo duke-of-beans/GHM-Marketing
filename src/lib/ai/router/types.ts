@@ -123,7 +123,9 @@ export type AIFeature =
   | "meta_description"   // Meta description (plain text output)
   // Analytics / CRM
   | "competitive_scan"   // Competitor analysis
-  | "upsell_detection";  // Upsell opportunity detection
+  | "upsell_detection"   // Upsell opportunity detection
+  // SCRVNR / Voice
+  | "voice_capture";     // Extract brand voice profile from website content
 
 export interface FeatureContext {
   feature: AIFeature;

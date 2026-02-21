@@ -51,7 +51,7 @@ export async function POST(
 
     // Capture voice profile
     console.log(`Capturing voice profile for ${client.businessName} from ${websiteUrl}`);
-    const voiceProfile = await captureVoiceFromWebsite(websiteUrl);
+    const voiceProfile = await captureVoiceFromWebsite(websiteUrl, clientId, client.businessName);
 
     // Store voice profile in database
     const saved = await prisma.voiceProfile.upsert({

@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { callAI } from "@/lib/ai";
 import * as cheerio from 'cheerio';
 
 export interface VoiceProfile {
@@ -110,114 +110,93 @@ async function scrapeWebsiteContent(url: string): Promise<string> {
  * Capture voice profile from a website using Claude API
  */
 export async function captureVoiceFromWebsite(
-  websiteUrl: string
+  websiteUrl: string,
+  clientId = 0,
+  clientName = "Unknown"
 ): Promise<VoiceProfile> {
-  // Validate API key
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY environment variable is not set. Please configure your API key to use voice capture.');
-  }
-
   // Scrape website content
   console.log(`Scraping website: ${websiteUrl}`);
   const websiteContent = await scrapeWebsiteContent(websiteUrl);
-  
+
   if (!websiteContent || websiteContent.length < 100) {
     throw new Error('Insufficient content found on website to analyze voice. The website may be blocking scrapers or has minimal text content.');
   }
-  
+
   console.log(`Scraped ${websiteContent.length} characters of content`);
-  
-  // Initialize Anthropic client
-  const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY!,
+  console.log('Sending content to Claude for voice analysis...');
+
+  const result = await callAI({
+    feature: "voice_capture",
+    prompt: `Analyze the writing style and brand voice from this website content:\n\n${websiteContent}`,
+    context: {
+      feature: "voice_capture",
+      clientId,
+      clientName,
+    },
+    maxTokens: 1200,
   });
-  
-  try {
-    // Analyze with Claude
-    console.log('Sending content to Claude for analysis...');
-    const analysis = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [{
-        role: 'user',
-        content: `Analyze the writing style and brand voice from this website content:
 
-${websiteContent}
-
-Provide a detailed voice profile in JSON format with this EXACT structure:
-{
-  "tonality": "brief description of overall tone (e.g., professional yet approachable, technical and authoritative)",
-  "vocabulary": ["key", "repeated", "industry", "terms", "that", "define", "the", "voice"],
-  "sentenceStructure": "description of typical sentence patterns (e.g., short and punchy, complex with subordinate clauses)",
-  "characteristics": {
-    "formality": <1-10, where 1 is very casual and 10 is very formal>,
-    "enthusiasm": <1-10, where 1 is subdued and 10 is very enthusiastic>,
-    "technicality": <1-10, where 1 is plain language and 10 is highly technical>,
-    "brevity": <1-10, where 1 is very verbose and 10 is very concise>
+  if (!result.ok) {
+    throw new Error(`Voice capture AI call failed: ${result.error}`);
   }
-}
 
-Return ONLY the JSON object, no other text, no markdown formatting.`
-      }]
-    });
-    
-    console.log('Received response from Claude');
-    
-    // Parse JSON response
-    const responseText = analysis.content[0].type === 'text' 
-      ? analysis.content[0].text 
-      : '';
-      
-    if (!responseText) {
-      throw new Error('Empty response from Claude API');
-    }
-      
-    // Clean any markdown formatting
-    const cleanedText = responseText
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-    
-    console.log('Parsing voice profile JSON...');
-    const profile = JSON.parse(cleanedText);
-    
-    // Validate structure
-    if (!profile.tonality || !profile.vocabulary || !profile.sentenceStructure || !profile.characteristics) {
-      console.error('Invalid profile structure:', profile);
-      throw new Error('Invalid voice profile structure returned from Claude. Missing required fields.');
-    }
-    
-    if (!Array.isArray(profile.vocabulary)) {
-      throw new Error('Invalid vocabulary format - must be an array');
-    }
-    
-    const { formality, enthusiasm, technicality, brevity } = profile.characteristics;
-    if (!formality || !enthusiasm || !technicality || !brevity) {
-      throw new Error('Missing characteristic scores in voice profile');
-    }
-    
-    // Generate unique profile ID
-    const profileId = `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    console.log('Voice profile generated successfully');
-    
-    return {
-      profileId,
-      tonality: profile.tonality,
-      vocabulary: profile.vocabulary,
-      sentenceStructure: profile.sentenceStructure,
-      characteristics: {
-        formality: Number(formality),
-        enthusiasm: Number(enthusiasm),
-        technicality: Number(technicality),
-        brevity: Number(brevity),
-      },
+  console.log('Received voice analysis from Claude');
+
+  // Clean any residual markdown fencing (system prompt forbids it, but defensive)
+  const cleanedText = result.content
+    .replace(/```json\n?/g, '')
+    .replace(/```\n?/g, '')
+    .trim();
+
+  console.log('Parsing voice profile JSON...');
+  let profile: {
+    tonality: string;
+    vocabulary: string[];
+    sentenceStructure: string;
+    characteristics: {
+      formality: number;
+      enthusiasm: number;
+      technicality: number;
+      brevity: number;
     };
-  } catch (parseError) {
-    console.error('Failed to parse voice profile JSON:', parseError);
-    if (parseError instanceof SyntaxError) {
-      throw new Error('Failed to parse voice analysis from Claude API. The response was not valid JSON.');
-    }
-    throw parseError;
+  };
+
+  try {
+    profile = JSON.parse(cleanedText);
+  } catch {
+    throw new Error('Failed to parse voice analysis from Claude API. The response was not valid JSON.');
   }
+
+  // Validate structure
+  if (!profile.tonality || !profile.vocabulary || !profile.sentenceStructure || !profile.characteristics) {
+    console.error('Invalid profile structure:', profile);
+    throw new Error('Invalid voice profile structure returned from Claude. Missing required fields.');
+  }
+
+  if (!Array.isArray(profile.vocabulary)) {
+    throw new Error('Invalid vocabulary format - must be an array');
+  }
+
+  const { formality, enthusiasm, technicality, brevity } = profile.characteristics;
+  if (!formality || !enthusiasm || !technicality || !brevity) {
+    throw new Error('Missing characteristic scores in voice profile');
+  }
+
+  // Generate unique profile ID
+  const profileId = `voice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  console.log('Voice profile generated successfully');
+
+  return {
+    profileId,
+    tonality: profile.tonality,
+    vocabulary: profile.vocabulary,
+    sentenceStructure: profile.sentenceStructure,
+    characteristics: {
+      formality: Number(formality),
+      enthusiasm: Number(enthusiasm),
+      technicality: Number(technicality),
+      brevity: Number(brevity),
+    },
+  };
 }
