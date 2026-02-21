@@ -5,6 +5,7 @@ import { territoryFilter } from "@/lib/auth/session";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateAuditData } from "@/lib/audit/generator";
 import { generateAuditHTML } from "@/lib/audit/template";
+import { randomBytes } from "crypto";
 
 async function handleAudit(
   _request: NextRequest,
@@ -37,6 +38,9 @@ async function handleAudit(
     const auditData = await generateAuditData(leadId, user.name ?? undefined);
     const html = generateAuditHTML(auditData);
 
+    // Generate a share token (32 random bytes = 64-char hex)
+    const shareToken = randomBytes(32).toString("hex");
+
     // Persist history record (non-fatal)
     await prisma.prospectAudit.create({
       data: {
@@ -45,6 +49,7 @@ async function handleAudit(
         repName: user.name ?? null,
         healthScore: auditData.healthScore,
         gapCount: auditData.gaps.length,
+        shareToken,
       },
     }).catch(() => {});
 
@@ -60,6 +65,7 @@ async function handleAudit(
         "Content-Disposition": `inline; filename="audit-${slug}.html"`,
         "X-Audit-Score": String(auditData.healthScore),
         "X-Audit-Gaps": String(auditData.gaps.length),
+        "X-Audit-Share-Token": shareToken,
       },
     });
   } catch (err) {

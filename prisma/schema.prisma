@@ -1631,6 +1631,7 @@ model ProspectAudit {
   repName     String?  @map("rep_name")
   healthScore Int?     @map("health_score")
   gapCount    Int?     @map("gap_count")
+  shareToken  String?  @unique @map("share_token")
   generatedAt DateTime @default(now()) @map("generated_at")
 
   @@index([leadId])
