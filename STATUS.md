@@ -1,6 +1,6 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth. All other status files are archived.**  
-**Last Updated:** February 20, 2026 — Onboarding Portal complete (all 5 phases), Wave Payments complete (W1-W6), W7 deferred
+**Last Updated:** February 21, 2026 — D3 verified complete; 9 new items added (UX-001–004, BUG-007–009, FEAT-013, ITEM-004)
 
 ---
 
@@ -145,7 +145,7 @@
 |----|------|--------|
 | D1 | Audit history on lead detail | ✅ DONE |
 | D2 | Demo history on lead detail | ✅ DONE |
-| D3 | Shareable audit link (public, no auth required) | 🔴 TODO |
+| D3 | Shareable audit link (public, no auth required) | ✅ DONE |
 | D4 | Audit → Demo one-click workflow | 🔴 TODO |
 | D5 | Territory map visualization (simple/static) | 🔴 TODO |
 
@@ -240,6 +240,170 @@
 - Coordinate with the permission system — don't show tutorials for features a user can't access
 
 ---
+
+---
+
+### UX-001: Client Detail Card — Panel Layout Rethink
+**Priority:** HIGH — affects every rep interaction with active clients daily
+**Problem:** The client detail view (`/clients/[id]`) renders all panels (Scorecard, Tasks, Rankings, Citations, Reports, Billing, etc.) as stacked sections inside a single scrollable container. In split-screen or responsive viewports, both vertical and horizontal scrollbars appear simultaneously, which breaks flow and feels broken. Reps don't know what they're looking for or where to find it.
+
+**Proposed rethink — Tab-per-panel architecture:**
+Replace the long scroll with a full-height tabbed layout where the viewport itself is the scroll boundary, not an inner container. The client header (name, health score, key metrics strip) stays pinned at top; below it sits a tab bar; below that is a scrollable content area that fills the remaining viewport height exactly. This gives each panel its own isolated scroll context — no horizontal scroll, no double-scroll, no confusion.
+
+**Tab groups (proposed):**
+- **Overview** — scorecard + recent activity summary (the "at a glance" landing tab)
+- **Tasks** — full task kanban/list (replaces embedded Tasks panel)
+- **SEO** — rankings + citations + GBP metrics
+- **Campaigns** — Google Ads / PPC (once I7 surfaces)
+- **Content** — content studio briefs + review queue (see UX-002/UX-004 for further decisions)
+- **Reports** — generate + history
+- **Billing** — Wave invoices + payment history
+- **Settings** — client details edit, contacts, access
+
+**Responsive behavior:** On narrow viewports, tab bar becomes a horizontal scroll (no truncation). On very narrow (< 480px), collapses to a dropdown selector. Tab content always fills available height.
+
+**Files to touch:**
+- `src/app/(dashboard)/clients/[id]/page.tsx` — layout restructure
+- `src/components/clients/profile.tsx` — currently the monolith, break into tab-gated components
+- All sub-panel components (RankingsTab, CitationsTab, ScorecardTab, etc.) — already componentized, just need correct height/overflow CSS
+
+---
+
+### UX-002: Website Studio + Content Studio — Left Panel Promotion
+**Priority:** HIGH — discoverability directly affects upsell conversion
+**Problem:** Website Studio and Content Studio are currently buried inside the client detail view, only accessible after navigating to a specific client. This is correct for client-level work, but wrong for awareness — reps and admins don't know these features exist unless they're deep in a client record. As paid upsell modules (alongside Lead Gen, Task Management, Payments), they need their own top-level presence.
+
+**Recommendation:** Promote both studios to the left nav as their own entries — but scope-aware. When accessed from the nav, they show a "select a client" state and then load that client's studio context. When accessed from within a client record (the tab in UX-001), they load directly into that client. This is the same pattern as any multi-tenant tool (Notion's per-workspace sidebar → per-page editor).
+
+**Left panel entries to add:**
+- **Content Studio** (with sub-item: Content Review, once UX-004 is resolved)
+- **Website Studio**
+- Both should show a badge or indicator if there are pending items (e.g., "3 drafts awaiting review")
+
+**Consideration:** Both modules should be conditionally rendered or clearly marked as "upsell" in the nav for clients who haven't activated them — show them, but with a "Upgrade" lock state so reps know they exist and can pitch them.
+
+**Files to touch:**
+- `src/components/layout/sidebar.tsx` (or equivalent nav component)
+- Route structure — may need `src/app/(dashboard)/content-studio/page.tsx` and `/website-studio/page.tsx` as landing pages with client-picker
+
+---
+
+### UX-003: Left Panel — Smart Group Navigation with Expand/Collapse
+**Priority:** MEDIUM-HIGH — will become critical as nav items grow past ~12
+**Problem:** As upsell modules, studios, admin tools, and new features get added to the left panel, it will become a flat wall of links. No mental model. No hierarchy. Hard to scan.
+
+**Recommendation:** Group nav items into collapsible sections with persistent expand/collapse state (saved to localStorage per user). Groups should reflect the actual workflow model — not arbitrary categories.
+
+**Proposed groups:**
+- **Prospects** (always expanded by default for sales) — Pipeline, Leads, Discovery, Territory Map
+- **Clients** (always expanded by default) — Client List, My Tasks, Content Studio, Website Studio, Reports
+- **Insights** — Analytics, Rankings Overview, Citation Health
+- **Finance** — Commissions/Earnings, Wave Billing (admin/master only)
+- **Team** (admin/master only) — Team Management, Document Vault, Bug Reports
+- **Settings** — Profile, App Settings
+
+**Behavior:**
+- Each group has a header label + chevron toggle
+- State persisted in localStorage (`sidebar_group_[group_id]_expanded: bool`)
+- On first load: Prospects + Clients expanded, everything else collapsed (unless user is admin, in which case all expanded)
+- Active route auto-expands its parent group even if collapsed
+- Keyboard accessible (focus group header → Enter to toggle)
+
+**Self-contained system note:** The core system (Pipeline, Clients, Tasks, Reports, Analytics, Earnings) must be fully navigable and useful without any upsell modules installed. Upsell module entries (Content Studio, Website Studio, Lead Gen, Payments) are additive — they appear in their group but are lockable per-client. A rep using only the base system should never feel like they're navigating around missing pieces.
+
+**Files to touch:**
+- `src/components/layout/sidebar.tsx` — full refactor
+- New `SidebarGroup` component with toggle logic
+
+---
+
+### UX-004: Content Review + Content Studio — Architecture Decision
+**Priority:** HIGH — affects information architecture before UX-001/UX-002 can be finalized
+**Problem:** Content Review is currently a separate nav/page item, but it only has meaning if a client has Content Studio active. Its presence in the top-level nav as a permanent item creates confusion for users who don't have any content pipeline.
+
+**Analysis:**
+- **Content Review** is a queue — it surfaces items awaiting approval. It's reactive, not proactive.
+- **My Tasks** is also a queue — it surfaces tasks assigned to the current user. Also reactive.
+- These are conceptually the same pattern: "things needing your attention right now."
+- The only meaningful difference is: Tasks = work actions; Content Review = approval actions.
+
+**Recommendation:** Merge Content Review into My Tasks as a sub-section or tab — "Tasks" and "Content Approvals" as two tabs within the same page. The merged page becomes "My Work" or just "Tasks" with a tab bar. Content Approvals tab is hidden/empty with a friendly empty state if the client has no Content Studio.
+
+**Alternative (keep separate):** Keep Content Review as its own left-panel item, but move it inside the Clients group (UX-003) and only show it when at least one client has Content Studio active. Show a count badge so it's useful at a glance.
+
+**Decision needed from David before implementation.** This choice gates UX-001, UX-002, and UX-003 final structure.
+
+---
+
+### BUG-007: Content Review Quick Approve Does Not Sync to Content Studio
+**Priority:** HIGH — data integrity issue, reps think they approved something but studio state is unchanged
+**Problem:** Clicking "Quick Approve" on an item in the Content Review queue marks it approved in the review queue's local state but does not update the corresponding record in Content Studio. The two views are reading from the same data source but the approval write is only updating one side.
+**Fix:** The approve action must write to the canonical content item status field, and both Content Review and Content Studio must read from that same field. Likely a state update is happening in the component but not persisting to DB, or persisting to a different field than Content Studio reads.
+**Files to investigate:** `src/components/content-review/` and `src/components/content-studio/` — compare the field they each read for approval status, and trace the approve API call.
+
+---
+
+### BUG-008: Completed Tasks Not Removed from Content Review
+**Priority:** HIGH — content review becomes polluted with stale items
+**Problem:** When a task is moved to "Complete" in the task system, it is not removed from the Content Review queue. Content Review should only show items that are pending review — completed items should be filtered out or auto-dismissed.
+**Fix:** Content Review query should filter `status != 'complete'` (or equivalent). Alternatively, task completion should trigger a status write on the linked content item that Content Review's query filters by.
+**Files to investigate:** `src/app/api/content-review/` — check the query filter conditions.
+
+---
+
+### FEAT-013: GoDaddy Parked Domain Search for Satellite Clusters
+**Priority:** HIGH — cost savings + faster deployment; we have dozens of parked domains that may be repurposable
+**Context:** When building satellite clusters for a client, the current flow goes straight to domain purchase. We have a portfolio of parked GoDaddy domains that should be searched first — if any parked domain matches the target keyword/city pattern, use it rather than buying new.
+
+**Proposed flow:**
+1. When rep initiates a satellite cluster build (or admin sets up cluster domains), before showing "purchase domain" CTA, trigger a search against our GoDaddy account via GoDaddy API
+2. Fetch all domains in our account with status = "parked" or "inactive"
+3. Fuzzy-match against the target keyword + city combination (e.g., "plumber-houston" would match "houstonplumber.com" or "plumbinghouston.net")
+4. If matches found: surface them first with a "Use This Domain" button — no purchase needed, just DNS reassignment
+5. If no matches: fall through to standard "purchase new domain" flow via GoDaddy Domains API (I7 already has GoDaddy integration)
+
+**API:** GoDaddy Domains API — `GET /v1/domains` with `statuses=PARKED` filter. Already have GoDaddy API credentials in the system (I7 sprint).
+
+**Files:**
+- `src/lib/enrichment/providers/godaddy.ts` — add `listParkedDomains()` and `fuzzyMatchDomains(keyword, city)` functions
+- Satellite cluster UI — add domain search step before purchase CTA
+- `src/app/api/domains/search-parked/route.ts` — new endpoint
+
+---
+
+### BUG-009: Dashboard Widget Layout Not Synchronized Across Light/Dark Mode
+**Priority:** MEDIUM — UX inconsistency, confusing when switching themes
+**Problem:** Dashboard widget arrangement is saved per-theme. If a user arranges widgets in light mode and saves, then switches to dark mode, the saved arrangement doesn't carry over. Switching back to light mode restores the saved arrangement, but the inconsistency creates the impression that settings aren't saving or that the system is broken.
+**Root cause:** Widget layout state is almost certainly being keyed by something that varies between themes (possibly a localStorage key that includes a theme identifier, or theme triggers a full remount that re-reads a stale default).
+**Fix:** Widget layout should be stored theme-agnostically — one layout state used by both themes. If the user rearranges in dark mode, that layout persists to light mode and vice versa. Theme affects only visual styling, never data or layout state.
+**Files to investigate:** Dashboard widget persistence logic — search for `localStorage` and `widget` in `src/components/dashboard/` and `src/app/(dashboard)/`.
+
+---
+
+### ITEM-004: AI Wrapper Audit — Verify Comprehensive Coverage
+**Priority:** MEDIUM — architectural quality; we have the layer, need to confirm everything routes through it
+**Context:** Phase 11 (AI Client Layer) implemented a unified `callAI()` entry point with model routing, complexity analysis, cost tracking, system prompt builder, cascade retry, and per-feature prompt engineering. This is the right architecture. The question is whether it's fully applied — or whether any later-added features are making raw `anthropic.messages.create()` calls that bypass the wrapper.
+
+**Current state (Phase 11 completed):**
+- `src/lib/ai/` — model router, complexity analyzer, cost tracker, system prompt builder, `callAI()` unified entry
+- `ai_cost_logs` table — per-call USD logging
+- Content brief API confirmed using `callAI()`
+
+**Audit needed — search for raw AI calls that bypass `callAI()`:**
+- Search `src/` for `anthropic.messages` or `new Anthropic()` or `openai.chat.completions` outside of `src/lib/ai/`
+- Any direct API calls found should be refactored to go through `callAI()` with appropriate feature context, model selection, and system prompt
+- Document which features exist in the system prompt builder and which may be missing
+
+**Enhancements to consider if gaps found:**
+- Model routing rules: simple summarization → Haiku; complex multi-step reasoning → Sonnet; long-context synthesis → Opus (if budget allows)
+- Token optimization: trim unnecessary context from prompts, compress large inputs before sending
+- Per-feature system prompts: ensure Content Brief, Demo Generator, Audit Narrative (if any), Upsell Detection, and Competitive Analysis each have distinct, well-tuned system prompts
+- Retry logic: verify cascade retry handles rate limits and 529s gracefully
+- Cost guardrails: per-client monthly cap, alert if client's AI spend exceeds threshold
+
+**Files:**
+- `src/lib/ai/` — existing layer, review and extend
+- Audit script: `grep -r "anthropic.messages\|new Anthropic\|openai.chat" src/ --include="*.ts" --exclude-dir=lib/ai`
 
 ---
 
