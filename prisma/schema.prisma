@@ -78,6 +78,10 @@ model User {
   messageReads          TeamMessageRead[]
   pushSubscriptions     PushSubscription[]
 
+  // Prospect history
+  generatedAudits       ProspectAudit[] @relation("AuditGenerator")
+  generatedDemos        ProspectDemo[]  @relation("DemoGenerator")
+
   @@index([territoryId])
   @@map("users")
 }
@@ -159,6 +163,8 @@ model Lead {
   notes             Note[]
   workOrders        WorkOrder[]
   vaultFiles        VaultFile[]
+  prospectAudits    ProspectAudit[]
+  prospectDemos     ProspectDemo[]
 
   @@index([territoryId])
   @@index([assignedTo])
@@ -1613,3 +1619,34 @@ enum VaultSpace {
   client_reports
   signed_contracts
 }
+
+// ─── Prospect Audit + Demo History ───────────────────────────────────────────
+
+model ProspectAudit {
+  id          Int      @id @default(autoincrement())
+  leadId      Int      @map("lead_id")
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  generatedBy Int      @map("generated_by")
+  generator   User     @relation("AuditGenerator", fields: [generatedBy], references: [id])
+  repName     String?  @map("rep_name")
+  healthScore Int?     @map("health_score")
+  gapCount    Int?     @map("gap_count")
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  @@index([leadId])
+  @@map("prospect_audits")
+}
+
+model ProspectDemo {
+  id          Int      @id @default(autoincrement())
+  leadId      Int      @map("lead_id")
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  generatedBy Int      @map("generated_by")
+  generator   User     @relation("DemoGenerator", fields: [generatedBy], references: [id])
+  repName     String?  @map("rep_name")
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  @@index([leadId])
+  @@map("prospect_demos")
+}
+

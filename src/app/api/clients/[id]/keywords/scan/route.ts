@@ -39,7 +39,11 @@ export async function POST(
 
   const domain =
     client.lead.website?.replace(/^https?:\/\//, "").replace(/\/.*$/, "") ?? "";
-  const zipCode = client.lead.zipCode ?? "00000";
+  const zipCode = client.lead.zipCode ?? "";
+
+  if (!zipCode) {
+    return NextResponse.json({ error: "Client has no zip code on file. Please update the lead record." }, { status: 422 });
+  }
 
   const tasks = client.keywordTrackers.map((kw) => ({
     keyword: kw.keyword,

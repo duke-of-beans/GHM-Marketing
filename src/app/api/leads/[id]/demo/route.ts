@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateDemoData } from "@/lib/demo/generator";
 import { generateDemoHTML } from "@/lib/demo/template";
@@ -25,6 +26,15 @@ export async function GET(
   try {
     const data = await generateDemoData(leadId, repName);
     const html = generateDemoHTML(data);
+
+    // Persist history record (non-fatal)
+    await prisma.prospectDemo.create({
+      data: {
+        leadId,
+        generatedBy: (user as unknown as { id: number }).id,
+        repName: repName ?? null,
+      },
+    }).catch(() => {});
 
     const autoprint = request.nextUrl.searchParams.get("autoprint") === "1";
 

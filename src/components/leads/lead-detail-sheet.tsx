@@ -37,6 +37,87 @@ type ProductOption = {
   pricingModel: string;
 };
 
+// ============================================================================
+// Audit & Demo Generation History
+// ============================================================================
+
+type AuditRecord = { id: number; repName: string | null; healthScore: number | null; gapCount: number | null; generatedAt: string };
+type DemoRecord  = { id: number; repName: string | null; generatedAt: string };
+type GenHistory  = { audits: AuditRecord[]; demos: DemoRecord[] };
+
+function AuditDemoHistory({
+  leadId,
+  history,
+  onLoad,
+}: {
+  leadId: number;
+  history: GenHistory | null;
+  onLoad: (h: GenHistory) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (history) return;
+    setLoading(true);
+    fetch(`/api/leads/${leadId}/history`)
+      .then((r) => r.json())
+      .then((data: GenHistory) => onLoad(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [leadId, history, onLoad]);
+
+  if (loading) return <p className="text-sm text-muted-foreground py-4 text-center">Loading...</p>;
+  if (!history) return null;
+
+  const noData = history.audits.length === 0 && history.demos.length === 0;
+  if (noData) return (
+    <p className="text-sm text-muted-foreground py-4 text-center">
+      No audits or demos generated yet for this lead.
+    </p>
+  );
+
+  const fmt = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
+
+  return (
+    <div className="space-y-4">
+      {history.audits.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Audit PDFs</p>
+          <div className="space-y-1">
+            {history.audits.map((a) => (
+              <div key={a.id} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0">
+                <div className="flex items-center gap-3">
+                  {a.healthScore !== null && (
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${a.healthScore >= 70 ? "bg-green-100 text-green-700" : a.healthScore >= 50 ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
+                      {a.healthScore}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground">{a.repName ?? "Unknown rep"}</span>
+                  {a.gapCount !== null && <span className="text-xs text-muted-foreground">{a.gapCount} gap{a.gapCount !== 1 ? "s" : ""}</span>}
+                </div>
+                <span className="text-xs text-muted-foreground">{fmt(a.generatedAt)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {history.demos.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Live Demos</p>
+          <div className="space-y-1">
+            {history.demos.map((d) => (
+              <div key={d.id} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0">
+                <span className="text-muted-foreground">{d.repName ?? "Unknown rep"}</span>
+                <span className="text-xs text-muted-foreground">{fmt(d.generatedAt)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AddProductForm({
   leadId,
   onAdded,
@@ -410,6 +491,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
   const [generatingWO, setGeneratingWO] = useState(false);
   const [generatingAudit, setGeneratingAudit] = useState(false);
   const [generatingDemo, setGeneratingDemo] = useState(false);
+  const [genHistory, setGenHistory] = useState<{ audits: Array<{ id: number; repName: string | null; healthScore: number | null; gapCount: number | null; generatedAt: string }>; demos: Array<{ id: number; repName: string | null; generatedAt: string }> } | null>(null);
 
   const handleEnrich = async (force = false) => {
     if (!leadId) return;
@@ -824,6 +906,9 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                 <TabsTrigger value="history">
                   History ({lead.leadHistory.length})
                 </TabsTrigger>
+                <TabsTrigger value="generated">
+                  Audits & Demos
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="notes" className="space-y-3 pt-3">
@@ -949,6 +1034,10 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                     </div>
                   ))
                 )}
+              </TabsContent>
+
+              <TabsContent value="generated" className="space-y-4 pt-3">
+                <AuditDemoHistory leadId={lead.id} history={genHistory} onLoad={setGenHistory} />
               </TabsContent>
             </Tabs>
           </>

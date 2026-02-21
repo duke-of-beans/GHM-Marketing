@@ -49,10 +49,8 @@ export async function GET(req: Request) {
   for (const client of clients) {
     if (client.keywordTrackers.length === 0) continue;
 
-    // Get zip from city/state — use stored zipCode field if present, else skip
-    // Zip should be stored on lead or clientProfile; for now we derive from city/state
-    // TODO: add zipCode field to Lead in future pass
-    const zipCode = client.lead.zipCode ?? client.lead.city ?? "00000";
+    const zipCode = client.lead.zipCode ?? "";
+    if (!zipCode) { totalSkipped += client.keywordTrackers.length; continue; }
 
     const tasks = client.keywordTrackers.map((kw) => ({
       keyword: kw.keyword,

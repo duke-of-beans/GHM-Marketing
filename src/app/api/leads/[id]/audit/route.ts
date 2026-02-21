@@ -37,6 +37,17 @@ async function handleAudit(
     const auditData = await generateAuditData(leadId, user.name ?? undefined);
     const html = generateAuditHTML(auditData);
 
+    // Persist history record (non-fatal)
+    await prisma.prospectAudit.create({
+      data: {
+        leadId,
+        generatedBy: (user as unknown as { id: number }).id,
+        repName: user.name ?? null,
+        healthScore: auditData.healthScore,
+        gapCount: auditData.gaps.length,
+      },
+    }).catch(() => {});
+
     const slug = auditData.lead.businessName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")

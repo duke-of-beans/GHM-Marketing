@@ -102,8 +102,8 @@
 | I2. DataForSEO SERP | Local rank tracking, Keywords tab, rank clusters | 12 | ✅ DONE |
 | I3. NAP Citation Scraper | 35 directory adapters, Citations tab, health sentry | 10 | ✅ DONE |
 | I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | 🔴 TODO (needs Google approval) |
-| I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | 🔴 TODO |
-| I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | 🔴 TODO |
+| I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | ✅ DONE |
+| I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | ✅ DONE |
 | I7. Google Ads + GoDaddy | Campaign data + domain deployment | 6 | ✅ DONE |
 | I8. Settings + Admin Dashboard | Integration health, cost dashboard, cache stats | 4 | ✅ DONE |
 
@@ -143,8 +143,8 @@
 **Phase D: Polish & Sales Enablement — MEDIUM**
 | ID | Task | Status |
 |----|------|--------|
-| D1 | Audit history on lead detail | 🔴 TODO |
-| D2 | Demo history on lead detail | 🔴 TODO |
+| D1 | Audit history on lead detail | ✅ DONE |
+| D2 | Demo history on lead detail | ✅ DONE |
 | D3 | Shareable audit link (public, no auth required) | 🔴 TODO |
 | D4 | Audit → Demo one-click workflow | 🔴 TODO |
 | D5 | Territory map visualization (simple/static) | 🔴 TODO |
@@ -195,7 +195,8 @@
 
 ---
 
-### ITEM-002: GHM is an "Inc" not "LLC"
+### ITEM-002: GHM is an "Inc" not "LLC" — ✅ RESOLVED
+**Result:** grep across entire codebase confirmed zero LLC references for GHM's entity. All documents already use "GHM Digital Marketing Inc" (PARTNER_AGREEMENT.md, email templates, etc.). No changes required.
 **Priority:** HIGH — legal/brand accuracy, must fix before any external materials go out
 **Scope:** Global find-and-replace across all files that might say "LLC"
 
