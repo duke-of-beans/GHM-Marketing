@@ -398,9 +398,12 @@ export function ClientPortfolio({
                       </div>
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <Badge variant="outline" className={`text-xs ${healthColor(client.healthScore)}`}>
-                        {client.healthScore}
-                      </Badge>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <Badge variant="outline" className={`text-xs ${healthColor(client.healthScore)}`}>
+                          {healthLabel(client.healthScore)}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground">{client.healthScore}/100</span>
+                      </div>
                     </td>
                     <td className="px-3 py-3 text-right font-medium">
                       {formatCurrency(Number(client.retainerAmount))}/mo
@@ -412,8 +415,15 @@ export function ClientPortfolio({
                         <span className="text-muted-foreground text-xs">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-3 text-center text-xs text-muted-foreground">
-                      {daysAgo(client.lastScanAt)}
+                    <td className="px-3 py-3 text-center text-xs">
+                      {isScanOverdue(client) ? (
+                        <span className="text-orange-600 font-medium flex items-center justify-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          {daysAgo(client.lastScanAt)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">{daysAgo(client.lastScanAt)}</span>
+                      )}
                     </td>
                     <td className="px-3 py-3 text-center">
                       <Badge variant="outline" className={`text-xs ${paymentBadgeClass(client.paymentStatus)}`}>
@@ -454,12 +464,15 @@ export function ClientPortfolio({
                     </div>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Badge
-                          variant="outline"
-                          className={`shrink-0 cursor-help ${healthColor(client.healthScore)}`}
-                        >
-                          {client.healthScore}
-                        </Badge>
+                        <div className="shrink-0 flex flex-col items-end gap-0.5 cursor-help">
+                          <Badge
+                            variant="outline"
+                            className={`${healthColor(client.healthScore)}`}
+                          >
+                            {healthLabel(client.healthScore)}
+                          </Badge>
+                          <span className="text-[10px] text-muted-foreground">{client.healthScore}/100</span>
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent side="left" className="max-w-[200px]">
                         <p className="text-xs font-medium mb-1">Health Score</p>
