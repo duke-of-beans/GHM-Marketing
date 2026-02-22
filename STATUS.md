@@ -148,16 +148,16 @@
 | D2 | Demo history on lead detail | ✅ DONE |
 | D3 | Shareable audit link (public, no auth required) | ✅ DONE |
 | D4 | Audit → Demo one-click workflow | 🔴 TODO |
-| D5 | Territory map visualization (simple/static) | 🔴 TODO |
+| D5 | Territory map visualization (simple/static) | ✅ DONE — `src/app/(onboarding)/territory-map/page.tsx` (4 territories, phase roadmap, rules strip) |
 
 **Non-Dashboard Sales Enablement (External Collateral)**
 | ID | Task | Status |
 |----|------|--------|
-| S3 | Digital Brochure — one-pager, phone/Zoom optimized | 🔴 TODO |
-| S4 | Recruiting Comp Sheet — earnings projections for candidates | 🔴 TODO |
-| S5 | Territory Map — initial definitions for first 4 reps | 🔴 TODO |
-| S6 | Sales Agreement Template — contractor terms | 🔴 TODO |
-| S7 | Job Ad — draft and post | 🔴 TODO |
+| S3 | Digital Brochure — one-pager, phone/Zoom optimized | ✅ DONE — `src/app/(onboarding)/brochure/page.tsx` (live dashboard page) |
+| S4 | Recruiting Comp Sheet — earnings projections for candidates | ✅ DONE — `src/app/(onboarding)/comp-sheet/page.tsx` (live, income projection table + stacked bar chart) |
+| S5 | Territory Map — initial definitions for first 4 reps | ✅ DONE — same as D5, `src/app/(onboarding)/territory-map/page.tsx` |
+| S6 | Sales Agreement Template — contractor terms | ✅ DONE — `D:\Work\SEO-Services\CLIENT_SERVICE_AGREEMENT.md` (complete 12-section agreement) |
+| S7 | Job Ad — draft and post | ✅ DONE — `D:\Work\SEO-Services\JOB_AD.md` (two versions: Indeed + LinkedIn, with posting notes) |
 
 ### Commission System Validation
 - End-to-end test with live client
@@ -417,18 +417,9 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 
 ---
 
-### FEAT-013: GoDaddy Parked Domain Search for Satellite Clusters — ✅ BACKEND COMPLETE (Feb 22, 2026)
-**Priority:** HIGH — cost savings + faster deployment
-**Context:** When building satellite clusters for a client, the current flow goes straight to domain purchase. We have a portfolio of parked GoDaddy domains that should be searched first.
-
-**✅ DONE — Backend:**
-- `/api/domains/search/route.ts` — live. Fetches parked domains from GoDaddy via `listOwnedDomains("PARKED")`, fuzzy-matches against search query, returns alongside `suggestDomains()` results.
-- Both calls run in parallel.
-
-**Still open — UI surface:**
-- Satellite cluster build flow — add domain search step before purchase CTA
-- Show "Use This Domain" button when parked match found (no purchase needed, just DNS reassignment)
-- Fall through to standard purchase flow if no match
+### FEAT-013: GoDaddy Parked Domain Search for Satellite Clusters — ✅ COMPLETE (Feb 22, 2026)
+**Backend:** `/api/domains/search/route.ts` — fetches parked domains + suggestions in parallel, fuzzy-matches query.
+**UI:** `DomainFinderSection.tsx` — keyword search bar, surfaces GHM parked matches first with "GHM Parked" badge, then ranked available domains with buy links. Wired into `ClientDomainsTab` via `defaultQuery={businessName}`. No purchase CTA shown when parked match exists.
 
 ---
 
