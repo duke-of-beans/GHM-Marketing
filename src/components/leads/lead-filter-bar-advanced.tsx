@@ -210,10 +210,6 @@ export function AdvancedLeadFilterBar({
     filters.hasWebsite !== "all" && 1,
     filters.hasEmail !== "all" && 1,
     filters.marketTypes.length,
-    filters.municipalMismatch !== "all" && 1,
-    filters.excludeChains && 1,
-    filters.excludeFranchises && 1,
-    filters.excludeCorporate && 1,
   ].filter(Boolean).reduce((a, b) => Number(a) + Number(b), 0) as number;
 
   return (
@@ -625,62 +621,6 @@ export function AdvancedLeadFilterBar({
                         <span>{option.label}</span>
                       </label>
                     ))}
-                  </div>
-                </div>
-
-                {/* Municipal Mismatch */}
-                <div>
-                  <Label className="text-sm mb-2 flex items-center gap-1.5">
-                    Municipal Mismatch
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        Business address doesn&apos;t match Google&apos;s city-name expectations
-                      </TooltipContent>
-                    </Tooltip>
-                  </Label>
-                  <Select
-                    value={filters.municipalMismatch}
-                    onValueChange={(value: any) => onChange({ ...filters, municipalMismatch: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="yes">Yes - Mismatched</SelectItem>
-                      <SelectItem value="no">No - Matched</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Exclusions */}
-                <div>
-                  <Label className="text-sm mb-2 block">Exclusions</Label>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <Checkbox
-                        checked={filters.excludeChains}
-                        onCheckedChange={(checked) => onChange({ ...filters, excludeChains: !!checked })}
-                      />
-                      Exclude Chains
-                    </label>
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <Checkbox
-                        checked={filters.excludeFranchises}
-                        onCheckedChange={(checked) => onChange({ ...filters, excludeFranchises: !!checked })}
-                      />
-                      Exclude Franchises
-                    </label>
-                    <label className="flex items-center gap-2 text-sm cursor-pointer">
-                      <Checkbox
-                        checked={filters.excludeCorporate}
-                        onCheckedChange={(checked) => onChange({ ...filters, excludeCorporate: !!checked })}
-                      />
-                      Exclude Corporate
-                    </label>
                   </div>
                 </div>
               </CollapsibleContent>

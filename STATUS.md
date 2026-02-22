@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint 3 complete: AdminTask wired; client health overview + TeamFeed Save to Vault confirmed complete.
+**Last Updated:** February 22, 2026 — Sprint 4 complete: ITEM-003 tutorials, Pipeline filter UX fixed, voice/micro-copy layer added.
 
 ---
 
@@ -30,8 +30,8 @@ Portfolio-level visibility as team and client base grow.
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.
 - [x] ITEM-003 — Per-page tutorials using Driver.js — DONE Feb 22, 2026. See files below.
-- [ ] Pipeline filter UX refinement
-- [ ] Voice/micro-copy layer (low priority, if budget)
+- [x] Pipeline filter UX refinement — DONE Feb 22, 2026. Fixed dateRange filter (was broken — missing updatedAt in data + no filter logic); removed 4 ghost UI filters (municipalMismatch, isChain, isFranchise, isCorporate — fields don't exist in DB); added localStorage filter persistence; fixed active filter count badge; deleted dead lead-filter-bar.tsx.
+- [x] Voice/micro-copy layer — DONE Feb 22, 2026. Added per-column sardonic empty state messages; zero-results banner with clear-all CTA.
 
 ---
 

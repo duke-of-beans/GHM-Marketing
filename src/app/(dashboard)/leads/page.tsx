@@ -24,6 +24,7 @@ export default async function LeadsPage() {
         domainRating: true,
         reviewCount: true,
         dealValueTotal: true,
+        updatedAt: true,
         assignedUser: { select: { id: true, name: true } },
         _count: { select: { notes: true } },
         // Lead gen engine fields (actual database field names)
@@ -61,6 +62,7 @@ export default async function LeadsPage() {
     domainRating: lead.domainRating,
     reviewCount: lead.reviewCount,
     dealValueTotal: Number(lead.dealValueTotal),
+    updatedAt: lead.updatedAt.toISOString(),
     assignedUser: lead.assignedUser,
     _count: lead._count,
     // Map database fields to client type names

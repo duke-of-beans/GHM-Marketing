@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle, XCircle, AlertCircle, FileText, Share2, Tag, DollarSign, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { voice, pick } from "@/lib/voice";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -160,7 +161,7 @@ export function ApprovalsTab() {
         setPaymentGroups(paymentJson.data.groups);
       }
     } catch (err) {
-      toast.error("Failed to load approval queue");
+      toast.error(voice.approvals.loadFailed);
     } finally {
       setLoading(false);
     }
@@ -185,18 +186,18 @@ export function ApprovalsTab() {
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
-        toast.error(json.error || "Failed to approve payments");
+        toast.error(json.error || voice.approvals.approveFailed);
         return;
       }
       const waveNote = json.waveCreated > 0
-        ? ` · Wave bill created`
+        ? "Wave bill created."
         : json.missingVendorId?.length
-          ? ` · No Wave vendor ID set — bill not created`
+          ? "No Wave vendor ID set — bill not created."
           : "";
-      toast.success(`${json.approved} payment${json.approved !== 1 ? "s" : ""} approved${waveNote}`);
+      toast.success(voice.approvals.paymentsApproved(json.approved, waveNote));
       loadApprovals();
     } catch {
-      toast.error("Network error");
+      toast.error(voice.errors.network);
     } finally {
       setActioning(null);
     }
@@ -215,13 +216,13 @@ export function ApprovalsTab() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error || "Failed to approve task");
+        toast.error(json.error || voice.approvals.approveFailed);
         return;
       }
-      toast.success("Task approved");
+      toast.success(pick(voice.approvals.taskApproved));
       loadApprovals();
     } catch {
-      toast.error("Network error");
+      toast.error(voice.errors.network);
     } finally {
       setActioning(null);
     }
@@ -237,11 +238,11 @@ export function ApprovalsTab() {
         body: JSON.stringify({ feedback: "Changes requested from Tasks > Approvals" }),
       });
       if (res.ok) {
-        toast.success("Changes requested — task returned to writer");
+        toast.success(pick(voice.approvals.changesRequested));
         loadApprovals();
       }
     } catch {
-      toast.error("Network error");
+      toast.error(voice.errors.network);
     } finally {
       setActioning(null);
     }
@@ -260,13 +261,13 @@ export function ApprovalsTab() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error || "Failed to update content");
+        toast.error(json.error || voice.approvals.approveFailed);
         return;
       }
-      toast.success(action === "approve" ? "Content approved" : "Content sent back to draft");
+      toast.success(action === "approve" ? pick(voice.approvals.contentApproved) : pick(voice.approvals.contentSentBack));
       loadApprovals();
     } catch {
-      toast.error("Network error");
+      toast.error(voice.errors.network);
     } finally {
       setActioning(null);
     }

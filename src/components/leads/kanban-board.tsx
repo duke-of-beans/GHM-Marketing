@@ -18,6 +18,16 @@ import { LeadCard } from "./lead-card";
 import type { LeadStatus } from "@prisma/client";
 import { toast } from "sonner";
 
+const COLUMN_EMPTY_MESSAGES: Partial<Record<LeadStatus, string>> = {
+  available: "No leads here. Import a list or run discovery.",
+  scheduled: "Nothing on the calendar. The phone works both ways.",
+  contacted: "First touch pending. Somebody has to go first.",
+  follow_up: "Follow-up queue is clear. Either you're crushing it or nobody's calling back.",
+  paperwork: "No contracts in motion. Close something.",
+  won: "The win column. Currently empty — keep going.",
+  lost: "Nothing here. Small victories.",
+};
+
 // Kanban shows active pipeline + "Won" as the finish line
 const KANBAN_STATUSES: LeadStatus[] = [...ACTIVE_STATUSES, "won"];
 
@@ -152,6 +162,7 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
             color={col.config.color}
             bgColor={col.config.bgColor}
             count={col.leads.length}
+            emptyMessage={COLUMN_EMPTY_MESSAGES[col.status]}
             dataTour={
               col.status === "available"
                 ? "kanban-column-available"

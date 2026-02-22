@@ -17,6 +17,7 @@ type KanbanColumnProps = {
   color: string;
   bgColor: string;
   count: number;
+  emptyMessage?: string;
   children: React.ReactNode;
   dataTour?: string;
 };
@@ -28,6 +29,7 @@ export function KanbanColumn({
   color,
   bgColor,
   count,
+  emptyMessage = "Drop leads here",
   children,
   dataTour,
 }: KanbanColumnProps) {
@@ -67,8 +69,8 @@ export function KanbanColumn({
       <div className="flex-1 p-2 space-y-2 min-h-[100px] overflow-y-auto max-h-[calc(100vh-220px)]">
         {children}
         {count === 0 && (
-          <div className="flex items-center justify-center h-20 text-xs text-muted-foreground">
-            Drop leads here
+          <div className="flex items-center justify-center h-20 text-xs text-muted-foreground text-center px-2">
+            {emptyMessage}
           </div>
         )}
       </div>

@@ -26,6 +26,7 @@ type KanbanLead = {
   domainRating: number | null;
   reviewCount: number | null;
   dealValueTotal: number;
+  updatedAt: string;
   assignedUser: { id: number; name: string } | null;
   _count: { notes: number };
   
@@ -55,8 +56,20 @@ type LeadsClientPageProps = {
 export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: LeadsClientPageProps) {
   const router = useRouter();
   const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
-  const [filters, setFilters] = useState<AdvancedFilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<AdvancedFilterState>(() => {
+    if (typeof window === "undefined") return DEFAULT_FILTERS;
+    try {
+      const saved = localStorage.getItem("leads_filters");
+      if (saved) return { ...DEFAULT_FILTERS, ...JSON.parse(saved) };
+    } catch {}
+    return DEFAULT_FILTERS;
+  });
   const { startTour } = useTour(LEADS_TOUR);
+
+  const handleFiltersChange = (next: AdvancedFilterState) => {
+    setFilters(next);
+    try { localStorage.setItem("leads_filters", JSON.stringify(next)); } catch {}
+  };
 
   const filteredLeads = useMemo(() => {
     let result = initialLeads;
@@ -168,15 +181,24 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       );
     }
 
-    // Exclusions
+    // Exclusions (fields not yet in DB — skip when null)
     if (filters.excludeChains) {
-      result = result.filter((lead) => !lead.isChain);
+      result = result.filter((lead) => lead.isChain === null || !lead.isChain);
     }
     if (filters.excludeFranchises) {
-      result = result.filter((lead) => !lead.isFranchise);
+      result = result.filter((lead) => lead.isFranchise === null || !lead.isFranchise);
     }
     if (filters.excludeCorporate) {
-      result = result.filter((lead) => !lead.isCorporate);
+      result = result.filter((lead) => lead.isCorporate === null || !lead.isCorporate);
+    }
+
+    // Date range filter (based on updatedAt)
+    if (filters.dateRange !== "all") {
+      const now = Date.now();
+      const msMap = { "7d": 7, "30d": 30, "90d": 90 };
+      const days = msMap[filters.dateRange];
+      const cutoff = now - days * 24 * 60 * 60 * 1000;
+      result = result.filter((lead) => new Date(lead.updatedAt).getTime() >= cutoff);
     }
 
     // Sorting
@@ -276,7 +298,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       <div data-tour="leads-filter-bar">
         <AdvancedLeadFilterBar
           filters={filters}
-          onChange={setFilters}
+          onChange={handleFiltersChange}
           showTerritoryFilter={userRole === "master"}
         />
       </div>
@@ -292,6 +314,18 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       )}
 
       <div data-tour="leads-kanban">
+        {filteredLeads.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
+            <p className="text-muted-foreground font-medium">No leads match these filters.</p>
+            <p className="text-sm text-muted-foreground">Your criteria are very specific. That&apos;s fine — or broaden them.</p>
+            <button
+              className="mt-3 text-sm underline text-muted-foreground hover:text-foreground"
+              onClick={() => handleFiltersChange(DEFAULT_FILTERS)}
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
         <KanbanBoard
           initialLeads={filteredLeads}
           onLeadClick={(id) => setSelectedLeadId(id)}

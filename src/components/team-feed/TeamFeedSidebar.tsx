@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { voice, pick } from "@/lib/voice";
 
 // ─── Types (duplicated from TeamFeed to avoid cross-import issues) ────────────
 
@@ -84,7 +85,7 @@ function AttachmentBlock({ msg }: { msg: Pick<TeamMessageData, "id" | "attachmen
     : null;
   async function saveToVault(e: React.MouseEvent) {
     e.stopPropagation();
-    if (savedId) { toast.info("Already saved to Vault"); return; }
+    if (savedId) { toast.info(voice.messages.alreadyInVault); return; }
     setSaving(true);
     try {
       const res = await fetch("/api/vault/transfer", {
@@ -93,9 +94,9 @@ function AttachmentBlock({ msg }: { msg: Pick<TeamMessageData, "id" | "attachmen
         body: JSON.stringify({ messageId: msg.id, targetSpace: "private" }),
       });
       const json = await res.json();
-      if (json.success) { setSavedId(json.file.id); toast.success("Saved to your Vault"); }
-      else toast.error(json.error ?? "Save failed");
-    } catch { toast.error("Save failed"); }
+      if (json.success) { setSavedId(json.file.id); toast.success(pick(voice.messages.savedToVault)); }
+      else toast.error(voice.messages.saveFailed);
+    } catch { toast.error(voice.messages.saveFailed); }
     finally { setSaving(false); }
   }
   return (
@@ -172,9 +173,9 @@ function ComposeBox({
       if (!res.ok) throw new Error("Failed");
       setContent("");
       onSent();
-      toast.success(parentId ? "Reply sent" : "Message sent");
+      toast.success(parentId ? pick(voice.messages.replySent) : pick(voice.messages.sent));
     } catch {
-      toast.error("Failed to send");
+      toast.error(voice.messages.sendFailed);
     } finally {
       setSending(false);
     }
@@ -305,14 +306,14 @@ function MessageRow({
       body: JSON.stringify({ isPinned: !msg.isPinned }),
     });
     onRefresh();
-    toast.success(msg.isPinned ? "Unpinned" : "Pinned to top");
+    toast.success(msg.isPinned ? pick(voice.messages.unpinned) : pick(voice.messages.pinned));
   }
 
   async function deleteMsg() {
-    if (!confirm("Delete this message?")) return;
+    if (!confirm(voice.confirm.deleteMessage)) return;
     await fetch(`/api/team-messages/${msg.id}`, { method: "DELETE" });
     onRefresh();
-    toast.success("Message deleted");
+    toast.success(pick(voice.messages.deleted));
   }
 
   return (
@@ -498,8 +499,7 @@ export function TeamFeedSidebar({
           ) : messages.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No messages yet</p>
-              <p className="text-xs mt-1">Be the first to post something.</p>
+              <p className="text-sm">{voice.empty.teamFeed.body}</p>
             </div>
           ) : (
             <>
