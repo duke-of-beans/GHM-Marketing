@@ -1,8 +1,9 @@
 /**
  * GET /api/cron/generate-payments
  *
- * Vercel Cron job that runs on the 1st of every month at 12:01 AM UTC.
- * Generates payment transactions for all active clients:
+ * Vercel Cron job that runs on the 5th of every month at 12:01 AM UTC.
+ * Safety-net catch-all — the webhook (invoice.paid) is the primary trigger.
+ * Generates payment transactions for any active clients not already covered:
  *   - Sales residuals (month 2+ after onboarding)
  *   - Master manager fees (month 1+ after onboarding)
  *

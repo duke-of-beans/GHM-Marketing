@@ -1,6 +1,6 @@
 // POST /api/wave/partners/sync
 // Creates Wave vendor records for all active sales reps + masters
-// Idempotent — skips users who already have a waveVendorId
+// Idempotent — skips users who already have a contractorVendorId
 
 import { NextRequest, NextResponse } from 'next/server'
 import { withPermission } from '@/lib/auth/api-permissions'
@@ -16,14 +16,14 @@ export async function POST(req: NextRequest) {
       isActive: true,
       role: { in: ['sales', 'master'] },
     },
-    select: { id: true, name: true, email: true, waveVendorId: true },
+    select: { id: true, name: true, email: true, contractorVendorId: true, contractorEntityName: true },
   })
 
   const results = { synced: 0, alreadyLinked: 0, failed: 0, errors: [] as string[] }
 
   for (const user of users) {
     try {
-      if (user.waveVendorId) {
+      if (user.contractorVendorId) {
         results.alreadyLinked++
         continue
       }

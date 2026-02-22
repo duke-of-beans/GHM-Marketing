@@ -175,6 +175,54 @@
 
 ---
 
+## 📥 BACKLOG — Added February 22, 2026
+
+### ✅ PAYMENTS-001: Wave invoice.paid Webhook Handler
+**Completed:** February 22, 2026
+**Note:** Wave doesn't expose webhooks in their standard UI. Built Option C (poll) instead — see invoice-status-poll cron below.
+**Files built:**
+- `src/app/api/webhooks/wave/route.ts` — handler exists but dormant (no Wave webhook endpoint to register against)
+- `src/app/api/cron/invoice-status-poll/route.ts` — hourly poll, same commission logic, ~1hr worst-case latency
+- `vercel.json` — invoice-status-poll added at `0 * * * *`
+- `prisma/schema.prisma` — `WebhookEvent` model and `sourceEventId` on PaymentTransaction (still useful for poll dedup)
+
+### ✅ PAYMENTS-002: Approval Flow for Payments in Approvals Tab
+**Completed:** February 22, 2026
+**Files built:**
+- `src/components/tasks/approvals-tab.tsx` — PaymentGroup section added (grouped by user, inline breakdown, vendor ID warning, approve button)
+- `src/app/api/payments/approve/route.ts` — approves transactions, creates Wave bill if contractorVendorId set
+- `src/app/api/payments/pending/route.ts` — GET pending transactions grouped by user for queue UI
+
+### ✅ PAYMENTS-003: Contractor Entity Fields on User
+**Completed:** February 22, 2026
+**Schema:** `contractorVendorId`, `contractorEntityName`, `contractorEmail` on User — replaces `waveVendorId`
+**Updated:** `sync.ts` ensureWaveVendor uses contractorEntityName/Email; payout, partners/sync, partners/[userId] routes updated
+**Pending:** UI in Team settings (admin) — low priority, can set via DB admin until needed
+
+### PAYMENTS-004: Position System
+**Priority:** MEDIUM — needed before operations hires, not blocking sales launch
+**Spec:** `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`
+**Schema:** New `Position` model — name, type, compensationType, defaultAmount, defaultFrequency, dashboardAccessLevel
+**UI:** Settings → Team → Positions (admin only)
+**Seed:** Owner, Manager, Sales Rep, Content Manager, SEO Specialist
+**Impact:** Decouples role (dashboard access) from position (job function) from compensation template. New hire types addable without code changes.
+
+### PAYMENTS-005: Generalized Employee Onboarding Wizard
+**Priority:** MEDIUM — needed for first operations hire
+**Spec:** `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`
+**Current:** Rep onboarding wizard (FEAT-011) exists but is sales-role-only
+**Change:** Generalize to all positions. Steps adapt by position type. All positions include contractor entity setup step. Admin-side task auto-created on new User creation.
+
+### PAYMENTS-006: Monthly Cron — Demote to Safety Net
+**Priority:** LOW — existing cron works, needs schedule change only
+**Change:** Move from 1st to 5th of month. Webhook is now primary trigger. Cron catches misses only.
+
+### ✅ PAYMENTS-006: Cron Schedule Change (generate-payments)
+**Completed:** February 22, 2026
+**Change:** `vercel.json` — `generate-payments` moved from 1st to 5th of month (`1 0 5 * *`). Webhook is now primary; cron is safety-net only.
+
+---
+
 ## 📥 BACKLOG — Added February 20, 2026
 
 ### ITEM-001: Google Ads & PPC — Surface in All Materials
@@ -586,6 +634,7 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 - `EDIT_AND_TASKS_SPEC.md` — Edit client + bulk task management
 - `BUILD_PLAN.md` — Master build plan + Website Studio status
 - `QUICK_REFERENCE.md` — API keys, env vars, deployment info
+- `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md` — Payments architecture (webhook triggers, position system, contractor routing, approval flow, personnel model)
 - `D:\Work\SEO-Services\specs\ONBOARDING_PORTAL_SPEC.md` — Client onboarding portal (token-auth form, wireframes, 21 tasks)
 - `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` — Wave payments integration (schema, wireframes, 30 tasks)
 - `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md` — Contract claims audit + payments architecture narrative
@@ -603,6 +652,10 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 
 - **DB drift:** NEVER run `prisma migrate dev` — use `prisma db push` only
 - **"master" stays as DB enum** — UI shows "Manager" via ROLE_LABELS
-- **David's account = admin role** in Neon DB
+- **David's account = admin role** in Neon DB (id=1)
 - **Admin hierarchy:** admin > master > sales, `isElevated()` = admin|master
 - **TypeScript must be clean** — run `npx tsc --noEmit` before closing any sprint
+- **SALARY_ONLY_USER_IDS = [4]** — Gavin (id=4) never receives engine-generated payments. Salary handled outside system entirely. This constant lives in `src/lib/payments/calculations.ts` and must never include David (id=1).
+- **David (id=1) legitimately receives $240/mo management fee** through the engine as master_fee transactions. His masterFeeEnabled=true in UserCompensationConfig is correct.
+- **Test account (userId=6)** must never have contractorVendorId set or be assigned as salesRepId/masterManagerId on any real client.
+- **Vercel build script:** `vercel-build` (not `build`) is what Vercel runs. `prisma db push` was removed — schema changes are manual only.

@@ -28,7 +28,7 @@ export async function GET(
   const [user, transactions] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, role: true, waveVendorId: true },
+      select: { id: true, name: true, email: true, role: true, contractorVendorId: true, contractorEntityName: true, contractorEmail: true },
     }),
     prisma.paymentTransaction.findMany({
       where: { userId, ...(monthFilter ? { month: monthFilter } : {}) },

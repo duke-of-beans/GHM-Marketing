@@ -1,12 +1,16 @@
 {
   "crons": [
     {
+      "path": "/api/cron/invoice-status-poll",
+      "schedule": "0 * * * *"
+    },
+    {
       "path": "/api/cron/daily-scans",
       "schedule": "0 2 * * *"
     },
     {
       "path": "/api/cron/generate-payments",
-      "schedule": "1 0 1 * *"
+      "schedule": "1 0 5 * *"
     },
     {
       "path": "/api/cron/invoice-monthly",

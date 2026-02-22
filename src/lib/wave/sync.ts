@@ -40,16 +40,16 @@ export async function ensureWaveCustomer(clientId: number): Promise<string> {
 export async function ensureWaveVendor(userId: number): Promise<string> {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } })
 
-  if (user.waveVendorId) return user.waveVendorId
+  if (user.contractorVendorId) return user.contractorVendorId
 
   const vendor = await createVendor({
-    name: user.name,
-    email: user.email,
+    name: user.contractorEntityName ?? user.name,
+    email: user.contractorEmail ?? user.email,
   })
 
   await prisma.user.update({
     where: { id: userId },
-    data: { waveVendorId: vendor.id },
+    data: { contractorVendorId: vendor.id },
   })
 
   return vendor.id

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       ...(userId ? { userId } : {}),
     },
     include: {
-      user: { select: { id: true, name: true, email: true, waveVendorId: true } },
+      user: { select: { id: true, name: true, email: true, contractorVendorId: true, contractorEntityName: true } },
       client: { select: { businessName: true } },
     },
     orderBy: [{ userId: 'asc' }, { type: 'asc' }],

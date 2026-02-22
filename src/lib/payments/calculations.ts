@@ -81,10 +81,13 @@ export interface PaymentCalculationResult {
 // CONSTANTS
 // ============================================================================
 
-// Owner user IDs - no self-payment for owners when assigned as master managers
-// TODO: Verify these IDs match production database
-// David Kirsch is primary owner, Gavin Kirsch may be secondary
-const OWNER_USER_IDS = [1, 2]; // Update after verifying user IDs in production
+// Users who are salary-only and must NEVER receive commission or fee payments
+// through the engine — their compensation is handled outside the system entirely.
+// Verified against production DB 2026-02-21:
+//   4 = Gavin Muirhead — salary only, no fees, no residuals, ever.
+//   David Kirsch (id=1) is NOT in this list — he legitimately collects $240/mo/client
+//   management fees which flow through the engine as master_fee transactions.
+const SALARY_ONLY_USER_IDS = [4];
 
 // ============================================================================
 // COMMISSION CALCULATIONS
@@ -207,12 +210,12 @@ export function calculateMasterFee(
   currentMonth: Date,
   masterManagerId: number
 ): PaymentCalculationResult {
-  // Owners (Gavin & David) don't pay themselves
-  if (OWNER_USER_IDS.includes(masterManagerId)) {
+  // Salary-only users never receive engine-generated payments
+  if (SALARY_ONLY_USER_IDS.includes(masterManagerId)) {
     return {
       shouldPay: false,
       amount: new Decimal(0),
-      reason: "Owner doesn't pay self (counts as profit)"
+      reason: "Salary-only user — compensation handled outside commission engine"
     };
   }
 

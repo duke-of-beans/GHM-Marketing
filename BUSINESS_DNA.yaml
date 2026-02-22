@@ -41,10 +41,10 @@ operations:
     automation: "Dashboard handles satellite posting, reporting, monitoring"
 
   team:
-    gavin: "Owner — stepping back from operations entirely"
-    david: "COO (effective) — manages all operations, sales team, systems, strategy"
-    sales_reps: "W-4 contracted, commission-only (hiring 4)"
-    content_manager: "Future hire at 12-15 active clients"
+    gavin: "Owner — salary only. No engine-generated commissions or fees ever. Salary handled outside the dashboard entirely."
+    david: "COO (effective) — manages all operations, sales team, systems, strategy. Contractor via Apex North. Receives $240/mo management fee per client via commission engine."
+    sales_reps: "Contractors (commission-only). Each has a contractor entity for Wave AP payments. Compensation via engine: $1,000 close bonus + tiered residuals + 10% upsell commission."
+    operations_staff: "Future hires (content managers, SEO specialists). Compensation model TBD — manual approval monthly until pattern is clear. Position system handles new roles without code changes."
 
 current_state:
   phase: "Sales Launch"
@@ -150,10 +150,18 @@ product_vision:
 
 notes: |
   GHM Digital Marketing is Gavin's company. David operates as effective COO
-  managing all operations, sales team, and strategy. David's current comp is
-  $240/mo per client managed. David plans to negotiate increased compensation
-  at 10+ clients based on demonstrated value. Long-term trajectory is toward
-  near-parity with owner given complete operational ownership.
-  
+  managing all operations, sales team, and strategy. David's compensation is
+  $240/mo per client managed, paid to Apex North (his contractor entity) via Wave AP.
+  David plans to negotiate increased compensation at 10+ clients based on demonstrated value.
+
+  Gavin receives a salary only — handled entirely outside the dashboard and commission
+  engine. SALARY_ONLY_USER_IDS = [4] is enforced in code permanently.
+
+  All client money flows to GHM bank account. Commission engine triggers on Wave
+  invoice.paid webhook (primary) and monthly reconciliation cron on the 5th (safety net).
+  Pending transactions surface in Approvals tab for David/Gavin to approve before Wave AP
+  sends payment to contractor entities.
+
+  Full payments architecture: D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md
   Full sales operations details: D:\Work\SEO-Services\SALES_OPERATIONS.md
   Commission system spec: D:\Work\SEO-Services\ghm-dashboard\COMMISSION_SYSTEM_SPEC.md

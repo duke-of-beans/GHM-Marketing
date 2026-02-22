@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle, XCircle, AlertCircle, FileText, Share2, Tag } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, FileText, Share2, Tag, DollarSign, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -52,6 +52,26 @@ type ReviewContent = {
   updatedAt: string;
   clientId: number;
   clientName: string;
+};
+
+type PaymentTx = {
+  id: number;
+  type: string;
+  amount: string;
+  month: string;
+  notes: string | null;
+  client: { id: number; businessName: string };
+};
+
+type PaymentGroup = {
+  userId: number;
+  userName: string;
+  userRole: string;
+  entityName: string | null;
+  hasVendorId: boolean;
+  totalAmount: number;
+  transactions: PaymentTx[];
+  month: string;
 };
 
 // ── Content type icons ─────────────────────────────────────────────────────
@@ -96,19 +116,22 @@ export async function fetchApprovalsCount(): Promise<number> {
 export function ApprovalsTab() {
   const [tasks, setTasks] = useState<ReviewTask[]>([]);
   const [contentItems, setContentItems] = useState<ReviewContent[]>([]);
+  const [paymentGroups, setPaymentGroups] = useState<PaymentGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [actioning, setActioning] = useState<string | null>(null);
 
   async function loadApprovals() {
     setLoading(true);
     try {
-      const [taskRes, contentRes] = await Promise.all([
+      const [taskRes, contentRes, paymentRes] = await Promise.all([
         fetch("/api/tasks/queue?status=review&view=team&limit=50"),
         fetch("/api/review/content-queue"),
+        fetch("/api/payments/pending"),
       ]);
 
       const taskJson = await taskRes.json();
       const contentJson = await contentRes.json();
+      const paymentJson = await paymentRes.json();
 
       if (taskJson.success) {
         setTasks(
@@ -132,6 +155,10 @@ export function ApprovalsTab() {
       if (contentJson.success) {
         setContentItems(contentJson.data);
       }
+
+      if (paymentJson.success) {
+        setPaymentGroups(paymentJson.data.groups);
+      }
     } catch (err) {
       toast.error("Failed to load approval queue");
     } finally {
@@ -142,6 +169,38 @@ export function ApprovalsTab() {
   useEffect(() => {
     loadApprovals();
   }, []);
+
+  // ── Payment approval actions ───────────────────────────────────────────
+
+  async function approvePaymentGroup(group: PaymentGroup) {
+    const key = `payment-approve-${group.userId}-${group.month}`;
+    setActioning(key);
+    try {
+      const res = await fetch("/api/payments/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactionIds: group.transactions.map((t) => t.id),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        toast.error(json.error || "Failed to approve payments");
+        return;
+      }
+      const waveNote = json.waveCreated > 0
+        ? ` · Wave bill created`
+        : json.missingVendorId?.length
+          ? ` · No Wave vendor ID set — bill not created`
+          : "";
+      toast.success(`${json.approved} payment${json.approved !== 1 ? "s" : ""} approved${waveNote}`);
+      loadApprovals();
+    } catch {
+      toast.error("Network error");
+    } finally {
+      setActioning(null);
+    }
+  }
 
   // ── Task actions ───────────────────────────────────────────────────────
 
@@ -233,7 +292,7 @@ export function ApprovalsTab() {
     );
   }
 
-  const totalItems = tasks.length + contentItems.length;
+  const totalItems = tasks.length + contentItems.length + paymentGroups.length;
 
   // ── Empty state ────────────────────────────────────────────────────────
 
@@ -381,6 +440,78 @@ export function ApprovalsTab() {
                     >
                       <CheckCircle className="h-3 w-3 mr-1" />
                       {actioning === `content-approve-${item.id}` ? "Approving…" : "Approve"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+      {/* Pending Payments */}
+      {paymentGroups.length > 0 && (
+        <div className="space-y-3">
+          {(tasks.length > 0 || contentItems.length > 0) && (
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Payment Approvals
+            </p>
+          )}
+          {paymentGroups.map((group) => {
+            const key = `payment-approve-${group.userId}-${group.month}`;
+            const isActioning = actioning === key;
+            return (
+              <Card
+                key={key}
+                className={`hover:border-primary/40 transition-colors ${!group.hasVendorId ? "border-amber-300 dark:border-amber-700" : ""}`}
+              >
+                <CardHeader className="pb-2 pt-4 px-4">
+                  <div className="flex items-start gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-sm font-medium leading-snug">
+                        {group.entityName ?? group.userName}
+                        {group.entityName && (
+                          <span className="text-muted-foreground font-normal"> ({group.userName})</span>
+                        )}
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {group.transactions.length} transaction{group.transactions.length !== 1 ? "s" : ""} ·{" "}
+                        {new Date(`${group.month}-01`).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold shrink-0">
+                      ${group.totalAmount.toFixed(2)}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-4 pb-3">
+                  {/* Transaction breakdown */}
+                  <div className="space-y-1 mb-3">
+                    {group.transactions.map((tx) => (
+                      <div key={tx.id} className="flex justify-between text-xs text-muted-foreground">
+                        <span>
+                          {tx.type.replace(/_/g, " ")} — {tx.client.businessName}
+                        </span>
+                        <span>${Number(tx.amount).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Vendor ID warning */}
+                  {!group.hasVendorId && (
+                    <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 mb-3 bg-amber-50 dark:bg-amber-900/20 rounded px-2 py-1.5">
+                      <AlertTriangle className="h-3 w-3 shrink-0" />
+                      No Wave vendor ID — approval will succeed but Wave bill won&apos;t be created. Set contractor info in Team settings first.
+                    </div>
+                  )}
+                  <div className="flex justify-end">
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                      disabled={isActioning}
+                      onClick={() => approvePaymentGroup(group)}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {isActioning ? "Approving…" : `Approve $${group.totalAmount.toFixed(2)}`}
                     </Button>
                   </div>
                 </CardContent>

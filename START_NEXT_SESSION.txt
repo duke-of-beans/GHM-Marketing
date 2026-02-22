@@ -1,27 +1,73 @@
-GHM DASHBOARD — SESSION CLOSEOUT
-Last commit: e98ad00 (Feb 19, 2026 ~1:00am)
-Branch: main, pushed to origin
-TypeScript: clean (0 errors)
-Vercel: last deploy had edge middleware size issue — FIXED in 7ffb64a (split auth config, catch-all middleware matcher). Current commit e98ad00 not yet deploy-verified.
+PAYMENTS SPRINT — COMPLETED February 22, 2026
+============================================================
 
-WHAT JUST SHIPPED:
-- BUG-005: Dashboard widget staleness fixed (3-layer: revalidatePath + RefreshOnFocus + useRefetchOnFocus hook)
-- BUG-006: Back navigation added to /permissions and /audit pages
-- INTEGRATION_STRATEGY.md: Full spec with DataForSEO, NAP scraper architecture, report upgrade roadmap, cost projections, BrightLocal phase-out
-- STATUS.md: 7 new backlog items across Next Tier and Future Roadmap
+WHAT WAS BUILT THIS SESSION:
 
-WHAT'S READY TO BUILD (priority order from STATUS.md Next Tier):
-1. Permission System Phase 4-5 (replace role checks with permission checks app-wide)
-2. Commission System end-to-end validation
-3. Pipeline Filter UX improvements
-4. Content Library → Calendar scheduling
-5. Content CTA enforcement in AI prompts
-6. Task Pipeline UX Overhaul (needs design discussion first)
+PAYMENTS-003 ✅ (schema first — blocks everything else)
+  prisma/schema.prisma:
+    - waveVendorId removed from User
+    - contractorVendorId, contractorEntityName, contractorEmail added to User
+    - WebhookEvent model added (source, eventType, externalId unique, rawPayload, status, error)
+    - sourceEventId added to PaymentTransaction (idempotency key)
+  src/lib/wave/sync.ts:
+    - ensureWaveVendor updated: uses contractorVendorId, contractorEntityName, contractorEmail
+  src/app/api/wave/partners/sync/route.ts — updated selects
+  src/app/api/wave/partners/[userId]/route.ts — updated selects
+  src/app/api/wave/partners/payout/route.ts — updated selects
+  DB: `npx prisma db push` ran clean
 
-WHAT'S READY TO INTEGRATE (from INTEGRATION_STRATEGY.md):
-1. Ahrefs API (highest value, feeds competitive scan engine)
-2. DataForSEO SERP API (rank tracking, eliminates BrightLocal $150/mo)
-3. Google Business Profile API (needs agency application)
+PAYMENTS-001 ✅ Wave invoice.paid Webhook
+  src/app/api/webhooks/wave/route.ts (NEW — 286 lines)
+    - HMAC-SHA256 signature validation (timingSafeEqual)
+    - WebhookEvent upsert for idempotency (dedup on source+externalId)
+    - invoice.paid → finds ClientProfile by waveCustomerId
+    - Runs generateClientMonthlyPayments() for that client
+    - Creates pending PaymentTransaction records tagged with sourceEventId
+    - Skips if transaction already exists for that client+user+type+month
+    - Updates client lastPaymentDate + paymentStatus → 'current'
+    - Returns 200 on processing failure (prevents Wave infinite retries)
 
-DEPLOY NOTE:
-Commit e98ad00 should deploy clean — the edge middleware fix from 7ffb64a is still in place. Verify on Vercel after push.
+PAYMENTS-002 ✅ Approval Flow
+  src/app/api/payments/pending/route.ts (NEW — 111 lines)
+    - GET pending transactions grouped by user+month
+    - Returns summary: totalAmount, userCount, missingVendorCount
+  src/app/api/payments/approve/route.ts (NEW — 151 lines)
+    - POST: accepts transactionIds OR (clientId+month) OR (userId+month)
+    - Marks approved, then best-effort Wave bill creation
+    - Failed Wave bill does NOT block approval
+    - Returns: approved count, waveCreated, waveFailed, missingVendorId names
+  src/components/tasks/approvals-tab.tsx (UPDATED)
+    - Added PaymentGroup type
+    - Third section: "Payment Approvals" below tasks + content
+    - Grouped by user with inline transaction breakdown
+    - Amber warning when contractorVendorId not set
+    - Single approve button per group: "Approve $X.XX"
+
+PAYMENTS-006 ✅ Cron Schedule
+  vercel.json: generate-payments moved 1 0 1 * * → 1 0 5 * *
+  src/app/api/cron/generate-payments/route.ts: comment updated
+
+BUILD: tsc --noEmit exit 0, no errors
+
+============================================================
+WHAT DAVID NEEDS TO DO BEFORE FIRST PAYMENT RUN:
+
+1. Go to Wave → Contacts → Vendors → Create vendor for "Apex North"
+   Copy the vendor ID from the URL or API
+
+2. In the dashboard (or DB directly for now):
+   Set User.contractorVendorId = <wave vendor id>
+   Set User.contractorEntityName = "Apex North"
+   Set User.contractorEmail = <billing email>
+
+3. Register webhook in Wave dashboard:
+   URL: https://ghm-dashboard.vercel.app/api/webhooks/wave
+   Events: invoice.paid
+
+4. Add to Vercel env vars:
+   WAVE_WEBHOOK_SECRET = <secret from Wave webhook config>
+
+WHAT'S NEXT (priority order):
+- PAYMENTS-004: Position system (before first ops hire)
+- PAYMENTS-005: Generalized employee onboarding wizard
+- UI: Team settings → Contractor Info section (currently DB-only)

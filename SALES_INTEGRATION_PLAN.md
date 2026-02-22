@@ -121,21 +121,27 @@
 ### F4: Tiered Residual System (Lock-at-Close)
 **Business Context:** Residual rate ($200/$250/$300) is determined by rep's close volume in the month the client was signed, and locked permanently at that rate.
 
-**What changes:**
-1. **Schema:** Add `lockedResidualAmount` to `ClientCompensationOverride` or `ClientProfile` — stores the locked rate at time of close
-2. **Close trigger:** When lead status → "won" and client profile is created, calculate the rep's close count for that month, determine tier, write locked rate
-3. **Cron update:** `generate-payments` reads locked rate per client instead of flat user config rate
-4. **UI update:** `CompensationConfigSection` shows tier structure instead of single amount. MyEarningsWidget shows per-client residual rates in breakdown.
+**Updated February 22, 2026:** The payments architecture spec (`D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`) defines the full compensation track model. F4 is the sales-layer implementation of Track 1 (Sales Track). Key changes from that spec:
 
-**Current state:** `UserCompensationConfig.residualAmount` is a flat $200. `ClientCompensationOverride.residualAmount` exists but is for manual one-off overrides.
+- The commission engine now triggers on **Wave `invoice.paid` webhook** (primary) rather than monthly cron
+- Monthly reconciliation cron runs on the 5th as a safety net only
+- `lockedResidualRate` lives on `ClientProfile` (not `ClientCompensationOverride`) — set once at close, never recalculated
+
+**What changes:**
+1. **Schema:** Add `lockedResidualRate Decimal?` to `ClientProfile` — stores the permanently locked rate at time of close
+2. **Close trigger:** When lead status → "won" and client profile is created, calculate the rep's close count for that month, determine tier, write locked rate to `ClientProfile.lockedResidualRate`
+3. **Engine update:** `calculateResidual()` reads `client.lockedResidualRate` first; falls back to `UserCompensationConfig.residualAmount` only if null (for legacy clients)
+4. **UI update:** `CompensationConfigSection` shows tier table ($200 / $250 / $300 + lock-at-close explanation). `MyEarningsWidget` shows per-client breakdown with locked rates.
 
 **Technical approach:**
-- Add `lockedResidualRate` field to `ClientProfile` (Decimal, nullable, set once at close)
-- New function: `calculateResidualTier(closesThisMonth: number): Decimal` — returns $200/$250/$300
-- Modify: Lead → Won transition handler to compute and lock residual rate
-- Modify: `calculateResidual()` to prefer `client.lockedResidualRate` over config default
+- Add `lockedResidualRate Decimal?` to `ClientProfile` schema
+- New function: `calculateResidualTier(closesThisMonth: number): Decimal` — returns 200/250/300
+- Modify: Lead → Won transition handler to compute and lock rate
+- Modify: `calculateResidual()` in `src/lib/payments/calculations.ts` to prefer `client.lockedResidualRate`
 - Modify: `MyEarningsWidget` to show per-client breakdown with locked rates
-- New: `CompensationConfigSection` updated to display tier table instead of single input
+- Update: `CompensationConfigSection` to display tier table
+
+**Status:** Not yet built. Prerequisite: PAYMENTS-001 (webhook handler) should be built first so the lock-at-close trigger fires on the correct event.
 
 ---
 

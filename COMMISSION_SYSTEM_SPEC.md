@@ -1,7 +1,46 @@
 # COMMISSION & RESIDUAL TRACKING SYSTEM - SPECIFICATION
 **Project:** GHM Dashboard  
-**Date:** February 17, 2026  
+**Date:** February 17, 2026
+**Updated:** February 22, 2026
 **Priority:** HIGH (Critical for sales team + financial tracking)
+
+> ⚠️ **PARTIAL SUPERSESSION NOTICE (February 22, 2026)**
+> The following sections of this spec have been superseded by `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`:
+> - Payment trigger architecture (webhook vs cron) → see PAYMENTS_ARCHITECTURE.md §Trigger Architecture
+> - Master manager payment rules / owner guard → see PAYMENTS_ARCHITECTURE.md §Compensation Tracks
+> - Contractor routing (Wave vendor IDs) → see PAYMENTS_ARCHITECTURE.md §Contractor Routing
+> - Approval flow → see PAYMENTS_ARCHITECTURE.md §Approval Flow
+> - Personnel/position model → see PAYMENTS_ARCHITECTURE.md §Personnel Model
+>
+> **This file remains authoritative for:** commission rates, residual tiers, lock-at-close rules, upsell commission rates, and the DB schema for PaymentTransaction/UserCompensationConfig/ClientCompensationOverride.
+
+---
+
+## KEY DECISIONS LOCKED (February 22, 2026)
+
+```yaml
+gavin_compensation:
+  type: salary_only
+  engine_payments: never
+  SALARY_ONLY_USER_IDS: [4]  # Gavin's userId — enforced in calculations.ts
+  
+david_compensation:
+  management_fee: $240/mo/client managed
+  engine_payments: yes — master_fee type
+  userId: 1
+  contractor_entity: Apex North
+  
+payment_trigger:
+  primary: Wave invoice.paid webhook
+  safety_net: Monthly cron on 5th of month
+  
+approval_flow:
+  surface: Approvals tab (Tasks page)
+  gate: admin/master only (David or Gavin)
+  action: Approve → Wave bill created to contractor entity → money moves
+```
+
+---
 
 ---
 

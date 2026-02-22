@@ -45,8 +45,10 @@ model User {
   assignedBugs          BugReport[] @relation("BugAssignee")
   resolvedBugs          BugReport[] @relation("BugResolver")
   
-  // Wave vendor (for partner payments)
-  waveVendorId          String?   @map("wave_vendor_id")
+  // Contractor entity (for Wave AP payments — replaces waveVendorId)
+  contractorVendorId    String?   @map("contractor_vendor_id")    // Wave vendor ID for AP bills
+  contractorEntityName  String?   @map("contractor_entity_name")  // e.g. "Apex North"
+  contractorEmail       String?   @map("contractor_email")        // Wave vendor billing email
 
   // Settings relations
   settingsUpdates       GlobalSettings[] @relation("SettingsUpdater")
@@ -701,6 +703,9 @@ model PaymentTransaction {
   wavePaymentId   String?   @map("wave_payment_id")
   paymentMethod   String?   @map("payment_method")   // "ach" | "credit_card" | "check" | "manual"
   processingFee   Decimal?  @map("processing_fee") @db.Decimal(10, 2)
+  
+  // Idempotency — Wave invoice ID or cron run identifier (prevents double-pay on webhook retry)
+  sourceEventId   String?   @map("source_event_id")
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -1373,6 +1378,28 @@ model InvoiceRecord {
   @@index([dueDate])
   @@index([status])
   @@map("invoice_records")
+}
+
+// ============================================================================
+// WEBHOOK EVENTS — Audit log for all inbound webhooks (Wave, etc.)
+// ============================================================================
+
+model WebhookEvent {
+  id           Int      @id @default(autoincrement())
+  source       String                         // "wave"
+  eventType    String   @map("event_type")    // "invoice.paid", "invoice.created", etc.
+  externalId   String   @map("external_id")  // Wave's event ID — dedup key
+  rawPayload   Json     @map("raw_payload")   // Full webhook body (for replay)
+  status       String   @default("received") // "received" | "processed" | "failed" | "replayed"
+  error        String?
+  processedAt  DateTime? @map("processed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@unique([source, externalId])
+  @@index([source, eventType])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("webhook_events")
 }
 
 // ============================================================================
