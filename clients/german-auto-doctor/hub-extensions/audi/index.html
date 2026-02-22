@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audi Repair Specialists | Simi Valley, CA | German Auto Doctor</title>
+<meta name="description" content="German Auto Doctor specializes in Audi repair and service in Simi Valley. A4, A6, Q5, Q7, TT — dealer-level diagnostics without the dealer markup. Family-owned since 2009.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://audi.germanautodoctorsimivalley.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ===== GAD MIRROR TOKENS ===== */
+:root {
+  --color-red: #D11600;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-page-bg: #FFFFFF;
+  --color-text: #000000;
+  --font-body: Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: "Bebas Neue", display;
+  --font-nav: "Roboto Condensed", Helvetica, Arial, sans-serif;
+  --container-max: 1600px;
+  --container-pad: 20px;
+  --header-height: 105px;
+  --topbar-height: 77px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); font-size: 18px; color: var(--color-text); background: var(--color-page-bg); line-height: 1.7; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; height: auto; display: block; }
+p { line-height: 1.7; margin-bottom: 1rem; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); text-transform: uppercase; line-height: 1.1; }
+h2 { font-size: 2rem; font-weight: 500; }
+h3 { font-size: 1.5rem; font-weight: 500; font-family: var(--font-body); color: var(--color-red); }
+
+/* ===== LAYOUT ===== */
+.gad-container { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--container-pad); }
+.gad-page-content { padding-top: calc(var(--header-height) + var(--topbar-height)); }
+.gad-page-content.has-schedule-bar { padding-top: calc(var(--header-height) + var(--topbar-height) + 46px); }
+
+/* ===== TOPBAR ===== */
+.gad-topbar {
+  background: var(--color-black); color: var(--color-white);
+  height: var(--topbar-height); font-size: 20px; font-family: var(--font-body);
+  display: flex; align-items: center;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100000;
+}
+.gad-topbar .gad-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.gad-topbar a { color: var(--color-white); }
+.gad-topbar a:hover { text-decoration: underline; }
+.gad-topbar-address, .gad-topbar-phone { display: flex; align-items: center; gap: 8px; }
+
+/* ===== HEADER ===== */
+.gad-header {
+  background: var(--color-red); height: var(--header-height);
+  position: fixed; top: var(--topbar-height); left: 0; right: 0; z-index: 99999;
+  box-shadow: rgba(0,0,0,0.1) 0px 1px 0px 0px; display: flex; align-items: center;
+}
+.gad-header .gad-container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.gad-logo img { max-width: 130px; height: auto; }
+.gad-nav { display: flex; align-items: center; gap: 8px; list-style: none; }
+.gad-nav a {
+  font-family: var(--font-nav); font-size: 14px; font-weight: 500;
+  color: var(--color-white); padding: 8px; display: block; white-space: nowrap; transition: opacity 0.2s;
+}
+.gad-nav a:hover { opacity: 0.8; text-decoration: none; }
+.gad-mobile-menu-toggle { display: none; background: none; border: none; cursor: pointer; color: var(--color-white); font-size: 24px; }
+
+/* ===== SCHEDULE BAR ===== */
+.gad-schedule-bar {
+  background: var(--color-black); padding: 12px 0;
+  position: fixed; top: calc(var(--topbar-height) + var(--header-height));
+  left: 0; right: 0; z-index: 99998; text-align: center;
+}
+.gad-schedule-bar a { color: var(--color-white); font-family: var(--font-body); font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ===== BUTTONS ===== */
+.gad-btn {
+  display: inline-block; background: var(--color-red); color: var(--color-white);
+  font-family: var(--font-body); font-size: 16px; font-weight: 400;
+  padding: 12px 30px; border: none; cursor: pointer; text-decoration: none; transition: background 0.2s;
+}
+.gad-btn:hover { background: #b81200; text-decoration: none; }
+.gad-btn-outline { background: transparent; border: 2px solid var(--color-white); color: var(--color-white); }
+.gad-btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+/* ===== BREADCRUMB ===== */
+.gad-breadcrumb { background: #f0f0f0; padding: 10px 0; font-size: 14px; color: #666; }
+.gad-breadcrumb a { color: var(--color-red); }
+.gad-breadcrumb span { margin: 0 6px; }
+
+/* ===== HERO ===== */
+.gad-hero { background: var(--color-black); color: var(--color-white); padding: 80px 0; position: relative; overflow: hidden; }
+.gad-hero-content { position: relative; z-index: 2; max-width: 720px; }
+.gad-hero h1 { font-family: var(--font-heading); font-size: 4rem; text-transform: uppercase; color: var(--color-white); line-height: 1; margin-bottom: 12px; }
+
+/* ===== SECTIONS ===== */
+.gad-section { padding: 60px 0; }
+.gad-section-red { background: var(--color-red); color: var(--color-white); }
+.gad-section-dark { background: var(--color-black); color: var(--color-white); }
+.gad-section-light { background: #f5f5f5; }
+.gad-section-title { font-family: var(--font-heading); font-size: 2.5rem; text-transform: uppercase; color: var(--color-black); margin-bottom: 8px; }
+.gad-section-subtitle { font-family: var(--font-body); font-size: 1rem; color: var(--color-red); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.gad-section-red .gad-section-title, .gad-section-dark .gad-section-title { color: var(--color-white); }
+.gad-section-red .gad-section-subtitle, .gad-section-dark .gad-section-subtitle { color: rgba(255,255,255,0.75); }
+
+/* ===== CARDS ===== */
+.gad-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 40px; }
+.gad-card { background: var(--color-white); border: 1px solid #e5e5e5; padding: 28px; }
+.gad-card h3 { margin-bottom: 12px; }
+.gad-card p { font-size: 0.95rem; margin-bottom: 0; }
+
+/* ===== PAGE-SPECIFIC ===== */
+.brand-badge {
+  display: inline-block; background: #000; color: #fff;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 4px 10px; margin-bottom: 16px;
+}
+.spoke-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2px; margin-top: 40px; }
+.spoke-card {
+  background: #111; padding: 32px; text-decoration: none; display: block;
+  transition: background 0.2s; border-left: 3px solid var(--color-red);
+}
+.spoke-card:hover { background: #1a1a1a; text-decoration: none; }
+.spoke-card-type { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-red); margin-bottom: 8px; }
+.spoke-card h3 { font-family: var(--font-heading); font-size: 1.4rem; color: #fff; margin-bottom: 10px; text-transform: uppercase; }
+.spoke-card p { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 0; }
+.spoke-card .read-more { display: inline-block; margin-top: 16px; font-size: 13px; color: var(--color-red); font-weight: 500; }
+.trust-strip { background: var(--color-red); padding: 20px 0; text-align: center; }
+.trust-strip p { color: #fff; font-size: 16px; font-weight: 500; margin: 0; }
+.faq-item { border-bottom: 1px solid #e5e5e5; padding: 20px 0; }
+.faq-item h4 { font-family: var(--font-body); font-size: 1rem; font-weight: 700; color: var(--color-black); margin-bottom: 10px; text-transform: none; }
+.faq-item p { margin-bottom: 0; color: #333; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: #e0e0e0; margin-top: 40px; }
+.stat-box { background: #fff; padding: 32px 20px; text-align: center; }
+.stat-box .stat-number { font-family: var(--font-heading); font-size: 3rem; color: var(--color-red); line-height: 1; display: block; }
+.stat-box .stat-label { font-size: 14px; color: #666; margin-top: 8px; }
+
+/* ===== FOOTER ===== */
+.gad-footer { background: var(--color-black); color: var(--color-white); padding: 50px 0 30px; }
+.gad-footer-grid { display: grid; grid-template-columns: 1.2fr 0.9fr 1.2fr 1.4fr; gap: 48px; margin-bottom: 48px; align-items: start; }
+.gad-footer h4 { font-family: var(--font-body); font-size: 18px; font-weight: 700; color: var(--color-red); margin-bottom: 12px; margin-top: 0; text-transform: none; }
+.gad-footer h4 + h4 { margin-top: 24px; }
+.gad-footer p, .gad-footer li { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.8; }
+.gad-footer ul { list-style: none; }
+.gad-footer a { color: rgba(255,255,255,0.8); }
+.gad-footer a:hover { color: var(--color-white); text-decoration: underline; }
+.gad-hours-table { width: 100%; border-collapse: collapse; }
+.gad-hours-table td { padding: 4px 0; font-size: 14px; color: rgba(255,255,255,0.75); white-space: nowrap; }
+.gad-hours-table td:first-child { color: rgba(255,255,255,0.5); padding-right: 16px; min-width: 90px; }
+.gad-social-label { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+.gad-social-row { display: flex; gap: 10px; margin-top: 12px; }
+.gad-social-icon { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); transition: background 0.2s, color 0.2s; }
+.gad-social-icon:hover { background: var(--color-red); color: #fff; text-decoration: none; }
+.gad-footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; text-align: center; font-size: 14px; color: rgba(255,255,255,0.5); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) { .gad-footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 768px) {
+  .gad-nav { display: none; }
+  .gad-mobile-menu-toggle { display: block; }
+  .gad-hero h1 { font-size: 2.4rem; }
+  .gad-topbar .gad-topbar-address { display: none; }
+  .gad-card-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) { .gad-footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="gad-topbar">
+  <div class="gad-container" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="gad-topbar-address" style="display:flex;align-items:center;gap:10px;">
+      <img src="https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/ads-icon.png" alt="" width="33" height="37" loading="lazy">
+      <span>521 East Los Angeles Avenue E &amp; F, Simi Valley, California 93065</span>
+    </div>
+    <div class="gad-topbar-phone" style="display:flex;align-items:center;gap:10px;">
+      <img src="https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/cal-icon.png" alt="" width="32" height="32" loading="lazy">
+      <a href="tel:8056247576">(805) 624-7576</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="gad-header">
+  <div class="gad-container">
+    <div class="gad-logo">
+      <a href="https://germanautodoctorsimivalley.com/">
+        <img src="https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2025/03/new-lgogo.png" alt="The German Auto Doctor" width="130" loading="lazy">
+      </a>
+    </div>
+    <nav>
+      <ul class="gad-nav">
+        <li><a href="https://germanautodoctorsimivalley.com/">Home</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/services/">Repair &amp; Service ▾</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/brands/" style="text-decoration:underline;">Brands ▾</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/reviews/">Reviews</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/blog/">Blog</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/videos/">Videos</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/schedule-appointment/">Contact Us</a></li>
+        <li><a href="https://germanautodoctorsimivalley.com/schedule-appointment/" class="gad-btn" style="padding:8px 16px;font-size:14px;">Schedule Appointment</a></li>
+      </ul>
+    </nav>
+    <button class="gad-mobile-menu-toggle" aria-label="Open menu">☰</button>
+  </div>
+</header>
+
+<!-- SCHEDULE BAR -->
+<div class="gad-schedule-bar">
+  <a href="https://germanautodoctorsimivalley.com/schedule-appointment/">SCHEDULE APPOINTMENT</a>
+</div>
+
+<!-- PAGE CONTENT -->
+<main class="gad-page-content has-schedule-bar">
+
+  <!-- Breadcrumb -->
+  <nav class="gad-breadcrumb" aria-label="Breadcrumb">
+    <div class="gad-container">
+      <a href="https://germanautodoctorsimivalley.com/">Home</a>
+      <span>›</span>
+      <a href="https://germanautodoctorsimivalley.com/brands/">Brands</a>
+      <span>›</span>
+      <span>Audi</span>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="gad-hero" style="background-image: none;">
+    <div style="position:absolute;inset:0;background:linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a0a 100%);"></div>
+    <div class="gad-container" style="position:relative;z-index:2;">
+      <div class="gad-hero-content">
+        <div class="brand-badge">Audi Specialists — Simi Valley</div>
+        <h1 style="font-size:4rem;color:#fff;margin-bottom:16px;">AUDI REPAIR &amp; SERVICE</h1>
+        <p style="font-size:1.15rem;color:rgba(255,255,255,0.85);max-width:540px;margin-bottom:28px;">
+          We've been working on Audis since before most of our competitors knew what VAG stood for.
+          Every TFSI, TDI, and quattro system that comes through our shop gets treated
+          like it belongs to one of us — because frankly, several of them do.
+        </p>
+        <a href="https://germanautodoctorsimivalley.com/schedule-appointment/" class="gad-btn">Schedule Audi Service</a>
+        &nbsp;&nbsp;
+        <a href="tel:8056247576" class="gad-btn gad-btn-outline">(805) 624-7576</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Strip -->
+  <div class="trust-strip">
+    <p>ASE-Certified Technicians &nbsp;·&nbsp; Dealer-Level Diagnostics &nbsp;·&nbsp; VCDS &amp; OBD Scan Tools &nbsp;·&nbsp; 2-Year / 24,000-Mile Warranty</p>
+  </div>
+
+  <!-- Stats -->
+  <section class="gad-section" style="padding-bottom:0;padding-top:0;">
+    <div class="gad-container">
+      <div class="stat-grid">
+        <div class="stat-box">
+          <span class="stat-number">15+</span>
+          <div class="stat-label">Years Specializing in European Imports</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">40%</span>
+          <div class="stat-label">Average Savings vs. Audi Dealer Pricing</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">500+</span>
+          <div class="stat-label">Five-Star Reviews Across Google &amp; Yelp</div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">24K</span>
+          <div class="stat-label">Mile Warranty on Parts &amp; Labor</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Spoke Grid -->
+  <section class="gad-section gad-section-dark">
+    <div class="gad-container">
+      <div class="gad-section-subtitle" style="color:var(--color-red);">Audi Expertise</div>
+      <h2 class="gad-section-title" style="color:#fff;">WHAT WE COVER</h2>
+      <p style="color:rgba(255,255,255,0.8);max-width:680px;margin-bottom:0;">
+        We work on the full Audi lineup — A-series, Q-series, TT, R8, and e-tron. Every model
+        has its quirks, and we know them. The TFSI oil consumption situation on B8 A4s. The DSG
+        mechatronic units that cause grief around 60,000 miles. Timing chain tensioners on
+        2.0T engines before the 2013 redesign. These aren't surprises to us — they're the first
+        things we check.
+      </p>
+      <div class="spoke-grid">
+        <a href="https://gad-audi-satellite.vercel.app/models/" class="spoke-card">
+          <div class="spoke-card-type">Model Guides</div>
+          <h3>Audi A4, A6, Q5 &amp; More</h3>
+          <p>Generation-by-generation breakdown of known issues, service intervals, and what to watch for at each mileage milestone.</p>
+          <span class="read-more">Explore Models →</span>
+        </a>
+        <a href="https://gad-audi-satellite.vercel.app/services/" class="spoke-card">
+          <div class="spoke-card-type">Service Pages</div>
+          <h3>DSG Service, Timing Chains, Oil Changes</h3>
+          <p>Specific service procedures for Audi's unique drivetrains. We follow Audi's published service specifications — not generic intervals.</p>
+          <span class="read-more">View Services →</span>
+        </a>
+        <a href="https://gad-audi-satellite.vercel.app/common-problems/" class="spoke-card">
+          <div class="spoke-card-type">Known Issues</div>
+          <h3>TFSI Oil Consumption, Carbon Buildup &amp; More</h3>
+          <p>The recurring problems that show up in every Audi forum, explained from the perspective of the shop that's actually fixed them.</p>
+          <span class="read-more">Read Problem Guides →</span>
+        </a>
+        <a href="https://gad-audi-satellite.vercel.app/guides/" class="spoke-card">
+          <div class="spoke-card-type">Owner Resources</div>
+          <h3>Service Intervals, Buyer's Guides, FAQs</h3>
+          <p>What every Audi owner in Simi Valley should know — including when dealer service is actually worth it and when it isn't.</p>
+          <span class="read-more">Browse Resources →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Us -->
+  <section class="gad-section">
+    <div class="gad-container">
+      <div class="gad-section-subtitle">Why German Auto Doctor</div>
+      <h2 class="gad-section-title">DEALER KNOWLEDGE. INDEPENDENT PRICES.</h2>
+      <div class="gad-card-grid" style="margin-top:32px;">
+        <div class="gad-card">
+          <h3>We Actually Own Audi Diagnostics Equipment</h3>
+          <p>VCDS (VAG-COM Diagnostic System) is the same tool Audi dealerships use for fault code access and module programming. Most independent shops don't have it. We do. That's not marketing — it's on the shelf behind bay three.</p>
+        </div>
+        <div class="gad-card">
+          <h3>No Shotgun Parts Replacement</h3>
+          <p>We've had people come in after a dealer quoted them $2,800 for a transmission service when a $90 mechatronic sleeve was the actual problem. We diagnose first, quote second. You'll know exactly what's wrong and why before we touch anything.</p>
+        </div>
+        <div class="gad-card">
+          <h3>We'll Tell You When It's Not Worth Fixing</h3>
+          <p>Some repairs on older Audis don't make financial sense. We'd rather spend 15 minutes being straight with you than take your money on a car that's going to have the next issue in three months. That conversation doesn't cost you anything.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Models We Service -->
+  <section class="gad-section gad-section-light">
+    <div class="gad-container">
+      <div class="gad-section-subtitle">Full Lineup Coverage</div>
+      <h2 class="gad-section-title">AUDI MODELS WE SERVICE</h2>
+      <p style="max-width:640px;margin-bottom:32px;">
+        From daily-driver A3s to performance-built RS models, we've seen them all at our Simi Valley shop.
+      </p>
+      <div class="gad-card-grid">
+        <div class="gad-card">
+          <h3>A-Series Sedans</h3>
+          <p>A3, A4, A5, A6, A7, A8. The A4 B8 generation (2008–2016) is probably our most common Audi — the TFSI engines have a well-documented oil consumption issue we've resolved dozens of times. <a href="https://gad-audi-satellite.vercel.app/models/a4/" style="color:var(--color-red);">See our A4 guide →</a></p>
+        </div>
+        <div class="gad-card">
+          <h3>Q-Series SUVs</h3>
+          <p>Q3, Q5, Q7, Q8. The Q5 with the 2.0T is the most common one we see — timing chain service around 60–80K miles is not optional on the pre-2017 engines. We've seen what happens when people skip it.</p>
+        </div>
+        <div class="gad-card">
+          <h3>TT &amp; R8 Sports</h3>
+          <p>Both TT generations and R8 V8/V10 variants. These tend to come to us for performance work as much as maintenance — suspension upgrades, clutch replacements, and brake system service are common requests.</p>
+        </div>
+        <div class="gad-card">
+          <h3>e-tron Electric</h3>
+          <p>We service e-tron and Q4 e-tron for everything outside of high-voltage battery work. Brakes, suspension, software updates, and 12V system issues are all in our wheelhouse. <a href="https://gad-audi-satellite.vercel.app/models/etron/" style="color:var(--color-red);">e-tron service details →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="gad-section">
+    <div class="gad-container" style="max-width:800px;">
+      <div class="gad-section-subtitle">Common Questions</div>
+      <h2 class="gad-section-title">AUDI OWNER FAQ</h2>
+      <div class="faq-item">
+        <h4>How much does Audi service cost compared to the dealer?</h4>
+        <p>On most services — oil changes, brake jobs, timing chain replacements — we run 30 to 45 percent less than the Audi dealer in Thousand Oaks or Westlake. The parts are identical OEM or OEM-equivalent. The difference is overhead.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Will servicing my Audi here void my warranty?</h4>
+        <p>No. Under the Magnuson-Moss Warranty Act, dealerships cannot void your warranty simply because you had service performed at an independent shop — as long as the work was done properly and the correct fluids and parts were used. We document everything.</p>
+      </div>
+      <div class="faq-item">
+        <h4>My Audi has the oil consumption issue. What does the fix actually involve?</h4>
+        <p>On 2.0 TFSI engines (particularly the EA888 Gen 1 in B8 A4s and Q5s), excessive oil consumption is usually a piston ring issue. The proper fix is a piston ring replacement — typically a 20 to 25 hour job. Some shops offer a "breather modification" as a cheaper workaround. We don't recommend it — it masks the symptom without fixing the engine.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Do you service Audi DSG transmissions?</h4>
+        <p>Yes. DSG service is one of our most common Audi jobs. Fluid and filter changes at 40,000 miles on the DQ250 wet-clutch version. We also handle mechatronic unit issues — the most common DSG failure point. <a href="https://gad-audi-satellite.vercel.app/services/dsg/" style="color:var(--color-red);">Full DSG service details →</a></p>
+      </div>
+      <div class="faq-item">
+        <h4>How long does Audi timing chain service take?</h4>
+        <p>On a 2.0T TFSI, budget a full day — typically 7 to 9 hours of labor. On the 3.0T supercharged V6, it's closer to 12 to 14 hours. We call you when the car's apart if we find anything unexpected, before we go further.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="gad-section gad-section-red">
+    <div class="gad-container" style="text-align:center;">
+      <h2 style="color:#fff;font-size:2.5rem;margin-bottom:16px;">READY TO BOOK YOUR AUDI SERVICE?</h2>
+      <p style="color:rgba(255,255,255,0.9);max-width:500px;margin:0 auto 28px;">
+        Call us or use the online scheduler. We're open Monday through Friday, 8am to 6pm,
+        and Saturday 9am to 2pm. Same-day appointments are often available for diagnostic work.
+      </p>
+      <a href="https://germanautodoctorsimivalley.com/schedule-appointment/" class="gad-btn gad-btn-outline" style="margin-right:12px;">Schedule Online</a>
+      <a href="tel:8056247576" class="gad-btn" style="background:#fff;color:var(--color-red);">(805) 624-7576</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="gad-footer">
+  <div class="gad-container">
+    <div class="gad-footer-grid">
+      <div>
+        <h4>Call Us Anytime</h4>
+        <p style="display:flex;align-items:center;gap:8px;">
+          <img src="https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/cal-icon.png" alt="" width="24" height="24" loading="lazy">
+          <a href="tel:8056247576">(805) 624-7576</a>
+        </p>
+        <h4>Visit Our Location</h4>
+        <p style="display:flex;align-items:flex-start;gap:8px;">
+          <img src="https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/ads-icon.png" alt="" width="22" height="25" loading="lazy" style="margin-top:2px;flex-shrink:0;">
+          <span>521 East Los Angeles Avenue E &amp; F,<br>Simi Valley, California 93065</span>
+        </p>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://germanautodoctorsimivalley.com/">Home</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/services/">Repair &amp; Service</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/brands/">Brands</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/reviews/">Reviews</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/blog/">Blog</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/schedule-appointment/">Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Our Services</h4>
+        <ul>
+          <li><a href="https://germanautodoctorsimivalley.com/european-auto-ac-service-simi-valley/">A/C System Repairs</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/oil-leak-repairs/">Oil Leak Repairs</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/engine-repair-and-maintenance/">Engine Repair and Maintenance</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/transmission-services/">Transmission Services</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/suspension-and-steering-repair/">Suspension and Steering Repair</a></li>
+          <li><a href="https://germanautodoctorsimivalley.com/bmw-repair-service/">BMW Repair &amp; Service</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <table class="gad-hours-table">
+          <tr><td>Monday</td><td>8:00 AM – 6:00 PM</td></tr>
+          <tr><td>Tuesday</td><td>8:00 AM – 6:00 PM</td></tr>
+          <tr><td>Wednesday</td><td>8:00 AM – 6:00 PM</td></tr>
+          <tr><td>Thursday</td><td>8:00 AM – 6:00 PM</td></tr>
+          <tr><td>Friday</td><td>8:00 AM – 6:00 PM</td></tr>
+          <tr><td>Saturday</td><td>9:00 AM – 2:00 PM</td></tr>
+          <tr><td>Sunday</td><td>Closed</td></tr>
+        </table>
+        <p class="gad-social-label">Follow us on</p>
+        <div class="gad-social-row">
+          <a href="https://www.yelp.com/biz/german-auto-doctor-simi-valley" aria-label="Yelp" class="gad-social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.5 14.5c-.55.35-1.3.15-1.63-.42l-1.5-2.6c-.33-.57-.15-1.3.42-1.63l1.21-.7V9.5c0-.65.53-1.18 1.18-1.18h.64c.65 0 1.18.53 1.18 1.18v4.32l1.21.7c.57.33.75 1.06.42 1.63l-1.5 2.6c-.33.57-1.08.77-1.63.42z"/></svg>
+          </a>
+          <a href="#" aria-label="Google" class="gad-social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M21.35 11.1H12.18V13.83H18.69C18.36 17.64 15.19 19.27 12.19 19.27C8.36 19.27 5 16.25 5 12C5 7.9 8.2 4.73 12.2 4.73C15.29 4.73 17.1 6.7 17.1 6.7L19 4.72C19 4.72 16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12C2.03 17.05 6.16 22 12.25 22C17.6 22 21.5 18.33 21.5 12.91C21.5 11.76 21.35 11.1 21.35 11.1Z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/thegermanautodoctor" aria-label="Facebook" class="gad-social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@GermanAutoDoctor" aria-label="YouTube" class="gad-social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="gad-footer-bottom">
+    <p>Copyright &copy; 2025 The German Auto Doctor, All Right Reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

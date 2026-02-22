@@ -1,0 +1,177 @@
+{
+  "_meta": {
+    "client": "German Auto Doctor",
+    "domain": "germanautodoctorsimivalley.com",
+    "capturedAt": "2026-02-18",
+    "capturedBy": "Claude Chrome extension — deep extraction v2",
+    "confidence": "HIGH — all values verified from live computed CSS + DOM",
+    "cms": "WordPress / Divi Builder (et_ prefix classes)",
+    "cdnNote": "All assets served via NitroCDN. Use CDN URLs for logo/icons."
+  },
+
+  "colors": {
+    "primaryRed": "#D11600",
+    "black": "#000000",
+    "white": "#FFFFFF",
+    "pageBackground": "#FFFFFF",
+    "navBackground": "#D11600",
+    "navText": "#FFFFFF",
+    "topBarBackground": "#000000",
+    "topBarText": "#FFFFFF",
+    "h3Color": "#D11600",
+    "footerHeadingColor": "#D70006",
+    "ctaButtonBg": "#D11600",
+    "ctaButtonText": "#FFFFFF"
+  },
+
+  "typography": {
+    "bodyFont": "Roboto, Helvetica, Arial, Lucida, sans-serif",
+    "headingFont": "\"Bebas Neue\", display",
+    "navFont": "\"Roboto Condensed\", Helvetica, Arial, Lucida, sans-serif",
+    "googleFontsImport": "@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;500;700&family=Bebas+Neue&family=Acme&family=Rubik:wght@400;500&display=swap');",
+    "baseFontSize": "18px",
+    "bodyLineHeight": "1.7",
+    "h2Size": "~31px",
+    "h2Transform": "uppercase",
+    "h2Font": "Bebas Neue",
+    "h3Size": "25px",
+    "h3Font": "Roboto",
+    "navFontSize": "16px",
+    "navFontWeight": "500",
+    "topBarFontSize": "20px"
+  },
+
+  "layout": {
+    "containerMaxWidth": "1600px",
+    "containerPaddingH": "20px",
+    "topBarHeight": "77px",
+    "headerHeight": "105px",
+    "scheduleBarHeight": "~46px",
+    "logoMaxWidth": "130px",
+    "logoSrc": "https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2025/03/new-lgogo.png",
+    "addressIconSrc": "https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/ads-icon.png",
+    "phoneIconSrc": "https://cdn-ilbdbhb.nitrocdn.com/mqrovloyuwBRudGLFAclMOpsPUwVaeua/assets/images/optimized/rev-fda5738/germanautodoctorsimivalley.com/wp-content/uploads/2024/05/cal-icon.png"
+  },
+
+  "navigation": {
+    "structure": [
+      { "text": "Home", "href": "https://germanautodoctorsimivalley.com/", "hasDropdown": false },
+      { "text": "Repair & Service", "href": "https://germanautodoctorsimivalley.com/services/", "hasDropdown": true,
+        "dropdown": [
+          { "text": "A/C Repairs", "href": "https://germanautodoctorsimivalley.com/european-auto-ac-service-simi-valley/" },
+          { "text": "Brake Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-brake-service-simi-valley/" },
+          { "text": "Check Engine Light", "href": "https://germanautodoctorsimivalley.com/european-auto-check-engine-service-simi-valley/" },
+          { "text": "Cooling System", "href": "https://germanautodoctorsimivalley.com/european-auto-cooling-system-service-simi-valley/" },
+          { "text": "Engine Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-engine-service-simi-valley/" },
+          { "text": "Oil Change Service", "href": "https://germanautodoctorsimivalley.com/european-auto-oil-change-service-simi-valley/" },
+          { "text": "Pre Purchase Inspections", "href": "https://germanautodoctorsimivalley.com/european-auto-pre-purchase-inspection-simi-valley/" },
+          { "text": "Radiator Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-radiator-service-simi-valley/" },
+          { "text": "Scheduled Maintenance", "href": "https://germanautodoctorsimivalley.com/european-auto-scheduled-maintenance-simi-valley/" },
+          { "text": "Suspension Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-suspension-service-simi-valley/" },
+          { "text": "Transmission Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-transmission-service-simi-valley/" },
+          { "text": "Wheel Alignment", "href": "https://germanautodoctorsimivalley.com/european-auto-tire-wheel-service-simi-valley/" },
+          { "text": "& More!", "href": "https://germanautodoctorsimivalley.com/services/" }
+        ]
+      },
+      { "text": "Brands", "href": "https://germanautodoctorsimivalley.com/brands/", "hasDropdown": true,
+        "dropdown": [
+          { "text": "Audi", "href": "https://germanautodoctorsimivalley.com/audi-repair-simi-valley/" },
+          { "text": "Aston Martin", "href": "https://germanautodoctorsimivalley.com/aston-martin-repair-simi-valley/" },
+          { "text": "Bentley", "href": "https://germanautodoctorsimivalley.com/bentley-repair-simi-valley/" },
+          { "text": "BMW", "href": "https://germanautodoctorsimivalley.com/bmw-repair-simi-valley/" },
+          { "text": "Mercedes", "href": "https://germanautodoctorsimivalley.com/mercedes-repair-simi-valley/" },
+          { "text": "MINI Cooper", "href": "https://germanautodoctorsimivalley.com/mini-cooper-repair-service-in-simi-valley/" },
+          { "text": "Maserati", "href": "https://germanautodoctorsimivalley.com/maserati-repair-simi-valley/" },
+          { "text": "Land Rover", "href": "https://germanautodoctorsimivalley.com/land-rover-repair-in-simi-valley/" },
+          { "text": "Porsche", "href": "https://germanautodoctorsimivalley.com/porsche-repair-simi-valley/" },
+          { "text": "Rolls-Royce", "href": "https://germanautodoctorsimivalley.com/rolls-royce-service-simi-valley/" },
+          { "text": "Volkswagen", "href": "https://germanautodoctorsimivalley.com/vw-repair-simi-valley/" }
+        ]
+      },
+      { "text": "Reviews", "href": "https://germanautodoctorsimivalley.com/reviews/", "hasDropdown": false },
+      { "text": "Performance", "href": "https://germanautodoctorsimivalley.com/#", "hasDropdown": true,
+        "dropdown": [{ "text": "Pure Turbos", "href": "https://germanautodoctorsimivalley.com/pure-turbos/" }]
+      },
+      { "text": "Blog", "href": "https://germanautodoctorsimivalley.com/blog/", "hasDropdown": false },
+      { "text": "Videos", "href": "https://germanautodoctorsimivalley.com/videos/", "hasDropdown": false },
+      { "text": "Contact Us", "href": "https://germanautodoctorsimivalley.com/schedule-appointment/", "hasDropdown": false }
+    ],
+    "ctaItem": { "text": "Schedule Appointment", "href": "https://germanautodoctorsimivalley.com/schedule-appointment/" }
+  },
+
+  "businessInfo": {
+    "name": "The German Auto Doctor",
+    "phone": "(805) 624-7576",
+    "phoneTel": "tel:8056247576",
+    "address1": "521 East Los Angeles Avenue E & F",
+    "address2": "Simi Valley, California 93065",
+    "scheduleUrl": "https://germanautodoctorsimivalley.com/schedule-appointment/",
+    "hours": {
+      "Monday": "8:00 AM – 6:00 PM",
+      "Tuesday": "8:00 AM – 6:00 PM",
+      "Wednesday": "8:00 AM – 6:00 PM",
+      "Thursday": "8:00 AM – 6:00 PM",
+      "Friday": "8:00 AM – 6:00 PM",
+      "Saturday": "9:00 AM – 2:00 PM",
+      "Sunday": "Closed"
+    },
+    "copyright": "Copyright © 2025 The German Auto Doctor. All Right Reserved."
+  },
+
+  "footer": {
+    "layout": "4-column grid",
+    "column1_contact": {
+      "sections": [
+        { "heading": "Call Us Anytime", "value": "(805) 624-7576", "href": "tel:8056247576" },
+        { "heading": "Visit Our Location", "value": "521 East Los Angeles Avenue E & F, Simi Valley, California 93065" }
+      ]
+    },
+    "column2_company": {
+      "heading": "Company",
+      "links": [
+        { "text": "Home", "href": "https://germanautodoctorsimivalley.com/" },
+        { "text": "Repair & Service", "href": "https://germanautodoctorsimivalley.com/services/" },
+        { "text": "Brands", "href": "https://germanautodoctorsimivalley.com/brands/" },
+        { "text": "Reviews", "href": "https://germanautodoctorsimivalley.com/reviews/" },
+        { "text": "Blog", "href": "https://germanautodoctorsimivalley.com/blog/" },
+        { "text": "Contact Us", "href": "https://germanautodoctorsimivalley.com/schedule-appointment/" }
+      ]
+    },
+    "column3_services": {
+      "heading": "Our Services",
+      "links": [
+        { "text": "A/C System Repairs", "href": "https://germanautodoctorsimivalley.com/european-auto-ac-service-simi-valley/" },
+        { "text": "Oil Leak Repairs", "href": "https://germanautodoctorsimivalley.com/oil-leak-repairs/" },
+        { "text": "Engine Repair and Maintenance", "href": "https://germanautodoctorsimivalley.com/engine-repair-and-maintenance/" },
+        { "text": "Transmission Services", "href": "https://germanautodoctorsimivalley.com/transmission-services/" },
+        { "text": "Suspension and Steering Repair", "href": "https://germanautodoctorsimivalley.com/suspension-and-steering-repair/" },
+        { "text": "BMW Repair & Service", "href": "https://germanautodoctorsimivalley.com/bmw-repair-service/" },
+        { "text": "Radiator Repair", "href": "https://germanautodoctorsimivalley.com/european-auto-radiator-service-simi-valley/" }
+      ]
+    },
+    "column4_hours": {
+      "heading": "Hours",
+      "hours": {
+        "Monday": "8:00 AM – 6:00 PM",
+        "Tuesday": "8:00 AM – 6:00 PM",
+        "Wednesday": "8:00 AM – 6:00 PM",
+        "Thursday": "8:00 AM – 6:00 PM",
+        "Friday": "8:00 AM – 6:00 PM",
+        "Saturday": "9:00 AM – 2:00 PM",
+        "Sunday": "Closed"
+      },
+      "socialHeading": "Follow us on",
+      "social": [
+        { "platform": "yelp", "href": "https://www.yelp.com/biz/german-auto-doctor-simi-valley", "icon": "yelp" },
+        { "platform": "google", "href": "https://germanautodoctorsimivalley.com/#", "icon": "google" },
+        { "platform": "facebook", "href": "https://www.facebook.com/thegermanautodoctor", "icon": "facebook" },
+        { "platform": "youtube", "href": "https://www.youtube.com/@GermanAutoDoctor", "icon": "youtube" }
+      ]
+    },
+    "bottomBar": {
+      "text": "Copyright © 2025 The German Auto Doctor. All Right Reserved.",
+      "bg": "#000000",
+      "color": "rgba(255,255,255,0.4)"
+    }
+  }
+}
