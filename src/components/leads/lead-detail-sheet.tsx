@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Search, FileText, Mail, ClipboardList, MonitorPlay } from "lucide-react";
+import { Search, FileText, Mail, ClipboardList, MonitorPlay, Zap } from "lucide-react";
 import { LEAD_STATUS_CONFIG } from "@/types";
 import { toast } from "sonner";
 import type { LeadStatus } from "@prisma/client";
@@ -491,6 +491,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
   const [generatingWO, setGeneratingWO] = useState(false);
   const [generatingAudit, setGeneratingAudit] = useState(false);
   const [generatingDemo, setGeneratingDemo] = useState(false);
+  const [generatingAll, setGeneratingAll] = useState(false);
   const [genHistory, setGenHistory] = useState<{ audits: Array<{ id: number; repName: string | null; healthScore: number | null; gapCount: number | null; generatedAt: string }>; demos: Array<{ id: number; repName: string | null; generatedAt: string }> } | null>(null);
 
   const handleEnrich = async (force = false) => {
@@ -605,6 +606,31 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
       toast.success("Demo opened — share this URL with your prospect during the call");
     } finally {
       setGeneratingDemo(false);
+    }
+  };
+
+  const handleGenerateAll = async () => {
+    if (!leadId || !lead) return;
+    setGeneratingAll(true);
+    try {
+      const fetchedAt = lead.competitiveIntel?.fetchedAt
+        ? new Date(lead.competitiveIntel.fetchedAt)
+        : null;
+      const ageDays = fetchedAt
+        ? Math.floor((Date.now() - fetchedAt.getTime()) / 86400000)
+        : null;
+      if (!fetchedAt) {
+        toast.warning("No enrichment data — both outputs will use live rankings only. Run Enrich Data first for full context.");
+      } else if (ageDays !== null && ageDays > 30) {
+        toast.warning(`Intel is ${ageDays} days old — consider re-enriching before sending to a prospect.`);
+      }
+      window.open(`/api/leads/${leadId}/audit?autoprint=1`, "_blank", "noopener,noreferrer");
+      // Brief pause so the browser doesn't block the second tab as a popup
+      await new Promise((r) => setTimeout(r, 500));
+      window.open(`/api/leads/${leadId}/demo`, "_blank", "noopener,noreferrer");
+      toast.success("Audit + Demo opened in two tabs — ready to present");
+    } finally {
+      setGeneratingAll(false);
     }
   };
 
@@ -808,9 +834,25 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                   <TooltipTrigger asChild>
                     <Button
                       size="sm"
+                      variant="default"
+                      onClick={handleGenerateAll}
+                      disabled={generatingAll || generatingAudit || generatingDemo}
+                    >
+                      <Zap className="h-4 w-4 mr-1.5" />
+                      {generatingAll ? "Opening..." : "Audit + Demo"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">One click — opens the Audit PDF and Live Demo simultaneously in two tabs. Use this before any prospect call.</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
                       variant="outline"
                       onClick={handleGenerateAudit}
-                      disabled={generatingAudit}
+                      disabled={generatingAudit || generatingAll}
                     >
                       <ClipboardList className="h-4 w-4 mr-1.5" />
                       {generatingAudit ? "Building..." : "Audit PDF"}
@@ -826,7 +868,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                       size="sm"
                       variant="outline"
                       onClick={handleGenerateDemo}
-                      disabled={generatingDemo}
+                      disabled={generatingDemo || generatingAll}
                     >
                       <MonitorPlay className="h-4 w-4 mr-1.5" />
                       {generatingDemo ? "Building..." : "Live Demo"}

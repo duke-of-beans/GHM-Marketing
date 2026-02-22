@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint 4 complete: ITEM-003 tutorials, Pipeline filter UX fixed, voice/micro-copy layer added.
+**Last Updated:** February 22, 2026 — Sprint 1 in progress: D4 done (Audit+Demo one-click button), ITEM-001 docs created.
 
 ---
 
@@ -11,8 +11,8 @@
 Items blocking confident client and rep handoff.
 - [ ] Commission validation — mark German Auto Doctor active, trigger monthly cron manually, verify transaction creation + widget population
 - [ ] W7 — verify Wave covers Gusto use cases, cancel Gusto
-- [ ] ITEM-001 docs — add PPC/Ads language to `CLIENT_AGREEMENT.md` §1.1; Google Ads account ID field to `CLIENT_ONBOARDING_FORM.md`; Ads section to monthly report PDF template
-- [ ] D4 — Audit → Demo one-click: single button on lead detail sheet chaining `handleGenerateAudit` + `handleGenerateDemo`
+- [x] ITEM-001 docs — `CLIENT_AGREEMENT.md` created (§1.1 includes full PPC/Ads scope language, separate ad spend clarification, account ownership); `CLIENT_ONBOARDING_FORM.md` created (Google Ads Account ID field, manager access, budget, campaign start); report PDF template Ads section was already complete.
+- [x] D4 — Audit → Demo one-click: `handleGenerateAll` + `generatingAll` state + "Audit + Demo" button (variant="default", Zap icon) added to lead-detail-sheet.tsx. Opens audit + 500ms delayed demo in two tabs simultaneously.
 
 ### SPRINT 2 — Personnel System (~6 hrs) ✅ COMPLETE
 Required before first operations hire.
