@@ -45,6 +45,9 @@ export async function getClients(filters?: {
       domains: {
         select: { id: true, domain: true, type: true },
       },
+      googleAdsConnection: {
+        select: { isActive: true },
+      },
     },
     orderBy: { healthScore: "asc" }, // Worst health first — needs attention
   });

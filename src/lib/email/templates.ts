@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Email Automation System
  * Sends reports, upsell notifications, and other client communications
  */
@@ -177,7 +177,7 @@ function generateReportEmailHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing. All rights reserved.
+          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </p>
       </div>
     </body>
@@ -259,7 +259,7 @@ function generateUpsellEmailHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing. All rights reserved.
+          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </p>
       </div>
     </body>
@@ -320,7 +320,7 @@ function generatePortalInviteHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing. All rights reserved.
+          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </p>
       </div>
     </body>

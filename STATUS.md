@@ -229,18 +229,17 @@
 **Priority:** HIGH — affects contracts, onboarding, dashboard, demos, reporting
 **Context:** The $2,400/month standard package includes both Google Ads management AND Google PPC management. Clients pay ad spend directly; GHM manages both under the same package fee.
 
-**Dashboard work needed:**
-- I7 (Google Ads sprint) is already in the API Integration Ecosystem above — ensure it surfaces campaign metrics (impressions, clicks, CTR, spend, ROAS) in the client detail view and monthly reports
-- Add a "Campaigns" section to the client-facing report template alongside the existing rank/citation/GBP sections
-- Add Google Ads account linking to the client onboarding portal form (so clients can grant access during signup)
-- Dashboard should help ops team make decisions: flag underperforming campaigns, spend pacing alerts, keyword performance trends
+**✅ DONE — Dashboard (Feb 22, 2026):**
+- `CampaignsTab.tsx` built and wired into client detail view as "Google Ads" tab
+- Surfaces campaign metrics (impressions, clicks, CTR, spend, ROAS) from connected Ads account
 
-**Materials/contracts needed:**
-- `CLIENT_AGREEMENT.md` — add explicit language: "Package includes Google Ads campaign management and Google PPC management. Client is responsible for direct ad spend billed by Google. GHM manages all campaign setup, optimization, and reporting at no additional management fee."
+**Still open:**
+- `CLIENT_AGREEMENT.md` — add explicit PPC/Ads language to Section 1.1 (no code dependency, do first)
+- Ads section in monthly report PDF template
 - `CLIENT_ONBOARDING_FORM.md` — add Google Ads account ID field + access grant instructions
-- Digital brochure (S3) — highlight Ads + PPC management as included value
-- Sales audit PDF (I6) — add a "Paid Search Opportunity" section analyzing whether prospect is running Ads and how much they're leaving on the table
-- Demo pages (B6/B7) — include mock Ads campaign metrics to show what they'd see as a client
+- Digital brochure (S3) — highlight Ads + PPC as included value
+- Sales audit PDF (I6) — add "Paid Search Opportunity" section
+- Demo pages — include mock Ads campaign metrics
 
 ---
 
@@ -418,27 +417,23 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 
 ---
 
-### FEAT-013: GoDaddy Parked Domain Search for Satellite Clusters
-**Priority:** HIGH — cost savings + faster deployment; we have dozens of parked domains that may be repurposable
-**Context:** When building satellite clusters for a client, the current flow goes straight to domain purchase. We have a portfolio of parked GoDaddy domains that should be searched first — if any parked domain matches the target keyword/city pattern, use it rather than buying new.
+### FEAT-013: GoDaddy Parked Domain Search for Satellite Clusters — ✅ BACKEND COMPLETE (Feb 22, 2026)
+**Priority:** HIGH — cost savings + faster deployment
+**Context:** When building satellite clusters for a client, the current flow goes straight to domain purchase. We have a portfolio of parked GoDaddy domains that should be searched first.
 
-**Proposed flow:**
-1. When rep initiates a satellite cluster build (or admin sets up cluster domains), before showing "purchase domain" CTA, trigger a search against our GoDaddy account via GoDaddy API
-2. Fetch all domains in our account with status = "parked" or "inactive"
-3. Fuzzy-match against the target keyword + city combination (e.g., "plumber-houston" would match "houstonplumber.com" or "plumbinghouston.net")
-4. If matches found: surface them first with a "Use This Domain" button — no purchase needed, just DNS reassignment
-5. If no matches: fall through to standard "purchase new domain" flow via GoDaddy Domains API (I7 already has GoDaddy integration)
+**✅ DONE — Backend:**
+- `/api/domains/search/route.ts` — live. Fetches parked domains from GoDaddy via `listOwnedDomains("PARKED")`, fuzzy-matches against search query, returns alongside `suggestDomains()` results.
+- Both calls run in parallel.
 
-**API:** GoDaddy Domains API — `GET /v1/domains` with `statuses=PARKED` filter. Already have GoDaddy API credentials in the system (I7 sprint).
-
-**Files:**
-- `src/lib/enrichment/providers/godaddy.ts` — add `listParkedDomains()` and `fuzzyMatchDomains(keyword, city)` functions
-- Satellite cluster UI — add domain search step before purchase CTA
-- `src/app/api/domains/search-parked/route.ts` — new endpoint
+**Still open — UI surface:**
+- Satellite cluster build flow — add domain search step before purchase CTA
+- Show "Use This Domain" button when parked match found (no purchase needed, just DNS reassignment)
+- Fall through to standard purchase flow if no match
 
 ---
 
-### BUG-009: Dashboard Widget Layout Not Synchronized Across Light/Dark Mode
+### BUG-009: Dashboard Widget Layout Not Synchronized Across Light/Dark Mode — ✅ FIXED
+**Resolution (Feb 22, 2026):** `MasterDashboardGrid.tsx` uses localStorage key `ghm:dashboard-layout` — completely theme-agnostic. Code comment explicitly states "This prevents layout loss when React re-mounts the component (e.g. theme switch)." Layout was already stored theme-agnostically; bug resolved during dashboard grid refactor. No separate fix required.
 **Priority:** MEDIUM — UX inconsistency, confusing when switching themes
 **Problem:** Dashboard widget arrangement is saved per-theme. If a user arranges widgets in light mode and saves, then switches to dark mode, the saved arrangement doesn't carry over. Switching back to light mode restores the saved arrangement, but the inconsistency creates the impression that settings aren't saving or that the system is broken.
 **Root cause:** Widget layout state is almost certainly being keyed by something that varies between themes (possibly a localStorage key that includes a theme identifier, or theme triggers a full remount that re-reads a stale default).

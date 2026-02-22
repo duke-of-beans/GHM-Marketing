@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Plus } from "lucide-react";
+import { HelpCircle, Plus, LayoutGrid, List } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
 import { ClientFilterBar, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
@@ -24,9 +24,11 @@ type ClientItem = {
   healthScore: number;
   scanFrequency: string;
   status: string;
+  paymentStatus: string | null;
   onboardedAt: string;
   lastScanAt: string | null;
   nextScanAt: string | null;
+  googleAdsConnection: { isActive: boolean } | null;
   lead: {
     businessName: string;
     phone: string;
@@ -67,6 +69,28 @@ function daysAgo(dateStr: string | null): string {
   return `${days}d ago`;
 }
 
+function paymentBadgeClass(status: string | null): string {
+  if (!status || status === "current") return "bg-green-100 text-green-800 border-green-200";
+  if (status === "overdue_7")  return "bg-yellow-100 text-yellow-800 border-yellow-200";
+  if (status === "overdue_15") return "bg-orange-100 text-orange-800 border-orange-200";
+  if (status === "overdue_30") return "bg-red-100 text-red-800 border-red-200";
+  return "bg-muted text-muted-foreground";
+}
+
+function paymentLabel(status: string | null): string {
+  if (!status || status === "current") return "Current";
+  if (status === "overdue_7")  return "7d late";
+  if (status === "overdue_15") return "15d late";
+  if (status === "overdue_30") return "30d+ late";
+  return status;
+}
+
+function healthDot(score: number): string {
+  if (score >= 75) return "bg-green-500";
+  if (score >= 50) return "bg-yellow-500";
+  return "bg-red-500";
+}
+
 export function ClientPortfolio({
   clients,
   stats,
@@ -76,6 +100,7 @@ export function ClientPortfolio({
 }) {
   const router = useRouter();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     healthFilter: "all",
@@ -258,12 +283,28 @@ export function ClientPortfolio({
           <Plus className="h-4 w-4 mr-1" />
           Add Client
         </Button>
+        <div className="flex items-center border rounded-md overflow-hidden">
+          <button
+            onClick={() => setViewMode("cards")}
+            className={`p-1.5 transition-colors ${viewMode === "cards" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            title="Card view"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("table")}
+            className={`p-1.5 transition-colors ${viewMode === "table" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            title="Table view"
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
       <ClientFilterBar filters={filters} onChange={setFilters} />
 
-      {/* Client cards */}
+      {/* Client list — cards or table */}
       {filteredClients.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -278,6 +319,73 @@ export function ClientPortfolio({
               </p>
             )}
           </CardContent>
+        </Card>
+      ) : viewMode === "table" ? (
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
+                  <th className="text-left px-4 py-2.5 font-medium">Client</th>
+                  <th className="text-center px-3 py-2.5 font-medium">Health</th>
+                  <th className="text-right px-3 py-2.5 font-medium">Retainer</th>
+                  <th className="text-center px-3 py-2.5 font-medium">Open Tasks</th>
+                  <th className="text-center px-3 py-2.5 font-medium">Last Scan</th>
+                  <th className="text-center px-3 py-2.5 font-medium">Payment</th>
+                  <th className="text-center px-4 py-2.5 font-medium">Google Ads</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredClients.map((client) => (
+                  <tr
+                    key={client.id}
+                    className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/clients/${client.id}`)}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${healthDot(client.healthScore)}`} />
+                        <div>
+                          <p className="font-medium">{client.businessName}</p>
+                          <p className="text-xs text-muted-foreground">{client.lead.city}, {client.lead.state}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <Badge variant="outline" className={`text-xs ${healthColor(client.healthScore)}`}>
+                        {client.healthScore}
+                      </Badge>
+                    </td>
+                    <td className="px-3 py-3 text-right font-medium">
+                      {formatCurrency(Number(client.retainerAmount))}/mo
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      {client.tasks.length > 0 ? (
+                        <Badge variant="secondary" className="text-xs">{client.tasks.length}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-center text-xs text-muted-foreground">
+                      {daysAgo(client.lastScanAt)}
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <Badge variant="outline" className={`text-xs ${paymentBadgeClass(client.paymentStatus)}`}>
+                        {paymentLabel(client.paymentStatus)}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {client.googleAdsConnection?.isActive ? (
+                        <span className="text-xs text-green-600 font-medium">Connected</span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

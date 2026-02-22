@@ -5,7 +5,7 @@
  * Drag + resize, per-user layout persisted to DB.
  */
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import React from "react";
 import { ResponsiveGridLayout, useContainerWidth } from "react-grid-layout";
 import type { Layout, ResponsiveLayouts } from "react-grid-layout";
@@ -66,6 +66,22 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
   ],
 };
 
+// ─── localStorage key ─────────────────────────────────────────────────────────
+
+const LS_KEY = "ghm:dashboard-layout";
+
+function readLocalLayout(): ResponsiveLayouts | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? (JSON.parse(raw) as ResponsiveLayouts) : null;
+  } catch { return null; }
+}
+
+function writeLocalLayout(layouts: ResponsiveLayouts) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(layouts)); } catch { /* quota exceeded — silent */ }
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function MasterDashboardGrid({
@@ -77,12 +93,27 @@ export function MasterDashboardGrid({
   showProfitability: boolean;
   savedLayout: ResponsiveLayouts | null;
 }) {
-  const [layouts, setLayouts] = useState<ResponsiveLayouts>(savedLayout ?? DEFAULT_LAYOUTS);
+  // Prefer localStorage (same-session state) → DB-fetched → default
+  // This prevents layout loss when React re-mounts the component (e.g. theme switch)
+  const [layouts, setLayouts] = useState<ResponsiveLayouts>(
+    () => readLocalLayout() ?? savedLayout ?? DEFAULT_LAYOUTS
+  );
   const [isEditMode, setIsEditMode] = useState(false);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const { width, containerRef } = useContainerWidth();
 
+  // If no localStorage layout exists yet and the DB returned a layout, seed localStorage.
+  // This handles first-load on a fresh browser without wiping a local session layout.
+  useEffect(() => {
+    if (!readLocalLayout() && savedLayout) {
+      writeLocalLayout(savedLayout);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const persistLayout = useCallback((newLayouts: ResponsiveLayouts) => {
+    // Write to localStorage immediately — this is what prevents layout loss on re-mount
+    writeLocalLayout(newLayouts);
+    // Debounce DB write (non-critical, cross-device sync)
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(async () => {
       try {
@@ -102,6 +133,7 @@ export function MasterDashboardGrid({
 
   async function resetLayout() {
     setLayouts(DEFAULT_LAYOUTS);
+    writeLocalLayout(DEFAULT_LAYOUTS);
     await fetch("/api/dashboard-layout", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

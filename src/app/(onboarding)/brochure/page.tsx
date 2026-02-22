@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "GHM Digital Marketing — Local SEO That Dominates",
+  title: "GHM Digital Marketing Inc — Local SEO That Dominates",
   description:
     "All-inclusive local SEO at $2,400/month. Month-to-month, no lock-in. Satellite site cluster methodology proven to dominate local search.",
 };
@@ -28,7 +28,7 @@ export default function BrochurePage() {
             marginBottom: 20,
           }}
         >
-          GHM Digital Marketing
+          GHM Digital Marketing Inc
         </p>
         <h1
           style={{
@@ -381,7 +381,7 @@ export default function BrochurePage() {
           borderTop: "1px solid #f3f4f6",
         }}
       >
-        GHM Digital Marketing · All-inclusive local SEO · Month-to-month
+        GHM Digital Marketing Inc · All-inclusive local SEO · Month-to-month
       </footer>
     </div>
   );

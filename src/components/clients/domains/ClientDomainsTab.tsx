@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DomainFinderSection } from "./DomainFinderSection";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -30,7 +31,13 @@ function timeAgo(d: string | null) {
 
 // ── Main export ─────────────────────────────────────────────────────────────
 
-export function ClientDomainsTab({ domains }: { domains: ClientDomain[] }) {
+export function ClientDomainsTab({
+  domains,
+  businessName = "",
+}: {
+  domains: ClientDomain[];
+  businessName?: string;
+}) {
   if (domains.length === 0) {
     return (
       <Card>
@@ -45,8 +52,19 @@ export function ClientDomainsTab({ domains }: { domains: ClientDomain[] }) {
   }
 
   return (
-    <div className="space-y-3">
-      {domains.map((domain) => (
+    <div className="space-y-4">
+      {domains.length === 0 ? (
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-muted-foreground">
+              No domains registered yet. Add the client&apos;s main site and any satellite domains
+              during onboarding.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {domains.map((domain) => (
         <Card key={domain.id}>
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
@@ -77,6 +95,10 @@ export function ClientDomainsTab({ domains }: { domains: ClientDomain[] }) {
           </CardContent>
         </Card>
       ))}
+        </div>
+      )}
+
+      <DomainFinderSection defaultQuery={businessName} />
     </div>
   );
 }

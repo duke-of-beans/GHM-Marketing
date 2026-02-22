@@ -124,3 +124,125 @@ function buildContact(c: ContactInfo) {
     },
   }
 }
+
+// ─── Parked domain discovery ──────────────────────────────────────────────────
+
+export interface OwnedDomain {
+  domain:    string
+  status:    string   // ACTIVE | PARKED | EXPIRED | CANCELLED
+  expires:   string   // ISO date
+  renewable: boolean
+}
+
+/**
+ * List all domains in GHM's GoDaddy account, optionally filtered by status.
+ * Used to surface parked/available domains for satellite repurposing.
+ */
+export async function listOwnedDomains(statusFilter?: string): Promise<OwnedDomain[]> {
+  const params = new URLSearchParams({ limit: '500', includes: 'nameServers' })
+  if (statusFilter) params.set('statuses', statusFilter)
+
+  const res = await gdGet(`/domains?${params}`)
+  if (!res.ok) {
+    console.error(`[godaddy] listOwnedDomains failed: ${await res.text()}`)
+    return []
+  }
+
+  const data = await res.json() as Array<{
+    domain:    string
+    status:    string
+    expires:   string
+    renewable: boolean
+  }>
+
+  return data.map((d) => ({
+    domain:    d.domain,
+    status:    d.status,
+    expires:   d.expires,
+    renewable: d.renewable ?? false,
+  }))
+}
+
+export interface DomainSuggestion {
+  domain:    string
+  available: boolean
+  price:     number   // USD cents
+  period:    number   // years
+}
+
+/**
+ * Suggest available domains based on keywords (business name, niche, city).
+ * Uses GoDaddy's /domains/suggest endpoint — returns up to 20 results.
+ * Also runs a bulk availability check to get accurate pricing.
+ */
+export async function suggestDomains(
+  keywords: string,
+  tlds: string[] = ['com', 'net', 'org', 'io', 'co']
+): Promise<DomainSuggestion[]> {
+  const params = new URLSearchParams({
+    query:        keywords,
+    country:      'US',
+    city:         '',
+    sources:      'CC_TLD,SPIN,DOTS_ADJACENT',
+    tlds:         tlds.join(','),
+    lengthMax:    '20',
+    limit:        '20',
+    waitMs:       '1000',
+    suggestionsPerTld: '4',
+  })
+
+  const res = await gdGet(`/domains/suggest?${params}`)
+  if (!res.ok) {
+    console.error(`[godaddy] suggestDomains failed: ${await res.text()}`)
+    return []
+  }
+
+  const suggestions = await res.json() as Array<{ domain: string }>
+  if (!suggestions.length) return []
+
+  // Bulk availability check to get prices
+  const domainList = suggestions.map((s) => s.domain)
+  const bulkRes = await gdPost('/domains/available', { domains: domainList, checkType: 'FAST' })
+
+  if (!bulkRes.ok) {
+    // Return without pricing if bulk check fails
+    return domainList.map((domain) => ({
+      domain, available: true, price: 0, period: 1,
+    }))
+  }
+
+  const bulk = await bulkRes.json() as {
+    domains: Array<{ domain: string; available: boolean; price: number; period: number }>
+  }
+
+  return (bulk.domains ?? []).map((d) => ({
+    domain:    d.domain,
+    available: d.available,
+    price:     d.price ?? 0,
+    period:    d.period ?? 1,
+  }))
+}
+
+/**
+ * Check if a specific list of domains are available (batch, up to 500).
+ */
+export async function checkDomainsAvailable(domains: string[]): Promise<DomainSuggestion[]> {
+  if (!domains.length) return []
+
+  const res = await gdPost('/domains/available', { domains, checkType: 'FAST' })
+  if (!res.ok) {
+    console.error(`[godaddy] checkDomainsAvailable failed: ${await res.text()}`)
+    return []
+  }
+
+  const data = await res.json() as {
+    domains: Array<{ domain: string; available: boolean; price: number; period: number }>
+  }
+
+  return (data.domains ?? []).map((d) => ({
+    domain:    d.domain,
+    available: d.available,
+    price:     d.price ?? 0,
+    period:    d.period ?? 1,
+  }))
+}

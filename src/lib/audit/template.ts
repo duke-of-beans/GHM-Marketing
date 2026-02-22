@@ -1,4 +1,4 @@
-import type { AuditData, AuditGap } from "./generator";
+﻿import type { AuditData, AuditGap } from "./generator";
 
 export function generateAuditHTML(data: AuditData): string {
   const { lead, intel, rankings, nap, gaps, healthScore, generatedAt, repName } = data;
@@ -120,7 +120,7 @@ export function generateAuditHTML(data: AuditData): string {
 
   <!-- COVER -->
   <div class="cover">
-    <div class="cover-logo">GHM Digital Marketing</div>
+    <div class="cover-logo">GHM Digital Marketing Inc</div>
     <div class="cover-title">Local SEO Audit Report</div>
     <div class="cover-business">${lead.businessName}</div>
     <div class="cover-meta">
@@ -218,7 +218,7 @@ export function generateAuditHTML(data: AuditData): string {
   </div>
 
   <div class="disclaimer">
-    This audit was generated on ${fmt(generatedAt)} using live ranking data, Ahrefs domain analysis, and directory citation checks. Rankings may fluctuate. Contact GHM Digital Marketing for a comprehensive strategy session.
+    This audit was generated on ${fmt(generatedAt)} using live ranking data, Ahrefs domain analysis, and directory citation checks. Rankings may fluctuate. Contact GHM Digital Marketing Inc for a comprehensive strategy session.
     ${intel.intelAge !== null ? ` Business profile data is ${intel.intelAge} day${intel.intelAge !== 1 ? "s" : ""} old.` : ""}
   </div>
 

@@ -52,6 +52,7 @@ import { RankingsTab } from "./rankings/RankingsTab";
 import { CitationsTab } from "./citations/CitationsTab";
 import { LocalPresenceTab } from "./local-presence/LocalPresenceTab";
 import { ClientIntegrationsTab } from "./integrations/ClientIntegrationsTab";
+import { CampaignsTab } from "./CampaignsTab";
 import { ClientTasksTab, type ClientTask } from "./tasks/ClientTasksTab";
 import { ClientNotesTab, type ClientNote } from "./notes/ClientNotesTab";
 import { ClientDomainsTab, type ClientDomain } from "./domains/ClientDomainsTab";
@@ -158,7 +159,7 @@ function timeAgo(d: string | null) {
 const VALID_TABS = [
   "scorecard", "tasks", "rankings", "citations", "local",
   "content", "websites", "reports", "domains", "compensation",
-  "billing", "integrations", "notes",
+  "billing", "campaigns", "integrations", "notes",
 ] as const;
 
 type TabId = (typeof VALID_TABS)[number];
@@ -390,6 +391,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="campaigns">Google Ads</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
         </TabsList>
@@ -453,7 +455,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
         </TabsContent>
 
         <TabsContent value="domains" className="space-y-4">
-          <ClientDomainsTab domains={client.domains} />
+          <ClientDomainsTab domains={client.domains} businessName={client.businessName} />
         </TabsContent>
 
         <TabsContent value="compensation" className="space-y-4">
@@ -466,6 +468,10 @@ export function ClientProfile({ client }: { client: ClientData }) {
 
         <TabsContent value="integrations" className="space-y-4">
           <ClientIntegrationsTab clientId={client.id} />
+        </TabsContent>
+
+        <TabsContent value="campaigns" className="space-y-4">
+          <CampaignsTab clientId={client.id} />
         </TabsContent>
 
         <TabsContent value="notes" className="space-y-4">

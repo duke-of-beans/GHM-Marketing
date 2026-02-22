@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "GHM Digital Marketing — Sales Partner Opportunity",
+  title: "GHM Digital Marketing Inc — Sales Partner Opportunity",
   description:
     "Commission-only sales partner opportunity. Claim your territory. Build residual income to $200K+ by month 18. No account management. We provide leads.",
 };
@@ -37,7 +37,7 @@ export default function CompSheetPage() {
         color: "white", padding: "72px 32px 56px", textAlign: "center",
       }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", opacity: 0.5, marginBottom: 16 }}>
-          GHM Digital Marketing
+          GHM Digital Marketing Inc
         </p>
         <h1 style={{ fontSize: "clamp(30px, 6vw, 56px)", fontWeight: 800, lineHeight: 1.1, margin: "0 0 20px" }}>
           Claim Your Territory.<br />Build Real Residual Income.
@@ -256,7 +256,7 @@ export default function CompSheetPage() {
       </section>
 
       <footer style={{ padding: "24px", textAlign: "center", fontSize: 13, color: "#94a3b8" }}>
-        GHM Digital Marketing · Commission-Only Sales Partner Program ·
+        GHM Digital Marketing Inc · Commission-Only Sales Partner Program ·
         Projections: 4 closes/month, 3% monthly churn, $250/client residual
       </footer>
     </div>

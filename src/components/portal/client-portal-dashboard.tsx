@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -195,7 +195,7 @@ export function ClientPortalDashboard({ client }: { client: Client }) {
       {/* Footer */}
       <footer className="bg-white border-t mt-12">
         <div className="max-w-6xl mx-auto px-6 py-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} GHM Digital Marketing. All rights reserved.
+          © {new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </div>
       </footer>
     </div>
