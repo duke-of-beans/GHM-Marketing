@@ -103,11 +103,27 @@ export async function POST(req: NextRequest) {
     ? await prisma.position.findUnique({ where: { id: parsed.data.positionId }, select: { name: true } })
     : null;
 
-  // Log the onboarding checklist (TODO: replace with AdminTask model in Sprint 3)
-  console.info(
-    `[ONBOARDING] New user created: ${user.name} (${user.email}) — ${position?.name ?? parsed.data.role}. ` +
-    `Admin checklist: Wave vendor, comp config, territory (if sales), access verify, position assign.`
-  );
+  try {
+    await prisma.adminTask.create({
+      data: {
+        title: `Onboard new user: ${user.name}`,
+        description:
+          `New user created (${position?.name ?? parsed.data.role}). Checklist:\n` +
+          `- Add Wave vendor record and set contractor fields\n` +
+          `- Configure compensation (commission + residual amounts)\n` +
+          `- Assign territory if sales role\n` +
+          `- Verify dashboard access level\n` +
+          `- Confirm position assignment`,
+        category: "onboarding",
+        priority: "P2",
+        status: "open",
+        subjectUserId: user.id,
+      },
+    });
+  } catch (taskError) {
+    // Non-fatal — user was created successfully, log and continue
+    console.error("[AdminTask] Failed to create onboarding task:", taskError);
+  }
 
   return NextResponse.json({ success: true, data: { id: user.id, name: user.name, email: user.email, role: user.role, tempPassword: parsed.data.password ? undefined : tempPassword } }, { status: 201 });
 }

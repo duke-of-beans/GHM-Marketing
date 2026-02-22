@@ -88,6 +88,10 @@ model User {
   positionId            Int?      @map("position_id")
   position              Position? @relation(fields: [positionId], references: [id])
 
+  // Admin task queue
+  assignedAdminTasks    AdminTask[] @relation("AdminTaskAssignee")
+  createdAdminTasks     AdminTask[] @relation("AdminTaskCreator")
+
   @@index([territoryId])
   @@index([positionId])
   @@map("users")
@@ -1699,5 +1703,45 @@ model ProspectDemo {
 
   @@index([leadId])
   @@map("prospect_demos")
+}
+
+// ============================================================================
+// ADMIN TASK QUEUE
+// ============================================================================
+
+model AdminTask {
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String?
+  category        String    @default("onboarding")
+  // "onboarding" | "setup" | "billing" | "ops" | "followup" | "other"
+  priority        String    @default("P2")
+  // "P1" | "P2" | "P3" | "P4"
+  status          String    @default("open")
+  // "open" | "in_progress" | "done" | "cancelled"
+  
+  // Who owns it / who created it
+  assignedToId    Int?      @map("assigned_to_id")
+  createdById     Int?      @map("created_by_id")
+  
+  // Context link (optional — e.g. user this task is about)
+  subjectUserId   Int?      @map("subject_user_id")
+  // Could extend later: subjectClientId, subjectLeadId, etc.
+  
+  dueDate         DateTime? @map("due_date")
+  completedAt     DateTime? @map("completed_at")
+  notes           String?
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  assignedTo      User?     @relation("AdminTaskAssignee", fields: [assignedToId], references: [id])
+  createdBy       User?     @relation("AdminTaskCreator", fields: [createdById], references: [id])
+  
+  @@index([status, priority])
+  @@index([assignedToId, status])
+  @@index([category])
+  @@index([dueDate])
+  @@map("admin_tasks")
 }
 

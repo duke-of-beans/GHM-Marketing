@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Plus, LayoutGrid, List } from "lucide-react";
+import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
 import { ClientFilterBar, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
@@ -67,6 +67,16 @@ function daysAgo(dateStr: string | null): string {
   if (days === 0) return "Today";
   if (days === 1) return "Yesterday";
   return `${days}d ago`;
+}
+
+function isScanOverdue(client: ClientItem): boolean {
+  if (!client.lastScanAt) return true;
+  const daysSince = Math.floor(
+    (Date.now() - new Date(client.lastScanAt).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const threshold =
+    client.scanFrequency === "weekly" ? 7 : client.scanFrequency === "monthly" ? 30 : 14;
+  return daysSince > threshold;
 }
 
 function paymentBadgeClass(status: string | null): string {
@@ -304,7 +314,43 @@ export function ClientPortfolio({
       {/* Filter Bar */}
       <ClientFilterBar filters={filters} onChange={setFilters} />
 
-      {/* Client list — cards or table */}
+      {/* Health Status Summary */}
+      {clients.length > 0 && (() => {
+        const healthy = clients.filter(c => c.healthScore >= 75).length;
+        const competitive = clients.filter(c => c.healthScore >= 50 && c.healthScore < 75).length;
+        const attention = clients.filter(c => c.healthScore < 50).length;
+        const scanOverdue = clients.filter(isScanOverdue).length;
+        const paymentIssues = clients.filter(c => c.paymentStatus && c.paymentStatus !== "current").length;
+        return (
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-800 border border-green-200 font-medium">
+              <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+              {healthy} Healthy
+            </span>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200 font-medium">
+              <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
+              {competitive} Competitive
+            </span>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 font-medium">
+              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+              {attention} Needs Attention
+            </span>
+            {scanOverdue > 0 && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-200 font-medium">
+                <AlertTriangle className="w-3 h-3" />
+                {scanOverdue} Scan Overdue
+              </span>
+            )}
+            {paymentIssues > 0 && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 font-medium">
+                <AlertTriangle className="w-3 h-3" />
+                {paymentIssues} Payment Issues
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
       {filteredClients.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -461,7 +507,17 @@ export function ClientPortfolio({
                   {/* Footer info */}
                   <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-2">
                     <span>{formatCurrency(Number(client.retainerAmount))}/mo</span>
-                    <span>Scanned {daysAgo(client.lastScanAt)}</span>
+                    <div className="flex items-center gap-2">
+                      {client.paymentStatus && client.paymentStatus !== "current" && (
+                        <Badge variant="outline" className={`text-[10px] px-1.5 ${paymentBadgeClass(client.paymentStatus)}`}>
+                          {paymentLabel(client.paymentStatus)}
+                        </Badge>
+                      )}
+                      <span className={isScanOverdue(client) ? "text-orange-600 font-medium flex items-center gap-1" : ""}>
+                        {isScanOverdue(client) && <AlertTriangle className="w-3 h-3" />}
+                        Scanned {daysAgo(client.lastScanAt)}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
