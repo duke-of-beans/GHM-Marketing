@@ -84,8 +84,31 @@ model User {
   generatedAudits       ProspectAudit[] @relation("AuditGenerator")
   generatedDemos        ProspectDemo[]  @relation("DemoGenerator")
 
+  // Position (job function — separate from dashboard role)
+  positionId            Int?      @map("position_id")
+  position              Position? @relation(fields: [positionId], references: [id])
+
   @@index([territoryId])
+  @@index([positionId])
   @@map("users")
+}
+
+model Position {
+  id                   Int       @id @default(autoincrement())
+  name                 String    @unique
+  type                 String    // "sales" | "management" | "operations" | "contractor"
+  compensationType     String    @map("compensation_type")  // "commission_residual" | "management_fee" | "flat_monthly" | "per_deliverable" | "manual"
+  defaultAmount        Decimal?  @map("default_amount") @db.Decimal(10, 2)
+  defaultFrequency     String?   @map("default_frequency") // "monthly" | "per_close" | "per_deliverable" | "manual"
+  dashboardAccessLevel String    @map("dashboard_access_level") // "admin" | "master" | "sales" | "readonly"
+  isActive             Boolean   @default(true) @map("is_active")
+  notes                String?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  users                User[]
+
+  @@map("positions")
 }
 
 model Territory {

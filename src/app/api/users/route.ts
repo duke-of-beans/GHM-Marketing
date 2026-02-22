@@ -2,14 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
+import { z } from "zod";
+import { hash } from "bcryptjs";
+
+const createUserSchema = z.object({
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+  role: z.enum(["admin", "master", "sales"]).default("sales"),
+  positionId: z.number().int().positive().nullable().optional(),
+  territoryId: z.number().int().positive().nullable().optional(),
+  password: z.string().min(8).optional(),
+});
 
 /**
- * GET /api/users
- * Get all users with their permissions
- * Requires manage_team permission
+ * GET /api/users — list all users (manage_team permission)
  */
 export async function GET(req: NextRequest) {
-  // Check permission
   const permissionError = await withPermission(req, "manage_team");
   if (permissionError) return permissionError;
 
@@ -25,24 +33,17 @@ export async function GET(req: NextRequest) {
         permissionPreset: true,
         permissions: true,
         repOnboardingCompletedAt: true,
-        territory: {
-          select: {
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            assignedLeads: true,
-            salesRepClients: true,
-          },
-        },
+        contractorVendorId: true,
+        contractorEntityName: true,
+        contractorEmail: true,
+        positionId: true,
+        position: { select: { id: true, name: true, type: true } },
+        territory: { select: { name: true } },
+        _count: { select: { assignedLeads: true, salesRepClients: true } },
       },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: { name: "asc" },
     });
 
-    // Add effective permissions to each user
     const usersWithPermissions = users.map((user) => ({
       ...user,
       effectivePermissions: getUserPermissions({
@@ -57,15 +58,56 @@ export async function GET(req: NextRequest) {
       }),
     }));
 
-    return NextResponse.json({
-      success: true,
-      data: usersWithPermissions,
-    });
+    return NextResponse.json({ success: true, data: usersWithPermissions });
   } catch (error) {
     console.error("Failed to fetch users:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch users" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
   }
+}
+
+/**
+ * POST /api/users — create a new user (admin only)
+ * Auto-creates an admin onboarding task after user creation.
+ */
+export async function POST(req: NextRequest) {
+  const permissionError = await withPermission(req, "manage_team");
+  if (permissionError) return permissionError;
+
+  const body = await req.json();
+  const parsed = createUserSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ success: false, error: "Validation failed", details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+  if (existing) {
+    return NextResponse.json({ success: false, error: "Email already in use" }, { status: 409 });
+  }
+
+  const tempPassword = parsed.data.password ?? Math.random().toString(36).slice(-10) + "A1!";
+  const passwordHash = await hash(tempPassword, 12);
+
+  const user = await prisma.user.create({
+    data: {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      role: parsed.data.role,
+      passwordHash,
+      positionId: parsed.data.positionId ?? null,
+      territoryId: parsed.data.territoryId ?? null,
+    },
+  });
+
+  // Auto-create admin onboarding checklist task
+  const position = parsed.data.positionId
+    ? await prisma.position.findUnique({ where: { id: parsed.data.positionId }, select: { name: true } })
+    : null;
+
+  // Log the onboarding checklist (TODO: replace with AdminTask model in Sprint 3)
+  console.info(
+    `[ONBOARDING] New user created: ${user.name} (${user.email}) — ${position?.name ?? parsed.data.role}. ` +
+    `Admin checklist: Wave vendor, comp config, territory (if sales), access verify, position assign.`
+  );
+
+  return NextResponse.json({ success: true, data: { id: user.id, name: user.name, email: user.email, role: user.role, tempPassword: parsed.data.password ? undefined : tempPassword } }, { status: 201 });
 }

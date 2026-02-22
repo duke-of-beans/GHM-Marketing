@@ -13,6 +13,10 @@ const updateUserSchema = z.object({
   territoryId: z.number().int().positive().nullable().optional(),
   password: z.string().min(8).optional(),
   isActive: z.boolean().optional(),
+  contractorVendorId: z.string().nullable().optional(),
+  contractorEntityName: z.string().nullable().optional(),
+  contractorEmail: z.string().email().nullable().optional(),
+  positionId: z.number().int().positive().nullable().optional(),
 });
 
 export async function PATCH(
@@ -57,6 +61,10 @@ export async function PATCH(
   if (parsed.data.role !== undefined) updateData.role = parsed.data.role;
   if (parsed.data.territoryId !== undefined) updateData.territoryId = parsed.data.territoryId;
   if (parsed.data.isActive !== undefined) updateData.isActive = parsed.data.isActive;
+  if (parsed.data.contractorVendorId !== undefined) updateData.contractorVendorId = parsed.data.contractorVendorId;
+  if (parsed.data.contractorEntityName !== undefined) updateData.contractorEntityName = parsed.data.contractorEntityName;
+  if (parsed.data.contractorEmail !== undefined) updateData.contractorEmail = parsed.data.contractorEmail;
+  if (parsed.data.positionId !== undefined) updateData.positionId = parsed.data.positionId;
   if (parsed.data.password) {
     updateData.passwordHash = await bcrypt.hash(parsed.data.password, 12);
   }

@@ -15,6 +15,8 @@ import {
   UserX,
   Trash2,
   UserCheck,
+  Building2,
+  RotateCcw,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,6 +55,11 @@ interface User {
   territory?: { id: number; name: string } | null;
   _count?: { assignedLeads: number; salesRepClients?: number };
   repOnboardingCompletedAt?: string | null;
+  contractorVendorId?: string | null;
+  contractorEntityName?: string | null;
+  contractorEmail?: string | null;
+  positionId?: number | null;
+  position?: { id: number; name: string; type: string } | null;
 }
 
 interface UserPermissionCardProps {
@@ -61,11 +68,16 @@ interface UserPermissionCardProps {
   onUpdate: (updates: {
     permissionPreset?: string;
     permissions?: Record<string, boolean>;
+    contractorVendorId?: string | null;
+    contractorEntityName?: string | null;
+    contractorEmail?: string | null;
+    positionId?: number | null;
   }) => void;
   onRoleChange: (role: AppRole) => void;
   onDeactivate: () => void;
   onReactivate: () => void;
   onHardDelete: () => void;
+  onResetOnboarding?: () => void;
 }
 
 export function UserPermissionCard({
@@ -76,11 +88,31 @@ export function UserPermissionCard({
   onDeactivate,
   onReactivate,
   onHardDelete,
+  onResetOnboarding,
 }: UserPermissionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [hardDeleteDialogOpen, setHardDeleteDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+
+  // Contractor entity fields
+  const [contractorVendorId, setContractorVendorId] = useState(user.contractorVendorId ?? "");
+  const [contractorEntityName, setContractorEntityName] = useState(user.contractorEntityName ?? "");
+  const [contractorEmail, setContractorEmail] = useState(user.contractorEmail ?? "");
+  const [savingContractor, setSavingContractor] = useState(false);
+
+  async function saveContractorFields() {
+    setSavingContractor(true);
+    try {
+      await onUpdate({
+        contractorVendorId: contractorVendorId.trim() || null,
+        contractorEntityName: contractorEntityName.trim() || null,
+        contractorEmail: contractorEmail.trim() || null,
+      });
+    } finally {
+      setSavingContractor(false);
+    }
+  }
 
   const viewerIsElevated = isElevated(currentUserRole);
   const viewerIsAdmin = currentUserRole === "admin";
@@ -173,6 +205,19 @@ export function UserPermissionCard({
                 </Select>
               )}
 
+              {/* Reset onboarding — admin only, active users with completed onboarding */}
+              {viewerIsAdmin && user.isActive && user.repOnboardingCompletedAt && onResetOnboarding && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-blue-600"
+                  onClick={onResetOnboarding}
+                  title="Reset onboarding — user will go through setup wizard again on next login"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              )}
+
               {/* Deactivate / Reactivate */}
               {user.isActive ? (
                 <Button
@@ -238,11 +283,60 @@ export function UserPermissionCard({
 
         {/* Expanded Permission Editor */}
         {isExpanded && (
-          <CardContent className="pt-0 border-t">
+          <CardContent className="pt-0 border-t space-y-6">
             <PermissionEditor
               permissions={user.permissions}
               onChange={(permissions) => onUpdate({ permissions })}
             />
+
+            {/* Contractor Entity Section */}
+            {viewerIsAdmin && (
+              <div className="space-y-3 pt-2 border-t">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <h4 className="text-sm font-semibold">Contractor Entity</h4>
+                  {user.contractorVendorId && (
+                    <span className="text-xs text-green-600 font-medium">✓ Wave configured</span>
+                  )}
+                  {!user.contractorVendorId && (
+                    <span className="text-xs text-amber-600 font-medium">⚠ Wave vendor ID missing — payments blocked</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Entity Name</Label>
+                    <Input
+                      className="h-8 text-sm"
+                      placeholder="e.g. Apex North"
+                      value={contractorEntityName}
+                      onChange={(e) => setContractorEntityName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Wave Vendor ID</Label>
+                    <Input
+                      className="h-8 text-sm font-mono"
+                      placeholder="Wave vendor ID"
+                      value={contractorVendorId}
+                      onChange={(e) => setContractorVendorId(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Billing Email</Label>
+                    <Input
+                      className="h-8 text-sm"
+                      type="email"
+                      placeholder="billing@entity.com"
+                      value={contractorEmail}
+                      onChange={(e) => setContractorEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={saveContractorFields} disabled={savingContractor}>
+                  {savingContractor ? "Saving..." : "Save Contractor Info"}
+                </Button>
+              </div>
+            )}
           </CardContent>
         )}
       </Card>

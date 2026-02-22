@@ -3,12 +3,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
+import { PositionsTab } from "@/components/settings/PositionsTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -20,7 +21,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "territories", "permissions", "audit", "bugs", "wave", "integrations"];
+const VALID_TABS = ["general", "team", "positions", "territories", "permissions", "audit", "bugs", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -54,6 +55,11 @@ export default function SettingsPage() {
           <TabsTrigger value="team" className="gap-1.5">
             <Users className="h-4 w-4" />Team
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="positions" className="gap-1.5">
+              <Briefcase className="h-4 w-4" />Positions
+            </TabsTrigger>
+          )}
           <TabsTrigger value="territories" className="gap-1.5">
             <Map className="h-4 w-4" />Territories
           </TabsTrigger>
@@ -87,6 +93,12 @@ export default function SettingsPage() {
         <TabsContent value="team">
           <TeamManagementTab currentUserRole={currentUserRole} />
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="positions">
+            <PositionsTab />
+          </TabsContent>
+        )}
 
         <TabsContent value="territories">
           <TerritoriesContent />

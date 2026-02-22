@@ -7,24 +7,18 @@
 
 import { useState, useEffect } from "react";
 import {
-  Loader2,
-  Users,
-  Plus,
-  Search,
-  SlidersHorizontal,
-  Eye,
-  EyeOff,
+  Loader2, Users, Plus, Search, SlidersHorizontal, Eye, EyeOff,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { UserPermissionCard } from "./UserPermissionCard";
 import { CompensationConfigSection } from "@/components/team/compensation-config";
@@ -57,9 +51,58 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
   const [sortBy, setSortBy] = useState<"name" | "role" | "leads">("name");
   const [showInactive, setShowInactive] = useState(false);
 
+  // Add User dialog
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState<AppRole>("sales");
+  const [newPassword, setNewPassword] = useState("");
+  const [addingSaving, setAddingSaving] = useState(false);
+  const [positions, setPositions] = useState<{ id: number; name: string }[]>([]);
+  const [newPositionId, setNewPositionId] = useState<string>("");
+
   useEffect(() => {
     loadUsers();
+    loadPositions();
   }, []);
+
+  async function loadPositions() {
+    try {
+      const res = await fetch("/api/positions");
+      if (res.ok) {
+        const data = await res.json();
+        setPositions(data.data ?? []);
+      }
+    } catch { /* non-fatal */ }
+  }
+
+  async function handleAddUser() {
+    if (!newName.trim() || !newEmail.trim()) { toast.error("Name and email are required"); return; }
+    setAddingSaving(true);
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newName.trim(),
+          email: newEmail.trim(),
+          role: newRole,
+          positionId: newPositionId ? parseInt(newPositionId) : null,
+          password: newPassword.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create user");
+      toast.success(`User created${data.data?.tempPassword ? ` — temp password: ${data.data.tempPassword}` : ""}`);
+      setAddDialogOpen(false);
+      setNewName(""); setNewEmail(""); setNewPassword(""); setNewPositionId("");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create user");
+    } finally {
+      setAddingSaving(false);
+    }
+  }
 
   async function loadUsers() {
     setLoading(true);
@@ -80,22 +123,55 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
 
   async function handlePermissionUpdate(
     userId: number,
-    updates: { permissionPreset?: string; permissions?: Record<string, boolean> }
+    updates: {
+      permissionPreset?: string;
+      permissions?: Record<string, boolean>;
+      contractorVendorId?: string | null;
+      contractorEntityName?: string | null;
+      contractorEmail?: string | null;
+      positionId?: number | null;
+    }
   ) {
     try {
-      const res = await fetch(`/api/users/${userId}/permissions`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Failed to update permissions");
+      // Contractor/position fields go to the user PATCH route directly
+      const contractorKeys = ["contractorVendorId", "contractorEntityName", "contractorEmail", "positionId"] as const;
+      const hasContractorFields = contractorKeys.some((k) => k in updates);
+      
+      if (hasContractorFields) {
+        const userUpdatePayload: Record<string, unknown> = {};
+        contractorKeys.forEach((k) => { if (k in updates) userUpdatePayload[k] = updates[k]; });
+        const res = await fetch(`/api/users/${userId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userUpdatePayload),
+        });
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error || "Failed to update user");
+        }
+        if (!updates.permissionPreset && !updates.permissions) {
+          toast.success("Contractor info updated");
+          loadUsers();
+          return;
+        }
       }
-      toast.success("Permissions updated");
+
+      if (updates.permissionPreset || updates.permissions) {
+        const res = await fetch(`/api/users/${userId}/permissions`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ permissionPreset: updates.permissionPreset, permissions: updates.permissions }),
+        });
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error || "Failed to update permissions");
+        }
+        toast.success("Permissions updated");
+      }
+      
       loadUsers();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update permissions");
+      toast.error(err instanceof Error ? err.message : "Failed to update");
     }
   }
 
@@ -158,6 +234,18 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
     }
   }
 
+  async function handleResetOnboarding(userId: number) {
+    try {
+      const res = await fetch(`/api/users/${userId}/onboarding-reset`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to reset onboarding");
+      toast.success("Onboarding reset — user will go through setup on next login");
+      loadUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to reset onboarding");
+    }
+  }
+
   const filteredUsers = users
     .filter((user) => {
       const matchesSearch =
@@ -202,7 +290,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
             Manage user permissions and access levels
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setAddDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add User
         </Button>
@@ -284,6 +372,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
               onDeactivate={() => handleDeactivate(user.id)}
               onReactivate={() => handleReactivate(user.id)}
               onHardDelete={() => handleHardDelete(user.id)}
+              onResetOnboarding={() => handleResetOnboarding(user.id)}
             />
           ))
         )}
@@ -300,6 +389,61 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
           />
         </>
       )}
+
+      {/* Add User Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogDescription>
+              Creates the account and generates an onboarding checklist task. An email invite is not sent automatically — share credentials manually.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label>Full Name</Label>
+              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Jane Smith" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="jane@example.com" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Dashboard Role</Label>
+                <Select value={newRole} onValueChange={(v: AppRole) => setNewRole(v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {currentUserRole === "admin" && <SelectItem value="admin">{ROLE_LABELS.admin}</SelectItem>}
+                    <SelectItem value="master">{ROLE_LABELS.master}</SelectItem>
+                    <SelectItem value="sales">{ROLE_LABELS.sales}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Position</Label>
+                <Select value={newPositionId} onValueChange={setNewPositionId}>
+                  <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None</SelectItem>
+                    {positions.map((p) => <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Temporary Password <span className="text-muted-foreground text-xs">(leave blank to auto-generate)</span></Label>
+              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 8 characters" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddUser} disabled={addingSaving}>
+              {addingSaving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Creating...</> : "Create User"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

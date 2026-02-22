@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Full reconciliation audit. Closed: BUG-009, FEAT-013, ITEM-001 (dashboard), D5, S3-S7. Sprint plan added below.
+**Last Updated:** February 22, 2026 — Sprint 2 complete: PAYMENTS-004, PAYMENTS-005, PAYMENTS-003 UI.
 
 ---
 
@@ -14,11 +14,11 @@ Items blocking confident client and rep handoff.
 - [ ] ITEM-001 docs — add PPC/Ads language to `CLIENT_AGREEMENT.md` §1.1; Google Ads account ID field to `CLIENT_ONBOARDING_FORM.md`; Ads section to monthly report PDF template
 - [ ] D4 — Audit → Demo one-click: single button on lead detail sheet chaining `handleGenerateAudit` + `handleGenerateDemo`
 
-### SPRINT 2 — Personnel System (~6 hrs)
+### SPRINT 2 — Personnel System (~6 hrs) ✅ COMPLETE
 Required before first operations hire.
-- [ ] PAYMENTS-004 — Position model (schema, seed: Owner/Manager/Sales Rep/Content Manager/SEO Specialist, Settings UI)
-- [ ] PAYMENTS-005 — Generalize rep onboarding wizard (FEAT-011) to all position types; steps adapt by position
-- [ ] PAYMENTS-003 UI — Contractor entity fields (vendor ID, entity name, email) in Team settings so admin doesn't need DB access
+- [x] PAYMENTS-004 — Position model (schema, seed: Owner/Manager/Sales Rep/Content Manager/SEO Specialist, Settings UI tab)
+- [x] PAYMENTS-005 — Generalize onboarding wizard to all position types; steps adapt by positionType (sales vs ops/management); contractor entity step for all
+- [x] PAYMENTS-003 UI — Contractor entity fields (vendor ID, entity name, email) in Team settings; Add User dialog with position picker + auto-temp-password; Reset Onboarding button (admin); `/api/users/[id]/onboarding-reset` POST route
 
 ### SPRINT 3 — Operations Intelligence (~5 hrs)
 Portfolio-level visibility as team and client base grow.
@@ -228,19 +228,20 @@ Makes the platform feel like a product.
 **Updated:** `sync.ts` ensureWaveVendor uses contractorEntityName/Email; payout, partners/sync, partners/[userId] routes updated
 **Pending:** UI in Team settings (admin) — low priority, can set via DB admin until needed
 
-### PAYMENTS-004: Position System
-**Priority:** MEDIUM — needed before operations hires, not blocking sales launch
-**Spec:** `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`
-**Schema:** New `Position` model — name, type, compensationType, defaultAmount, defaultFrequency, dashboardAccessLevel
-**UI:** Settings → Team → Positions (admin only)
-**Seed:** Owner, Manager, Sales Rep, Content Manager, SEO Specialist
-**Impact:** Decouples role (dashboard access) from position (job function) from compensation template. New hire types addable without code changes.
+### ✅ PAYMENTS-004: Position System — COMPLETE (February 22, 2026)
+**Schema:** `Position` model — name, type, compensationType, defaultAmount, defaultFrequency, dashboardAccessLevel. `positionId` FK on User.
+**Seed:** Owner, Manager, Sales Rep, Content Manager, SEO Specialist.
+**API:** GET/POST `/api/positions`, PATCH/DELETE `/api/positions/[id]`.
+**UI:** `PositionsTab.tsx` in Settings → admin-only tab. Full CRUD with active toggle, user count per position.
 
-### PAYMENTS-005: Generalized Employee Onboarding Wizard
-**Priority:** MEDIUM — needed for first operations hire
-**Spec:** `D:\Work\SEO-Services\specs\PAYMENTS_ARCHITECTURE.md`
-**Current:** Rep onboarding wizard (FEAT-011) exists but is sales-role-only
-**Change:** Generalize to all positions. Steps adapt by position type. All positions include contractor entity setup step. Admin-side task auto-created on new User creation.
+### ✅ PAYMENTS-005: Generalized Onboarding Wizard — COMPLETE (February 22, 2026)
+**Files:** `src/app/(onboarding)/rep-setup/page.tsx` (generalized), `src/components/onboarding/onboarding-wizard.tsx` (position-adaptive, new).
+**Sales flow:** Welcome → Profile → Contractor → Territory → Tools → First Lead → Resources → Done (8 steps).
+**Ops/Mgmt flow:** Welcome → Profile → Contractor → Scope → Tools → Done (6 steps).
+**API:** `POST /api/users/onboarding/contractor` — self-serve entity name + billing email save during onboarding.
+**Admin:** `POST /api/users/[id]/onboarding-reset` — clears `repOnboardingCompletedAt` + `repOnboardingStep`. Reset button in UserPermissionCard (admin-only, shown when onboarding already completed).
+**User creation:** `POST /api/users` — creates account, position-assignable, generates temp password, logs onboarding checklist to console (AdminTask model deferred to Sprint 3).
+**Add User dialog:** wired into TeamManagementTab with role + position selectors and password field.
 
 ### PAYMENTS-006: Monthly Cron — Demote to Safety Net
 **Priority:** LOW — existing cron works, needs schedule change only
