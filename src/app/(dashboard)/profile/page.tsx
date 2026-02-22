@@ -1,5 +1,6 @@
 import { UserCircle } from "lucide-react";
 import { ProfileForm } from "@/components/settings/ProfileForm";
+import { ResetToursCard } from "@/components/tutorials/ResetToursCard";
 
 export default function ProfilePage() {
   return (
@@ -15,6 +16,7 @@ export default function ProfilePage() {
       </div>
 
       <ProfileForm />
+      <ResetToursCard />
     </div>
   );
 }

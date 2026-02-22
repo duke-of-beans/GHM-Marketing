@@ -152,8 +152,6 @@ function NavGroupSection({
     return permissions[link.permission] === true;
   });
 
-  if (visibleLinks.length === 0) return null;
-
   // Auto-expand if any child is active — always override stored state
   const hasActive = visibleLinks.some((l) => isActivePath(l.href));
 
@@ -169,6 +167,8 @@ function NavGroupSection({
       writeExpanded(group.id, true);
     }
   }, [hasActive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (visibleLinks.length === 0) return null;
 
   function toggle() {
     const next = !open;

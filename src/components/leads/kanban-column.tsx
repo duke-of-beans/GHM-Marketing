@@ -18,6 +18,7 @@ type KanbanColumnProps = {
   bgColor: string;
   count: number;
   children: React.ReactNode;
+  dataTour?: string;
 };
 
 export function KanbanColumn({
@@ -28,12 +29,14 @@ export function KanbanColumn({
   bgColor,
   count,
   children,
+  dataTour,
 }: KanbanColumnProps) {
   const { isOver, setNodeRef } = useDroppable({ id });
 
   return (
     <div
       ref={setNodeRef}
+      data-tour={dataTour}
       className={cn(
         "flex-shrink-0 w-[280px] md:w-[300px] flex flex-col rounded-lg border transition-colors",
         isOver ? "border-primary bg-primary/5" : "border-border bg-muted/30"

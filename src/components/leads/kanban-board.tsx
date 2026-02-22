@@ -152,6 +152,13 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
             color={col.config.color}
             bgColor={col.config.bgColor}
             count={col.leads.length}
+            dataTour={
+              col.status === "available"
+                ? "kanban-column-available"
+                : col.status === "won"
+                ? "kanban-column-won"
+                : undefined
+            }
           >
             {col.leads.map((lead) => (
               <LeadCard

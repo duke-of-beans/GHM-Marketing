@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Mic, Sparkles } from "lucide-react";
 import { formatCurrency } from "@/components/dashboard/metric-card";
+import { useTour, CLIENT_DETAIL_TOUR } from "@/lib/tutorials";
+import { TourButton } from "@/components/tutorials/TourButton";
 
 import { ScanHistory } from "./scan-history";
 import { ClientReportsTab } from "./reports/client-reports-tab";
@@ -218,11 +220,12 @@ export function ClientProfile({ client }: { client: ClientData }) {
     (t) => !["deployed", "measured", "dismissed"].includes(t.status)
   ).length;
   const pinnedNoteCount = client.notes.filter((n) => n.isPinned).length;
+  const { startTour } = useTour(CLIENT_DETAIL_TOUR);
 
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4" data-tour="client-header">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
@@ -232,6 +235,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Badge
+                      data-tour="client-health-badge"
                       variant="outline"
                       className={`${healthColor(client.healthScore)} text-sm px-3 py-1 cursor-help`}
                     >
@@ -275,6 +279,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
               </TooltipProvider>
 
               <EditClientDialog client={client} onUpdate={handleUpdate} />
+              <TourButton onStart={startTour} tooltip="Tour this client page" />
 
               <div className="relative inline-flex">
                 <Button
@@ -375,22 +380,22 @@ export function ClientProfile({ client }: { client: ClientData }) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabId)}>
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="scorecard">Scorecard</TabsTrigger>
-          <TabsTrigger value="tasks">
+        <TabsList className="w-full justify-start overflow-x-auto" data-tour="client-tabs">
+          <TabsTrigger value="scorecard" data-tour="client-tab-scorecard">Scorecard</TabsTrigger>
+          <TabsTrigger value="tasks" data-tour="client-tab-tasks">
             Tasks{openTaskCount > 0 && (
               <Badge variant="secondary" className="ml-1.5 text-xs">{openTaskCount}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="rankings">Rankings</TabsTrigger>
+          <TabsTrigger value="rankings" data-tour="client-tab-rankings">Rankings</TabsTrigger>
           <TabsTrigger value="citations">Citations</TabsTrigger>
           <TabsTrigger value="local">Local Presence</TabsTrigger>
           <TabsTrigger value="content">Content Studio</TabsTrigger>
           <TabsTrigger value="websites">Website Studio</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="reports" data-tour="client-tab-reports">Reports</TabsTrigger>
           <TabsTrigger value="domains">Domains</TabsTrigger>
           <TabsTrigger value="compensation">Compensation</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="billing" data-tour="client-tab-billing">Billing</TabsTrigger>
           <TabsTrigger value="campaigns">Google Ads</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>

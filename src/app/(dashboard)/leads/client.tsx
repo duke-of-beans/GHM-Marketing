@@ -12,6 +12,9 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { LeadStatus, UserRole } from "@prisma/client";
+import { useTour } from "@/lib/tutorials";
+import { LEADS_TOUR } from "@/lib/tutorials";
+import { TourButton } from "@/components/tutorials/TourButton";
 
 type KanbanLead = {
   id: number;
@@ -53,6 +56,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
   const router = useRouter();
   const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
   const [filters, setFilters] = useState<AdvancedFilterState>(DEFAULT_FILTERS);
+  const { startTour } = useTour(LEADS_TOUR);
 
   const filteredLeads = useMemo(() => {
     let result = initialLeads;
@@ -246,31 +250,36 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
   return (
     <div className="space-y-4 pb-20 md:pb-0">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
+        <div data-tour="leads-heading">
           <h1 className="text-2xl font-bold">Sales Pipeline</h1>
           <p className="text-sm text-muted-foreground">
             Manage leads from first contact through deal close — {filteredLeads.length} leads • Drag cards between stages
           </p>
         </div>
-        {userRole === "master" && (
-          <div className="flex gap-2">
-            <button
-              className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
-              onClick={() => handleBatchEnrich()}
-              disabled={batchEnriching || filteredLeads.length === 0}
-            >
-              {batchEnriching ? "Enriching..." : `🔍 Enrich (${Math.min(filteredLeads.length, 50)})`}
-            </button>
-            <CSVImportDialog onComplete={handleImportComplete} />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <TourButton onStart={startTour} tooltip="Tour the Sales Pipeline" />
+          {userRole === "master" && (
+            <>
+              <button
+                className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
+                onClick={() => handleBatchEnrich()}
+                disabled={batchEnriching || filteredLeads.length === 0}
+              >
+                {batchEnriching ? "Enriching..." : `🔍 Enrich (${Math.min(filteredLeads.length, 50)})`}
+              </button>
+              <CSVImportDialog onComplete={handleImportComplete} />
+            </>
+          )}
+        </div>
       </div>
 
-      <AdvancedLeadFilterBar
-        filters={filters}
-        onChange={setFilters}
-        showTerritoryFilter={userRole === "master"}
-      />
+      <div data-tour="leads-filter-bar">
+        <AdvancedLeadFilterBar
+          filters={filters}
+          onChange={setFilters}
+          showTerritoryFilter={userRole === "master"}
+        />
+      </div>
 
       {/* Cap warning — shown when lead count exceeds the 500-lead kanban limit */}
       {totalLeadCount > 500 && (
@@ -282,10 +291,12 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
         </div>
       )}
 
-      <KanbanBoard
-        initialLeads={filteredLeads}
-        onLeadClick={(id) => setSelectedLeadId(id)}
-      />
+      <div data-tour="leads-kanban">
+        <KanbanBoard
+          initialLeads={filteredLeads}
+          onLeadClick={(id) => setSelectedLeadId(id)}
+        />
+      </div>
 
       <LeadDetailSheet
         leadId={selectedLeadId}

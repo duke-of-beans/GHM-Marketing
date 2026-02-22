@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import { TourStyles } from "@/components/tutorials/TourStyles";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             <ServiceWorkerRegistration />
+            <TourStyles />
             {children}
           </AuthProvider>
           <Toaster richColors position="top-right" />

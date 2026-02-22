@@ -29,7 +29,7 @@ Portfolio-level visibility as team and client base grow.
 
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.
-- [ ] ITEM-003 — Per-page tutorials (Driver.js or Shepherd.js), starting with Leads + Client Detail
+- [x] ITEM-003 — Per-page tutorials using Driver.js — DONE Feb 22, 2026. See files below.
 - [ ] Pipeline filter UX refinement
 - [ ] Voice/micro-copy layer (low priority, if budget)
 
