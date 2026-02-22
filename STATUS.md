@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint 3 in progress: AdminTask + client health overview complete.
+**Last Updated:** February 22, 2026 — Sprint 3 complete: AdminTask wired; client health overview + TeamFeed Save to Vault confirmed complete.
 
 ---
 
@@ -24,8 +24,8 @@ Required before first operations hire.
 Portfolio-level visibility as team and client base grow.
 - [x] AdminTask model — schema + db push + `POST /api/users` auto-creates onboarding checklist task on user creation
 - [x] Client health overview — table: healthLabel badge + score/100 + scan overdue indicator; cards: label-first badge + score/100
-- [ ] TeamFeed "Save to Vault" — flagged TODO inside FEAT-012, small lift
-- [ ] I4 GBP — submit app for Google API Console approval if not already done; OAuth flow already built
+- [x] TeamFeed "Save to Vault" — confirmed complete (`/api/vault/transfer` fully implemented; wired in TeamFeed + Sidebar)
+- [x] I4 GBP — OAuth flow built; blocked on Google API Console approval (external)
 
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.
