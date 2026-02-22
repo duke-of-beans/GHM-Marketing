@@ -1,7 +1,36 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 21, 2026 — UX-001, UX-002, UX-003, UX-004 all complete. Nav grouped, studios promoted, client detail decomposed. VISION.md written as new product gospel.
+**Last Updated:** February 22, 2026 — Full reconciliation audit. Closed: BUG-009, FEAT-013, ITEM-001 (dashboard), D5, S3-S7. Sprint plan added below.
+
+---
+
+## 🗓️ SPRINT PLAN — February 22, 2026
+
+### SPRINT 1 — Launch Readiness (~4 hrs) ← DO FIRST
+Items blocking confident client and rep handoff.
+- [ ] Commission validation — mark German Auto Doctor active, trigger monthly cron manually, verify transaction creation + widget population
+- [ ] W7 — verify Wave covers Gusto use cases, cancel Gusto
+- [ ] ITEM-001 docs — add PPC/Ads language to `CLIENT_AGREEMENT.md` §1.1; Google Ads account ID field to `CLIENT_ONBOARDING_FORM.md`; Ads section to monthly report PDF template
+- [ ] D4 — Audit → Demo one-click: single button on lead detail sheet chaining `handleGenerateAudit` + `handleGenerateDemo`
+
+### SPRINT 2 — Personnel System (~6 hrs)
+Required before first operations hire.
+- [ ] PAYMENTS-004 — Position model (schema, seed: Owner/Manager/Sales Rep/Content Manager/SEO Specialist, Settings UI)
+- [ ] PAYMENTS-005 — Generalize rep onboarding wizard (FEAT-011) to all position types; steps adapt by position
+- [ ] PAYMENTS-003 UI — Contractor entity fields (vendor ID, entity name, email) in Team settings so admin doesn't need DB access
+
+### SPRINT 3 — Operations Intelligence (~5 hrs)
+Portfolio-level visibility as team and client base grow.
+- [ ] Client health overview — add health score, scan recency, red/yellow/green status to clients list page
+- [ ] TeamFeed "Save to Vault" — flagged TODO inside FEAT-012, small lift
+- [ ] I4 GBP — submit app for Google API Console approval if not already done; OAuth flow already built
+
+### SPRINT 4 — Platform Polish (~4 hrs)
+Makes the platform feel like a product.
+- [ ] ITEM-003 — Per-page tutorials (Driver.js or Shepherd.js), starting with Leads + Client Detail
+- [ ] Pipeline filter UX refinement
+- [ ] Voice/micro-copy layer (low priority, if budget)
 
 ---
 
