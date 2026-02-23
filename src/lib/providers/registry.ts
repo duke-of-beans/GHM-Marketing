@@ -28,11 +28,11 @@ import { TENANT_REGISTRY, DEFAULT_PROVIDERS } from '@/lib/tenant/config'
 
 // ─── Provider resolution ─────────────────────────────────────────────────────
 
-export function getAccountingProvider(tenantSlug: string): AccountingProvider {
+export async function getAccountingProvider(tenantSlug: string): Promise<AccountingProvider> {
   const key = getProviderKey(tenantSlug, 'accounting') as AccountingProviderKey
   switch (key) {
     case 'wave': {
-      const { WaveAccountingProvider } = require('./wave/accounting')
+      const { WaveAccountingProvider } = await import('./wave/accounting')
       return new WaveAccountingProvider()
     }
     // case 'stripe':    return new StripeAccountingProvider()
@@ -43,11 +43,11 @@ export function getAccountingProvider(tenantSlug: string): AccountingProvider {
   }
 }
 
-export function getDomainProvider(tenantSlug: string): DomainProvider {
+export async function getDomainProvider(tenantSlug: string): Promise<DomainProvider> {
   const key = getProviderKey(tenantSlug, 'domain') as DomainProviderKey
   switch (key) {
     case 'godaddy': {
-      const { GoDaddyDomainProvider } = require('./godaddy/domain')
+      const { GoDaddyDomainProvider } = await import('./godaddy/domain')
       return new GoDaddyDomainProvider()
     }
     // case 'namecheap':  return new NamecheapDomainProvider()
@@ -58,11 +58,11 @@ export function getDomainProvider(tenantSlug: string): DomainProvider {
   }
 }
 
-export function getPayrollProvider(tenantSlug: string): PayrollProvider {
+export async function getPayrollProvider(tenantSlug: string): Promise<PayrollProvider> {
   const key = getProviderKey(tenantSlug, 'payroll') as PayrollProviderKey
   switch (key) {
     case 'wave': {
-      const { WavePayrollProvider } = require('./wave/payroll')
+      const { WavePayrollProvider } = await import('./wave/payroll')
       return new WavePayrollProvider()
     }
     // case 'gusto': return new GustoPayrollProvider()
@@ -72,11 +72,11 @@ export function getPayrollProvider(tenantSlug: string): PayrollProvider {
   }
 }
 
-export function getEmailProvider(tenantSlug: string): EmailProvider {
+export async function getEmailProvider(tenantSlug: string): Promise<EmailProvider> {
   const key = getProviderKey(tenantSlug, 'email') as EmailProviderKey
   switch (key) {
     case 'resend': {
-      const { ResendEmailProvider } = require('./resend/email')
+      const { ResendEmailProvider } = await import('./resend/email')
       return new ResendEmailProvider()
     }
     // case 'sendgrid':  return new SendGridEmailProvider()
