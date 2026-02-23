@@ -271,7 +271,16 @@ Makes the platform feel like a product.
 **Solution:** When a rep views or downloads any document from the Shared space, show a persistent banner or toast: "This is the official current version. Saved copies may become outdated — always access contracts and agreements from the Shared folder." Additionally, consider a "Version warning" badge on any private vault file that was transferred from a shared document, indicating it may not be current.
 **Scope:** Vault UI — Shared space document viewer/download action + transfer-to-private flow.
 
-### FINANCE-001: Payments Tab — Full Wave Financial Dashboard
+### FINANCE-002: Historical Data Sync — Wave + Gusto into Dashboard
+**Priority:** MEDIUM — context and continuity for financial reporting
+**Problem:** The dashboard has no history prior to its launch date. Wave has months of invoicing and accounting data, Gusto has payroll history. The Payments/Finance tab shows a blank slate when it should reflect actual business history.
+**Solution:** One-time historical import:
+- Wave: Pull all historical invoices (AR) and bills (AP) via GraphQL and seed PaymentTransaction records with accurate dates and amounts. Mark them status='paid' with historical note.
+- Gusto: Export payroll history (CSV or API) and import as salary records or compensation log entries for Gavin.
+- Set a clear cutoff date (e.g. Jan 1, 2026) — everything before is "imported history", everything after is live dashboard data.
+**Scope:** Data migration script + possibly a new `isHistorical` flag on PaymentTransaction to distinguish imported vs. engine-generated records.
+
+
 **Priority:** HIGH — financial visibility for operations
 **Problem:** Current Payments tab shows pending/approved transactions but has no live financial picture. Wave has real data we're not surfacing: current bank account balances, recent transactions, outstanding invoices, bills due, cash flow. Gavin and David need this at a glance without logging into Wave separately.
 **Solution:** Rebuild the Payments/Finance tab to match the communicative density of the Wave dashboard itself:
