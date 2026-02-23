@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, MapPin,
   FileText, MonitorPlay, BookOpen, DollarSign, Target, Rocket,
-  ExternalLink,
+  ExternalLink, LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -68,7 +69,16 @@ export function RepOnboardingWizard({ userName, currentStep, territory }: Props)
       <div className="mb-6 space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Step {step + 1} of {TOTAL_STEPS}</span>
-          <span>{progress}% complete</span>
+          <div className="flex items-center gap-3">
+            <span>{progress}% complete</span>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-3 w-3" />
+              Sign out
+            </button>
+          </div>
         </div>
         <Progress value={progress} className="h-1.5" />
       </div>
@@ -90,18 +100,25 @@ export function RepOnboardingWizard({ userName, currentStep, territory }: Props)
         ) : (
           <div />
         )}
-        <Button onClick={advance} disabled={saving} className="min-w-[120px]">
-          {saving
-            ? "Saving..."
-            : step === TOTAL_STEPS - 1
-            ? "Go close something →"
-            : (
-              <>
-                {step === 0 ? "Let's go" : "Continue"}
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </>
-            )}
-        </Button>
+        <div className="flex items-center gap-2">
+          {step < TOTAL_STEPS - 1 && (
+            <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
+              Skip
+            </Button>
+          )}
+          <Button onClick={advance} disabled={saving} className="min-w-[120px]">
+            {saving
+              ? "Saving..."
+              : step === TOTAL_STEPS - 1
+              ? "Go close something →"
+              : (
+                <>
+                  {step === 0 ? "Let's go" : "Continue"}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </>
+              )}
+          </Button>
+        </div>
       </div>
     </div>
   );

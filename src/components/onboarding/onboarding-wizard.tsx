@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import {
   CheckCircle2, ChevronRight, ChevronLeft, MapPin,
   FileText, MonitorPlay, BookOpen, DollarSign, Target, Rocket,
-  ExternalLink, Building2, Loader2,
+  ExternalLink, Building2, Loader2, LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -124,7 +125,16 @@ export function OnboardingWizard({
       <div className="mb-6 space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Step {stepIndex + 1} of {TOTAL}</span>
-          <span>{progress}% complete</span>
+          <div className="flex items-center gap-3">
+            <span>{progress}% complete</span>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-3 w-3" />
+              Sign out
+            </button>
+          </div>
         </div>
         <Progress value={progress} className="h-1.5" />
       </div>
@@ -156,11 +166,18 @@ export function OnboardingWizard({
             <ChevronLeft className="h-4 w-4 mr-1" /> Back
           </Button>
         ) : <div />}
-        <Button onClick={advance} disabled={saving} className="min-w-[120px]">
-          {saving ? "Saving..." : isLastStep ? "Let's go →" : (
-            <>{stepIndex === 0 ? "Get started" : "Continue"}<ChevronRight className="h-4 w-4 ml-1" /></>
+        <div className="flex items-center gap-2">
+          {!isLastStep && (
+            <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
+              Skip
+            </Button>
           )}
-        </Button>
+          <Button onClick={advance} disabled={saving} className="min-w-[120px]">
+            {saving ? "Saving..." : isLastStep ? "Let's go →" : (
+              <>{stepIndex === 0 ? "Get started" : "Continue"}<ChevronRight className="h-4 w-4 ml-1" /></>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
