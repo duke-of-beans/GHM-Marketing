@@ -2,6 +2,8 @@
 // Tenant registry — maps subdomain slug to tenant configuration.
 // Currently file-based; migrate to DB table when tenant count exceeds ~10.
 
+import type { TenantProviderConfig } from '@/lib/providers/types'
+
 export interface TenantConfig {
   slug: string;           // Subdomain identifier (e.g. "ghm")
   name: string;           // Display name
@@ -9,7 +11,18 @@ export interface TenantConfig {
   logoUrl?: string;       // Custom branding (future use)
   primaryColor?: string;  // Custom branding (future use)
   active: boolean;
+  /** Vendor provider selection. Omit a key to use the platform default. */
+  providers?: Partial<TenantProviderConfig>;
 }
+
+// Platform defaults — used when a tenant doesn't specify a provider.
+// Change here to change the default for all new tenants.
+export const DEFAULT_PROVIDERS: TenantProviderConfig = {
+  accounting: 'wave',
+  domain:     'godaddy',
+  payroll:    'wave',
+  email:      'resend',
+};
 
 // Registry of all known tenants.
 // Add new client here when onboarded.
@@ -18,6 +31,12 @@ export const TENANT_REGISTRY: Record<string, TenantConfig> = {
     slug: "ghm",
     name: "GHM Digital Marketing",
     active: true,
+    providers: {
+      accounting: 'wave',
+      domain:     'godaddy',
+      payroll:    'wave',
+      email:      'resend',
+    },
   },
 };
 
