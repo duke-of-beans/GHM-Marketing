@@ -6,6 +6,7 @@ import { Globe, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PropertyMatrix } from "./PropertyMatrix";
 import { BuildQueue } from "./BuildQueue";
+import { ApprovalQueue } from "./ApprovalQueue";
 import { NewPropertyModal } from "./NewPropertyModal";
 import { PageComposer } from "./PageComposer";
 import { DnaLab } from "./DnaLab";
@@ -18,8 +19,9 @@ import type {
 // ── View states ───────────────────────────────────────────────────────────────
 type View =
   | { mode: "matrix" }
-  | { mode: "composer"; jobId: number; pageId: number | null }
-  | { mode: "dna"; propertyId: number; propertySlug: string };
+  | { mode: "composer";  jobId: number; pageId: number | null }
+  | { mode: "approval";  jobId: number; jobStage: string }
+  | { mode: "dna";       propertyId: number; propertySlug: string };
 
 interface Props {
   clientId: number;
@@ -54,6 +56,10 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
     setView({ mode: "composer", jobId, pageId: pageId ?? null });
   }
 
+  function openApproval(jobId: number, jobStage: string) {
+    setView({ mode: "approval", jobId, jobStage });
+  }
+
   function openDna(propertyId: number, propertySlug: string) {
     setView({ mode: "dna", propertyId, propertySlug });
   }
@@ -61,6 +67,18 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
   function backToMatrix() {
     setView({ mode: "matrix" });
     load(); // Refresh counts after composer work
+  }
+
+  // ── Approval Queue view ───────────────────────────────────────────────────
+  if (view.mode === "approval") {
+    return (
+      <ApprovalQueue
+        clientId={clientId}
+        jobId={view.jobId}
+        onClose={backToMatrix}
+        onApprovalComplete={() => { backToMatrix(); }}
+      />
+    );
   }
 
   // ── DNA Lab view ──────────────────────────────────────────────────────────
@@ -126,6 +144,7 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
               clientId={clientId}
               jobs={activeJobs}
               onOpenComposer={(jobId, pageId) => openComposer(jobId, pageId)}
+              onOpenApproval={(jobId, jobStage) => openApproval(jobId, jobStage)}
               onRefresh={load}
             />
           )}

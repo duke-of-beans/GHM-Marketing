@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, AlertCircle, Edit3, Rocket, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ApprovalQueue } from "./ApprovalQueue";
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   scaffolded: { label: "Scaffolded",  color: "text-gray-500",   icon: <Clock className="h-3 w-3" /> },
@@ -17,11 +18,12 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.R
 interface Props {
   clientId: number;
   jobs: any[];
-  onOpenComposer: (jobId: number, pageId?: number) => void;
+  onOpenComposer:  (jobId: number, pageId?: number) => void;
+  onOpenApproval:  (jobId: number, jobStage: string) => void;
   onRefresh: () => void;
 }
 
-export function BuildQueue({ clientId, jobs, onOpenComposer, onRefresh }: Props) {
+export function BuildQueue({ clientId, jobs, onOpenComposer, onOpenApproval, onRefresh }: Props) {
   return (
     <div className="space-y-3">
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -74,6 +76,16 @@ export function BuildQueue({ clientId, jobs, onOpenComposer, onRefresh }: Props)
                 >
                   Open
                 </Button>
+                {job.stage === "review" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
+                    onClick={() => onOpenApproval(job.id, job.stage)}
+                  >
+                    Review Pages
+                  </Button>
+                )}
                 {(job.pagesApproved ?? 0) > 0 &&
                   (job.pagesApproved ?? 0) === (job.pageCount ?? 0) &&
                   job.stage !== "live" && (

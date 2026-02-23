@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { executeBatchScan } from '@/lib/competitive-scan';
+import { checkWebPropertyStaleness } from '@/lib/ops/cluster-approval';
 
 export async function GET(req: NextRequest) {
   // Verify cron secret (Vercel automatically sends this)
@@ -28,6 +29,10 @@ export async function GET(req: NextRequest) {
     
     // Run batch scan for all clients due for a scan
     const result = await executeBatchScan({ includeDue: true });
+
+    // Check web property staleness — fires alert engine for overdue deploys
+    const staleness = await checkWebPropertyStaleness();
+    console.log(`[Cron] Staleness check: ${staleness.checked} properties, ${staleness.stale} stale`);
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     

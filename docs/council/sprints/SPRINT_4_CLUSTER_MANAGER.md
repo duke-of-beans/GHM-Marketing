@@ -80,8 +80,10 @@ When BuildJob reaches "approved":
 
 ## TESTING CRITERIA
 
-- [ ] Approving all pages auto-transitions BuildJob to "approved"
-- [ ] ClientTask auto-created on BuildJob approval with deployment checklist
-- [ ] Staleness alert fires when site hasn't been deployed in threshold days
-- [ ] SCRVNR override works with required note
-- [ ] Existing Website Studio functionality unbroken
+- [x] Approving all pages auto-transitions BuildJob to "approved"
+- [x] ClientTask auto-created on BuildJob approval with deployment checklist
+- [x] Staleness alert fires when site hasn't been deployed in threshold days
+- [x] SCRVNR override works with required note
+- [x] Existing Website Studio functionality unbroken
+
+**Status: ✅ COMPLETE — February 23, 2026**

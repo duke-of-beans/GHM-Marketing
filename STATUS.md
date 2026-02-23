@@ -58,6 +58,19 @@ Portfolio-level visibility as team and client base grow.
 - [x] AlertSourceType extended with "gbp" + "rankings" in alert-engine.ts
 - [x] vercel.json — gbp-snapshot cron wired (0 4 * * 1 — Monday 4am UTC)
 
+### SPRINT 4 — Cluster Manager ✅ COMPLETE (February 23, 2026)
+Approval workflow on existing Website Studio. No new domain tables — governance added to existing BuildJob pipeline.
+- [x] cluster-approval.ts — evaluateBuildJobApproval() auto-transitions BuildJob to "approved" when all pages approved; createDeploymentTask() auto-creates ClientTask(website_deployment) with checklist; approveAllClearedPages() bulk approval; checkWebPropertyStaleness() staleness monitor
+- [x] PATCH /api/website-studio/[clientId]/pages/[pageId]/review — single-page approve/reject/SCRVNR-override (requires overrideNote for failed pages)
+- [x] POST /api/website-studio/[clientId]/approve-all — bulk approve all SCRVNR-cleared pages, triggers job evaluation
+- [x] GET /api/website-studio/[clientId]/pages?jobId= — new list route for ApprovalQueue component
+- [x] ApprovalQueue.tsx — Pending Review panel: per-page SCRVNR scores (P1/P2), approve/reject/override per page, bulk "Approve All Cleared" with confirmation, reviewer note field, SCRVNR failure detail expansion, auto-close on job transition
+- [x] WebsiteStudioTab — approval view mode wired; BuildQueue "Review Pages" button navigates to ApprovalQueue view
+- [x] website_deployment TaskChecklistTemplate seeded (6 items: DNS, SSL, GA, Search Console, client approval, go-live notification)
+- [x] website_stale AlertRule seeded (sourceType: health, 7-day cooldown)
+- [x] daily-scans cron extended — checkWebPropertyStaleness() runs daily, feeds alert engine for overdue sites
+- [x] Zero new TypeScript errors
+
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.
 - [x] ITEM-003 — Per-page tutorials using Driver.js — DONE Feb 22, 2026. See files below.
