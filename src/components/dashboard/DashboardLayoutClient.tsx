@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { TeamFeedSidebar, TeamFeedToggle } from "@/components/team-feed/TeamFeedSidebar";
 import { PushPermissionPrompt } from "@/components/push/PushPermissionPrompt";
+import { AISearchBar } from "@/components/search/AISearchBar";
 
 type TeamUser = { id: number; name: string; role: string };
 
@@ -58,7 +59,8 @@ export function DashboardLayoutClient({
       {/* Main scrollable content area */}
       <div className="flex-1 min-w-0 overflow-auto">
         {/* Sticky top bar with Team Feed toggle */}
-        <div className="sticky top-0 z-10 flex justify-end px-4 md:px-6 pt-3 pb-1 bg-background/80 backdrop-blur-sm border-b">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-4 md:px-6 pt-3 pb-1 bg-background/80 backdrop-blur-sm border-b">
+          <AISearchBar />
           <TeamFeedToggle
             open={sidebarOpen}
             onToggle={toggle}

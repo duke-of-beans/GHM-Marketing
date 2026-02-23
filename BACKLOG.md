@@ -1,6 +1,6 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
 **Consolidated from: past chat sessions, STATUS.md, VISION.md, and live session decisions.**
-**Last Updated:** February 22, 2026 — AI Search added; W7 Gusto gate clarified (parallel validation required before cancel)
+**Last Updated:** February 23, 2026 — Commission validation closed (was done Feb 22, BACKLOG was stale). Vendor Flexibility Architecture closed. Task→Invoice auto-generation added and closed.
 **Owner:** David Kirsch
 
 This file is the single source of truth for everything we want to build that isn't yet started.
@@ -23,11 +23,9 @@ Pick the top item in your current tier that unblocks the next thing, not the mos
 
 ## 🔴 MUST — Active Blockers
 
-### Commission Validation — End-to-End Test
-**Context:** The cron, engine, and Wave integration are fully built but never run with a live client.
-**Action:** Mark German Auto Doctor active in DB → manually trigger `/api/cron/generate-payments` → verify `PaymentTransaction` records created → verify sales dashboard widgets populate → verify Wave bill generated for contractor vendors.
-**Size:** 30 min — no code, just ops + database verification.
-**Owner:** David + Gavin
+### ✅ Commission Validation — COMPLETE (February 22, 2026)
+**Commits:** f5fcb3f (validation run + Apex North test client deleted), f9e8bcf (Sprint B — historical Wave invoice import, commission validation cleanup in STATUS.md)
+**Result:** Cron triggered, PaymentTransactions verified, Wave bill generated. End-to-end confirmed working.
 
 ### W7 — Kill Gusto (after parallel validation)
 **Context:** Wave AP/payroll is fully built. Gavin is confident in the architecture but wants to prove it before cutting services — same protocol as BrightLocal. Run both in parallel, validate Wave covers everything Gusto does, then cancel.
@@ -44,10 +42,9 @@ Pick the top item in your current tier that unblocks the next thing, not the mos
 
 ## 🟠 SHOULD — Productization & Growth
 
-### VENDOR FLEXIBILITY ARCHITECTURE (NEW — February 22, 2026)
-**Priority:** HIGH — Critical before adding more clients. Cannot lock architecture to single vendors.
-**Context:** Currently hardcoded to Wave (accounting/AR/AP), GoDaddy (hosting/domains), Stripe not yet integrated, B of A for banking. As we productize for other agencies on Covos, every client shop will use different tools — QuickBooks, Xero, FreshBooks, Stripe, PayPal, Square, Shopify Payments, AWS, etc.
-**Vision:** Every external vendor integration lives behind an interface. We swap providers by changing a config flag, not rewriting 40 files.
+### ✅ VENDOR FLEXIBILITY ARCHITECTURE — COMPLETE (February 23, 2026)
+**Commit:** a6d8108 (Item 1 session)
+**Delivered:** `src/lib/providers/` — types.ts, registry.ts, wave/accounting.ts, wave/payroll.ts, godaddy/domain.ts, resend/email.ts. TenantConfig extended with `providers` block. GHM registry entry wired. Zero new TypeScript errors.
 
 **What needs to happen:**
 
@@ -94,7 +91,15 @@ Admins select their providers from a dropdown per category. Each selection shows
 
 ---
 
-### PWA Manifest + Push Notifications
+### ✅ PWA Manifest + Push Notifications — COMPLETE (prior session)
+**Delivered:** manifest.json, sw.js, ServiceWorkerRegistration, lib/push.ts (sendPushToUser/sendPushToUsers), /api/push/subscribe + /api/push-subscription, PushPermissionPrompt component, DashboardLayoutClient fully wired. Push fires on: team messages, task assignments, payment alerts, onboarding submissions.
+
+### ✅ TeamFeed — Collapsible Permanent Sidebar — COMPLETE (prior session)
+**Delivered:** TeamFeedSidebar + TeamFeedToggle components, DashboardLayoutClient flex-row layout, localStorage open/closed persistence, 30s unread polling. Replaces the Sheet/overlay pattern entirely.
+
+---
+
+### PWA Manifest + Push Notifications ~~(moved above — already done)~~
 **Context:** Fully designed and spec'd in chat sessions. Aligns with mobile-first usage by sales reps.
 **Scope:**
 - VAPID key pair (generated once, env vars)
@@ -111,7 +116,11 @@ Admins select their providers from a dropdown per category. Each selection shows
 
 ---
 
-### TeamFeed — Collapsible Permanent Sidebar (vs. Sheet/Overlay)
+### ✅ TeamFeed — Collapsible Permanent Sidebar — COMPLETE (see above)
+
+---
+
+### TeamFeed — Collapsible Permanent Sidebar ~~(moved above — already done)~~
 **Context:** Designed in chat. Currently TeamFeed opens as a Sheet overlay. A persistent sidebar that squeezes the content area is more intuitive for daily-driver tools.
 **Scope:**
 - New `TeamFeedSidebar` component — `w-80` when open, `w-0 overflow-hidden` when closed, `transition-all duration-300`
@@ -180,6 +189,39 @@ Admins select their providers from a dropdown per category. Each selection shows
 **Size:** ~2 sessions (1 for API + system prompt + basic result rendering; 1 for autocomplete streaming + action layer + client-scoped mode).
 **Files:** `src/app/api/search/route.ts` (new), `src/components/search/AISearchBar.tsx` (new), `src/components/search/SearchResult.tsx` (new), `src/lib/ai/search-prompt.ts` (new system prompt), global layout for search trigger.
 **Prerequisite:** `callAI()` layer (complete). Vendor flexibility not required. Can build independently.
+
+---
+
+### Static Empty-State Help + Contextual Guides
+**Context:** Every widget, page, and feature that hasn't been populated yet shows dead negative space. That space should work for the user — not with animations or toasts, but with static, in-place copy that tells them exactly what to do and why the thing in front of them matters.
+**Philosophy:** This isn't onboarding. It's not a tooltip. It's the text that lives where data would be. If the lead pipeline is empty, the kanban should explain what it is and how to fill it. If the payments page has no transactions, it should explain how transactions get created and what approving one does. The copy must carry the sardonic COVOS voice — deadpan, fourth-wall-aware, never peppy.
+**Scope:**
+- Leads pipeline empty state: explain the kanban, how leads get into Available, what claiming means
+- Payments page empty state: explain how PaymentTransactions are generated (cron + client activation), what "approve" does, what happens after approval
+- Content Studio empty state: explain the approval queue, how content gets into it, what each status means
+- Client roster empty state: explain that clients come from Won leads, and how to mark a lead Won
+- Task queue empty state: explain how tasks get assigned, what categories mean, what the Generate button does
+- Analytics empty state: explain what populates it (scan history, client health) and when it'll have data
+- Team Feed empty state: already has voice copy — audit for consistency
+- Reports section per-client: explain that reports require at least one scan + active status
+- Dashboard widgets (earnings, goals, pipeline count): each zero state should explain what feeds that number
+**Voice rules (same as tutorials and notifications):**
+- Deadpan, sardonic, fourth-wall-aware
+- Never say "Looks like..." or "It seems..." or "Welcome!"
+- Never use exclamation points
+- Acknowledge the emptiness without apologizing for it
+- Tell them what to do, not how they feel about it
+- Short. Two to four sentences max per empty state.
+**Examples of the right tone:**
+- Pipeline empty: "Nothing here. Leads show up in Available when you run a Discovery scan or import manually. Claim one to start moving it through the pipeline."
+- Payments empty: "No transactions yet. The engine runs on the 1st of each month for active clients, and fires immediately when a client goes active. Once transactions exist, they'll appear here for approval."
+- Analytics empty: "Data populates as clients get scanned. You need at least one active client with a completed scan before any of these charts mean anything."
+**Implementation notes:**
+- These are not components with logic — they're just the text that renders when `data.length === 0` or equivalent
+- Some already exist (Team Feed) — audit those for voice consistency
+- No animations, no icons required (though a subtle muted icon is fine if it helps orientation)
+- Each empty state should answer: what is this section, what populates it, what should I do right now
+**Size:** ~1 session (mostly copy + small conditional renders). High polish value, low complexity.
 
 ---
 
