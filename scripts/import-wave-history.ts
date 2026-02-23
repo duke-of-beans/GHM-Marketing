@@ -134,38 +134,11 @@ interface WaveBillRaw {
 }
 
 async function fetchAllBills(): Promise<WaveBillRaw[]> {
-  const QUERY = `
-    query ListBills($businessId: ID!, $page: Int!, $pageSize: Int!) {
-      business(id: $businessId) {
-        bills(page: $page, pageSize: $pageSize) {
-          edges { node {
-            id billNumber status invoiceDate dueDate
-            total { raw }
-            amountDue { raw }
-            amountPaid { raw }
-            vendor { id name }
-          }}
-        }
-      }
-    }
-  `
-  const all: WaveBillRaw[] = []
-  let page = 1
-  const pageSize = 100
-
-  while (true) {
-    const data = await waveQuery<{
-      business: { bills: { edges: Array<{ node: WaveBillRaw }> } }
-    }>(QUERY, { businessId: WAVE_BUSINESS_ID, page, pageSize })
-
-    const nodes = data.business.bills.edges.map(e => e.node)
-    all.push(...nodes)
-    console.log(`  [bills] page ${page} — fetched ${nodes.length}`)
-    if (nodes.length < pageSize) break
-    page++
-  }
-
-  return all
+  // Wave's public GraphQL API does not expose bills/AP on the Business type.
+  // Only AR (invoices), customers, vendors, accounts, and products are queryable.
+  // Historical AP data cannot be imported from Wave — skip gracefully.
+  console.log('  [bills] Wave API does not expose bills via GraphQL — skipping AP import.')
+  return []
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

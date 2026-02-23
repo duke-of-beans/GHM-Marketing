@@ -210,10 +210,8 @@ Makes the platform feel like a product.
 | S6 | Sales Agreement Template — contractor terms | ✅ DONE — `D:\Work\SEO-Services\CLIENT_SERVICE_AGREEMENT.md` (complete 12-section agreement) |
 | S7 | Job Ad — draft and post | ✅ DONE — `D:\Work\SEO-Services\JOB_AD.md` (two versions: Indeed + LinkedIn, with posting notes) |
 
-### Commission System Validation
-- End-to-end test with live client
-- Manually trigger monthly cron to verify residual generation
-- Verify dashboard widgets populate
+### Commission System Validation — ✅ COMPLETE (February 22, 2026)
+Validated via Apex North LLC test client. Cron generated residual ($200, Arian) + master_fee ($240, David). Approval flow confirmed. Cron rescheduled to 5th of month. Test client hard-deleted. See Sprint 1 + PAYMENTS-002/006 above.
 
 ### Other Pending (Lower Priority)
 - BUG-005: ✅ DONE | BUG-006: ✅ DONE
