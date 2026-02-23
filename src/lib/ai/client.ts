@@ -81,6 +81,8 @@ const DEFAULT_MAX_TOKENS: Record<AIFeature, number> = {
   upsell_detection:   600,
   // SCRVNR / Voice
   voice_capture:     1200,
+  // GMB
+  gbp_post:          600,
 };
 
 // ── Singleton client ──────────────────────────────────────────────────────────

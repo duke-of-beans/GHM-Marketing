@@ -183,6 +183,7 @@ The schema has no tenantId on any table. `src/lib/tenant/` exists but uses file-
 | nap-health-check | Check directory scraper health | Daily |
 | nap-scan | Run NAP citation scans | Weekly |
 | payment-check | Escalate overdue payments | Daily |
+| gbp-snapshot | Aggregate GBP insight totals → GbpSnapshot | Weekly (Mon 4am) |
 | rank-poll | Poll DataForSEO for pending rank results | Hourly |
 | rank-tracking | Post new rank tracking tasks to DataForSEO | Daily |
 

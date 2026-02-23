@@ -453,6 +453,7 @@ model ClientProfile {
   alertEvents           AlertEvent[]
   recurringTaskRules    RecurringTaskRule[] @relation("RecurringTaskRuleClient")
   siteHealthSnapshots   SiteHealthSnapshot[]
+  gbpSnapshots          GbpSnapshot[]
 
   @@map("client_profiles")
 }
@@ -1961,4 +1962,39 @@ model SiteHealthSnapshot {
   @@index([clientId, scanDate(sort: Desc)])
   @@index([domainId, scanDate(sort: Desc)])
   @@map("site_health_snapshots")
+}
+
+model GbpSnapshot {
+  id                  Int       @id @default(autoincrement())
+  clientId            Int       @map("client_id")
+
+  // Aggregated insight totals for the period
+  searchViews         Int?      @map("search_views")
+  mapViews            Int?      @map("map_views")
+  websiteClicks       Int?      @map("website_clicks")
+  phoneClicks         Int?      @map("phone_clicks")
+  directionClicks     Int?      @map("direction_clicks")
+
+  // Review metrics
+  reviewCount         Int?      @map("review_count")
+  reviewAvg           Float?    @map("review_avg")
+  newReviews          Int?      @map("new_reviews")
+
+  // Content metrics
+  photosCount         Int?      @map("photos_count")
+  postsCount          Int?      @map("posts_count")
+
+  // Deltas vs previous snapshot (for trend display)
+  previousSearchViews Int?      @map("previous_search_views")
+  previousMapViews    Int?      @map("previous_map_views")
+
+  // Period the insight data covers
+  periodStart         DateTime  @map("period_start")
+  periodEnd           DateTime  @map("period_end")
+  scanDate            DateTime  @default(now()) @map("scan_date")
+
+  client              ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, scanDate(sort: Desc)])
+  @@map("gbp_snapshots")
 }

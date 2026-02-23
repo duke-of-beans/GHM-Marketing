@@ -22,6 +22,8 @@ export type AlertSourceType =
   | "rank_tracking"
   | "nap_scan"
   | "health"
+  | "gbp"
+  | "rankings"
   | "manual";
 
 export interface AlertEngineInput {

@@ -43,6 +43,10 @@
     {
       "path": "/api/cron/site-health",
       "schedule": "0 5 * * 0"
+    },
+    {
+      "path": "/api/cron/gbp-snapshot",
+      "schedule": "0 4 * * 1"
     }
   ]
 }

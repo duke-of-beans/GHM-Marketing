@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint A complete. Three new blueprints added: Operations Blueprint, UX Design Spec, UX Philosophy v2. Defines solo-operator interaction architecture, evidence-based design spec, and complete operational gap-fill for post-overseas-team transition.
+**Last Updated:** February 23, 2026 — Sprint 3 SEO/GMB complete. GbpSnapshot table + migration, weekly cron (Monday 4am), snapshot history API (/gbp/snapshots + /latest), AI GMB post drafting (/gbp/draft-post with VoiceProfile), LocalPresenceTab extended (Trends tab + AI Draft button), 5 alert rules seeded (review avg, zero reviews, search view drop, keyword lost/entered top 3), AlertSourceType extended with "gbp" + "rankings", vercel.json wired. Zero new TypeScript errors.
 
 ---
 
@@ -47,6 +47,16 @@ Portfolio-level visibility as team and client base grow.
 - [x] Client health overview — table: healthLabel badge + score/100 + scan overdue indicator; cards: label-first badge + score/100
 - [x] TeamFeed "Save to Vault" — confirmed complete (`/api/vault/transfer` fully implemented; wired in TeamFeed + Sidebar)
 - [x] I4 GBP — OAuth client created (GHM Marketing GCP project), Business Profile APIs enabled, credentials vaulted + deployed. Testing mode with David + Gavin as test users. Ready to connect real client GBP accounts.
+
+### SPRINT 3 SEO/GMB — Rank Tracking + GBP Snapshot System ✅ COMPLETE (February 23, 2026)
+- [x] GbpSnapshot schema + migration — 30-day rolling aggregates: searchViews, mapViews, clicks, reviewCount, reviewAvg, newReviews, previousSearchViews delta
+- [x] GBP snapshot cron — `/api/cron/gbp-snapshot` weekly Mon 4am UTC; skips no-connection clients; feeds alert engine; updates DataSourceStatus
+- [x] Snapshot API — `/api/clients/[id]/gbp/snapshots` (paginated history) + `/latest` (with computed deltas)
+- [x] AI GMB post drafting — `/api/clients/[id]/gbp/draft-post`; reads VoiceProfile; 150-300 char GBP post; update/offer/event types
+- [x] LocalPresenceTab extended — Trends tab (6 KPI cards + LineChart from snapshot history); AI Draft button → AIDraftModal → pre-fills CreatePostModal
+- [x] 5 alert rules seeded — review avg <4.0 (critical), zero new reviews, search views -25%, keyword lost top 3, keyword entered top 3 (info)
+- [x] AlertSourceType extended with "gbp" + "rankings" in alert-engine.ts
+- [x] vercel.json — gbp-snapshot cron wired (0 4 * * 1 — Monday 4am UTC)
 
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.

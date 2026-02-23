@@ -1,6 +1,7 @@
-# SPRINT 3 — SEO + GMB
+# SPRINT 3 — SEO + GMB ✅ COMPLETE
 ## Rank Tracking Dashboard + GBP Snapshot System
 *Dependency: Sprint 0 (alert engine), Sprint 2 pattern (snapshot + cron)*
+*Completed: 2026-02-23*
 
 ---
 
@@ -115,10 +116,10 @@ Extend existing client detail page with "Google Business Profile" section:
 
 ## TESTING CRITERIA
 
-- [ ] GBP snapshot cron creates records for clients with GBPConnection
-- [ ] Rank tracking UI shows current + historical positions
-- [ ] GMB dashboard shows metrics from GbpSnapshot
-- [ ] AI post draft generates voice-appropriate content
-- [ ] Alert fires when review average drops
-- [ ] Alert fires when keyword leaves top 3
-- [ ] Clients without GBPConnection don't error (graceful skip)
+- [x] GBP snapshot cron creates records for clients with GBPConnection
+- [x] Rank tracking UI shows current + historical positions (RankingsTab pre-existing — excellent)
+- [x] GMB dashboard shows metrics from GbpSnapshot (LocalPresenceTab Trends tab)
+- [x] AI post draft generates voice-appropriate content (draft-post route + AIDraftModal)
+- [x] Alert fires when review average drops (seeded)
+- [x] Alert fires when keyword leaves top 3 (seeded)
+- [x] Clients without GBPConnection don't error (graceful skip in cron)

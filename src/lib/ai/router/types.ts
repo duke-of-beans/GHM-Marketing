@@ -125,7 +125,9 @@ export type AIFeature =
   | "competitive_scan"   // Competitor analysis
   | "upsell_detection"   // Upsell opportunity detection
   // SCRVNR / Voice
-  | "voice_capture";     // Extract brand voice profile from website content
+  | "voice_capture"      // Extract brand voice profile from website content
+  // GMB
+  | "gbp_post";          // AI-drafted Google Business Profile post
 
 export interface FeatureContext {
   feature: AIFeature;
