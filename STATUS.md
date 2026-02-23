@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint A (Revenue & Financial Visibility) complete. FINANCE-001 live, FINANCE-002 import script ready, Arian setup pending manual Wave step.
+**Last Updated:** February 23, 2026 — Sprint A complete. Three new blueprints added: Operations Blueprint, UX Design Spec, UX Philosophy v2. Defines solo-operator interaction architecture, evidence-based design spec, and complete operational gap-fill for post-overseas-team transition.
 
 ---
 
@@ -700,6 +700,11 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 - `D:\Work\SEO-Services\specs\WAVE_PAYMENTS_BLUEPRINT.md` — Wave payments integration (schema, wireframes, 30 tasks)
 - `D:\Work\SEO-Services\specs\CONTRACT_AUDIT_AND_PAYMENTS.md` — Contract claims audit + payments architecture narrative
 - `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` — API ecosystem (DataForSEO, NAP, GBP, Ads, GoDaddy, 56 hrs)
+
+**Design blueprints (docs/blueprints/):**
+- `docs/blueprints/OPERATIONS_BLUEPRINT.md` — Complete operational gap-fill: solo-operator model, client lifecycle workflows, AI-assisted content/SEO/PPC pipelines, Basecamp migration, task automation architecture
+- `docs/blueprints/UXUI_DESIGN_SPEC.md` — Evidence-based visual design: competitive research (AgencyAnalytics pain points), component patterns, data density principles, responsive behavior
+- `docs/blueprints/UXUI_PHILOSOPHY_v2.md` — Interaction architecture for solo operator + AI: mental model, session context, alert vs notification distinction, data-to-action pathways, compact/full rendering modes
 
 **Business operations:**
 - `D:\Work\SEO-Services\SALES_OPERATIONS.md` — Canonical sales comp, territory, hiring manual
