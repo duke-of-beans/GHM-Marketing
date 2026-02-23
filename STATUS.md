@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Commission validation ✅. W7 Gusto deferred to Jan 2027 (equity + payroll migration together). I4 GBP pending Google approval.
+**Last Updated:** February 22, 2026 — MUST sprint complete. Commission validation ✅, W7 deferred to Jan 2027, I4 GBP OAuth live in Testing mode.
 
 ---
 
@@ -46,7 +46,7 @@ Portfolio-level visibility as team and client base grow.
 - [x] AdminTask model — schema + db push + `POST /api/users` auto-creates onboarding checklist task on user creation
 - [x] Client health overview — table: healthLabel badge + score/100 + scan overdue indicator; cards: label-first badge + score/100
 - [x] TeamFeed "Save to Vault" — confirmed complete (`/api/vault/transfer` fully implemented; wired in TeamFeed + Sidebar)
-- [x] I4 GBP — OAuth flow built; blocked on Google API Console approval (external)
+- [x] I4 GBP — OAuth client created (GHM Marketing GCP project), Business Profile APIs enabled, credentials vaulted + deployed. Testing mode with David + Gavin as test users. Ready to connect real client GBP accounts.
 
 ### SPRINT 4 — Platform Polish (~4 hrs)
 Makes the platform feel like a product.
@@ -153,7 +153,7 @@ Makes the platform feel like a product.
 | I1. Provider Refactor + Cache | Extract providers, shared cache + cost tracking | 6 | ✅ DONE |
 | I2. DataForSEO SERP | Local rank tracking, Keywords tab, rank clusters | 12 | ✅ DONE |
 | I3. NAP Citation Scraper | 35 directory adapters, Citations tab, health sentry | 10 | ✅ DONE |
-| I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | 🔴 TODO (needs Google approval) |
+| I4. Google Business Profile | OAuth, reviews, insights, posts, Local Presence tab | 8 | ✅ DONE — GHM Marketing GCP project created, OAuth client configured, Business Profile APIs enabled, test users added (David + Gavin). Credentials in Oktyv vault + .env.local + Vercel. App in Testing mode — full verification when ready to open to all clients. |
 | I5. Report Generator Upgrades | Rank/citation/GBP/perf sections in client reports | 6 | ✅ DONE |
 | I6. Prospect Audit Enrichment | Rank data + citation health in sales audits | 4 | ✅ DONE |
 | I7. Google Ads + GoDaddy | Campaign data + domain deployment | 6 | ✅ DONE |
