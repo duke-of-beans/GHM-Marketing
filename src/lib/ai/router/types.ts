@@ -129,7 +129,9 @@ export type AIFeature =
   // GMB
   | "gbp_post"           // AI-drafted Google Business Profile post
   // Reports
-  | "report_narrative";  // AI narrative section for monthly client reports
+  | "report_narrative"   // AI narrative section for monthly client reports
+  // Universal Search (COVOS Intelligence Layer)
+  | "universal_search";  // AI-powered cross-entity search and navigation
 
 export interface FeatureContext {
   feature: AIFeature;

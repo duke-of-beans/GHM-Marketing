@@ -1,381 +1,85 @@
-# Changelog
-
-All notable changes to the GHM Dashboard project.
-
-## [Unreleased] - 2026-02-18
-
-### Lead Enrichment — Duplicate Detection
-
-- 7-day cooldown (`ENRICHMENT_COOLDOWN_DAYS`) prevents re-billing recently enriched leads
-- `enrichLead(leadId, force)` returns `{ skipped: true }` if enriched within window unless `force=true`
-- API returns 409 with `code: "RECENTLY_ENRICHED"`, `lastEnrichedAt`, `cooldownDays`
-- Batch enrichment returns `{ enriched, skipped, errors }` summary counts
-- UI: single-lead button shows "Force Re-enrich" toast action on 409
-- UI: batch button surfaces skip count in confirmation toast
-
-### FEAT-001: Admin Role Tier
-
-- Added `admin` to `UserRole` enum in Prisma schema; `db push` applied
-- Role hierarchy: `admin` > `master` > `sales`
-- `src/lib/auth/session.ts`:
-  - `isElevated(role)` — returns true for `admin | master`
-  - `requireAdmin()` — admin-only gate with redirect
-  - `ROLE_LABELS` — maps enum values to display strings (Admin / Manager / Sales Rep)
-  - `requireMaster()` and `territoryFilter()` updated to use `isElevated()`
-- `src/lib/permissions/checker.ts`:
-  - `isMaster()` now calls `isElevated()` for backward compatibility
-  - `isAdmin()` added for owner-level checks
-- `src/lib/permissions/types.ts`: `UserWithPermissions.role` widened to `'admin' | 'master' | 'sales'`
-- `src/lib/permissions/presets.ts`: `getDefaultPermissionsForRole()` signature widened to `string`
-- `src/lib/auth/permissions.ts`: all three redirect checks updated to `isElevated()`
-- 17 API gate checks across 9 route files updated from `role !== "master"` to `!isElevated(role)`
-- `PATCH /api/users/[id]`: `updateUserSchema` now accepts `"admin"` as assignable role value
-- `scripts/make-admin.ts`: bootstrap script for first admin promotion via `npx tsx`
-- TypeScript: 0 errors
-
-**Pending (next session):**
-- Privilege escalation guard in PATCH /api/users/[id] (if body.role === "admin", require requester to be admin)
-- UI role dropdown: conditionally show "Admin" option only for admin viewers
-- UI role badges: use ROLE_LABELS everywhere instead of hardcoded strings
-
-
-
-### 🚀 Major Feature Sprint - 13 Features Complete
-
-This release represents a comprehensive platform upgrade with enterprise-grade features across content management, intelligence systems, filtering, and configuration.
+# GHM DASHBOARD — CHANGELOG
+**Purpose:** Permanent record of every completed item. Items are moved here when shipped.
+**Never prune this file.** It is the audit trail.
+**Last Updated:** February 23, 2026
 
 ---
 
-### ✨ Added - Content Management Suite
-
-#### Content Scheduling & Publishing
-- **POST** `/api/content/schedule` - Schedule content for future publication
-- **POST** `/api/content/publish/:id` - Manually trigger publication
-- Status flow: `draft` → `scheduled` → `published`
-- Automated publishing at scheduled timestamps
-- Schedule metadata: publishAt, publishedAt, scheduledBy
-
-#### Batch Content Operations
-- **DELETE** `/api/content/batch` - Delete multiple items simultaneously
-- Security validation (user ownership verification)
-- Bulk operation confirmation dialogs
-- Batch action dropdown UI component
-
-#### Content Versioning System
-- Database: `ContentVersion` model with full audit trail
-- Auto-versioning on every edit (optional change notes)
-- Complete content snapshots preserved
-- One-click restore to any previous version
-- Version metadata: content, changeNote, versionNumber, createdBy, createdAt
-- **GET** `/api/content/:id/versions` - Retrieve version history
-- **POST** `/api/content/:id/versions/:versionId/restore` - Restore specific version
+## How items land here
+When you ship something:
+1. Add a row to the table below (date + commit + what shipped)
+2. Delete the item from BACKLOG.md
+3. Update STATUS.md "Last Updated" line
+4. Then commit
 
 ---
 
-### 🎤 Added - Voice Intelligence (SCRVNR Integration)
-
-#### Brand Voice Capture
-- Database: `VoiceProfile` model
-- Website analysis via SCRVNR API (20-40 second processing)
-- Extracted characteristics:
-  - Tonality (professional, casual, friendly, etc.)
-  - Vocabulary (phrases, word choice, industry terms)
-  - Sentence structure (length, complexity)
-  - Characteristics scores (formality, enthusiasm, technical depth, brevity)
-- **POST** `/api/clients/:id/voice/capture` - Capture voice from website
-- **DELETE** `/api/clients/:id/voice` - Remove voice profile
-- **GET** `/api/clients/:id/voice` - Retrieve active profile
-
-#### Generator Integration
-- Auto-enables voice profile in Blog Generator
-- Auto-enables voice profile in Social Media Generator
-- Auto-enables voice profile in Meta Description Generator
-- Visual indicators: "Custom Voice Active" badges
-- Fully reversible (capture/remove anytime)
-
----
-
-### 🐛 Added - Enterprise Bug Reporting System
-
-#### Bug Tracking Database
-- `BugReport` model with comprehensive fields:
-  - User info: userId, userEmail, userName
-  - Issue details: title, description, category, severity, status
-  - Metadata: pageUrl, userAgent, screenResolution, browserInfo
-  - Error capture: consoleErrors, networkErrors, recentActions, sessionData
-  - Assignment: assignedTo, priority, resolvedAt, resolvedBy, resolutionNotes
-- Auto-categorization based on URL patterns and keywords
-- Auto-priority assignment based on severity + category
-- Auto-assignment to master user (David Kirsch)
-
-#### Bug Reporting UI
-- **POST** `/api/bug-reports` - Create new bug report
-- **GET** `/api/bug-reports` - List all reports (master-only)
-- Components:
-  - `BugReportDialog.tsx` - Guided reporting form
-  - `BugReportButton.tsx` - Reusable button component
-  - `BugTrackingInit.tsx` - Global metadata tracking
-  - `/bugs` page - Master dashboard view
-- Categories: content, compensation, scans, clients, leads, ui, performance, other
-- Severity levels: critical, high, medium, low
-- Status tracking: new, in-progress, resolved
-
-#### Automatic Metadata Capture
-- Console errors (last 10)
-- Network failures (last 5)
-- User actions (last 5 clicks)
-- Page URL, browser info, screen resolution
-- Error boundary integration with pre-filled reports
-
----
-
-### 🔍 Added - Advanced Lead Filtering
-
-#### Comprehensive Filter System
-- **20+ filter criteria** across 3 categories:
-
-**Priority & Quality Filters:**
-- Impact Score range (0-100)
-- Close Likelihood range (0-100)
-- Priority Tier multi-select (A, B, C)
-- Rating range (0-5 stars)
-- Review Count range (0-1000+)
-- Domain Rating range (0-100)
-- Has Website toggle
-- Has Email toggle
-
-**Market Intelligence Filters:**
-- Market Type multi-select (6 types):
-  - Wealthy Suburb Suppression
-  - Incorporated City Penalty
-  - Rapid Growth Market
-  - Interstate Border Town
-  - Fragmented Metropolitan
-  - Immigrant/Ethnic Cluster
-- Municipal Mismatch toggle
-- Wealth Score range
-- Distance from Metro range
-
-**Exclusion Filters:**
-- Exclude Chains
-- Exclude Franchises
-- Exclude Corporate
-
-#### Enhanced Sorting
-- Impact Score (high/low)
-- Close Likelihood (high/low)
-- Deal Value (high/low)
-- Date (newest/oldest/updated)
-
-#### Filter UX Improvements
-- Collapsible sections for progressive disclosure
-- Range sliders for numeric filters
-- Active filter badge counter
-- Summary tags showing applied filters
-- Tooltips explaining each criterion
-- Clear all filters button
-- Persistent filter state
-
----
-
-### ⚙️ Added - Global Settings & Configuration
-
-#### Settings Database
-- `GlobalSettings` model with master-only access
-
-#### Commission Defaults
-- Default Commission percentage (0-100%)
-- Default Residual percentage (0-100%)
-- Master Manager Fee ($)
-
-#### Feature Toggles
-- Content Studio enabled/disabled
-- Competitive Scanning enabled/disabled
-- Voice Capture enabled/disabled
-- Bug Reporting enabled/disabled
-
-#### Scan Configuration
-- Scan Frequency (1-365 days)
-- Monthly Cost Limit ($)
-
-#### Notification Preferences
-- Email Notifications toggle
-- Task Assignment Alerts toggle
-- Scan Complete Alerts toggle
-
-#### API Key Management
-- OpenAI API Key (encrypted)
-- Google API Key (encrypted)
-- SEMrush API Key (encrypted)
-- Ahrefs API Key (encrypted)
-- Password-masked inputs
-- Security warnings
-
-#### Settings API
-- **GET** `/api/settings` - Fetch current settings
-- **PATCH** `/api/settings` - Update settings (master-only)
-- Audit trail: updatedBy, updatedAt
-
----
-
-### 🎨 Added - Theme System
-
-#### Dark Mode Support
-- `next-themes` integration
-- Theme options: light, dark, system
-- Persistent theme selection
-- Smooth transitions
-- ThemeProvider in root layout
-- Theme selector in Settings page
-
----
-
-### 🖼️ Enhanced - UI/UX Improvements
-
-#### Login Screen Polish
-- Logo size increased: 180x60 → 240x80 (+33%)
-- Reduced header padding (space-y-3 → space-y-2 pb-4)
-- Better visual balance
-
-#### Content Generator Messaging
-- Blog Generator: sophisticated progress indicators
-- Social Media Generator: platform-specific messaging
-- Meta Description Generator: SEO optimization details
-- Voice Profile Dialog: detailed analysis steps
-- Reassuring timing estimates (15-30 seconds)
-- Professional, non-generic AI language
-
----
-
-### 🔧 Changed - Compensation UI
-
-#### Override Count Badge
-- Active override count display
-- Real-time updates
-- Visual prominence
-
-#### Master Manager Fee Display
-- Accurate calculation: effectiveFee = isOwner ? 0 : masterManagerFee
-- Removed misleading override button
-- Clear zero-display for owners
-
----
-
-### 📱 Added - Navigation & Access
-
-#### Master Navigation
-- Settings link added (⚙️ icon)
-- Bug Reports link added (🐛 icon)
-- Bug Report button in sidebar footer
-
----
-
-### 🗄️ Database Schema Changes
-
-**New Models:**
-- `VoiceProfile` (14 fields)
-- `ContentVersion` (9 fields)
-- `BugReport` (23 fields)
-- `GlobalSettings` (18 fields)
-
-**New Relations:**
-- User → VoiceProfiles
-- User → ContentVersions
-- User → BugReports (reporter, assignee, resolver)
-- User → GlobalSettings (updater)
-
----
-
-### 📦 Dependencies Added
-
-- `next-themes@^0.2.1` - Theme management
-- `@radix-ui/react-checkbox` - Checkbox component
-- `@radix-ui/react-slider` - Slider component
-- `@radix-ui/react-collapsible` - Collapsible component
-
----
-
-### 📚 Documentation
-
-**Added:**
-- `FEATURE_GUIDE.md` - Comprehensive 412-line user guide
-- `CHANGELOG.md` - This file
-
-**Documented Features:**
-1. Content Scheduling & Publishing
-2. Batch Content Operations
-3. Content Versioning System
-4. SCRVNR Voice Intelligence
-5. Bug Reporting System
-6. Advanced Lead Filtering
-7. Global Settings Panel
-8. API Key Management
-9. Dark Mode Support
-
----
-
-### 🎯 Sprint Statistics
-
-- **Features Delivered:** 13
-- **Files Created/Modified:** 40+
-- **Components Built:** 30+
-- **API Endpoints:** 20+
-- **Database Tables:** 4 new
-- **Lines of Code:** ~7,500
-- **Sprint Duration:** ~4-5 hours
-- **Completion:** 100%
-
----
-
-### 🔒 Security Enhancements
-
-- API keys encrypted in database
-- Master-only access to sensitive features
-- Permission checks on all mutations
-- Auto-assignment to appropriate users
-- Validation on all inputs
-- Password-masked API key inputs
-
----
-
-### 🚀 Performance Optimizations
-
-- Slider controls for range filters
-- Debounced search inputs
-- Efficient database queries
-- Minimal re-renders
-- Collapsible sections for progressive disclosure
-
----
-
-### ✅ Production Readiness
-
-- Enterprise-grade feature set
-- Comprehensive bug reporting
-- Global configuration panel
-- Advanced filtering system
-- Dark mode support
-- Professional UX messaging
-- Complete version control
-- Voice intelligence integration
-- Zero technical debt
-- Full audit trails
-- Type-safe implementations
-
----
-
-## [1.0.0] - Previous
-
-Initial dashboard release with core features:
-- Lead management and pipeline
-- Client portfolio tracking
-- Content generation suite
-- Competitive scanning
-- Analytics and reporting
-- Team management
-- Territory assignment
-- Compensation tracking
-
----
-
-**Version 2.0.0 represents a complete platform transformation with enterprise-grade capabilities across all major systems.**
+## Completed Work Log
+
+| Date | Commit | Item |
+|------|--------|------|
+| 2026-02-23 | e762287 | AI Universal Search (Cmd+K) — two-phase local+AI, wired to DashboardLayoutClient |
+| 2026-02-23 | 2ebdefb | Vendor Flexibility Architecture — provider interfaces for Wave/GoDaddy/Resend, TENANT_REGISTRY providers block |
+| 2026-02-23 | 92b2629 | Task→Invoice auto-generation — website_deployment→deployed fires Wave invoice |
+| 2026-02-23 | a6d8108 | pick() readonly tuple TypeScript fix |
+| 2026-02-23 | 17fceb6 | Tutorial sardonic voice rewrite + overlap fix |
+| 2026-02-23 | e953ef3 | VAULT-001 — shared file version warning banner + download toast on open/download |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 0 — alert engine, DataSourceStatus, notification model, recurring task framework, schema migration |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 1 — execution spine: checklists, recurring tasks, alert→task links |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 2 — SiteHealthSnapshot cron + API + tab + alert rules |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 3 — GBP snapshot system + AI post drafting + alert rules |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 4 — cluster approval workflow + ApprovalModal + staleness monitoring + deployment task automation |
+| 2026-02-23 | 9bd8cad–e86d677 | Ops Layer Sprint 5 — AI report narratives (6 parallel AI calls, voice-profile tone-matching, report_narrative AIFeature) |
+| 2026-02-23 | c84a1aa | BACKLOG full reconciliation — 30+ items audited against git history + past chats |
+| 2026-02-22 | f5fcb3f | Commission validation end-to-end — cron triggered, transactions verified, Apex North test client deleted |
+| 2026-02-22 | f9e8bcf | Wave historical invoice import script (scripts/import-wave-history.ts) |
+| 2026-02-22 | 153205e | Basecamp OAuth integration |
+| 2026-02-22 | 0a97fad | I4 GBP OAuth code complete — OAuth client, Business Profile APIs, test users, credentials vaulted. Pending Google approval. |
+| 2026-02-22 | 8df9bd8 | FINANCE-001 — live financial overview: Wave bank balances + DB AR/AP, cash flow detail, recent transactions feed |
+| 2026-02-22 | a586948 | COVOS multi-tenant infrastructure — *.covos.app wildcard DNS, tenant detection middleware, TENANT_REGISTRY |
+| 2026-02-22 | afb4eba | Pipeline filter UX — fixed dateRange bug, removed 4 ghost filters, localStorage persistence, active count badge |
+| 2026-02-22 | afb4eba | Voice/micro-copy layer — per-column sardonic empty states, zero-results banner with clear-all CTA |
+| 2026-02-22 | 817b9d5 | ITEM-003 — per-page Driver.js tutorials for Leads, Clients, Discovery, Content Studio |
+| 2026-02-22 | 084a437 | AdminTask auto-creation on user creation — onboarding checklist auto-seeded |
+| 2026-02-22 | 9d638c6 | Client churn (soft, with reason) + hard delete (admin only, name confirmation) |
+| 2026-02-22 | d9bb3f3 | Client tabs — primary nav + grouped overflow "More" menu |
+| 2026-02-22 | PAYMENTS-006 | Cron schedule change — generate-payments moved from 1st to 5th of month |
+| 2026-02-22 | PAYMENTS-001 | Wave invoice.paid webhook handler + invoice-status-poll hourly fallback cron |
+| 2026-02-22 | PAYMENTS-002 | Approval flow for payments — PaymentGroup section in ApprovalsTab, approve route, pending route |
+| 2026-02-22 | PAYMENTS-003 | Contractor entity fields on User (contractorVendorId, contractorEntityName, contractorEmail) |
+| 2026-02-22 | PAYMENTS-004 | Position system — Position model, seed (Owner/Manager/Sales Rep/Content Manager/SEO Specialist), PositionsTab CRUD |
+| 2026-02-22 | PAYMENTS-005 | Generalized onboarding wizard — position-adaptive steps, sales (8 steps) vs ops/mgmt (6 steps), admin reset |
+| 2026-02-22 | FINANCE-002 | Historical data sync script (scripts/import-wave-history.ts) — isHistorical flag, Jan 1 2026 cutoff |
+| 2026-02-22 | FEAT-013 | GoDaddy parked domain search — DomainFinderSection, fuzzy match, GHM Parked badge, wired to ClientDomainsTab |
+| 2026-02-21 | b759f42 | UX-001 — Client detail card tab architecture (13-tab layout, profile.tsx decomposed from 1057→489 lines) |
+| 2026-02-21 | UX-002 | Content Studio + Website Studio promoted to top-level nav with StudioClientPicker, ?clientId= deep links |
+| 2026-02-21 | UX-003 | Left nav smart group navigation — 5 collapsible groups, localStorage state, active route auto-expand |
+| 2026-02-21 | UX-004 | Content Review merged into Tasks — Work tab + Approvals tab, URL sync, /review permanent redirect |
+| 2026-02-21 | ITEM-004 | AI wrapper audit — voice-capture migrated to callAI(), voice_capture AIFeature + system prompt + cost tracking |
+| 2026-02-21 | BUG-007 | Content Review quick approve sync fix — dual-query (ClientTask + ClientContent), approve routes to correct model |
+| 2026-02-21 | BUG-008 | Completed tasks not removed from review — status string mismatch fixed (in-review → review), approve route hardened |
+| 2026-02-21 | BUG-009 | Dashboard widget layout theme sync — confirmed theme-agnostic localStorage key, no fix needed |
+| 2026-02-20 | 331ac9b | Phase A — Commission system foundation (lockedResidualAmount, tiered residuals, lock-at-close, upsell_commission, rolling 90-day close rate) |
+| 2026-02-20 | 0e6c291 | Phase C — Commission dashboard UI (territory banner, My Book widget, close rate widget, CompensationConfigSection, My Earnings) |
+| 2026-02-20 | b72fc37 | FEAT-010 — Rep dashboard (territory health, My Book projections, sales tools panel, needs-attention list) |
+| 2026-02-20 | e613280 | FEAT-011 — Rep onboarding wizard (7-step, DB progress tracking, first-login redirect, admin reset) |
+| 2026-02-20 | 56f8135 | FEAT-012 — Document Vault (4 spaces, upload, transfer, search, VaultFile schema, API routes) |
+| 2026-02-20 | b62af2c | TeamFeed "Save to Vault" — file attachment in messages → vault via API |
+| 2026-02-20 | f1ee8ae | Sales tools — audit PDF, live demo generator, digital brochure, comp sheet, territory map |
+| 2026-02-20 | (session 6522f504) | Client onboarding portal (OnboardingToken-based) — 5-step wizard, auto-save, expiry UX, ops queue, submission detail |
+| 2026-02-20 | 6058025–b04ae15 | API integrations I1–I6 — DataForSEO SERP, NAP citation scraper, GBP layer, report sections, audit enrichment |
+| 2026-02-20 | (phase) | Wave payments W1–W6 — setup, schema, invoice AR cron, partner AP, dashboard UI, admin settings |
+| 2026-02-19 | 03bf33b | Permission migration — 16 API routes to withPermission(), zero requireMaster() calls remaining |
+| 2026-02-19 | 03bf33b | Task pipeline full build — schema, API, kanban UI, status transitions, history |
+| 2026-02-19 | (phase 12) | Commission transaction engine — monthly cron, residuals + master fees, dashboard widgets (3 role views) |
+| 2026-02-19 | (phase 11) | AI client layer — model router, complexity analyzer, cost tracker, system prompt builder, callAI(), ai_cost_logs |
+| 2026-02-18 | 8d0622d | Content Studio collapsible panels with localStorage persistence |
+| 2026-02-18 | (session e724a6f6) | Content Studio PPC ad copy generator — 3 Google Ads variants with character count validation |
+| 2026-02-18 | (session e724a6f6) | Content Studio topic + keyword generator — unified Content Strategy panel |
+| 2026-02-18 | (session e724a6f6) | Client portfolio sorting — A–Z, Z–A, MRR, health score, newest, oldest |
+| 2026-02-18 | 81c2c1e | SCRVNR gate engine — voice alignment scoring, 54/54 tests passing |
+| 2026-02-18–19 | (admin) | Admin role system — 3-tier hierarchy, isElevated(), ROLE_LABELS, AppRole type, role badges, profile refresh BUG-001 fix |
+| 2026-02-18–19 | (admin) | Bug report system — POST/GET/PATCH routes, BugReportsTab (admin), auto-captures console + network errors |
+| 2026-02-17 | 2abf973 | PWA manifest + push notifications — VAPID keys, service worker, PushSubscription table, settings toggles |
+| 2026-02-17 | f61d299 | TeamFeed permanent collapsible sidebar — squeezes content, toggle in header, unread badge, localStorage state |
+| 2026-02-17 | (phase 1–11) | Core platform — auth, client management, lead database, task system, competitive scanning, content review, reports, upsell detection, product catalog, analytics, client portal, email automation |

@@ -85,6 +85,8 @@ const DEFAULT_MAX_TOKENS: Record<AIFeature, number> = {
   gbp_post:          600,
   // Reports
   report_narrative: 1000,
+  // Universal Search
+  universal_search:  800,
 };
 
 // ── Singleton client ──────────────────────────────────────────────────────────

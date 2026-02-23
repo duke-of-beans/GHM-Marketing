@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — AI Universal Search complete (Cmd+K, two-phase local+AI, wired to layout). Static empty-state help added to BACKLOG. BACKLOG commission validation closed (was done Feb 22, stale entry).
+**Last Updated:** February 23, 2026 — Sync protocol established. CHANGELOG.md created (permanent completion log). BACKLOG.md rewritten to open items only. SYNC_PROTOCOL.md + updated commit.bat enforce docs-first process.
 
 ---
 
@@ -734,7 +734,13 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 
 ## 📁 FILE INDEX
 
-**This file (`STATUS.md`)** — Single source of truth for project status.
+**This file (`STATUS.md`)** — Current sprint + critical constraints + file index. Open work lives in BACKLOG.md. Completed work lives in CHANGELOG.md.
+
+**`BACKLOG.md`** — Open items only, tiered by priority (MUST / SHOULD / WOULD / FUTURE). Items are deleted when shipped. Never contains ✅.
+
+**`CHANGELOG.md`** — Permanent log of every completed item (date + commit + summary). Never pruned. The destination when a BACKLOG item ships.
+
+**`SYNC_PROTOCOL.md`** — Exact 6-step process for closing items and running git. Read this when syncing. `commit.bat` and `deploy.bat` print a checklist reminder before running git.
 
 **Specs (reference when building):**
 - `SALES_INTEGRATION_PLAN.md` — Full gap analysis, schema changes, API specs, UI requirements for sales features
