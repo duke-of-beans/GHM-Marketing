@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Commission validation prep + client lifecycle management shipped. See changelog below.
+**Last Updated:** February 22, 2026 — Commission validation complete. VAULT-001 + FINANCE-001 added to backlog.
 
 ---
 
@@ -265,7 +265,25 @@ Makes the platform feel like a product.
 **User creation:** `POST /api/users` — creates account, position-assignable, generates temp password, logs onboarding checklist to console (AdminTask model deferred to Sprint 3).
 **Add User dialog:** wired into TeamManagementTab with role + position selectors and password field.
 
-### PAYMENTS-006: Monthly Cron — Demote to Safety Net
+### VAULT-001: Global Document Version Warning
+**Priority:** HIGH — legal/ops risk
+**Problem:** Reps can download or transfer global documents (contracts, agreements, comp sheet, etc.) to their private vault folder or local machine. If they do, they're working from a snapshot that won't reflect future updates. There's no signal that the shared versions are the only guaranteed-current copies.
+**Solution:** When a rep views or downloads any document from the Shared space, show a persistent banner or toast: "This is the official current version. Saved copies may become outdated — always access contracts and agreements from the Shared folder." Additionally, consider a "Version warning" badge on any private vault file that was transferred from a shared document, indicating it may not be current.
+**Scope:** Vault UI — Shared space document viewer/download action + transfer-to-private flow.
+
+### FINANCE-001: Payments Tab — Full Wave Financial Dashboard
+**Priority:** HIGH — financial visibility for operations
+**Problem:** Current Payments tab shows pending/approved transactions but has no live financial picture. Wave has real data we're not surfacing: current bank account balances, recent transactions, outstanding invoices, bills due, cash flow. Gavin and David need this at a glance without logging into Wave separately.
+**Solution:** Rebuild the Payments/Finance tab to match the communicative density of the Wave dashboard itself:
+- Bank account balance(s) — current BofA balance pulled from Wave, visually prominent
+- Cash in (AR): outstanding invoices total, overdue amount, next expected payment
+- Cash out (AP): pending partner payments awaiting approval, bills due
+- Recent transactions feed: last 5-10 Wave transactions with amount + description
+- Net position: simple cash in - cash out = current working capital
+**API:** Wave GraphQL already wired (`src/lib/wave/`) — this is a UI/query expansion, not new integration work.
+**Files:** `src/components/payments/` — likely a new FinancialOverviewSection component + new Wave queries for account balances and recent transactions.
+
+
 **Priority:** LOW — existing cron works, needs schedule change only
 **Change:** Move from 1st to 5th of month. Webhook is now primary trigger. Cron catches misses only.
 
