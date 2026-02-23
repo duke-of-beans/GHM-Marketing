@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { TaskChecklist } from "@/components/tasks/task-checklist";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,9 @@ type QueueTask = {
   isMine: boolean;
   transitions: TaskTransitionOption[];
   createdAt: string;
+  sourceAlertId: number | null;
+  recurringRuleId: number | null;
+  checklistComplete: boolean;
 };
 
 type QueueStats = {
@@ -680,6 +684,29 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                 <p className="text-sm whitespace-pre-wrap bg-muted/30 rounded-lg p-3">{t.description}</p>
               </div>
             )}
+
+            {/* Origin badges */}
+            {(t.sourceAlertId || t.recurringRuleId) && (
+              <div className="flex flex-wrap gap-2">
+                {t.sourceAlertId && (
+                  <Link href={`/alerts?highlight=${t.sourceAlertId}`}>
+                    <Badge variant="outline" className="text-[10px] border-orange-400 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/30 cursor-pointer">
+                      🔔 From alert #{t.sourceAlertId}
+                    </Badge>
+                  </Link>
+                )}
+                {t.recurringRuleId && (
+                  <Link href={`/recurring-tasks?highlight=${t.recurringRuleId}`}>
+                    <Badge variant="outline" className="text-[10px] border-purple-400 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30 cursor-pointer">
+                      🔁 Recurring task
+                    </Badge>
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Checklist */}
+            <TaskChecklist taskId={t.id} category={t.category} />
 
             {/* Self-assign */}
             {!t.assignedTo && (

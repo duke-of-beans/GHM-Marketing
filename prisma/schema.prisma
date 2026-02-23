@@ -451,6 +451,7 @@ model ClientProfile {
 
   // Operations Layer
   alertEvents           AlertEvent[]
+  recurringTaskRules    RecurringTaskRule[] @relation("RecurringTaskRuleClient")
 
   @@map("client_profiles")
 }
@@ -1895,13 +1896,16 @@ model TaskChecklistItem {
 }
 
 model TaskChecklistTemplate {
-  id        Int      @id @default(autoincrement())
-  name      String
-  category  String   // Matches ClientTask.category values
-  items     Json     // Array of { label, sortOrder }
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String?  // Matches ClientTask.category; null = universal
+  description String?
+  items       Json     // Array of { label, sortOrder }
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  recurringRules RecurringTaskRule[] @relation("RecurringTaskRuleTemplate")
 
   @@index([category, isActive])
   @@map("task_checklist_templates")
@@ -1924,6 +1928,8 @@ model RecurringTaskRule {
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
   tasks               ClientTask[]
+  client              ClientProfile?         @relation("RecurringTaskRuleClient", fields: [clientId], references: [id], onDelete: SetNull)
+  checklistTemplate   TaskChecklistTemplate? @relation("RecurringTaskRuleTemplate", fields: [checklistTemplateId], references: [id], onDelete: SetNull)
 
   @@index([isActive, nextRunAt])
   @@map("recurring_task_rules")

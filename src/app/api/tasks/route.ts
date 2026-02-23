@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { clientId, title, description, category, priority, dueDate, estimatedMinutes, assignToUserId } = body;
+    const {
+      clientId, title, description, category, priority, dueDate, estimatedMinutes, assignToUserId,
+      checklistItems, sourceAlertId, recurringRuleId,
+    } = body;
 
     // Validation
     if (!clientId || !title?.trim() || !category) {
@@ -99,6 +102,8 @@ export async function POST(req: NextRequest) {
           assignedToUserId,
           assignedByUserId: currentUserId,
           statusChangedAt: now,
+          sourceAlertId: sourceAlertId ?? null,
+          recurringRuleId: recurringRuleId ?? null,
         },
         select: {
           id: true,
@@ -121,6 +126,36 @@ export async function POST(req: NextRequest) {
           comment: "Task created",
         },
       });
+
+      // Auto-create checklist items if provided
+      if (Array.isArray(checklistItems) && checklistItems.length > 0) {
+        await tx.taskChecklistItem.createMany({
+          data: checklistItems.map((item: { label: string; sortOrder?: number }, i: number) => ({
+            taskId: created.id,
+            label: item.label,
+            sortOrder: item.sortOrder ?? i + 1,
+          })),
+        });
+      } else {
+        // Auto-apply category template if one exists
+        const template = await tx.taskChecklistTemplate.findFirst({
+          where: { category },
+          select: { items: true },
+        });
+        if (template) {
+          const tItems = template.items as Array<{ label: string; sortOrder: number }>;
+          await tx.taskChecklistItem.createMany({
+            data: tItems.map((item) => ({ taskId: created.id, label: item.label, sortOrder: item.sortOrder })),
+          });
+        }
+      }
+
+      // Create TaskAlertLink if sourceAlertId provided
+      if (sourceAlertId) {
+        await tx.taskAlertLink.create({
+          data: { taskId: created.id, alertId: sourceAlertId },
+        });
+      }
 
       return created;
     });

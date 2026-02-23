@@ -74,6 +74,7 @@ const NAV_GROUPS: NavGroup[] = [
     links: [
       { href: "/clients",        label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
       { href: "/tasks",          label: "My Tasks",         icon: "✅" },
+      { href: "/recurring-tasks",label: "Recurring Tasks",  icon: "🔁", permission: "manage_clients" },
       // UX-002 entries — routes created in UX-002 sprint
       { href: "/content-studio", label: "Content Studio",   icon: "✍️", permission: "manage_clients" },
       { href: "/website-studio", label: "Website Studio",   icon: "🌐", permission: "manage_clients" },

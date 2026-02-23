@@ -1,10 +1,32 @@
-# SPRINT 1 — EXECUTION SPINE
+# SPRINT 1 — EXECUTION SPINE ✅ COMPLETE
 ## Extend Existing Task System with Checklists, Recurring Tasks, Alert Links
-*Dependency: Sprint 0 complete (schema + alert engine + notifications)*
+*Completed: 2026-02-23*
 
 ---
 
-## GOAL
+## STATUS: ALL DELIVERABLES COMPLETE
+
+- [x] D1: Checklist API (GET/POST /api/tasks/[id]/checklist, PUT/DELETE /api/tasks/[id]/checklist/[itemId], PUT /api/tasks/[id]/checklist/reorder)
+- [x] D1: Checklist templates API (GET/POST /api/checklist-templates, PUT/DELETE /api/checklist-templates/[id])
+- [x] D1: TaskChecklist UI component (task-checklist.tsx) — fixed API response shape mismatch
+- [x] D1: Checklist wired into task detail sheet with progress bar + apply-template picker
+- [x] D2: Recurring tasks management page (/recurring-tasks)
+- [x] D2: RecurringTasksClient list view with active toggle, edit, delete
+- [x] D2: RecurringTaskForm dialog (create/edit with cron presets, client picker, template picker)
+- [x] D2: Recurring tasks API response shape fixed (success/data pattern)
+- [x] D3: Alert + recurring origin badges in task detail sheet
+- [x] D4: POST /api/tasks extended (checklistItems, sourceAlertId, recurringRuleId)
+- [x] D4: task-creator.ts updated to create TaskAlertLink when AlertEvent exists
+- [x] Queue API extended (sourceAlertId, recurringRuleId, checklistComplete in response)
+- [x] QueueTask type updated with new fields
+- [x] Nav: "Recurring Tasks" link added to Clients group (elevated only)
+- [x] Schema: RecurringTaskRule client + checklistTemplate relations added
+- [x] Schema: TaskChecklistTemplate description field + category nullable + recurringRules back-relation
+- [x] Migration: 20260223103724_sprint1_schema_relations applied
+
+**TypeScript:** 0 errors in Sprint 1 files (21 pre-existing errors unchanged)
+
+---
 
 Enhance the existing task pipeline with operational intelligence: checklists for structured work, recurring rules for automated task creation, and alert-to-task linking for traceability. All work extends existing components — zero rewrites.
 

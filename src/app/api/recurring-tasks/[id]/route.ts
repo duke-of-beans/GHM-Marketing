@@ -29,7 +29,7 @@ export async function PUT(
     }
 
     const rule = await prisma.recurringTaskRule.update({ where: { id: ruleId }, data: body });
-    return NextResponse.json({ rule });
+    return NextResponse.json({ success: true, data: rule });
   } catch (err) {
     console.error("[PUT /api/recurring-tasks/[id]]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -114,6 +114,9 @@ export async function GET(req: NextRequest) {
           sortOrder: true,
           createdAt: true,
           updatedAt: true,
+          sourceAlertId: true,
+          recurringRuleId: true,
+          checklistComplete: true,
           client: {
             select: {
               businessName: true,
@@ -197,6 +200,9 @@ export async function GET(req: NextRequest) {
           requiresComment: tr.requiresComment,
         })),
         createdAt: t.createdAt.toISOString(),
+        sourceAlertId: t.sourceAlertId ?? null,
+        recurringRuleId: t.recurringRuleId ?? null,
+        checklistComplete: t.checklistComplete,
       };
     });
 

@@ -73,6 +73,13 @@ export async function createTasksFromAlerts(
   const created: Array<{ id: number; title: string }> = [];
   const errors: string[] = [];
   
+  // Look up any AlertEvents for this scan to link tasks to
+  const scanAlertEvents = await prisma.alertEvent.findMany({
+    where: { sourceType: "competitive_scan", sourceId: scanId, clientId },
+    select: { id: true },
+  });
+  const alertEventId = scanAlertEvents[0]?.id ?? null;
+  
   // Collect all actionable alerts
   const actionableAlerts: Alert[] = [];
   
@@ -98,8 +105,16 @@ export async function createTasksFromAlerts(
           contentBrief: buildContentBrief(alert),
           targetKeywords: alert.keyword ? [alert.keyword] : [],
           competitorRef: alert.competitor || null,
+          sourceAlertId: alertEventId,
         },
       });
+
+      // Link task to AlertEvent for traceability
+      if (alertEventId) {
+        await prisma.taskAlertLink.create({
+          data: { taskId: task.id, alertId: alertEventId },
+        });
+      }
       
       created.push({ id: task.id, title: task.title });
     } catch (error) {
