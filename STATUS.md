@@ -1,11 +1,23 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint 1 in progress: D4 done (Audit+Demo one-click button), ITEM-001 docs created.
+**Last Updated:** February 22, 2026 — Sprint 1 in progress: D4 done, ITEM-001 docs done. Covos multi-tenant infrastructure complete: wildcard DNS (*.covos.app), Vercel domains, tenant middleware, registry, server helper, client hook.
 
 ---
 
 ## 🗓️ SPRINT PLAN — February 22, 2026
+
+### COVOS MULTI-TENANT INFRASTRUCTURE — ✅ COMPLETE (February 22, 2026)
+- DNS: covos.app wildcard (*.covos.app) → Vercel, ghm.covos.app registered
+- Vercel: wildcard + ghm subdomain added to ghm-marketing project, both verified
+- `src/lib/tenant/config.ts` — TenantConfig interface, TENANT_REGISTRY (ghm), getTenantFromHost()
+- `src/lib/tenant/index.ts` — public module exports + TENANT_HEADER constant
+- `src/lib/tenant/server.ts` — getTenant() + requireTenant() for Server Components/API routes
+- `src/hooks/use-tenant.ts` — useTenant() hook for client components
+- `src/middleware.ts` — layered: tenant detection first (injects x-tenant-slug header, rejects unknown subdomains), auth second
+- `.env.local` + `.env.example` + Vercel env — ROOT_DOMAIN="covos.app"
+- Build verified: 120/120 pages, zero errors
+- New client onboarding: add slug to TENANT_REGISTRY in config.ts, DNS handles the rest
 
 ### SPRINT 1 — Launch Readiness (~4 hrs) ← DO FIRST
 Items blocking confident client and rep handoff.
