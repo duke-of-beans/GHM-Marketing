@@ -36,7 +36,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Mic, Sparkles } from "lucide-react";
+import { Mic, Sparkles, ChevronDown, Circle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/components/dashboard/metric-card";
 import { useTour, CLIENT_DETAIL_TOUR } from "@/lib/tutorials";
 import { TourButton } from "@/components/tutorials/TourButton";
@@ -380,26 +388,103 @@ export function ClientProfile({ client }: { client: ClientData }) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabId)}>
-        <TabsList className="w-full justify-start overflow-x-auto" data-tour="client-tabs">
-          <TabsTrigger value="scorecard" data-tour="client-tab-scorecard">Scorecard</TabsTrigger>
-          <TabsTrigger value="tasks" data-tour="client-tab-tasks">
-            Tasks{openTaskCount > 0 && (
-              <Badge variant="secondary" className="ml-1.5 text-xs">{openTaskCount}</Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="rankings" data-tour="client-tab-rankings">Rankings</TabsTrigger>
-          <TabsTrigger value="citations">Citations</TabsTrigger>
-          <TabsTrigger value="local">Local Presence</TabsTrigger>
-          <TabsTrigger value="content">Content Studio</TabsTrigger>
-          <TabsTrigger value="websites">Website Studio</TabsTrigger>
-          <TabsTrigger value="reports" data-tour="client-tab-reports">Reports</TabsTrigger>
-          <TabsTrigger value="domains">Domains</TabsTrigger>
-          <TabsTrigger value="compensation">Compensation</TabsTrigger>
-          <TabsTrigger value="billing" data-tour="client-tab-billing">Billing</TabsTrigger>
-          <TabsTrigger value="campaigns">Google Ads</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-        </TabsList>
+        {(() => {
+          const PRIMARY_TABS: { value: TabId; label: React.ReactNode }[] = [
+            { value: "scorecard", label: "Scorecard" },
+            {
+              value: "tasks",
+              label: (
+                <span className="flex items-center gap-1.5">
+                  Tasks
+                  {openTaskCount > 0 && (
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4">
+                      {openTaskCount}
+                    </Badge>
+                  )}
+                </span>
+              ),
+            },
+            { value: "rankings", label: "Rankings" },
+            { value: "citations", label: "Citations" },
+            { value: "local", label: "Local" },
+            { value: "content", label: "Content" },
+            { value: "websites", label: "Websites" },
+            { value: "notes", label: "Notes" },
+          ];
+
+          const OVERFLOW_TABS: { value: TabId; label: string; group: string }[] = [
+            { value: "reports",      label: "Reports",       group: "Operations" },
+            { value: "domains",      label: "Domains",       group: "Operations" },
+            { value: "compensation", label: "Compensation",  group: "Account" },
+            { value: "billing",      label: "Billing",       group: "Account" },
+            { value: "campaigns",    label: "Google Ads",    group: "Account" },
+            { value: "integrations", label: "Integrations",  group: "Account" },
+          ];
+
+          const overflowValues = OVERFLOW_TABS.map((t) => t.value);
+          const activeIsOverflow = overflowValues.includes(activeTab);
+
+          return (
+            <div className="flex items-center gap-0.5 border-b">
+              <TabsList className="h-10 bg-transparent p-0 gap-0 border-0 rounded-none flex-shrink-0">
+                {PRIMARY_TABS.map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    data-tour={`client-tab-${tab.value}`}
+                    className="h-10 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-3 text-sm font-medium text-muted-foreground data-[state=active]:text-foreground hover:text-foreground transition-colors"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className={`h-10 flex items-center gap-1 px-3 text-sm font-medium border-b-2 transition-colors hover:text-foreground flex-shrink-0 ${
+                      activeIsOverflow
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground"
+                    }`}
+                  >
+                    {activeIsOverflow ? (
+                      <span className="flex items-center gap-1.5">
+                        <Circle className="h-1.5 w-1.5 fill-primary text-primary" />
+                        {OVERFLOW_TABS.find((t) => t.value === activeTab)?.label}
+                      </span>
+                    ) : (
+                      "More"
+                    )}
+                    <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-44">
+                  {["Operations", "Account"].map((group, i) => (
+                    <div key={group}>
+                      {i > 0 && <DropdownMenuSeparator />}
+                      <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1">
+                        {group}
+                      </DropdownMenuLabel>
+                      {OVERFLOW_TABS.filter((t) => t.group === group).map((tab) => (
+                        <DropdownMenuItem
+                          key={tab.value}
+                          onClick={() => setActiveTab(tab.value)}
+                          className={`cursor-pointer ${activeTab === tab.value ? "bg-accent font-medium" : ""}`}
+                        >
+                          {tab.label}
+                          {activeTab === tab.value && (
+                            <Circle className="ml-auto h-1.5 w-1.5 fill-primary text-primary" />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          );
+        })()}
 
         <TabsContent value="scorecard" className="space-y-4">
           <UpsellOpportunities
