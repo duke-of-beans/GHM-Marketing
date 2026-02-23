@@ -147,7 +147,9 @@ Admins select their providers from a dropdown per category. Each selection shows
 
 ---
 
-### AI-Powered Universal Search (COVOS Intelligence Layer)
+### ✅ AI-Powered Universal Search (COVOS Intelligence Layer) — COMPLETE (February 23, 2026)
+**Commit:** e762287
+**Delivered:** `src/app/api/search/route.ts` — two-phase POST handler (local Prisma match at 200ms + Haiku AI semantic at 500ms, merged deduplicated results). `src/lib/ai/search-prompt.ts` — role-aware system prompt builder with client-scoped context. `src/components/search/AISearchBar.tsx` — global Cmd+K modal, keyboard navigation (↑↓/Enter), loading state, AI answers + actions sections, sardonic empty state. Wired into DashboardLayoutClient sticky top bar alongside TeamFeedToggle.
 **Context:** Not in backlog previously. Distinct from the command palette (Cmd+K) — that's fast navigation. This is contextual intelligence. The difference: command palette finds "German Auto Doctor." AI search answers "which clients are at churn risk this month" or "find the task where we discussed satellite site for the restaurant client in Round Rock."
 **Vision:** A single search bar, globally available, that understands the entire Covos data model AND the live state of this specific agency's data. When inside a client record, it automatically scopes to that client first. When at the master dashboard level, it searches across everything.
 
