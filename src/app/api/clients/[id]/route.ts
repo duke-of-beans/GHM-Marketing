@@ -20,6 +20,7 @@ const editClientSchema = z.object({
     retainerAmount: z.number().min(0).optional(),
     scanFrequency: z.enum(['weekly', 'biweekly', 'monthly']).optional(),
     status: z.enum(['active', 'paused', 'at_risk', 'churned']).optional(),
+    churnReason: z.string().max(2000).optional().nullable(),
   }).optional(),
 });
 
@@ -103,11 +104,31 @@ export async function PATCH(
         }
       });
 
-      // Update client profile
+      // Churn handling: stamp churnedAt and cancel pending transactions
+      const isChurning =
+        clientUpdates.status === 'churned' &&
+        existingClient.status !== 'churned';
+
+      const { churnReason, ...profileUpdates } = clientUpdates;
+
       await prisma.clientProfile.update({
         where: { id: clientId },
-        data: clientUpdates,
+        data: {
+          ...profileUpdates,
+          ...(isChurning && {
+            churnedAt: new Date(),
+            churnReason: churnReason ?? null,
+          }),
+        },
       });
+
+      if (isChurning) {
+        // Cancel all pending/approved transactions — no more payments on a churned client
+        await prisma.paymentTransaction.updateMany({
+          where: { clientId, status: { in: ['pending', 'approved'] } },
+          data: { status: 'cancelled', notes: `Auto-cancelled: client churned` },
+        });
+      }
 
       // Commission trigger: fire one-time commission when client first goes active
       const isNewlyActive =
@@ -234,5 +255,49 @@ export async function PATCH(
       { error: 'Failed to update client' },
       { status: 500 }
     );
+  }
+}
+
+// DELETE /api/clients/[id]
+// Admin only. Hard deletes the ClientProfile and its parent Lead.
+// All child records cascade via schema onDelete: Cascade.
+// Intended for test/junk data removal only — use churn for real departures.
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+    }
+
+    const clientId = parseInt(params.id);
+    if (isNaN(clientId)) {
+      return NextResponse.json({ error: 'Invalid client ID' }, { status: 400 });
+    }
+
+    const client = await prisma.clientProfile.findUnique({
+      where: { id: clientId },
+      select: { leadId: true, businessName: true },
+    });
+    if (!client) {
+      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+    }
+
+    // Delete ClientProfile first (children cascade), then the parent Lead
+    await prisma.clientProfile.delete({ where: { id: clientId } });
+    await prisma.lead.delete({ where: { id: client.leadId } });
+
+    return NextResponse.json({
+      success: true,
+      message: `${client.businessName} permanently deleted`,
+    });
+  } catch (error) {
+    console.error('Error deleting client:', error);
+    return NextResponse.json({ error: 'Failed to delete client' }, { status: 500 });
   }
 }

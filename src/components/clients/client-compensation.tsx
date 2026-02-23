@@ -202,7 +202,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
       return override.feeAmount;
     }
     // Default master manager fee logic
-    if ([1, 2].includes(userId)) return 0; // Owners
+    if (userId === 1) return 0; // David (admin/owner) — no fee, profit goes direct
     return 240; // Default
   };
 
@@ -283,7 +283,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
             <SelectContent>
               <SelectItem value="none">None</SelectItem>
               {users
-                .filter((u) => u.role === "master")
+                .filter((u) => u.role === "master" || u.role === "admin")
                 .map((user) => (
                   <SelectItem key={user.id} value={user.id.toString()}>
                     {user.name}

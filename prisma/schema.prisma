@@ -399,6 +399,10 @@ model ClientProfile {
   lockedResidualAmount  Decimal?  @map("locked_residual_amount") @db.Decimal(10, 2)
   closedInMonth         DateTime? @map("closed_in_month") @db.Date
 
+  // Churn tracking
+  churnedAt         DateTime? @map("churned_at")
+  churnReason       String?   @map("churn_reason") @db.Text
+
   // Wave billing fields
   waveCustomerId    String?   @map("wave_customer_id")
   invoiceDay        Int       @default(1) @map("invoice_day")

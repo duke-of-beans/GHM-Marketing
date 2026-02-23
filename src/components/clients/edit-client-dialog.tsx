@@ -10,8 +10,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -19,8 +31,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface EditClientDialogProps {
   client: {
@@ -40,11 +53,17 @@ interface EditClientDialogProps {
     status: string;
   };
   onUpdate: () => void;
+  onDelete?: () => void;
 }
 
-export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
+export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialogProps) {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Form state
   const [businessName, setBusinessName] = useState(client.lead.businessName);
@@ -58,6 +77,7 @@ export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
   const [retainerAmount, setRetainerAmount] = useState(client.retainerAmount.toString());
   const [scanFrequency, setScanFrequency] = useState(client.scanFrequency);
   const [status, setStatus] = useState(client.status);
+  const [churnReason, setChurnReason] = useState('');
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -138,6 +158,7 @@ export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
             retainerAmount: parseFloat(retainerAmount),
             scanFrequency,
             status,
+            ...(status === 'churned' && { churnReason: churnReason || null }),
           },
         }),
       });
@@ -156,6 +177,23 @@ export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
       toast.error(error instanceof Error ? error.message : 'Failed to update client');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (deleteConfirmName !== client.lead.businessName) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/clients/${client.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete client');
+      toast.success(data.message);
+      setOpen(false);
+      onDelete?.();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete client');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -348,20 +386,74 @@ export function EditClientDialog({ client, onUpdate }: EditClientDialogProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              {status === 'churned' && client.status !== 'churned' && (
+                <div className="grid gap-2 mt-4">
+                  <Label htmlFor="churnReason">
+                    Churn Reason <span className="text-muted-foreground text-xs">(optional but recommended)</span>
+                  </Label>
+                  <Textarea
+                    id="churnReason"
+                    value={churnReason}
+                    onChange={(e) => setChurnReason(e.target.value)}
+                    placeholder="Why did this client churn? Price, service issues, went in-house, competitor…"
+                    rows={3}
+                    maxLength={2000}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    This will be saved to the client record and all pending payments will be cancelled automatically.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={loading}>
-              {loading ? 'Saving...' : 'Save Changes'}
-            </Button>
+          <DialogFooter className="flex items-center justify-between gap-2 sm:justify-between">
+            {isAdmin && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" type="button">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Client
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Permanently delete this client?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This cannot be undone. All data — tasks, notes, scans, payment history — will be gone forever.
+                      Use <strong>Churned</strong> status instead if you want to keep the record.
+                      <br /><br />
+                      Type <strong>{client.lead.businessName}</strong> to confirm.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <Input
+                    value={deleteConfirmName}
+                    onChange={(e) => setDeleteConfirmName(e.target.value)}
+                    placeholder={client.lead.businessName}
+                    className="mt-2"
+                  />
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setDeleteConfirmName('')}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={deleteConfirmName !== client.lead.businessName || deleteLoading}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleteLoading ? 'Deleting…' : 'Delete permanently'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            <div className="flex gap-2 ml-auto">
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={loading}>
+                {loading ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

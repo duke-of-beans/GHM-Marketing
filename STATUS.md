@@ -1,11 +1,20 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Tab nav redesign shipped (d9bb3f3). BACKLOG.md created as consolidated backlog. See BACKLOG.md for all queued work.
+**Last Updated:** February 22, 2026 — Commission validation prep + client lifecycle management shipped. See changelog below.
 
 ---
 
 ## 🗓️ SPRINT PLAN — February 22, 2026
+
+## 🗓️ SPRINT PLAN — February 22, 2026
+
+### SESSION — Commission Validation Prep + Client Lifecycle (February 22, 2026)
+- [x] **DB cleanup** — Deleted seed accounts Alex Johnson (id=2) and Sarah Chen (id=3). Zero real data attached. User roster is now David/Gavin/Arian/TestAccount only.
+- [x] **BUG: Master Manager dropdown excluded admins** — `client-compensation.tsx` filter was `role === 'master'` only. Fixed to `role === 'master' || role === 'admin'`. David now appears in dropdown.
+- [x] **BUG: getEffectiveFee hardcoded userId=2 as owner** — was `[1, 2].includes(userId)` → fixed to `userId === 1` (David only). Alex was already deleted but logic was wrong regardless.
+- [x] **FEAT: Churn client with notes** — `churnedAt` + `churnReason` added to ClientProfile schema (db push complete). PATCH route handles churn stamping + auto-cancels all pending/approved PaymentTransactions on churn. Edit dialog shows churn reason textarea when status switches to Churned. Churn is a soft status change — record preserved.
+- [x] **FEAT: Hard delete client** — DELETE `/api/clients/[id]` (admin only). Cascades ClientProfile + parent Lead. Edit dialog has destructive "Delete Client" button (admin only) behind AlertDialog requiring exact business name confirmation to activate.
 
 ### COVOS MULTI-TENANT INFRASTRUCTURE — ✅ COMPLETE (February 22, 2026)
 - DNS: covos.app wildcard (*.covos.app) → Vercel, ghm.covos.app registered
