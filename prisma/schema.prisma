@@ -1423,6 +1423,7 @@ model InvoiceRecord {
   waveViewUrl     String?   @map("wave_view_url")
   lineItems       Json?     @map("line_items")
   notes           String?
+  sourceTaskId    Int?      @map("source_task_id")   // set when auto-generated from a task deployment
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 

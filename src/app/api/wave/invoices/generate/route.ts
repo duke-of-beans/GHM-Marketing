@@ -8,13 +8,7 @@ import { prisma } from '@/lib/db'
 import { ensureWaveCustomer } from '@/lib/wave/sync'
 import { createInvoice, sendInvoice } from '@/lib/wave/invoices'
 import { addDays, format, startOfMonth } from 'date-fns'
-
-async function getSeoProductId(): Promise<string> {
-  // Env var takes precedence; fall back to DB setting configured in UI
-  if (process.env.WAVE_SEO_PRODUCT_ID) return process.env.WAVE_SEO_PRODUCT_ID
-  const setting = await prisma.appSetting.findUnique({ where: { key: 'wave_seo_product_id' } })
-  return setting?.value ?? ''
-}
+import { getSeoProductId } from '@/lib/wave/product-id'
 
 export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, 'manage_payments')
