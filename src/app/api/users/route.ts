@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
 import { z } from "zod";
 import { hash } from "bcryptjs";
+import { createVendor } from "@/lib/wave/vendors";
+import { sendContractorWaveInvite } from "@/lib/email";
 
 const createUserSchema = z.object({
   name: z.string().min(1).max(100),
@@ -12,6 +14,9 @@ const createUserSchema = z.object({
   positionId: z.number().int().positive().nullable().optional(),
   territoryId: z.number().int().positive().nullable().optional(),
   password: z.string().min(8).optional(),
+  // Contractor fields — if provided, Wave vendor is created automatically
+  contractorEntityName: z.string().min(1).max(200).optional(),
+  contractorEmail: z.string().email().optional(),
 });
 
 /**
@@ -95,8 +100,43 @@ export async function POST(req: NextRequest) {
       passwordHash,
       positionId: parsed.data.positionId ?? null,
       territoryId: parsed.data.territoryId ?? null,
+      contractorEntityName: parsed.data.contractorEntityName ?? null,
+      contractorEmail: parsed.data.contractorEmail ?? null,
     },
   });
+
+  // ── Wave vendor auto-creation ──────────────────────────────────────────────
+  // If contractor fields were supplied, create the Wave vendor immediately and
+  // write the vendor ID back to the user record. Non-fatal if Wave is down —
+  // the admin onboarding task will flag it as a manual step.
+  let waveVendorId: string | null = null;
+  let waveError: string | null = null;
+
+  if (parsed.data.contractorEntityName && parsed.data.contractorEmail) {
+    try {
+      const vendor = await createVendor({
+        name: parsed.data.contractorEntityName,
+        email: parsed.data.contractorEmail,
+      });
+      waveVendorId = vendor.id;
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { contractorVendorId: vendor.id },
+      });
+
+      // Fire the plain-English setup email to the contractor
+      await sendContractorWaveInvite({
+        contractorEmail: parsed.data.contractorEmail,
+        contractorName: parsed.data.name,
+        entityName: parsed.data.contractorEntityName,
+      });
+    } catch (err) {
+      // Log but don't fail the request — vendor can be set manually via team settings
+      waveError = String(err);
+      console.error("[Wave] Vendor auto-creation failed for user", user.id, waveError);
+    }
+  }
 
   // Auto-create admin onboarding checklist task
   const position = parsed.data.positionId
@@ -104,12 +144,18 @@ export async function POST(req: NextRequest) {
     : null;
 
   try {
+    const waveSetupLine = waveVendorId
+      ? `- ✅ Wave vendor created automatically (ID: ${waveVendorId}) — contractor notified via email`
+      : waveError
+      ? `- ⚠️ Wave vendor creation failed — set contractorVendorId manually in team settings (error: ${waveError.slice(0, 120)})`
+      : `- Add Wave vendor record and set contractor fields (if contractor role)`;
+
     await prisma.adminTask.create({
       data: {
         title: `Onboard new user: ${user.name}`,
         description:
           `New user created (${position?.name ?? parsed.data.role}). Checklist:\n` +
-          `- Add Wave vendor record and set contractor fields\n` +
+          `${waveSetupLine}\n` +
           `- Configure compensation (commission + residual amounts)\n` +
           `- Assign territory if sales role\n` +
           `- Verify dashboard access level\n` +
@@ -121,9 +167,19 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (taskError) {
-    // Non-fatal — user was created successfully, log and continue
     console.error("[AdminTask] Failed to create onboarding task:", taskError);
   }
 
-  return NextResponse.json({ success: true, data: { id: user.id, name: user.name, email: user.email, role: user.role, tempPassword: parsed.data.password ? undefined : tempPassword } }, { status: 201 });
+  return NextResponse.json({
+    success: true,
+    data: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      tempPassword: parsed.data.password ? undefined : tempPassword,
+      waveVendorId,
+      waveError,
+    },
+  }, { status: 201 });
 }

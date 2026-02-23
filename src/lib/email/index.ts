@@ -235,6 +235,89 @@ export async function sendOpsOnboardingNotification(params: {
 }
 
 // ============================================================================
+// Contractor Wave onboarding — sent when a new contractor is added to the system
+// ============================================================================
+
+export async function sendContractorWaveInvite(params: {
+  contractorEmail: string;
+  contractorName: string;
+  entityName: string;
+}) {
+  const { contractorEmail, contractorName, entityName } = params;
+  if (!process.env.RESEND_API_KEY) return { success: false, error: "Email not configured" };
+
+  try {
+    const { data, error } = await getResend()!.emails.send({
+      from: `GHM Marketing <${FROM_EMAIL}>`,
+      to: contractorEmail,
+      subject: "Action required: Set up your payment account with GHM Marketing",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f9fafb;">
+          <div style="background: #1a1a2e; padding: 24px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: #fff; margin: 0; font-size: 22px;">GHM Marketing</h1>
+            <p style="color: #a0a0b0; margin: 4px 0 0; font-size: 12px; letter-spacing: 1px;">PARTNER PAYMENT SETUP</p>
+          </div>
+
+          <div style="background: #fff; padding: 32px 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+            <p style="color: #111827; font-size: 16px; margin-top: 0;">Hi ${contractorName},</p>
+
+            <p style="color: #374151; line-height: 1.7;">
+              You've been added to GHM's payment system as a contractor under the entity
+              <strong>${entityName}</strong>. To receive your commissions and residuals, you need
+              to complete one quick step: connect your bank account through Wave, our payment platform.
+            </p>
+
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 20px; margin: 24px 0;">
+              <p style="color: #1e40af; font-weight: 700; font-size: 15px; margin: 0 0 12px;">What you need to do</p>
+              <ol style="color: #1e40af; font-size: 14px; margin: 0; padding-left: 20px; line-height: 2;">
+                <li>Check your inbox for a separate email from <strong>Wave (waveapps.com)</strong> — it may take a few minutes to arrive.</li>
+                <li>Open that email and click <strong>"Accept invitation"</strong> or <strong>"Set up account"</strong>.</li>
+                <li>Create your free Wave account (or log in if you already have one).</li>
+                <li>Go to <strong>Payments → Payout account</strong> and enter your bank account details (routing + account number).</li>
+                <li>That's it — you're set up. GHM will process your payments directly to that account each month.</li>
+              </ol>
+            </div>
+
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <p style="color: #6b7280; font-size: 13px; margin: 0 0 6px; font-weight: 600;">A few things to know:</p>
+              <ul style="color: #6b7280; font-size: 13px; margin: 0; padding-left: 18px; line-height: 1.9;">
+                <li>Wave is free for contractors — you won't be charged anything.</li>
+                <li>Your bank details are entered directly into Wave and are never stored by GHM.</li>
+                <li>Payments are processed once your commissions are approved each month.</li>
+                <li>Wave will issue your 1099 at year-end automatically.</li>
+              </ul>
+            </div>
+
+            <p style="color: #374151; line-height: 1.7;">
+              If you don't see the Wave email within 10 minutes, check your spam folder. If it's
+              not there either, reply to this email and we'll sort it out.
+            </p>
+
+            <p style="color: #374151; line-height: 1.7;">
+              Welcome to the team — we're glad to have you.
+            </p>
+
+            <p style="color: #374151; margin-bottom: 0;">
+              — The GHM Team
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 28px 0 16px;" />
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+              GHM Digital Marketing Inc · Questions? Reply to this email.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, emailId: data?.id };
+  } catch (err) {
+    return { success: false, error: String(err) };
+  }
+}
+
+// ============================================================================
 // Onboarding submission — notify the partner who generated the link
 // ============================================================================
 
