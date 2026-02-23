@@ -2,9 +2,8 @@ import type { TourConfig } from "../types";
 
 /**
  * Client Detail page tour.
- *
- * Targets elements via data-tour="[id]" attributes added to profile.tsx.
- * Steps cover: header, health score, tab bar, key tabs (scorecard, tasks, SEO, reports).
+ * Fires automatically on first visit to any client detail page.
+ * Covers the header, health score, tabs, and what lives in each.
  */
 export const CLIENT_DETAIL_TOUR: TourConfig = {
   slug: "client-detail",
@@ -12,59 +11,59 @@ export const CLIENT_DETAIL_TOUR: TourConfig = {
   steps: [
     {
       element: '[data-tour="client-header"]',
-      title: "Client Overview",
+      title: "Client Header",
       description:
-        "The header shows the client's name, health score, monthly revenue, and quick-action buttons. Everything about this client starts here.",
+        "Name, health score, monthly revenue, quick-action buttons. Everything about this client starts here. If the health score looks bad, that's not a display bug.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-health-badge"]',
       title: "Health Score",
       description:
-        "The health score (0–100) measures how well the client is performing relative to their local competitors. 75+ is healthy. Below 50 needs attention. It updates automatically after every competitive scan.",
+        "0–100. Measures how this client is performing against their local competitors. 75+ is healthy. Below 50 is a problem. It updates automatically after every scan — no manual refresh needed.",
       side: "bottom",
       padding: 4,
     },
     {
       element: '[data-tour="client-tabs"]',
-      title: "Tab Navigation",
+      title: "Tabs",
       description:
-        "Each tab focuses on a different area: Scorecard (overall health + opportunities), Tasks (work queue), SEO (rankings + citations), Reports, Billing, and more. The URL updates when you switch tabs — you can bookmark or share a direct link to any tab.",
+        "Each tab is a different area of the client relationship. The URL updates when you switch — you can bookmark or share a direct link to any tab. This is relevant more often than you'd think.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-scorecard"]',
-      title: "Scorecard Tab",
+      title: "Scorecard — Start Here",
       description:
-        "Start here. The Scorecard shows upsell opportunities, competitive gaps, and the full scan history. This tells you exactly what work is most impactful right now.",
+        "Upsell opportunities, competitive gaps, full scan history. If you're not sure what to work on, this tab will tell you.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-tasks"]',
-      title: "Tasks Tab",
+      title: "Tasks",
       description:
-        "The task queue for this client. Create tasks, assign them to team members, and track progress. AI Content Briefs live here — click Generate to create one with a single click.",
+        "Work queue for this client. Create tasks, assign them, track progress. AI Content Briefs live here — click Generate and the system does the brief for you.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-rankings"]',
-      title: "SEO Tab — Rankings",
+      title: "SEO — Rankings",
       description:
-        "Live keyword rankings pulled from DataForSEO. See which keywords are climbing, declining, or newly appearing. Rank data updates daily via cron.",
+        "Live keyword rankings from DataForSEO. Climbing, declining, new — it's all here. Updates daily via cron. If a keyword disappeared, it's not gone, check the filter.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-reports"]',
-      title: "Reports Tab",
+      title: "Reports",
       description:
-        "Generate, preview, and download the monthly client report PDF. Reports pull live data — rankings, citations, scan results — into a branded PDF you can send directly to the client.",
+        "Generate, preview, and download the monthly client report PDF. Pulls live data — rankings, citations, scan results — into a branded PDF. Ready to send directly to the client.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-billing"]',
-      title: "Billing Tab",
+      title: "Billing",
       description:
-        "Wave invoice history, payment status, and outstanding balance for this client. Invoices are generated automatically every month — check here if a payment is late.",
+        "Wave invoice history, payment status, and outstanding balance. Invoices generate automatically every month. If a payment is late, this is where you confirm it and then call them.",
       side: "bottom",
     },
   ],
