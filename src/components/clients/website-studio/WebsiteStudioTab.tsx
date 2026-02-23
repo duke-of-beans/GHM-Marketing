@@ -6,39 +6,42 @@ import { Globe, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PropertyMatrix } from "./PropertyMatrix";
 import { BuildQueue } from "./BuildQueue";
-import { ApprovalQueue } from "./ApprovalQueue";
+import { ApprovalModal } from "./ApprovalModal";
 import { NewPropertyModal } from "./NewPropertyModal";
 import { PageComposer } from "./PageComposer";
 import { DnaLab } from "./DnaLab";
-import type {
-  WebPropertyMatrix,
-  BuildJobWithPages,
-  ComposerPage,
-} from "@/types/website-studio";
+import type { WebPropertyMatrix } from "@/types/website-studio";
 
 // ── View states ───────────────────────────────────────────────────────────────
 type View =
   | { mode: "matrix" }
-  | { mode: "composer";  jobId: number; pageId: number | null }
-  | { mode: "approval";  jobId: number; jobStage: string }
-  | { mode: "dna";       propertyId: number; propertySlug: string };
+  | { mode: "composer"; jobId: number; pageId: number | null }
+  | { mode: "dna";      propertyId: number; propertySlug: string };
+
+interface ApprovalTarget {
+  jobId:         number;
+  brandSegment:  string;
+  tier:          string;
+  pages:         any[];
+}
 
 interface Props {
-  clientId: number;
+  clientId:     number;
   businessName: string;
 }
 
 export function WebsiteStudioTab({ clientId, businessName }: Props) {
-  const [loading, setLoading] = useState(true);
-  const [matrix, setMatrix] = useState<WebPropertyMatrix>({});
-  const [buildJobs, setBuildJobs] = useState<any[]>([]);
-  const [view, setView] = useState<View>({ mode: "matrix" });
+  const [loading, setLoading]               = useState(true);
+  const [matrix, setMatrix]                 = useState<WebPropertyMatrix>({});
+  const [buildJobs, setBuildJobs]           = useState<any[]>([]);
+  const [view, setView]                     = useState<View>({ mode: "matrix" });
   const [newPropertyOpen, setNewPropertyOpen] = useState(false);
+  const [approvalTarget, setApprovalTarget] = useState<ApprovalTarget | null>(null);
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/website-studio/${clientId}`);
+      const res  = await fetch(`/api/website-studio/${clientId}`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error);
       setMatrix(json.data.matrix);
@@ -56,8 +59,15 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
     setView({ mode: "composer", jobId, pageId: pageId ?? null });
   }
 
-  function openApproval(jobId: number, jobStage: string) {
-    setView({ mode: "approval", jobId, jobStage });
+  function openApproval(jobId: number) {
+    const job = buildJobs.find(j => j.id === jobId);
+    if (!job) return;
+    setApprovalTarget({
+      jobId,
+      brandSegment: job.property?.brandSegment ?? "",
+      tier:         job.property?.tier ?? "",
+      pages:        job.pages ?? [],
+    });
   }
 
   function openDna(propertyId: number, propertySlug: string) {
@@ -66,19 +76,7 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
 
   function backToMatrix() {
     setView({ mode: "matrix" });
-    load(); // Refresh counts after composer work
-  }
-
-  // ── Approval Queue view ───────────────────────────────────────────────────
-  if (view.mode === "approval") {
-    return (
-      <ApprovalQueue
-        clientId={clientId}
-        jobId={view.jobId}
-        onClose={backToMatrix}
-        onApprovalComplete={() => { backToMatrix(); }}
-      />
-    );
+    load();
   }
 
   // ── DNA Lab view ──────────────────────────────────────────────────────────
@@ -93,9 +91,9 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
     );
   }
 
-  // ── Page Composer view ───────────────────────────────────────────────────
+  // ── Page Composer view ────────────────────────────────────────────────────
   if (view.mode === "composer") {
-    const job = buildJobs.find((j) => j.id === view.jobId);
+    const job = buildJobs.find(j => j.id === view.jobId);
     return (
       <PageComposer
         clientId={clientId}
@@ -107,9 +105,9 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
     );
   }
 
-  // ── Matrix + Queue view ──────────────────────────────────────────────────
+  // ── Matrix + Queue view (approval is a modal overlay) ─────────────────────
   const hasProperties = Object.keys(matrix).length > 0;
-  const activeJobs = buildJobs.filter((j) => j.stage !== "live");
+  const activeJobs    = buildJobs.filter(j => j.stage !== "live");
 
   return (
     <div className="space-y-6">
@@ -144,13 +142,14 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
               clientId={clientId}
               jobs={activeJobs}
               onOpenComposer={(jobId, pageId) => openComposer(jobId, pageId)}
-              onOpenApproval={(jobId, jobStage) => openApproval(jobId, jobStage)}
+              onOpenApproval={(jobId) => openApproval(jobId)}
               onRefresh={load}
             />
           )}
         </>
       )}
 
+      {/* Modals */}
       <NewPropertyModal
         open={newPropertyOpen}
         onOpenChange={setNewPropertyOpen}
@@ -158,17 +157,24 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
         businessName={businessName}
         onCreated={() => { setNewPropertyOpen(false); load(); }}
       />
+
+      {approvalTarget && (
+        <ApprovalModal
+          open={!!approvalTarget}
+          onOpenChange={(v) => { if (!v) setApprovalTarget(null); }}
+          clientId={clientId}
+          jobId={approvalTarget.jobId}
+          jobBrandSegment={approvalTarget.brandSegment}
+          jobTier={approvalTarget.tier}
+          pages={approvalTarget.pages}
+          onDone={() => { setApprovalTarget(null); load(); }}
+        />
+      )}
     </div>
   );
 }
 
-function EmptyState({
-  onNew,
-  businessName,
-}: {
-  onNew: () => void;
-  businessName: string;
-}) {
+function EmptyState({ onNew, businessName }: { onNew: () => void; businessName: string }) {
   return (
     <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
       <Globe className="h-8 w-8 text-muted-foreground mx-auto" />

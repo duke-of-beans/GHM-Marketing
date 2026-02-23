@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, AlertCircle, Edit3, Rocket, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { ApprovalQueue } from "./ApprovalQueue";
+// ApprovalModal is mounted in WebsiteStudioTab and driven via onOpenApproval callback
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   scaffolded: { label: "Scaffolded",  color: "text-gray-500",   icon: <Clock className="h-3 w-3" /> },
@@ -18,8 +18,8 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.R
 interface Props {
   clientId: number;
   jobs: any[];
-  onOpenComposer:  (jobId: number, pageId?: number) => void;
-  onOpenApproval:  (jobId: number, jobStage: string) => void;
+  onOpenComposer: (jobId: number, pageId?: number) => void;
+  onOpenApproval: (jobId: number) => void;
   onRefresh: () => void;
 }
 
@@ -81,7 +81,7 @@ export function BuildQueue({ clientId, jobs, onOpenComposer, onOpenApproval, onR
                     size="sm"
                     variant="outline"
                     className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
-                    onClick={() => onOpenApproval(job.id, job.stage)}
+                    onClick={() => onOpenApproval(job.id)}
                   >
                     Review Pages
                   </Button>
