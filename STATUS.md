@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — MUST sprint complete. Commission validation ✅, W7 deferred to Jan 2027, I4 GBP OAuth live in Testing mode.
+**Last Updated:** February 22, 2026 — Sprint A (Revenue & Financial Visibility) complete. FINANCE-001 live, FINANCE-002 import script ready, Arian setup pending manual Wave step.
 
 ---
 
@@ -273,24 +273,22 @@ Makes the platform feel like a product.
 
 ### FINANCE-002: Historical Data Sync — Wave + Gusto into Dashboard
 **Priority:** MEDIUM — context and continuity for financial reporting
-**Problem:** The dashboard has no history prior to its launch date. Wave has months of invoicing and accounting data, Gusto has payroll history. The Payments/Finance tab shows a blank slate when it should reflect actual business history.
-**Solution:** One-time historical import:
-- Wave: Pull all historical invoices (AR) and bills (AP) via GraphQL and seed PaymentTransaction records with accurate dates and amounts. Mark them status='paid' with historical note.
-- Gusto: Export payroll history (CSV or API) and import as salary records or compensation log entries for Gavin.
-- Set a clear cutoff date (e.g. Jan 1, 2026) — everything before is "imported history", everything after is live dashboard data.
-**Scope:** Data migration script + possibly a new `isHistorical` flag on PaymentTransaction to distinguish imported vs. engine-generated records.
+**Status:** ✅ SCRIPT READY — February 22, 2026. Schema updated (isHistorical flag). Run when ready.
+**Script:** `scripts/import-wave-history.ts`
+**Run:** `DRY_RUN=true npx tsx scripts/import-wave-history.ts` (preview), then without DRY_RUN to write
+**Cutoff:** Jan 1, 2026 — everything before is imported history, everything after is live
+**Notes:** Bills import uses `clientId=clients[0]` as placeholder — update manually post-import if attribution needed for specific bills. Gusto payroll history is out of scope (Gusto is W-2 for Gavin only; 1099 contractors handled via Wave bills).
 
 
 **Priority:** HIGH — financial visibility for operations
-**Problem:** Current Payments tab shows pending/approved transactions but has no live financial picture. Wave has real data we're not surfacing: current bank account balances, recent transactions, outstanding invoices, bills due, cash flow. Gavin and David need this at a glance without logging into Wave separately.
-**Solution:** Rebuild the Payments/Finance tab to match the communicative density of the Wave dashboard itself:
-- Bank account balance(s) — current BofA balance pulled from Wave, visually prominent
-- Cash in (AR): outstanding invoices total, overdue amount, next expected payment
-- Cash out (AP): pending partner payments awaiting approval, bills due
-- Recent transactions feed: last 5-10 Wave transactions with amount + description
-- Net position: simple cash in - cash out = current working capital
-**API:** Wave GraphQL already wired (`src/lib/wave/`) — this is a UI/query expansion, not new integration work.
-**Files:** `src/components/payments/` — likely a new FinancialOverviewSection component + new Wave queries for account balances and recent transactions.
+**Status:** ✅ DONE — February 22, 2026 (Sprint A)
+**Files built:**
+- `src/lib/wave/accounts.ts` — `getBankAccounts()` + `getRecentTransactions()` Wave queries
+- `src/lib/wave/types.ts` — `WaveAccount`, `WaveTransaction`, `WaveFinancialSummary` types added
+- `src/app/api/finance/live-summary/route.ts` — admin-only GET: Wave bank balances + DB AR/AP totals + net cash
+- `src/components/payments/FinancialOverviewSection.tsx` — client component with 4-card KPI row, cash flow detail, recent transactions feed, multi-account strip
+- `src/app/(dashboard)/payments/page.tsx` — FinancialOverviewSection injected above existing PaymentsOverview (admin-only)
+- `prisma/schema.prisma` — isHistorical Boolean @default(false) added to PaymentTransaction; db push complete
 
 
 **Priority:** LOW — existing cron works, needs schedule change only

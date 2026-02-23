@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { PaymentsOverview } from "@/components/payments/PaymentsOverview";
+import { FinancialOverviewSection } from "@/components/payments/FinancialOverviewSection";
 
 export default async function PaymentsPage() {
   const session = await auth();
@@ -68,5 +69,16 @@ export default async function PaymentsPage() {
     )
   );
 
-  return <PaymentsOverview clients={serialized} partners={partners} />;
+  return (
+    <div className="space-y-8 p-6">
+      {/* FINANCE-001: Live financial overview — bank balance, AR/AP, cash position */}
+      {(session.user as { role?: string }).role === 'admin' && (
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Financial Overview</h2>
+          <FinancialOverviewSection />
+        </div>
+      )}
+      <PaymentsOverview clients={serialized} partners={partners} />
+    </div>
+  );
 }

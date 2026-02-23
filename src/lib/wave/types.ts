@@ -83,3 +83,25 @@ export interface WaveLineItem {
   quantity: number
   unitPrice: number
 }
+
+export interface WaveAccount {
+  id: string
+  name: string
+  balance: number          // raw decimal as number
+  currency: { code: string; symbol: string }
+  type: { name: string }
+  subtype: { name: string; value: string }
+}
+
+export interface WaveTransaction {
+  id: string
+  description: string | null
+  date: string             // ISO date YYYY-MM-DD
+  amount: number           // positive = credit, negative = debit
+  account: { id: string; name: string } | null
+}
+
+export interface WaveFinancialSummary {
+  bankAccounts: WaveAccount[]
+  recentTransactions: WaveTransaction[]
+}

@@ -737,6 +737,9 @@ model PaymentTransaction {
   
   // Idempotency — Wave invoice ID or cron run identifier (prevents double-pay on webhook retry)
   sourceEventId   String?   @map("source_event_id")
+
+  // Historical import flag — true for records seeded from Wave history (pre-Jan 1 2026)
+  isHistorical    Boolean   @default(false) @map("is_historical")
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
