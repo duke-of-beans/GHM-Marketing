@@ -12,6 +12,28 @@ Completed history lives in CHANGELOG.md. Never put ✅ items here.
 
 ---
 
+## 🗺️ RECOMMENDED SPRINT SEQUENCE (February 23, 2026)
+
+Foundation → out. Each sprint unblocks the next.
+
+| Sprint | Focus | Items | Size | Why This Order |
+|--------|-------|-------|------|----------------|
+| 1 | Production Foundation | Security Hardening + Sentry + Structured Logging | ~1 session | Gates all external use. Must be done before reps, new clients, or second agency. |
+| 2 | Ops Spine Completion | Client Portal Decision + Ops Sprint 6 (Reporting Pipeline) | ~1.5 sessions | Fulfills contract promise of monthly delivery. Portal ambiguity off the board. |
+| 3 | Bulk Operations | Ops Sprint 7 (bulk content/task/pipeline) | ~1 session | Team can't scale without batch actions. Additive to existing systems. |
+| 4 | Intelligence Layer | Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories) | ~1 session | Synthesizes all collected data. Turns dashboard into indispensable ops platform. |
+| 5 | Data Access + Admin Visibility | Data Export + User Activity/Session Stats | ~1 session | External data requests + internal usage intelligence. |
+| 6 | UX Completeness | Static Empty States + Pipeline Filter UX debt + Keyboard Shortcuts | ~1 session | Closes gap between functional and polished. |
+| 7 | Sales Enablement Polish | Audit PDF PPC + Brochure PPC + Save Searches | ~0.5 sessions | Completes ITEM-001 scope. Power-user filter layer. |
+| 8 | Content Power | Bulk Content Ops + Competitor Tracking Manual + Custom Report Builder | ~1 session | Makes content and competitive intelligence practical at scale. |
+| 9 | COVOS Self-Service | COVOS Admin Onboarding Wizard | ~2 sessions | Requires Sprint 1 security first. Unlocks white-label productization. |
+
+**Background (no code needed, external waits):**
+- W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
+- I4 GBP OAuth — monitor Google API Console approval
+
+---
+
 ## 🧭 HOW TO PICK WORK
 
 Pick the top item in your current tier that unblocks the next thing.
