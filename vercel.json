@@ -39,6 +39,10 @@
     {
       "path": "/api/cron/recurring-tasks",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/site-health",
+      "schedule": "0 5 * * 0"
     }
   ]
 }

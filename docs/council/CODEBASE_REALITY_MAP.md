@@ -433,7 +433,7 @@ The existing tasks page has Work + Approvals tabs. Operations layer adds:
 |--------|------|------------------------------|
 | 0 | Foundation ✅ COMPLETE | Schema migration (8 new tables + column migrations), alert rule engine, notification system, DataSourceStatus tracking, recurring task engine, 9 API routes, wired into 3 crons |
 | 1 | Execution Spine ✅ COMPLETE | Checklist CRUD (5 routes), checklist templates (2 routes), TaskChecklist UI, recurring tasks page + form, origin badges in task sheet, queue API + QueueTask type updated, nav link |
-| 2 | Site Health | SiteHealthSnapshot table + PageSpeed cron + extend client detail page |
+| 2 | Site Health ✅ COMPLETE | SiteHealthSnapshot table + PageSpeed cron + extend client detail page |
 | 3 | SEO + GMB | GbpSnapshot + extend existing rank tracking UI + GMB insights dashboard |
 | 4 | Cluster Manager | Approval workflow on existing WebProperty system |
 | 5 | Reports | AI narrative layer on existing ClientReport + auto-generation via RecurringTaskRule |

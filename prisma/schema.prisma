@@ -452,6 +452,7 @@ model ClientProfile {
   // Operations Layer
   alertEvents           AlertEvent[]
   recurringTaskRules    RecurringTaskRule[] @relation("RecurringTaskRuleClient")
+  siteHealthSnapshots   SiteHealthSnapshot[]
 
   @@map("client_profiles")
 }
@@ -489,6 +490,7 @@ model ClientDomain {
   lastDeployedAt  DateTime?     @map("last_deployed_at")
   createdAt       DateTime      @default(now()) @map("created_at")
   client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  siteHealthSnapshots SiteHealthSnapshot[]
 
   @@index([clientId])
   @@map("client_domains")
@@ -1933,4 +1935,30 @@ model RecurringTaskRule {
 
   @@index([isActive, nextRunAt])
   @@map("recurring_task_rules")
+}
+
+model SiteHealthSnapshot {
+  id                   Int       @id @default(autoincrement())
+  clientId             Int       @map("client_id")
+  domainId             Int       @map("domain_id")
+  performanceMobile    Int?      @map("performance_mobile")    // 0-100
+  performanceDesktop   Int?      @map("performance_desktop")   // 0-100
+  lcp                  Float?    // Largest Contentful Paint (ms)
+  tbt                  Float?    // Total Blocking Time (ms) — replaces deprecated FID
+  cls                  Float?    // Cumulative Layout Shift
+  ttfb                 Float?    // Time to First Byte (ms) — from speed_index proxy; set if available
+  fcp                  Float?    // First Contentful Paint (ms)
+  seoScore             Int?      @map("seo_score")             // 0-100
+  accessibilityScore   Int?      @map("accessibility_score")   // 0-100
+  bestPracticesScore   Int?      @map("best_practices_score")  // 0-100
+  previousMobile       Int?      @map("previous_mobile")       // For delta calculation
+  previousDesktop      Int?      @map("previous_desktop")
+  scanDate             DateTime  @default(now()) @map("scan_date")
+
+  client               ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  domain               ClientDomain  @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, scanDate(sort: Desc)])
+  @@index([domainId, scanDate(sort: Desc)])
+  @@map("site_health_snapshots")
 }

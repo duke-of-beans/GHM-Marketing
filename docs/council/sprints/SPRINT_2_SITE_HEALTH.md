@@ -1,6 +1,14 @@
-# SPRINT 2 — SITE HEALTH
+# SPRINT 2 — SITE HEALTH ✅ COMPLETE
 ## PageSpeed Snapshots + Automated Monitoring
 *Dependency: Sprint 0 (alert engine, DataSourceStatus)*
+*Completed: 2026-02-23*
+
+**Implementation notes:**
+- Used `tbt` (Total Blocking Time) instead of `fid` (First Input Delay) — FID is deprecated in Lighthouse; pagespeed.ts returns `tbt`
+- Added `domain` relation to `SiteHealthSnapshot` (sprint doc only had `client`) — needed for per-domain querying
+- Alert rules seeded via `prisma/seed-sprint2-health-rules.ts` (separate from main seed to avoid collisions)
+- "Site Health" added to PRIMARY_TABS in profile.tsx (between Websites and Notes)
+- Cron scheduled Sunday 5am (`0 5 * * 0`) — weekly, off-peak
 
 ---
 
@@ -100,9 +108,9 @@ Extend existing client detail page with "Site Health" section:
 
 ## TESTING CRITERIA
 
-- [ ] Cron creates SiteHealthSnapshot records for all active clients
-- [ ] Delta calculation compares to previous snapshot correctly
-- [ ] Alert fires when performance drops below threshold
-- [ ] DataSourceStatus updates on PageSpeed calls
-- [ ] Client detail page shows site health section
-- [ ] Historical chart renders with real data
+- [x] Cron creates SiteHealthSnapshot records for all active clients
+- [x] Delta calculation compares to previous snapshot correctly
+- [x] Alert fires when performance drops below threshold
+- [x] DataSourceStatus updates on PageSpeed calls
+- [x] Client detail page shows site health section
+- [x] Historical chart renders with real data

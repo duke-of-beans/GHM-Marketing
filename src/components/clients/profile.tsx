@@ -66,6 +66,7 @@ import { CampaignsTab } from "./CampaignsTab";
 import { ClientTasksTab, type ClientTask } from "./tasks/ClientTasksTab";
 import { ClientNotesTab, type ClientNote } from "./notes/ClientNotesTab";
 import { ClientDomainsTab, type ClientDomain } from "./domains/ClientDomainsTab";
+import { SiteHealthTab } from "./site-health/SiteHealthTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -168,7 +169,7 @@ function timeAgo(d: string | null) {
 
 const VALID_TABS = [
   "scorecard", "tasks", "rankings", "citations", "local",
-  "content", "websites", "reports", "domains", "compensation",
+  "content", "websites", "health", "reports", "domains", "compensation",
   "billing", "campaigns", "integrations", "notes",
 ] as const;
 
@@ -409,6 +410,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
             { value: "local", label: "Local" },
             { value: "content", label: "Content" },
             { value: "websites", label: "Websites" },
+            { value: "health", label: "Site Health" },
             { value: "notes", label: "Notes" },
           ];
 
@@ -527,6 +529,10 @@ export function ClientProfile({ client }: { client: ClientData }) {
 
         <TabsContent value="websites" className="space-y-4">
           <WebsiteStudioTab clientId={client.id} businessName={client.businessName} />
+        </TabsContent>
+
+        <TabsContent value="health" className="space-y-4">
+          <SiteHealthTab clientId={client.id} />
         </TabsContent>
 
         <TabsContent value="reports" className="space-y-4">
