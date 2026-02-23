@@ -134,7 +134,19 @@ export function VaultFileTile({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <a href={file.blobUrl} download={file.name} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={file.blobUrl}
+                  download={file.name}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    if (file.space === "shared") {
+                      toast.warning("Saved copies may become outdated — always access contracts and agreements from the Shared folder.", {
+                        duration: 5000,
+                      });
+                    }
+                  }}
+                >
                   <Download className="h-3.5 w-3.5 mr-2" /> Download
                 </a>
               </DropdownMenuItem>
@@ -182,6 +194,12 @@ export function VaultFileTile({
         onClick={(e) => {
           // Don't fire if dropdown was clicked
           if ((e.target as HTMLElement).closest('[role="menuitem"]')) e.preventDefault();
+          // Warn reps that saved copies may become outdated
+          if (file.space === "shared") {
+            toast.warning("Saved copies may become outdated — always access contracts and agreements from the Shared folder.", {
+              duration: 5000,
+            });
+          }
         }}
       />
     </div>

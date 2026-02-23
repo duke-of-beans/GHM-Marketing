@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint 5 AI Reports complete. ai-narrative.ts (6 parallel AI narrative calls, voice-profile tone-matching), generator.ts updated (includeNarratives option, VoiceProfile fetch), template.ts updated (narrative callout blocks in all sections + Recommended Next Steps section), /api/clients/[id]/reports/generate route (per-client, D3), report_narrative AIFeature + system prompt + DEFAULT_MAX_TOKENS, seed-sprint5-reports.ts run (TaskChecklistTemplate id=2, RecurringTaskRule id=1, next run 2026-03-01). Zero new TypeScript errors.
+**Last Updated:** February 23, 2026 — VAULT-001 complete. Version warning banner on Shared tab (non-elevated users), toast warning on open/download of shared files. Zero new TypeScript errors.
 
 ---
 
@@ -295,6 +295,11 @@ Validated via Apex North LLC test client. Cron generated residual ($200, Arian) 
 **Admin:** `POST /api/users/[id]/onboarding-reset` — clears `repOnboardingCompletedAt` + `repOnboardingStep`. Reset button in UserPermissionCard (admin-only, shown when onboarding already completed).
 **User creation:** `POST /api/users` — creates account, position-assignable, generates temp password, logs onboarding checklist to console (AdminTask model deferred to Sprint 3).
 **Add User dialog:** wired into TeamManagementTab with role + position selectors and password field.
+
+### VAULT-001: Global Document Version Warning ✅ COMPLETE (February 23, 2026)
+- [x] `vault-client.tsx` — amber banner on Shared tab for non-elevated users: "Always use files from this Shared folder. Documents saved to your device may become outdated."
+- [x] `vault-file-tile.tsx` — `toast.warning()` fires on tile click (open) and Download dropdown item for any file in the `shared` space. 5-second duration.
+- [x] Zero new TypeScript errors.
 
 ### VAULT-001: Global Document Version Warning
 **Priority:** HIGH — legal/ops risk
