@@ -15,8 +15,8 @@
  *   toast.error(voice.errors.network);
  */
 
-/** Pick a random item from an array. */
-export function pick<T>(arr: T[]): T {
+/** Pick a random item from an array. Works with readonly arrays (as const). */
+export function pick<T>(arr: readonly T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
