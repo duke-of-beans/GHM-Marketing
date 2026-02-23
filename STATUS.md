@@ -30,7 +30,7 @@
 
 ### SPRINT 1 — Launch Readiness (~4 hrs) ← DO FIRST
 Items blocking confident client and rep handoff.
-- [ ] Commission validation — mark German Auto Doctor active, trigger monthly cron manually, verify transaction creation + widget population
+- [x] Commission validation — validated via Apex North LLC test client. Cron generated residual ($200, Arian) + master_fee ($240, David), both pending, no Wave calls. Engine confirmed correct. Test client hard-deleted post-validation.
 - [ ] W7 — verify Wave covers Gusto use cases, cancel Gusto
 - [x] ITEM-001 docs — `CLIENT_AGREEMENT.md` created (§1.1 includes full PPC/Ads scope language, separate ad spend clarification, account ownership); `CLIENT_ONBOARDING_FORM.md` created (Google Ads Account ID field, manager access, budget, campaign start); report PDF template Ads section was already complete.
 - [x] D4 — Audit → Demo one-click: `handleGenerateAll` + `generatingAll` state + "Audit + Demo" button (variant="default", Zap icon) added to lead-detail-sheet.tsx. Opens audit + 500ms delayed demo in two tabs simultaneously.
