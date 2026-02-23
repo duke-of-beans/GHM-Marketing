@@ -129,7 +129,22 @@ export async function executeScan(params: ExecuteScanParams): Promise<ExecuteSca
       console.error(`[Scan ${clientId}] Upsell detection failed:`, upsellError);
       // Don't fail the scan if upsell detection fails
     }
-    
+
+    // Step 9: Evaluate alert rules against this scan's alerts
+    console.log(`[Scan ${clientId}] Evaluating alert rules...`);
+    try {
+      const { evaluateScanAlerts } = await import("@/lib/ops/alert-engine");
+      const allAlerts = [
+        ...alerts.critical.map((a) => ({ ...a, severity: "critical" as const })),
+        ...alerts.warning.map((a) => ({ ...a, severity: "warning" as const })),
+        ...alerts.info.map((a) => ({ ...a, severity: "info" as const })),
+      ];
+      await evaluateScanAlerts(clientId, scan.id, allAlerts as unknown as Array<{ [key: string]: unknown; type: string; severity: string }>);
+    } catch (alertEngineError) {
+      console.error(`[Scan ${clientId}] Alert rule evaluation failed:`, alertEngineError);
+      // Don't fail the scan if alert engine fails
+    }
+
     return {
       success: true,
       scanId: scan.id,

@@ -376,3 +376,54 @@ export async function sendPartnerOnboardingNotification(params: {
     return { success: false, error: String(err) };
   }
 }
+
+// ============================================================================
+// Generic system notification email
+// ============================================================================
+
+export async function sendNotificationEmail(params: {
+  to: string;
+  name: string;
+  subject: string;
+  body: string;
+  href?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const resend = getResend();
+  if (!resend) return { success: false, error: "Email not configured" };
+
+  const { to, name, subject, body, href } = params;
+
+  try {
+    const actionButton = href
+      ? `<div style="text-align:center;margin:24px 0;">
+           <a href="${href}" style="display:inline-block;background:#2563eb;color:white;padding:12px 28px;text-decoration:none;border-radius:6px;font-size:15px;font-weight:600;">
+             View Details
+           </a>
+         </div>`
+      : "";
+
+    const { error } = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to,
+      subject,
+      html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#f9fafb;padding:24px;">
+          <div style="background:white;border-radius:8px;padding:32px;border:1px solid #e5e7eb;">
+            <h2 style="margin:0 0 16px;font-size:20px;color:#111827;">${subject}</h2>
+            <p style="color:#374151;margin-bottom:16px;">Hi ${name},</p>
+            <p style="color:#374151;white-space:pre-wrap;">${body}</p>
+            ${actionButton}
+            <p style="color:#9ca3af;font-size:12px;margin-top:24px;margin-bottom:0;">
+              GHM Marketing Dashboard — automated notification
+            </p>
+          </div>
+        </div>
+      `,
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: String(err) };
+  }
+}

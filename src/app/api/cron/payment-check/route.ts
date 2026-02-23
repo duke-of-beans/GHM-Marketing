@@ -69,6 +69,14 @@ export async function GET(req: NextRequest) {
         data: { paymentStatus: newPaymentStatus },
       })
 
+      // Alert engine hook — evaluate payment rules on status change
+      try {
+        const { evaluatePaymentAlert } = await import('@/lib/ops/alert-engine')
+        await evaluatePaymentAlert(client.id, invoice.id, newPaymentStatus, client.paymentStatus)
+      } catch (err) {
+        console.error('[payment-check] Alert engine failed:', err)
+      }
+
       if (shouldCreateTask && taskTitle) {
         await prisma.clientTask.create({
           data: {

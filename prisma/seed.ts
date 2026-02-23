@@ -122,6 +122,76 @@ async function main() {
   ]);
   console.log(`✅ Positions: ${positions.map((p) => p.name).join(", ")}`);
 
+  // ── Operations Layer: DataSourceStatus ──────────────────────────────────
+  const { initDataSourceStatus } = await import("../src/lib/ops/data-source-monitor");
+  await initDataSourceStatus();
+  console.log("✅ DataSourceStatus: 7 providers initialized");
+
+  // ── Operations Layer: Default AlertRules ────────────────────────────────
+  const defaultRules = [
+    {
+      name: "Critical scan alerts",
+      description: "Fire when a competitive scan produces one or more critical alerts",
+      sourceType: "competitive_scan",
+      conditionType: "threshold",
+      conditionConfig: { field: "criticalCount", operator: "gte", value: 1 },
+      severity: "critical",
+      autoCreateTask: false,
+      notifyOnTrigger: true,
+      cooldownMinutes: 1440,
+    },
+    {
+      name: "Client payment overdue",
+      description: "Fire when a client payment status changes to overdue",
+      sourceType: "payment_check",
+      conditionType: "status_change",
+      conditionConfig: { field: "paymentStatus", operator: "changed_to", value: "overdue" },
+      severity: "warning",
+      autoCreateTask: false,
+      notifyOnTrigger: true,
+      cooldownMinutes: 2880,
+    },
+    {
+      name: "Client service paused (collections risk)",
+      description: "Fire when payment status escalates to paused or collections",
+      sourceType: "payment_check",
+      conditionType: "status_change",
+      conditionConfig: { field: "isOverdue", operator: "eq", value: true },
+      severity: "critical",
+      autoCreateTask: false,
+      notifyOnTrigger: true,
+      cooldownMinutes: 1440,
+    },
+    {
+      name: "Significant rank decline",
+      description: "Fire when organic rank drops 10 or more positions",
+      sourceType: "rank_tracking",
+      conditionType: "threshold",
+      conditionConfig: { field: "rankDelta", operator: "lte", value: -10 },
+      severity: "warning",
+      autoCreateTask: false,
+      notifyOnTrigger: true,
+      cooldownMinutes: 10080,
+    },
+    {
+      name: "Provider down",
+      description: "Fire when an external API provider reaches down status",
+      sourceType: "health",
+      conditionType: "status_change",
+      conditionConfig: { field: "isDown", operator: "eq", value: true },
+      severity: "critical",
+      autoCreateTask: false,
+      notifyOnTrigger: true,
+      cooldownMinutes: 60,
+    },
+  ];
+
+  for (const rule of defaultRules) {
+    const existing = await prisma.alertRule.findFirst({ where: { name: rule.name } });
+    if (!existing) await prisma.alertRule.create({ data: rule });
+  }
+  console.log(`✅ AlertRules: ${defaultRules.length} default rules seeded`);
+
   console.log("\n🎉 Database seeded successfully!");
   console.log("\n📋 Login credentials:");
   console.log("   Master: david@ghmmarketing.com / changeme123");

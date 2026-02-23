@@ -74,7 +74,7 @@ export async function GET(req: Request) {
       localPackPosition = matchedEntry?.position ?? null;
     }
 
-    await prisma.rankSnapshot.create({
+    const snapshot = await prisma.rankSnapshot.create({
       data: {
         keywordId: pendingTask.keywordId,
         clientId: pendingTask.clientId,
@@ -89,6 +89,28 @@ export async function GET(req: Request) {
         previousLocalPack: previous?.localPackPosition ?? null,
       },
     });
+
+    // Alert engine hook — fire on significant rank change
+    if (
+      result.organicPosition !== null &&
+      previous?.organicPosition !== null &&
+      previous?.organicPosition !== undefined
+    ) {
+      const delta = result.organicPosition - previous.organicPosition;
+      if (Math.abs(delta) >= 5) {
+        try {
+          const { evaluateRankAlert } = await import("@/lib/ops/alert-engine");
+          await evaluateRankAlert(
+            pendingTask.clientId,
+            snapshot.id,
+            delta,
+            pendingTask.keyword
+          );
+        } catch (err) {
+          console.error("[rank-poll] Alert engine failed:", err);
+        }
+      }
+    }
 
     // Mark task resolved
     await prisma.pendingRankTask.update({

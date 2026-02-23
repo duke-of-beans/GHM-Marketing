@@ -92,6 +92,10 @@ model User {
   assignedAdminTasks    AdminTask[] @relation("AdminTaskAssignee")
   createdAdminTasks     AdminTask[] @relation("AdminTaskCreator")
 
+  // Operations Layer
+  acknowledgedAlerts    AlertEvent[] @relation("AlertAcknowledger")
+  notifications         NotificationEvent[]
+
   @@index([territoryId])
   @@index([positionId])
   @@map("users")
@@ -445,6 +449,9 @@ model ClientProfile {
   // Document Vault
   vaultFiles            VaultFile[]
 
+  // Operations Layer
+  alertEvents           AlertEvent[]
+
   @@map("client_profiles")
 }
 
@@ -520,12 +527,21 @@ model ClientTask {
   estimatedMinutes  Int?        @map("estimated_minutes")     // Time estimate for queue planning
   sortOrder         Int         @default(0) @map("sort_order")// Manual queue ordering (lower = higher priority)
   
+  // ── Operations Layer additions ───────────────────────────────────────────
+  recurringRuleId   Int?        @map("recurring_rule_id")   // FK to RecurringTaskRule
+  sourceAlertId     Int?        @map("source_alert_id")     // FK to AlertEvent (alert-originated tasks)
+  blockedReason     String?     @map("blocked_reason")       // Why task is blocked
+  checklistComplete Boolean     @default(false) @map("checklist_complete") // Quick filter for completed checklists
+
   // Relations
   notes             ClientNote[]
   transitions       TaskTransition[]
-  client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  assignedToUser    User?         @relation("TaskAssignee", fields: [assignedToUserId], references: [id])
-  assignedByUser    User?         @relation("TaskAssigner", fields: [assignedByUserId], references: [id])
+  client            ClientProfile      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  assignedToUser    User?              @relation("TaskAssignee", fields: [assignedToUserId], references: [id])
+  assignedByUser    User?              @relation("TaskAssigner", fields: [assignedByUserId], references: [id])
+  recurringRule     RecurringTaskRule? @relation(fields: [recurringRuleId], references: [id])
+  checklistItems    TaskChecklistItem[]
+  alertLinks        TaskAlertLink[]
 
   @@index([clientId, status])
   @@index([clientId, category])
@@ -1752,3 +1768,163 @@ model AdminTask {
   @@map("admin_tasks")
 }
 
+
+// ============================================================================
+// OPERATIONS LAYER — SPRINT 0 FOUNDATION
+// ============================================================================
+
+model AlertRule {
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String?
+  sourceType      String    @map("source_type")   // "competitive_scan" | "payment" | "rank" | "nap" | "health"
+  conditionType   String    @map("condition_type") // "threshold" | "delta" | "status_change" | "missing_data"
+  conditionConfig Json      @map("condition_config") // { field, operator, value, window }
+  severity        String    @default("warning")
+  isActive        Boolean   @default(true) @map("is_active")
+  autoCreateTask  Boolean   @default(false) @map("auto_create_task")
+  taskTemplate    Json?     @map("task_template") // { title, category, priority, contentBrief }
+  notifyOnTrigger Boolean   @default(true) @map("notify_on_trigger")
+  cooldownMinutes Int       @default(1440) @map("cooldown_minutes") // 24h default
+  lastTriggeredAt DateTime? @map("last_triggered_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  alerts          AlertEvent[]
+
+  @@index([sourceType, isActive])
+  @@map("alert_rules")
+}
+
+model AlertEvent {
+  id              Int       @id @default(autoincrement())
+  type            String    // "scan_alert" | "payment_overdue" | "rank_change" | "health_degraded" | "custom"
+  severity        String    // "critical" | "warning" | "info"
+  clientId        Int?      @map("client_id")
+  title           String
+  description     String?   @db.Text
+  sourceType      String    @map("source_type")  // "competitive_scan" | "payment_check" | "rank_tracking" | "nap_scan" | "manual"
+  sourceId        Int?      @map("source_id")    // FK to source record (scanId, invoiceId, etc.)
+  metadata        Json?     // Structured alert data
+  ruleId          Int?      @map("rule_id")
+  acknowledged    Boolean   @default(false)
+  acknowledgedBy  Int?      @map("acknowledged_by")
+  acknowledgedAt  DateTime? @map("acknowledged_at")
+  autoTaskCreated Boolean   @default(false) @map("auto_task_created")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  client          ClientProfile?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  rule            AlertRule?      @relation(fields: [ruleId], references: [id])
+  acknowledger    User?           @relation("AlertAcknowledger", fields: [acknowledgedBy], references: [id])
+  taskLinks       TaskAlertLink[]
+
+  @@index([clientId, createdAt(sort: Desc)])
+  @@index([type, severity])
+  @@index([acknowledged])
+  @@index([createdAt(sort: Desc)])
+  @@map("alert_events")
+}
+
+model NotificationEvent {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  type        String    // "alert" | "task_assigned" | "task_status" | "report_ready" | "system"
+  title       String
+  body        String?
+  href        String?   // Deep link to relevant page
+  alertId     Int?      @map("alert_id")
+  read        Boolean   @default(false)
+  readAt      DateTime? @map("read_at")
+  channel     String    @default("in_app") // "in_app" | "push" | "email" | "all"
+  delivered   Boolean   @default(false)
+  deliveredAt DateTime? @map("delivered_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notification_events")
+}
+
+model TaskAlertLink {
+  id        Int       @id @default(autoincrement())
+  taskId    Int       @map("task_id")
+  alertId   Int       @map("alert_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  task      ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  alert     AlertEvent @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, alertId])
+  @@map("task_alert_links")
+}
+
+model DataSourceStatus {
+  id                  Int       @id @default(autoincrement())
+  provider            String    @unique
+  // "dataforseo" | "ahrefs" | "pagespeed" | "google_business" | "google_ads" | "wave" | "outscraper"
+  displayName         String    @map("display_name")
+  status              String    @default("unknown")
+  // "healthy" | "degraded" | "down" | "unknown"
+  lastCheckAt         DateTime? @map("last_check_at")
+  lastSuccessAt       DateTime? @map("last_success_at")
+  lastFailureAt       DateTime? @map("last_failure_at")
+  consecutiveFailures Int       @default(0) @map("consecutive_failures")
+  avgLatencyMs        Int?      @map("avg_latency_ms")
+  errorMessage        String?   @map("error_message")
+  metadata            Json?     // Provider-specific health data
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@map("data_source_status")
+}
+
+model TaskChecklistItem {
+  id          Int       @id @default(autoincrement())
+  taskId      Int       @map("task_id")
+  label       String
+  isComplete  Boolean   @default(false) @map("is_complete")
+  completedAt DateTime? @map("completed_at")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  task        ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_checklist_items")
+}
+
+model TaskChecklistTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String
+  category  String   // Matches ClientTask.category values
+  items     Json     // Array of { label, sortOrder }
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([category, isActive])
+  @@map("task_checklist_templates")
+}
+
+model RecurringTaskRule {
+  id                  Int       @id @default(autoincrement())
+  name                String
+  clientId            Int?      @map("client_id") // null = applies to all active clients
+  category            String    // ClientTask category
+  title               String    // Template title (supports {clientName} interpolation)
+  description         String?
+  priority            String    @default("P3")
+  checklistTemplateId Int?      @map("checklist_template_id")
+  cronExpression      String    @map("cron_expression") // e.g. "0 9 1 * *" = 1st of month at 9am
+  isActive            Boolean   @default(true) @map("is_active")
+  lastRunAt           DateTime? @map("last_run_at")
+  nextRunAt           DateTime? @map("next_run_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  tasks               ClientTask[]
+
+  @@index([isActive, nextRunAt])
+  @@map("recurring_task_rules")
+}
