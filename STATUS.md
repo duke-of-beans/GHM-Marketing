@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Commission validation complete. VAULT-001 + FINANCE-001 added to backlog.
+**Last Updated:** February 22, 2026 — Commission validation ✅. W7 Gusto deferred to Jan 2027 (equity + payroll migration together). I4 GBP pending Google approval.
 
 ---
 
@@ -142,7 +142,7 @@ Makes the platform feel like a product.
 | W4. Partner payments AP — vendor sync, bill gen, payout cron | ✅ DONE |
 | W5. Dashboard UI — financial overview page, billing tab on client detail | ✅ DONE |
 | W6. Settings — Wave tab (admin-only), AppSetting model, product picker | ✅ DONE |
-| W7. Kill Gusto | ⏸ DEFERRED |
+| W7. Kill Gusto | ⏸ DEFERRED — Jan 2027. Gavin is W-2/2% shareholder in Gusto; mid-year migration creates split W-2. Plan: close 2026 on Gusto, migrate to Wave Payroll Jan 2027 alongside equity restructure. Arian + future reps are 1099 handled via dashboard → Wave bills, no Gusto needed. |
 
 ### API Integration Ecosystem — SPEC COMPLETE, READY TO BUILD
 **Spec:** `D:\Work\SEO-Services\specs\API_INTEGRATION_BLUEPRINT.md` (1,124 lines)
