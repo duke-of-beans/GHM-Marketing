@@ -431,7 +431,7 @@ The existing tasks page has Work + Approvals tabs. Operations layer adds:
 
 | Sprint | Name | Scope (Adjusted for Reality) |
 |--------|------|------------------------------|
-| 0 | Foundation | Schema migration (11 new tables + 2 column migrations), alert rule engine, notification system, DataSourceStatus tracking |
+| 0 | Foundation ✅ COMPLETE | Schema migration (8 new tables + column migrations), alert rule engine, notification system, DataSourceStatus tracking, recurring task engine, 9 API routes, wired into 3 crons |
 | 1 | Execution Spine | Extend existing task UI (checklists, recurring tasks, alert links). NOT rebuilding task page |
 | 2 | Site Health | SiteHealthSnapshot table + PageSpeed cron + extend client detail page |
 | 3 | SEO + GMB | GbpSnapshot + extend existing rank tracking UI + GMB insights dashboard |

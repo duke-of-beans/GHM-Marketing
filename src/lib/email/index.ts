@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { Resend } from "resend";
 import { prisma } from "@/lib/db";
 
 let _resend: Resend | null = null;

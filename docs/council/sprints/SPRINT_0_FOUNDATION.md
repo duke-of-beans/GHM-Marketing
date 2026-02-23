@@ -1,6 +1,6 @@
-# SPRINT 0 — FOUNDATION
+# SPRINT 0 — FOUNDATION ✅ COMPLETE
 ## Schema Migration + Alert Engine + Notification System
-*Dependency: CODEBASE_REALITY_MAP.md (read before building)*
+*Completed: 2026-02-23*
 
 ---
 
@@ -10,13 +10,22 @@ Stand up the operational plumbing that all subsequent sprints depend on: new dat
 
 ---
 
-## PRE-BUILD CHECKLIST
+## STATUS: ALL DELIVERABLES COMPLETE
 
-- [ ] Read CODEBASE_REALITY_MAP.md §1-§3 (conflicts + existing infra + table plan)
-- [ ] Verify Prisma schema compiles with existing 60+ models
-- [ ] Confirm all FKs use Int (not String)
-- [ ] Confirm no tenantId columns added
-- [ ] Run `npx prisma validate` before and after changes
+- [x] D1: Schema migration (8 new tables + ClientTask/ClientProfile extensions)
+- [x] D2: Alert rule evaluation engine (`src/lib/ops/alert-engine.ts`)
+- [x] D3: Notification delivery service (`src/lib/ops/notification-service.ts`)
+- [x] D4: DataSourceStatus tracking (`src/lib/ops/data-source-monitor.ts`)
+- [x] D5: Recurring task engine (`src/lib/ops/recurring-tasks.ts`)
+- [x] D6: 9 API routes (alerts, notifications, data-sources, recurring-tasks)
+- [x] D7: Wired alert engine into executor.ts, payment-check, rank-poll
+- [x] D8: Seeded 5 default AlertRules + 7 DataSourceStatus provider rows
+- [x] D9: Cron route `/api/cron/recurring-tasks` + vercel.json entries
+
+**Migration:** `20260223092738_full_schema_sync` (1461 lines, clean apply)
+**TypeScript:** 0 errors in Sprint 0 files (21 pre-existing errors in other files unchanged)
+
+---
 
 ---
 

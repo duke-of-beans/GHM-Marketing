@@ -236,21 +236,18 @@ export async function evaluateAlertRules(
 export async function evaluateScanAlerts(
   clientId: number,
   scanId: number,
-  scanAlerts: Array<{ type: string; severity: string; [key: string]: unknown }>
+  scanData: { criticalCount: number; warningCount: number; infoCount: number }
 ): Promise<AlertEngineResult> {
-  const criticalCount = scanAlerts.filter((a) => a.severity === "critical").length;
-  const warningCount = scanAlerts.filter((a) => a.severity === "warning").length;
-
   return evaluateAlertRules({
     sourceType: "competitive_scan",
     sourceId: scanId,
     clientId,
     data: {
-      totalAlerts: scanAlerts.length,
-      criticalCount,
-      warningCount,
-      alerts: scanAlerts,
-      hasCritical: criticalCount > 0,
+      criticalCount: scanData.criticalCount,
+      warningCount: scanData.warningCount,
+      infoCount: scanData.infoCount,
+      totalAlerts: scanData.criticalCount + scanData.warningCount + scanData.infoCount,
+      hasCritical: scanData.criticalCount > 0,
     },
   });
 }
