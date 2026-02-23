@@ -1,12 +1,11 @@
 // GET /api/auth/basecamp/callback — receives OAuth code, exchanges for token, saves to DB
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/config'
+import { auth } from '@/lib/auth'
 import { exchangeCodeForToken } from '@/lib/basecamp/client'
 import { prisma } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
   if (!session || session.user.role !== 'admin') {
     return NextResponse.json({ error: 'Admin only' }, { status: 403 })
   }
