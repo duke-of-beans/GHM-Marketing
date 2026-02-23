@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { log } from '@/lib/logger'
 import { differenceInDays } from 'date-fns'
 import { sendPushToUser } from '@/lib/push'
 import { PAYMENT_STATUS } from '@/lib/wave/constants'
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
         const { evaluatePaymentAlert } = await import('@/lib/ops/alert-engine')
         await evaluatePaymentAlert(client.id, invoice.id, newPaymentStatus, client.paymentStatus)
       } catch (err) {
-        console.error('[payment-check] Alert engine failed:', err)
+        log.error({ cron: 'payment-check', clientId: client.id, error: err }, 'Alert engine failed')
       }
 
       if (shouldCreateTask && taskTitle) {
@@ -87,7 +88,7 @@ export async function GET(req: NextRequest) {
             status: 'queued',
             source: 'system',
           },
-        }).catch(err => console.error('[payment-check] Task creation failed:', err))
+        }).catch(err => log.error({ cron: 'payment-check', clientId: client.id, error: err }, 'Task creation failed'))
       }
 
       const escalatedStatuses = [PAYMENT_STATUS.PAUSED, PAYMENT_STATUS.COLLECTIONS] as string[]
@@ -111,6 +112,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  console.log('[cron/payment-check]', JSON.stringify({ results, escalations }))
+  log.info({ cron: 'payment-check', ...results, escalations }, 'Payment check complete')
   return NextResponse.json({ ok: true, results, escalations })
 }

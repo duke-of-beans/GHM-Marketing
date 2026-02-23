@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { authConfig } from "./auth.config";
+import { decryptSecret, verifyCode, verifyBackupCode } from "@/lib/totp";
 import type { UserRole } from "@prisma/client";
 
 type AuthUser = {
@@ -69,6 +70,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        totpCode: { label: "2FA Code", type: "text" },
+        isBackupCode: { label: "Is Backup Code", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -91,6 +94,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!passwordMatch) {
           return null;
+        }
+
+        // ── 2FA enforcement (admin + master accounts only) ──────────────────
+        // If the user has 2FA enabled, require a valid TOTP code at login.
+        // If they don't have it enabled but are admin/master, they can still
+        // log in — 2FA enrollment is encouraged but not yet forced (sprint 1).
+        if (user.totpEnabled && user.totpSecret) {
+          const totpCode = credentials.totpCode as string | undefined;
+          if (!totpCode) {
+            // Signal to the UI that 2FA is required
+            // Returning null with a specific error is NextAuth's mechanism
+            throw new Error("2FA_REQUIRED");
+          }
+
+          const secret = decryptSecret(user.totpSecret);
+          const useBackup = (credentials.isBackupCode as string) === "true";
+
+          let codeValid = false;
+          if (useBackup) {
+            const hashedCodes: string[] = JSON.parse(user.totpBackupCodes ?? "[]");
+            const remaining = verifyBackupCode(totpCode, hashedCodes);
+            if (remaining !== null) {
+              codeValid = true;
+              // Consume backup code
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { totpBackupCodes: JSON.stringify(remaining) },
+              });
+            }
+          } else {
+            codeValid = verifyCode(totpCode.replace(/\s/g, ""), secret);
+          }
+
+          if (!codeValid) {
+            throw new Error("INVALID_TOTP_CODE");
+          }
         }
 
         await prisma.user.update({

@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeBatchScan } from '@/lib/competitive-scan';
 import { checkWebPropertyStaleness } from '@/lib/ops/cluster-approval';
+import { log } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   // Verify cron secret (Vercel automatically sends this)
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
   }
   
   try {
-    console.log('[Cron] Starting daily competitive scans...');
+    log.info({ cron: 'daily-scans' }, 'Starting daily competitive scans');
     const startTime = Date.now();
     
     // Run batch scan for all clients due for a scan
@@ -32,11 +33,11 @@ export async function GET(req: NextRequest) {
 
     // Check web property staleness — fires alert engine for overdue deploys
     const staleness = await checkWebPropertyStaleness();
-    console.log(`[Cron] Staleness check: ${staleness.checked} properties, ${staleness.stale} stale`);
+    log.info({ cron: 'daily-scans', checked: staleness.checked, stale: staleness.stale }, 'Web property staleness check complete');
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     
-    console.log(`[Cron] Complete in ${duration}s: ${result.successful} scanned, ${result.failed} failed`);
+    log.info({ cron: 'daily-scans', durationSec: duration, successful: result.successful, failed: result.failed }, 'Daily scans complete');
     
     return NextResponse.json({
       success: true,
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
     });
     
   } catch (error) {
-    console.error('[Cron] Daily scan failed:', error);
+    log.error({ cron: 'daily-scans', error }, 'Daily scan failed');
     return NextResponse.json(
       { error: 'Batch scan failed', details: String(error) },
       { status: 500 }

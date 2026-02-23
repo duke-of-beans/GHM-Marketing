@@ -13,6 +13,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { Decimal } from "@prisma/client/runtime/library";
 import {
   calculateResidual,
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    console.log("[Cron] Starting monthly payment generation...");
+    log.info({ cron: 'generate-payments' }, 'Starting monthly payment generation');
     const startTime = Date.now();
     const currentMonth = getFirstDayOfMonth();
 
@@ -132,10 +133,9 @@ export async function GET(req: NextRequest) {
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
-    console.log(
-      `[Cron] Payment generation complete in ${duration}s — ` +
-        `${created.count} created, ${existing.length} already existed, ` +
-        `${clients.length} clients processed`
+    log.info(
+      { cron: 'generate-payments', durationSec: duration, created: created.count, skipped: existing.length, clientsProcessed: clients.length },
+      'Payment generation complete'
     );
 
     return NextResponse.json({
@@ -146,7 +146,7 @@ export async function GET(req: NextRequest) {
       clientsProcessed: clients.length,
     });
   } catch (error) {
-    console.error("[Cron] Payment generation failed:", error);
+    log.error({ cron: 'generate-payments', error }, 'Payment generation failed');
     return NextResponse.json(
       { error: "Payment generation failed", details: String(error) },
       { status: 500 }

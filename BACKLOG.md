@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 23, 2026
+**Last Updated:** February 23, 2026 — Added UX-BUG-001 through UX-BUG-007 + ARCH-001 from session review
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -18,7 +18,7 @@ Foundation → out. Each sprint unblocks the next.
 
 | Sprint | Focus | Items | Size | Why This Order |
 |--------|-------|-------|------|----------------|
-| 1 | Production Foundation | Security Hardening + Sentry + Structured Logging | ~1 session | Gates all external use. Must be done before reps, new clients, or second agency. |
+| ~~1~~ | ~~Production Foundation~~ | ~~Security Hardening + Sentry + Structured Logging~~ | ✅ SHIPPED | ~~Gates all external use.~~ |
 | 2 | Ops Spine Completion | Client Portal Decision + Ops Sprint 6 (Reporting Pipeline) | ~1.5 sessions | Fulfills contract promise of monthly delivery. Portal ambiguity off the board. |
 | 3 | Bulk Operations | Ops Sprint 7 (bulk content/task/pipeline) | ~1 session | Team can't scale without batch actions. Additive to existing systems. |
 | 4 | Intelligence Layer | Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories) | ~1 session | Synthesizes all collected data. Turns dashboard into indispensable ops platform. |
@@ -31,6 +31,50 @@ Foundation → out. Each sprint unblocks the next.
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
 - I4 GBP OAuth — monitor Google API Console approval
+
+---
+
+## 🐛 UX BUGS & POLISH — Added February 23, 2026
+
+### UX-BUG-001: Search Bar — Click-Outside Should Close
+Search bar currently only closes on Escape key. Clicking anywhere outside should also dismiss it. Standard web convention.
+**Scope:** Add `onBlur` or click-outside handler (e.g., `useClickOutside` hook) to search component.
+**Size:** ~30 min.
+
+### UX-BUG-002: Search Bar — Animation Is Jarring and Off-Pattern
+When activated, a gray overlay appears at the top of the window and a second search bar renders lower on screen. Two instances + overlay = confusing and off-putting.
+**Recommended fix:** Keep search bar in place. On focus, elongate it horizontally with a smooth CSS transition (responsive max-width expansion). Results dropdown appears inline below. No overlay, no teleportation. Follow standard pattern (Linear, Vercel, GitHub).
+**Size:** ~1–2 hrs.
+
+### UX-BUG-003: Payments Page — Wave Widget Fails Without Graceful Degradation
+Wave GraphQL UNAUTHENTICATED error is surfaced raw in the UI: `Wave bank data unavailable — showing DB records only. (Error: Wave GraphQL error: [{"extensions":{"code":"UNAUTHENTICATED"...`. Raw JSON/stack traces must never reach the UI.
+**Fix:** Catch Wave auth errors specifically. Show a clean amber inline notice: "Live bank data unavailable. Showing payment records only." with a refresh icon. Error detail to server log only.
+**Size:** ~1 hr.
+
+### UX-BUG-004: Left Nav — Auto-Scroll on Group Expand at Bottom of Panel
+When scrolled to the bottom of the nav and a collapsed group is expanded, new items render below the viewport. User has to manually scroll to see them.
+**Fix:** On expand, `scrollIntoView({ behavior: 'smooth' })` on the last item in the expanded group. Only trigger when the group is at/near the bottom of the scroll container.
+**Size:** ~1 hr.
+
+### UX-BUG-005: "Team" Nav Group — Rename to Better Reflect Contents
+"Team" contains Service Catalog and Document Vault — neither of which is team-management in the conventional sense. Misleading label.
+**Suggested rename:** "Resources", "Operations", "Library", or "Workspace" — pick what fits the nav language and what a rep would intuitively scan for.
+**Size:** ~15 min.
+
+### UX-BUG-006: Command Palette — macOS Symbol Shown on Windows
+The command palette hint displays ⌘ instead of Ctrl on Windows. UI should detect the OS and show the correct modifier key.
+**Fix:** Use `navigator.platform` or `navigator.userAgentData.platform` to detect OS. Show `Ctrl+K` on Windows/Linux, `⌘K` on macOS. Create a shared `useModifierKey()` hook and apply globally to all shortcut hints.
+**Size:** ~30 min.
+
+### UX-BUG-007: Command Palette — Opens as Empty Transparent Square (Broken)
+When triggered, the command palette renders a transparent grey rectangle with no content.
+**Scope:** Investigate the component — likely z-index, missing portal target, hydration mismatch, or cmdk misconfiguration. Verify items are passed, component mounts correctly, overlay renders with content.
+**Size:** ~1–2 hrs diagnosis + fix.
+
+### ARCH-001: Orphaned File Audit
+Significant doc drift across sprints. Old sprint files, duplicate summaries, obsolete prompts, and stale handoff docs are cluttering the root and docs/.
+**Scope:** Audit root-level `.md` files — candidates for archive: PHASE_*.md, SESSION_*.md, DEPLOYMENT_SUMMARY_2025-*.md, INLINE_HANDOFF.md, HANDOFF_PROMPT.md, HANDOFF_CLIENT_OPS_SUITE.md, PHASE4_CONTINUATION.md, PHASE_3_POLISH_COMPLETE.md, UX_*.md in root, MISSING_FEATURES_TODO.md, PRODUCTIZING_BACKLOG.md, CONTENT_STUDIO_*.md, CLIENT_DETAIL_FIX.md, ADD_CLIENT_FEATURE.md. Audit docs/ for same. Create `docs/archive/` and move historical-only files there. Update FILE INDEX in STATUS.md.
+**Size:** ~1 hr.
 
 ---
 
@@ -92,10 +136,7 @@ Pick the top item in your current tier that unblocks the next thing.
 **Size:** ~2 sessions.
 **Files:** `src/app/(dashboard)/settings/onboarding/` (new), `src/lib/tenant/`
 
-### Security Hardening
-**Context:** Flagged as medium priority across multiple sessions. Required before any external agency onboards.
-**Scope:** 2FA for admin + master accounts (TOTP via `otplib` or NextAuth MFA hooks), rate limiting per user on auth endpoints, CSRF token verification on sensitive mutation routes, security headers audit (`CSP`, `X-Frame-Options`, `Referrer-Policy`) via `next.config.js`.
-**Size:** ~1 session.
+
 
 ---
 
@@ -146,15 +187,9 @@ Zero export capability currently.
 **Scope:** "Export" button on Leads table (current filtered view → CSV), "Export" on Clients table, column picker, admin-only full DB export.
 **Size:** ~3 hrs.
 
-### Sentry Error Monitoring
-No runtime error visibility in production.
-**Scope:** `@sentry/nextjs` install + wizard config, source maps on deploy, alerts for error rate threshold + new types, user context (role, email) attached to events.
-**Size:** ~1 hr setup.
 
-### Structured Logging (Replace console.log)
-Crons and API routes use `console.log` everywhere. No severity, no trace IDs.
-**Scope:** Minimal structured logger (`log.info/warn/error` with JSON output), correlation IDs on API routes. Consider `pino`.
-**Size:** ~2 hrs.
+
+
 
 ### Static Empty State Help Text
 Noted in commit cb8dd9d. Current empty states are static.

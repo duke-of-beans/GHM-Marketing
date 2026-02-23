@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { log } from '@/lib/logger'
 import { getInvoice } from '@/lib/wave/invoices'
 import { generateClientMonthlyPayments } from '@/lib/payments/calculations'
 import { startOfMonth } from 'date-fns'
@@ -152,14 +153,14 @@ export async function GET(req: NextRequest) {
       }
 
       results.commissionsGenerated += created
-      console.log(`[cron/invoice-status-poll] ${client.businessName} paid — ${created} transactions created`)
+      log.info({ cron: 'invoice-status-poll', clientName: client.businessName, created }, 'Client invoice paid — transactions created')
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       results.errors.push(`Invoice ${invoice.waveInvoiceId}: ${msg}`)
-      console.error(`[cron/invoice-status-poll] Error on invoice ${invoice.waveInvoiceId}:`, msg)
+      log.error({ cron: 'invoice-status-poll', waveInvoiceId: invoice.waveInvoiceId, error: msg }, 'Error processing invoice')
     }
   }
 
-  console.log('[cron/invoice-status-poll]', JSON.stringify(results))
+  log.info({ cron: 'invoice-status-poll', ...results }, 'Invoice poll complete')
   return NextResponse.json({ ok: true, results })
 }

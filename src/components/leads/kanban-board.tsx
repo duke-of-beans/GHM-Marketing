@@ -25,7 +25,7 @@ const COLUMN_EMPTY_MESSAGES: Partial<Record<LeadStatus, string>> = {
   follow_up: "Follow-up queue is clear. Either you're crushing it or nobody's calling back.",
   paperwork: "No contracts in motion. Close something.",
   won: "The win column. Currently empty — keep going.",
-  lost: "Nothing here. Small victories.",
+  lost_rejection: "Nothing here. Small victories.",
 };
 
 // Kanban shows active pipeline + "Won" as the finish line

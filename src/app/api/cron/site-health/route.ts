@@ -13,6 +13,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { fetchPageSpeedFull } from "@/lib/enrichment/providers/pagespeed";
 import { logProviderCall } from "@/lib/enrichment/cost-tracker";
 import { recordProviderSuccess, recordProviderFailure } from "@/lib/ops/data-source-monitor";
@@ -85,7 +86,7 @@ export async function GET(req: Request) {
       },
     });
   } catch (err) {
-    console.error("[site-health cron] fatal error:", err);
+    log.error({ cron: 'site-health', error: err }, 'Fatal site health cron error');
     await recordProviderFailure("pagespeed", err);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
@@ -198,7 +199,7 @@ async function processDomain(
 
     return true;
   } catch (err) {
-    console.error(`[site-health cron] error processing domain ${domain.domain}:`, err);
+    log.error({ cron: 'site-health', domain: domain.domain, clientId, error: err }, 'Error processing domain');
     await recordProviderFailure("pagespeed", err).catch(() => {});
     await logProviderCall({
       provider: "pagespeed",

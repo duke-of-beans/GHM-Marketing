@@ -6,6 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { runCitationScan } from "@/lib/enrichment/providers/nap-scraper/scanner";
 
 export const maxDuration = 300;
@@ -38,7 +39,7 @@ export async function GET(req: Request) {
     } catch (err) {
       failed++;
       errors.push(`Client ${client.id}: ${err}`);
-      console.error(`[nap-scan] client ${client.id} failed:`, err);
+      log.error({ cron: 'nap-scan', clientId: client.id, error: err }, 'NAP scan failed for client');
     }
   }
 

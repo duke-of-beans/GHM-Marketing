@@ -6,6 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { getSerpResults } from "@/lib/enrichment/providers/dataforseo";
 
 export const maxDuration = 120;
@@ -107,7 +108,7 @@ export async function GET(req: Request) {
             pendingTask.keyword
           );
         } catch (err) {
-          console.error("[rank-poll] Alert engine failed:", err);
+          log.error({ cron: 'rank-poll', clientId: pendingTask.clientId, error: err }, 'Alert engine failed');
         }
       }
     }

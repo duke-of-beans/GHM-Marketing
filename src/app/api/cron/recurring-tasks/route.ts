@@ -6,6 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { processRecurringTasks } from "@/lib/ops/recurring-tasks";
+import { log } from "@/lib/logger";
 
 export const maxDuration = 60;
 
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
 
   const result = await processRecurringTasks();
 
-  console.log("[cron/recurring-tasks]", JSON.stringify(result));
+  log.info({ cron: 'recurring-tasks', rulesProcessed: result.rulesProcessed, tasksCreated: result.tasksCreated.length, errors: result.errors }, 'Recurring tasks processed');
 
   return NextResponse.json({
     ok: true,

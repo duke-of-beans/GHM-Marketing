@@ -3,6 +3,7 @@
 // Triggers batch invoice generation for all active clients
 
 import { NextRequest, NextResponse } from 'next/server'
+import { log } from '@/lib/logger'
 
 export async function GET(req: NextRequest) {
   // Verify this is a legitimate Vercel cron call
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
   })
 
   const result = await response.json()
-  console.log('[cron/invoice-monthly]', JSON.stringify(result))
+  log.info({ cron: 'invoice-monthly', result }, 'Monthly invoice batch triggered')
 
   return NextResponse.json({ ok: true, result })
 }

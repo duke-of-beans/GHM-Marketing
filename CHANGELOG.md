@@ -18,6 +18,9 @@ When you ship something:
 
 | Date | Commit | Item |
 |------|--------|------|
+| 2026-02-23 | (uncommitted) | Security Hardening Sprint 1 — TOTP/2FA (totp.ts, /api/auth/totp/ routes, login page MFA wiring), rate limiting (rate-limit.ts), CSRF protection (csrf.ts), security headers in next.config.mjs |
+| 2026-02-23 | (uncommitted) | Sentry error monitoring — sentry.client/server/edge.config.ts, src/lib/sentry.ts, user context injection, PII scrubbing, session replay on error |
+| 2026-02-23 | (uncommitted) | Structured logging — src/lib/logger.ts (log.info/warn/error), cron routes migrated off console.log |
 | 2026-02-23 | e762287 | AI Universal Search (Cmd+K) — two-phase local+AI, wired to DashboardLayoutClient |
 | 2026-02-23 | 2ebdefb | Vendor Flexibility Architecture — provider interfaces for Wave/GoDaddy/Resend, TENANT_REGISTRY providers block |
 | 2026-02-23 | 92b2629 | Task→Invoice auto-generation — website_deployment→deployed fires Wave invoice |

@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint sequence planned (9 sprints, foundation→out). Recorded in BACKLOG.md. Sprint 1 = Security Hardening + Sentry + Structured Logging.
+**Last Updated:** February 23, 2026 — Sprint 1 (Security Hardening + Sentry + Structured Logging) closed out. Work was built but uncommitted; docs now reflect reality. Committed as sprint-1-security.
 
 ---
 
@@ -714,9 +714,9 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 ## 🟢 INFRASTRUCTURE (When Time Allows)
 
 - Client Portal migration
-- Error monitoring (Sentry)
-- Structured logging
-- Security hardening (2FA, rate limiting)
+- ✅ Error monitoring (Sentry) — shipped Sprint 1
+- ✅ Structured logging — shipped Sprint 1
+- ✅ Security hardening (2FA/TOTP, rate limiting, CSRF) — shipped Sprint 1
 - Automated testing
 - Production deployment checklist
 
