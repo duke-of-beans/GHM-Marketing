@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 22, 2026 — Sprint 1 in progress: D4 done, ITEM-001 docs done. Covos multi-tenant infrastructure complete: wildcard DNS (*.covos.app), Vercel domains, tenant middleware, registry, server helper, client hook.
+**Last Updated:** February 22, 2026 — Tab nav redesign shipped (d9bb3f3). BACKLOG.md created as consolidated backlog. See BACKLOG.md for all queued work.
 
 ---
 
