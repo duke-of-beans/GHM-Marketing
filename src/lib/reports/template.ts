@@ -14,6 +14,7 @@ export function generateReportHTML(reportData: any): string {
     citationHealth,
     gbpPerformance,
     ppcPerformance,
+    narratives,
   } = reportData;
 
   const formatDate = (date: Date) => {
@@ -169,6 +170,17 @@ export function generateReportHTML(reportData: any): string {
       .metric-grid { break-inside: avoid; }
       .section { break-inside: avoid; }
     }
+    .narrative {
+      background: #f0f7ff;
+      border-left: 3px solid #3b82f6;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.7;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -200,6 +212,8 @@ export function generateReportHTML(reportData: any): string {
       <div class="value">${tasks.completed}</div>
     </div>
   </div>
+
+  ${narratives?.executiveSummary ? `<div class="narrative">${narratives.executiveSummary}</div>` : ""}
 
   <div class="section">
     <h3>🏆 Top Wins This Month</h3>
@@ -237,6 +251,7 @@ export function generateReportHTML(reportData: any): string {
   ${rankTracking?.hasData ? `
   <div class="section">
     <h3>📈 Keyword Rankings</h3>
+    ${narratives?.rankingChanges ? `<div class="narrative">${narratives.rankingChanges}</div>` : ""}
     <div class="kpi-row">
       <div class="kpi">
         <div class="kpi-label">Tracked</div>
@@ -292,6 +307,7 @@ export function generateReportHTML(reportData: any): string {
   ${citationHealth?.hasData ? `
   <div class="section">
     <h3>🗂️ Citation Consistency</h3>
+    ${narratives?.competitivePositioning ? `<div class="narrative">${narratives.competitivePositioning}</div>` : ""}
     <div class="kpi-row">
       <div class="kpi">
         <div class="kpi-label">Citation Score</div>
@@ -323,6 +339,7 @@ export function generateReportHTML(reportData: any): string {
   ${gbpPerformance?.hasData ? `
   <div class="section">
     <h3>📍 Google Business Profile</h3>
+    ${narratives?.gmbPerformance ? `<div class="narrative">${narratives.gmbPerformance}</div>` : ""}
     ${gbpPerformance.insights ? `
     <p style="font-weight:600; margin-bottom:8px;">Search Visibility — ${gbpPerformance.insights.period}</p>
     <div class="kpi-row">
@@ -435,6 +452,12 @@ export function generateReportHTML(reportData: any): string {
         </tr>`).join("")}
       </tbody>
     </table>` : ""}
+  </div>` : ""}
+
+  ${narratives?.recommendedNextSteps ? `
+  <div class="section">
+    <h3>🎯 Recommended Next Steps</h3>
+    <div class="narrative">${narratives.recommendedNextSteps}</div>
   </div>` : ""}
 
   <div class="footer">

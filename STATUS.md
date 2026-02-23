@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint 3 SEO/GMB complete. GbpSnapshot table + migration, weekly cron (Monday 4am), snapshot history API (/gbp/snapshots + /latest), AI GMB post drafting (/gbp/draft-post with VoiceProfile), LocalPresenceTab extended (Trends tab + AI Draft button), 5 alert rules seeded (review avg, zero reviews, search view drop, keyword lost/entered top 3), AlertSourceType extended with "gbp" + "rankings", vercel.json wired. Zero new TypeScript errors.
+**Last Updated:** February 23, 2026 — Sprint 5 AI Reports complete. ai-narrative.ts (6 parallel AI narrative calls, voice-profile tone-matching), generator.ts updated (includeNarratives option, VoiceProfile fetch), template.ts updated (narrative callout blocks in all sections + Recommended Next Steps section), /api/clients/[id]/reports/generate route (per-client, D3), report_narrative AIFeature + system prompt + DEFAULT_MAX_TOKENS, seed-sprint5-reports.ts run (TaskChecklistTemplate id=2, RecurringTaskRule id=1, next run 2026-03-01). Zero new TypeScript errors.
 
 ---
 
@@ -57,6 +57,16 @@ Portfolio-level visibility as team and client base grow.
 - [x] 5 alert rules seeded — review avg <4.0 (critical), zero new reviews, search views -25%, keyword lost top 3, keyword entered top 3 (info)
 - [x] AlertSourceType extended with "gbp" + "rankings" in alert-engine.ts
 - [x] vercel.json — gbp-snapshot cron wired (0 4 * * 1 — Monday 4am UTC)
+
+### SPRINT 5 — AI Report Narratives ✅ COMPLETE (February 23, 2026)
+AI-generated narrative paragraphs embedded in client monthly reports, voice-profile tone-matched, zero new TypeScript errors.
+- [x] `src/lib/reports/ai-narrative.ts` — 6 parallel AI narrative calls (executive summary, ranking changes, site health, GBP performance, competitive positioning, recommended next steps); `Promise.allSettled` for resilience; voice profile tone-matching; all routed through `callAI()`
+- [x] `src/lib/reports/generator.ts` — `includeNarratives` option added; VoiceProfile fetched from DB; `generateAINarratives()` called after section data is assembled
+- [x] `src/lib/reports/template.ts` — narrative callout blocks (`<div class="narrative">`) rendered after metric grid (executive summary), in Rankings, Citations, GBP sections; standalone "Recommended Next Steps" section before footer
+- [x] `src/app/api/clients/[id]/reports/generate/route.ts` — per-client on-demand report generation (D3); supports monthly/quarterly/annual; `includeNarratives: true`; persists `ClientReport` record
+- [x] `src/lib/ai/router/types.ts` + `src/lib/ai/client.ts` — `report_narrative` added to `AIFeature` union + `DEFAULT_MAX_TOKENS` (1,000)
+- [x] `src/lib/ai/context/system-prompt-builder.ts` — `report_narrative` case added with plain-text output contract
+- [x] `prisma/seed-sprint5-reports.ts` — seeded: `TaskChecklistTemplate` (Monthly Client Report, 7 items, id=2) + `RecurringTaskRule` (1st of month 9am, id=1, next run 2026-03-01)
 
 ### SPRINT 4 — Cluster Manager ✅ COMPLETE (February 23, 2026)
 Approval workflow on existing Website Studio. No new domain tables — governance added to existing BuildJob pipeline.

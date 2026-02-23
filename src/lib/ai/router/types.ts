@@ -127,7 +127,9 @@ export type AIFeature =
   // SCRVNR / Voice
   | "voice_capture"      // Extract brand voice profile from website content
   // GMB
-  | "gbp_post";          // AI-drafted Google Business Profile post
+  | "gbp_post"           // AI-drafted Google Business Profile post
+  // Reports
+  | "report_narrative";  // AI narrative section for monthly client reports
 
 export interface FeatureContext {
   feature: AIFeature;

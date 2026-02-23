@@ -61,6 +61,18 @@ function buildFeatureSection(ctx: FeatureContext): string {
       return buildUpsellProtocol(ctx);
     case "voice_capture":
       return buildVoiceCaptureProtocol(ctx);
+    case "report_narrative":
+      return `FEATURE: Monthly Report Narrative Generation
+
+Your job is to write a single, focused narrative paragraph for a specific section of a client-facing monthly SEO performance report.
+
+REQUIREMENTS:
+- Write in a professional, plain-language style appropriate for a business owner audience.
+- Be specific — reference actual numbers from the data provided. Never use vague language.
+- Do not fabricate data or mention specific competitor names unless provided.
+- Keep each paragraph to 2-3 sentences unless instructed otherwise.
+- Output plain text only — no markdown, no headers, no bullet points.
+- The paragraph will be inserted directly into a formatted PDF report.`;
     // Content Studio: lean system prompt — detailed instructions live in the user prompt
     case "seo_strategy":
       return `FEATURE: SEO Strategy\nYou are an expert SEO strategist. Follow the instructions in the user message exactly. Return only what is asked — no preamble, no explanations outside the requested format.`;

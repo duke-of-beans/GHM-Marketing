@@ -3,6 +3,8 @@ import { generateRankTrackingSection } from "./sections/rank-tracking";
 import { generateCitationHealthSection } from "./sections/citation-health";
 import { generateGBPPerformanceSection } from "./sections/gbp-performance";
 import { generatePPCSection } from "./sections/ppc-performance";
+import { generateAINarratives } from "./ai-narrative";
+import type { VoiceProfileData } from "./ai-narrative";
 
 /**
  * Generate monthly report data for a client
@@ -10,7 +12,8 @@ import { generatePPCSection } from "./sections/ppc-performance";
 export async function generateMonthlyReportData(
   clientId: number,
   periodStart: Date,
-  periodEnd: Date
+  periodEnd: Date,
+  options: { includeNarratives?: boolean } = {}
 ) {
   // Get all scans in the period
   const scans = await prisma.competitiveScan.findMany({
@@ -117,7 +120,7 @@ export async function generateMonthlyReportData(
     generatePPCSection(clientId, { startDate: periodStartStr, endDate: periodEndStr }),
   ]);
 
-  return {
+  const baseReport = {
     client: {
       id: client.id,
       businessName: client.lead.businessName,
@@ -152,5 +155,29 @@ export async function generateMonthlyReportData(
     citationHealth,
     gbpPerformance,
     ppcPerformance,
+    narratives: null as any,
   };
+
+  if (options.includeNarratives) {
+    // Fetch voice profile for tone matching
+    const voiceProfileRaw = await prisma.voiceProfile.findUnique({
+      where: { clientId },
+    });
+
+    const voiceProfile: VoiceProfileData | null = voiceProfileRaw
+      ? {
+          tonality: voiceProfileRaw.tonality,
+          vocabulary: voiceProfileRaw.vocabulary,
+          sentenceStructure: voiceProfileRaw.sentenceStructure,
+          formality: voiceProfileRaw.formality,
+          enthusiasm: voiceProfileRaw.enthusiasm,
+          technicality: voiceProfileRaw.technicality,
+          brevity: voiceProfileRaw.brevity,
+        }
+      : null;
+
+    baseReport.narratives = await generateAINarratives(baseReport, voiceProfile);
+  }
+
+  return baseReport;
 }
