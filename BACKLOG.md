@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 11 shipped. Added BUG-010–011, UX-AUDIT-012–015 from session review.
+**Last Updated:** February 24, 2026 — Sprint 12 complete. Added UX-AUDIT-016 (tooltip vs tour tip differentiation), UX-AUDIT-017 (bulk actions custom volume).
 
 **Owner:** David Kirsch
 
@@ -175,6 +175,16 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 - Add a warning when bulk enrichment is triggered on leads in "available" status: "You're about to enrich leads that haven't been contacted yet. Enrichment is most valuable for leads in Scheduled or later stages. Continue?" Dismissible with a "Don't show again" option.
 - The existing `handleBatchEnrich` logic (skip-if-fresh + force-re-enrich) stays intact — just rerouted through these new entry points.
 **Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD — affects API cost hygiene and rep workflow clarity.
+
+### UX-AUDIT-016: Tooltip vs. Tour Tip — Visual Differentiation
+**Observed:** The dashboard uses two distinct "?" interactions — inline tooltips (contextual help on a specific field or control) and tour tips (guided walkthrough steps). Both currently render identically, causing user confusion about whether clicking "?" will give a quick definition or launch a full tour step.
+**Scope:** Define two visually distinct components. Tooltip `?` = small, subdued, info-only (circle outline, muted color, appears inline). Tour tip `?` = distinct affordance (filled, branded accent color, or different icon shape — compass rose, map pin, play icon) that signals "this starts a guided step." Audit all `?` instances across the dashboard and reclassify each as tooltip or tour tip. Update all instances to use the correct component. Document the distinction in a brief design-system note.
+**Size:** ~1–2 hrs. **Priority:** 🟠 SHOULD — small surface area, meaningful UX clarity signal.
+
+### UX-AUDIT-017: Bulk Actions — Custom Volume Input (Global)
+**Observed:** Bulk action operations (enrich, assign, export, etc.) use hardcoded integer limits (e.g., "Enrich 50", "Process 200"). Users have no way to specify a custom count or operate on their full filtered set.
+**Scope:** Replace hardcoded integers in all bulk action entry points with a configurable input — either a numeric input field inline in the bulk action dropdown, or a stepper/select that includes "All filtered" as an explicit option alongside common presets (25, 50, 100, custom). Cap enforcement stays server-side. Apply globally: leads pipeline, client portfolio, any other page with bulk operations. Ensure the UI communicates clearly when "All filtered" would exceed a rate/cost threshold (e.g., enrichment API cost warning above N=100).
+**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD — current hardcoded limits are arbitrary and create friction for power users.
 
 ### UX-AUDIT-015: Static Empty States — Mark as Shipped, Consolidate
 **Note:** "Static Empty States" was listed as a backlog item (see WOULD section). Sprint 11 shipped context-aware empty states for Leads, Portfolio, and Discovery. The remaining scope is Content Studio empty states — not yet addressed.
