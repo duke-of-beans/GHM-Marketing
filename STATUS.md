@@ -1,7 +1,12 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Pre-Sprint-8 fixes: management fee tooltip rewritten, Sales Tools panel tooltips added, dashboard grid mount flash fixed. Sprint 8 starting.
+**Last Updated:** February 24, 2026 — Sprint 8 complete: Bulk content ops, competitor tracking, custom report builder. Commit 1bea7c7.
+
+### SPRINT 8 — Content Power ✅ COMPLETE (February 24, 2026)
+- [x] **8A — Bulk Content Operations** — Multi-select UI on ContentList, bulk action bar (Approve/Archive), `POST /api/content/bulk` route. Master+ only. `isMaster` prop threaded from page → profile → ContentStudioTab → ContentList.
+- [x] **8B — Competitor Tracking** — `CompetitorsTab` component with add/remove/refresh-scan UX. `GET/POST /api/clients/[id]/competitors`, `DELETE /api/clients/[id]/competitors/[cid]`. "Competitors" added to profile Overflow tab group under Operations.
+- [x] **8C — Custom Report Builder** — Report dialog extended with 8-section toggle grid, AI Executive Summary switch, Client-Facing Mode switch. All params passed to existing `/api/reports/generate` endpoint.
 
 ---
 
