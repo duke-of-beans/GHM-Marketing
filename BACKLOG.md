@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 13 complete + BUG-010 fully resolved (Blob store provisioned, token active). BUG-011 shipped. AUDIT-004 fixed. FEAT-022 added (Client Website Audit).
+**Last Updated:** February 24, 2026 — Added FEAT-022 (TeamFeed multimedia/GIF/emoji — Slack-grade), FEAT-023 (stock photo library API integration).
 
 **Owner:** David Kirsch
 
@@ -164,6 +164,28 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 - Add a warning when bulk enrichment is triggered on leads in "available" status: "You're about to enrich leads that haven't been contacted yet. Enrichment is most valuable for leads in Scheduled or later stages. Continue?" Dismissible with a "Don't show again" option.
 - The existing `handleBatchEnrich` logic (skip-if-fresh + force-re-enrich) stays intact — just rerouted through these new entry points.
 **Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD — affects API cost hygiene and rep workflow clarity.
+
+### FEAT-022: TeamFeed — Multimedia, GIF, and Emoji Support (Slack-Grade)
+**Context:** TeamFeed exists as a text-only message thread. For a team communication tool to actually get used, it needs to feel as natural and low-friction as Slack — which means emoji reactions, GIF support, and image attachments are table stakes, not extras.
+**Scope:**
+- **Emoji picker:** Integrate `emoji-mart` inline in the compose box. Standard picker UI with search and recent/frequently used. Emoji render inline in message text.
+- **Emoji reactions:** Allow team members to react to any message with an emoji (similar to Slack reactions). Store per-message-per-user. Aggregate and display reaction counts below messages.
+- **GIF search:** Integrate Giphy or Tenor API. Search accessible from compose toolbar. Selected GIF renders inline in the thread — not as a link, as an actual image.
+- **Image/file attachment:** Drag-and-drop or click-to-upload in compose box. Uploaded to Vercel Blob (depends on BUG-010 Blob provisioning being complete first). Renders inline in thread. Server-enforced limits: images max 8 MB, accepted types PNG/JPG/GIF/WebP. Non-image files show as attachment cards.
+- **Paste support:** Pasting an image from clipboard into the compose box triggers upload.
+- **UX standard:** All of the above should feel native and instant — picker opens without page shift, GIFs autoplay in thread, reactions update optimistically. The bar is Slack. If it feels worse than Slack, it's not done.
+**Dependencies:** BUG-010 Blob store provisioning (for image upload). Giphy/Tenor API key (free tier is sufficient for internal use).
+**Size:** ~2 sessions (emoji + reactions first pass; GIF + attachment second pass). **Priority:** 🟠 SHOULD — TeamFeed without this is a bulletin board, not a communication tool.
+
+### FEAT-023: Stock Photo Library Integration (API-Based Media Automation)
+**Context:** Content production — blogs, website copy, landing pages, GMB posts — requires images. Currently there's no way to source or attach images from within the platform. Every piece of content goes out either imageless or requires the editor to manually source media outside the system.
+**Scope:**
+- Integrate one or more stock photo APIs. Primary candidates: **Unsplash** (free, high quality, permissive license), **Pexels** (free), **Pixabay** (free). All three have well-documented REST APIs. Pexels and Pixabay are fully free with attribution; Unsplash requires attribution. Getty/Shutterstock are paid and lower priority.
+- **Search interface:** Accessible from content editors — Content Studio brief composer, blog post editor, any rich text field. Keyword search returns a grid of photo options with photographer credit. One-click insert.
+- **Automation layer:** When AI generates content (blog posts, GMB posts, website copy), the system should automatically suggest or auto-select a relevant stock image based on the content topic. This can be a keyword extraction step post-generation that runs a Pexels/Unsplash query and attaches the top result. Admin can accept, replace, or remove.
+- **Storage:** Selected images can be referenced by URL (no re-hosting needed for Unsplash/Pexels CDN links) or optionally saved to Vercel Blob for self-hosting. Attribution metadata stored with image reference (required for Unsplash compliance).
+- **License compliance:** Unsplash requires a visible credit line. Pexels and Pixabay require attribution in certain contexts. System should auto-generate credit markup when inserting images.
+**Size:** ~1 session for search UI + Unsplash/Pexels integration; ~1 additional session for automation layer (auto-suggest on content generation). **Priority:** 🟠 SHOULD — directly increases the quality and completeness of all content output without adding manual work.
 
 ### UX-AUDIT-016: Tooltip vs. Tour Tip — Visual Differentiation
 **Observed:** The dashboard uses two distinct "?" interactions — inline tooltips (contextual help on a specific field or control) and tour tips (guided walkthrough steps). Both currently render identically, causing user confusion about whether clicking "?" will give a quick definition or launch a full tour step.
