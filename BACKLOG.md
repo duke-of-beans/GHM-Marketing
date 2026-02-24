@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 13 complete. Reconciled with FEATURE_ROADMAP.md (now deleted). Added missing items from roadmap Feb 18 backlog section: FEAT-025 (pipeline filter full Lead model expansion), FEAT-026 (pipeline filter UX — collapsibility + defaults), FEAT-027 (logo → dashboard home), FEAT-028 (bug report status feedback loop), FEAT-029 (rename master → manager). Fixed duplicate FEAT-022 (Client Website Audit renumbered to FEAT-024). BUG-010 root cause documented (Blob store — manual Vercel step required). BUG-011 fixed.
+**Last Updated:** February 24, 2026 — Removed FEAT-027 (logo nav — shipped) and BUG-010 (Blob provisioning — complete). Backlog reconciled against FEATURE_ROADMAP.md (now deleted).
 
 **Owner:** David Kirsch
 
@@ -42,7 +42,6 @@ Foundation → out. Each sprint unblocks the next.
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
 - I4 GBP OAuth — monitor Google API Console approval
-- BUG-010 — Provision Vercel Blob store (5 min manual, see below)
 
 
 ---
@@ -75,19 +74,6 @@ Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audi
 ---
 
 ## 🔴 MUST — Active Blockers
-
-### BUG-010: Admin Onboarding — Logo Upload 500 Error
-**Root cause identified:** `BLOB_READ_WRITE_TOKEN` is not set in Vercel project environment variables — the Blob store was never formally provisioned/linked. The token existed only as a manual `.env.local` entry, which was wiped by `vercel env pull` on Feb 24.
-
-**Manual step required (5 min):**
-1. Go to [vercel.com/davids-projects-b0509900/ghm-marketing](https://vercel.com/davids-projects-b0509900/ghm-marketing) → **Storage** tab
-2. Create a new **Blob store** (or link existing one if already exists in the team)
-3. Vercel will auto-inject `BLOB_READ_WRITE_TOKEN` into all environments
-4. Run `npx vercel env pull .env.local` from `D:\Work\SEO-Services\ghm-dashboard` to pull the token locally
-5. Restart dev server — upload will work immediately
-
-**Code already done (Sprint 13):** Graceful error fallback in wizard — upload failure no longer blocks progression. Amber notice points to Settings → Branding. Meta tag deprecation warning also fixed.
-**Size:** 5 min manual setup on Vercel dashboard. **Priority:** 🔴 MUST.
 
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
@@ -264,10 +250,6 @@ Two specific UX issues with the current filter panel.
 **Issue 1:** "Pipeline Status" section in More Filters is not collapsible, unlike the other two sections. All three sections should be collapsible and open by default — consistent behavior.
 **Issue 2:** Default visible filter/sort options don't reflect what reps actually use. Most-used options should be always-visible above the More Filters button. Suggested top-level defaults: Status, Assigned Rep, Territory, Sort (newest / deal value / close score). Secondary options go into More Filters: Score range, Market type, Lead source, Deal value, Distance, Wealth score, etc.
 **Size:** ~1 hr. **Priority:** 🟠 SHOULD.
-
-### FEAT-027: Logo → Dashboard Home Navigation
-The logo in the navbar/header should be a link to `/master` or `/sales` depending on role. Currently not a link.
-**Fix:** Wrap logo in a `<Link>` with role-aware `href`. **Size:** ~15 min. **Priority:** 🟠 SHOULD — should have been there from day one.
 
 ### FEAT-028: Bug Report Status Feedback Loop
 Bug and feature submissions currently go into a void from the submitter's perspective. Reports are visible to admin but submitters get no status updates.
