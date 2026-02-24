@@ -5,6 +5,7 @@ import { TeamFeedSidebar, TeamFeedToggle } from "@/components/team-feed/TeamFeed
 import { PushPermissionPrompt } from "@/components/push/PushPermissionPrompt";
 import { AISearchBar } from "@/components/search/AISearchBar";
 import { KeyboardShortcutsHelp } from "@/components/ui/keyboard-shortcuts-help";
+import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import { useRouter } from "next/navigation";
 
 type TeamUser = { id: number; name: string; role: string };
@@ -15,6 +16,8 @@ type Props = {
   isMaster: boolean;
   currentUserId: number;
   pushEnabled?: boolean;
+  userRole: "sales" | "manager" | "owner";
+  userName: string;
 };
 
 export function DashboardLayoutClient({
@@ -23,6 +26,8 @@ export function DashboardLayoutClient({
   isMaster,
   currentUserId,
   pushEnabled = true,
+  userRole,
+  userName,
 }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -146,6 +151,9 @@ export function DashboardLayoutClient({
         isMaster={isMaster}
         currentUserId={currentUserId}
       />
+
+      {/* Onboarding tutorial — mounted globally so Help menu restart works on any page */}
+      <OnboardingTutorial userRole={userRole} userName={userName} />
 
       {/* Push notification permission prompt — fires once on first visit */}
       <PushPermissionPrompt pushEnabled={pushEnabled} />

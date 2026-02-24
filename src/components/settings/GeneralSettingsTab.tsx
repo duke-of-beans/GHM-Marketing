@@ -1,6 +1,7 @@
 /**
  * General Settings Tab
- * Contains all non-team settings (appearance, commissions, features, etc.)
+ * Appearance and push notification settings.
+ * Commission defaults and monthly goals are in CompensationTab (Settings → Compensation).
  */
 
 "use client";
@@ -123,129 +124,6 @@ export function GeneralSettingsTab() {
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Commission Defaults */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Commission Defaults</CardTitle>
-          <CardDescription>
-            Global commission rates applied to new sales reps
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="defaultCommission">Default Commission ($)</Label>
-              <Input
-                id="defaultCommission"
-                type="number"
-                step="1"
-                min="0"
-                value={settings.defaultCommission}
-                onChange={(e) =>
-                  updateSetting(
-                    "defaultCommission",
-                    parseFloat(e.target.value)
-                  )
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                Dollar amount per sale
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="defaultResidual">Default Residual ($)</Label>
-              <Input
-                id="defaultResidual"
-                type="number"
-                step="1"
-                min="0"
-                value={settings.defaultResidual}
-                onChange={(e) =>
-                  updateSetting(
-                    "defaultResidual",
-                    parseFloat(e.target.value)
-                  )
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                Ongoing monthly dollar amount
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="masterManagerFee">Master Manager Fee ($)</Label>
-              <Input
-                id="masterManagerFee"
-                type="number"
-                step="1"
-                min="0"
-                value={settings.masterManagerFee}
-                onChange={(e) =>
-                  updateSetting("masterManagerFee", parseFloat(e.target.value))
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                Monthly fee per master manager
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Monthly Goals */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Monthly Goals</CardTitle>
-          <CardDescription>
-            Set deal and revenue targets shown on the master dashboard. Disable to hide the goals widget until you&apos;re ready.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="goalsEnabled">Enable Goals Widget</Label>
-              <p className="text-sm text-muted-foreground">Show progress bars on the dashboard</p>
-            </div>
-            <Switch
-              id="goalsEnabled"
-              checked={!!settings.goalsEnabled}
-              onCheckedChange={(checked) => updateSetting("goalsEnabled", checked)}
-            />
-          </div>
-          {settings.goalsEnabled && (
-            <div className="grid gap-4 md:grid-cols-2 pt-2">
-              <div className="space-y-2">
-                <Label htmlFor="monthlyDealTarget">Monthly Deal Target</Label>
-                <Input
-                  id="monthlyDealTarget"
-                  type="number"
-                  min="1"
-                  step="1"
-                  placeholder="e.g. 20"
-                  value={settings.monthlyDealTarget ?? ""}
-                  onChange={(e) => updateSetting("monthlyDealTarget", e.target.value ? parseInt(e.target.value) : null)}
-                />
-                <p className="text-xs text-muted-foreground">Number of deals to close this month</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="monthlyRevenueTarget">Monthly Revenue Target ($)</Label>
-                <Input
-                  id="monthlyRevenueTarget"
-                  type="number"
-                  min="0"
-                  step="1000"
-                  placeholder="e.g. 50000"
-                  value={settings.monthlyRevenueTarget ?? ""}
-                  onChange={(e) => updateSetting("monthlyRevenueTarget", e.target.value ? parseFloat(e.target.value) : null)}
-                />
-                <p className="text-xs text-muted-foreground">MRR target for the month</p>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 

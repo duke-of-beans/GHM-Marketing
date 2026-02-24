@@ -6,7 +6,6 @@ import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyEarningsWidget } from "@/components/payments/my-earnings-widget";
-import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
 import { RefreshOnFocus } from "@/components/dashboard/refresh-on-focus";
 import { TerritoryHealthBanner } from "@/components/sales/territory-health-banner";
@@ -230,7 +229,6 @@ export default async function SalesDashboard() {
         </CardContent>
       </Card>
 
-      <OnboardingTutorial userRole="sales" userName={user.name} />
       <RefreshOnFocus />
     </div>
   );

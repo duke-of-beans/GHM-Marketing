@@ -52,6 +52,10 @@ export default async function DashboardLayout({
   const logoUrl = settings?.logoUrl ?? null;
   const companyName = settings?.companyName ?? null;
 
+  // Normalise role for OnboardingTutorial — "admin" maps to the master/manager tutorial
+  const tutorialRole: "sales" | "manager" | "owner" =
+    session.user.role === "sales" ? "sales" : "manager";
+
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
@@ -61,6 +65,8 @@ export default async function DashboardLayout({
         isMaster={elevated}
         currentUserId={currentUserId}
         pushEnabled={pushEnabled}
+        userRole={tutorialRole}
+        userName={session.user.name ?? ""}
       >
         {children}
       </DashboardLayoutClient>

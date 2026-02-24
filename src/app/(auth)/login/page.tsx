@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,16 +21,6 @@ export default function LoginPage() {
   // Store credentials across the two-step flow
   const emailRef = useRef<string>("");
   const passwordRef = useRef<string>("");
-
-  // Force light mode on login page regardless of system/user preference
-  useEffect(() => {
-    const html = document.documentElement;
-    const wasDark = html.classList.contains("dark");
-    html.classList.remove("dark");
-    return () => {
-      if (wasDark) html.classList.add("dark");
-    };
-  }, []);
 
   async function handleCredentials(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

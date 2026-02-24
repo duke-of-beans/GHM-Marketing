@@ -195,7 +195,7 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
         <Search className="h-3.5 w-3.5 flex-shrink-0" />
         <span className="truncate">Search</span>
         <kbd className="ml-auto hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground flex-shrink-0">
-          {modSymbol}K
+          {modSymbol}+K
         </kbd>
       </button>
 

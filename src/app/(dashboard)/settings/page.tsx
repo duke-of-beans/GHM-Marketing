@@ -3,8 +3,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity, Paintbrush } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity, Paintbrush, DollarSign } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
+import { CompensationTab } from "@/components/settings/CompensationTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { UserActivityTab } from "@/components/settings/UserActivityTab";
@@ -25,7 +26,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "branding", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
+const VALID_TABS = ["general", "compensation", "branding", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -56,6 +57,11 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="gap-1.5">
             <Sliders className="h-4 w-4" />General
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="compensation" className="gap-1.5">
+              <DollarSign className="h-4 w-4" />Compensation
+            </TabsTrigger>
+          )}
           {isAdmin && (
             <TabsTrigger value="branding" className="gap-1.5">
               <Paintbrush className="h-4 w-4" />Branding
@@ -103,6 +109,12 @@ export default function SettingsPage() {
         <TabsContent value="general">
           <GeneralSettingsTab />
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="compensation">
+            <CompensationTab />
+          </TabsContent>
+        )}
 
         {isAdmin && (
           <TabsContent value="branding">

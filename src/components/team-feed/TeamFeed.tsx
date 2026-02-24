@@ -41,6 +41,7 @@ import {
   Paperclip,
   HardDriveDownload,
   CheckCircle,
+  CornerDownLeft,
 } from "lucide-react";
 import {
   Tooltip,
@@ -240,7 +241,7 @@ function ComposeMessage({
         </div>
       )}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-muted-foreground">{modSymbol}↵ to send</p>
+        <p className="flex items-center gap-0.5 text-[10px] text-muted-foreground">{modSymbol}<CornerDownLeft className="h-3.5 w-3.5" /> to send</p>
         <Button size="sm" onClick={send} disabled={sending || !content.trim()} className="h-7 text-xs">
           <Send className="h-3 w-3 mr-1" />
           {sending ? "Sending…" : "Send"}

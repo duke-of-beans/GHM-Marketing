@@ -5,7 +5,6 @@ import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { RepLeaderboard } from "@/components/dashboard/rep-leaderboard";
 import { ManagementFeesWidget } from "@/components/payments/management-fees-widget";
 import { CompanyProfitabilityWidget } from "@/components/payments/company-profitability-widget";
-import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
 import { QuickActions, RevenueMetricsWidget, GoalsWidget } from "@/components/dashboard/dashboard-widgets";
 import { MyTasksWidget } from "@/components/dashboard/my-tasks-widget";
 import { MetricsRow } from "@/components/dashboard/MetricsRow";
@@ -133,7 +132,6 @@ export default async function MasterDashboard() {
         }}
       </MasterDashboardGrid>
 
-      <OnboardingTutorial userRole={isOwner ? "owner" : "manager"} userName={user.name} />
       <RefreshOnFocus />
     </MasterPageClient>
   );
