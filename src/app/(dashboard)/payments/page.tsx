@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { requirePermission } from "@/lib/auth/permissions";
+import { isElevated } from "@/lib/auth/roles";
 import { PaymentsOverview } from "@/components/payments/PaymentsOverview";
 import { FinancialOverviewSection } from "@/components/payments/FinancialOverviewSection";
 
 export default async function PaymentsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  await requirePermission("view_payments");
 
   // Fetch all clients with invoice summary
   const clients = await prisma.clientProfile.findMany({
@@ -72,7 +75,7 @@ export default async function PaymentsPage() {
   return (
     <div className="space-y-8 p-6">
       {/* FINANCE-001: Live financial overview — bank balance, AR/AP, cash position */}
-      {(session.user as { role?: string }).role === 'admin' && (
+      {isElevated((session.user as { role?: string }).role ?? "") && (
         <div>
           <h2 className="text-lg font-semibold mb-4">Financial Overview</h2>
           <FinancialOverviewSection />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { isElevated } from "@/lib/auth/roles";
 
 /**
  * POST /api/bug-reports
@@ -84,7 +85,7 @@ export async function GET(req: NextRequest) {
       select: { role: true },
     });
 
-    if (user?.role !== "admin") {
+    if (!isElevated(user?.role ?? "")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

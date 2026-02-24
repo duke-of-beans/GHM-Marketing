@@ -74,7 +74,8 @@ export default async function MasterDashboard() {
     }).then(u => (u?.dashboardLayout as ResponsiveLayouts | null) ?? null),
   ]);
 
-  const isOwner = [1, 2].includes(Number(user.id));
+  // isOwner = David only (id=1). Seed user id=2 (Alex Johnson) was deleted in session Feb 22.
+  const isOwner = Number(user.id) === 1;
   const isMaster = user.role === "master";
 
   // Goals widget or placeholder

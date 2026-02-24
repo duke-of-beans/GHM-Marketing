@@ -1,7 +1,18 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 11 complete. Context-aware empty states on leads pipeline, client portfolio, and discovery. See CHANGELOG.
+**Last Updated:** February 24, 2026 — Sprint 12 complete. Route/permission audit. Fixed 3 unguarded pages (/bugs, /territories, /payments), 1 API bug (bug-reports GET admin-only → isElevated), 1 stale hardcoded ID (master isOwner). Full audit in docs/ROUTE_AUDIT.md.
+
+### SPRINT 12 — Route/Button/Permission Audit ✅ COMPLETE (February 24, 2026)
+- [x] **Full route inventory** — All `src/app/(dashboard)/` pages mapped to their permission gates. Documented in `docs/ROUTE_AUDIT.md`.
+- [x] **/bugs permission gap fixed** — Page was a bare client component with no server gate. Extracted `BugsPageClient` to `src/components/bugs/`, replaced page with server wrapper calling `requirePermission("manage_settings")`. Also fixed silent data bug: API returns `{ data: [] }` not `{ bugs: [] }`.
+- [x] **/territories permission gap fixed** — Same pattern. Extracted `TerritoriesClient` to `src/components/territories/`, server wrapper calls `requirePermission("manage_territories")`.
+- [x] **/payments permission gap fixed** — Page had no top-level permission check. Added `requirePermission("view_payments")`. Replaced raw `role === "admin"` string with `isElevated(role ?? "")`.
+- [x] **/api/bug-reports GET — admin-only → isElevated** — Master-role users were blocked from viewing bug reports. Fixed to `isElevated(user?.role ?? "")`.
+- [x] **/master isOwner stale ID fixed** — `[1, 2].includes(...)` → `Number(user.id) === 1`. Seed user id=2 deleted Feb 22.
+- [x] **Zero new TypeScript errors** — Pre-existing basecamp/dotenv script errors unaffected.
+**Files:** `src/app/(dashboard)/bugs/page.tsx`, `src/components/bugs/bugs-page-client.tsx`, `src/app/(dashboard)/territories/page.tsx`, `src/components/territories/territories-client.tsx`, `src/app/(dashboard)/payments/page.tsx`, `src/app/api/bug-reports/route.ts`, `src/app/(dashboard)/master/page.tsx`, `docs/ROUTE_AUDIT.md`
+**Open items from audit:** /tasks API mutation routes not verified; /territories API mutations not verified; /discovery page not audited; nav visibility vs. route protection not cross-referenced. See ROUTE_AUDIT.md §4–6.
 
 ### SPRINT 11 — Context-Aware Empty States ✅ COMPLETE (February 24, 2026)
 - [x] **Leads pipeline** — 3-state empty logic: (1) no leads anywhere → "pipeline is empty" + CTA to import or go to Discovery; (2) filters active + no results → "X leads exist, try broadening" + clear-all link; (3) no filters active but no leads visible → neutral "no leads in this view" (territory/assignment context).
