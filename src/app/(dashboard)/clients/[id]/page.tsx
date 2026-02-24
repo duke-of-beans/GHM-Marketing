@@ -36,7 +36,7 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   try {
-    await requirePermission("manage_clients");
+    const currentUser = await requirePermission("manage_clients");
     const { id } = await params;
     const clientId = parseInt(id);
     if (isNaN(clientId)) notFound();
@@ -86,7 +86,7 @@ export default async function ClientDetailPage({
           <span>/</span>
           <span className="text-foreground">{safeSerialized.businessName}</span>
         </div>
-        <ClientProfile client={safeSerialized} />
+        <ClientProfile client={safeSerialized} currentUserRole={(currentUser as any).role} />
       </div>
     );
   } catch (error) {

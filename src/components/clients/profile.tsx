@@ -26,6 +26,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { isElevated } from "@/lib/auth/roles";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
 import { ClientCompensationSection } from "./client-compensation";
 import { ContentStudioTab } from "../content/ContentStudioTab";
+import { CompetitorsTab } from "./competitors/CompetitorsTab";
 import { WebsiteStudioTab } from "./website-studio/WebsiteStudioTab";
 import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
 import { BillingTab } from "./billing/BillingTab";
@@ -170,14 +172,14 @@ function timeAgo(d: string | null) {
 const VALID_TABS = [
   "scorecard", "tasks", "rankings", "citations", "local",
   "content", "websites", "health", "reports", "domains", "compensation",
-  "billing", "campaigns", "integrations", "notes",
+  "billing", "campaigns", "integrations", "notes", "competitors",
 ] as const;
 
 type TabId = (typeof VALID_TABS)[number];
 
 // ── Main export ─────────────────────────────────────────────────────────────
 
-export function ClientProfile({ client }: { client: ClientData }) {
+export function ClientProfile({ client, currentUserRole }: { client: ClientData; currentUserRole?: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -417,6 +419,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
           const OVERFLOW_TABS: { value: TabId; label: string; group: string }[] = [
             { value: "reports",      label: "Reports",       group: "Operations" },
             { value: "domains",      label: "Domains",       group: "Operations" },
+            { value: "competitors",  label: "Competitors",   group: "Operations" },
             { value: "compensation", label: "Compensation",  group: "Account" },
             { value: "billing",      label: "Billing",       group: "Account" },
             { value: "campaigns",    label: "Google Ads",    group: "Account" },
@@ -524,7 +527,7 @@ export function ClientProfile({ client }: { client: ClientData }) {
         </TabsContent>
 
         <TabsContent value="content" className="space-y-4">
-          <ContentStudioTab clientId={client.id} />
+          <ContentStudioTab clientId={client.id} isMaster={isElevated(currentUserRole ?? "")} />
         </TabsContent>
 
         <TabsContent value="websites" className="space-y-4">
@@ -572,6 +575,10 @@ export function ClientProfile({ client }: { client: ClientData }) {
 
         <TabsContent value="notes" className="space-y-4">
           <ClientNotesTab clientId={client.id} initialNotes={client.notes} />
+        </TabsContent>
+
+        <TabsContent value="competitors" className="space-y-4">
+          <CompetitorsTab clientId={client.id} />
         </TabsContent>
       </Tabs>
 

@@ -1,26 +1,20 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { format } from 'date-fns'
-import { Loader2, FileText, Share2, Hash, ExternalLink, Pencil, Trash2, Clock } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+  Loader2, FileText, Share2, Hash, ExternalLink,
+  Pencil, Trash2, Clock, CheckSquare, Square, CheckCheck, Archive, X,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  Card, CardContent, CardDescription, CardHeader, CardTitle,
+} from '@/components/ui/card'
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { EditContentDialog } from './EditContentDialog'
 import { VersionHistoryDialog } from './versioning/VersionHistoryDialog'
@@ -29,6 +23,7 @@ import { toast } from 'sonner'
 interface ContentListProps {
   clientId: number
   refreshTrigger?: number
+  isMaster?: boolean
 }
 
 interface ContentItem {
@@ -36,151 +31,215 @@ interface ContentItem {
   contentType: string
   title: string | null
   content: string
+  status: string
   metadata: Record<string, any>
   currentVersion: number
   createdAt: string
 }
 
-export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
+const STATUS_COLORS: Record<string, string> = {
+  draft:     'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  review:    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+  approved:  'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+  published: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+  scheduled: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+  archived:  'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+}
+
+export function ContentList({ clientId, refreshTrigger, isMaster = false }: ContentListProps) {
   const [content, setContent] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [bulkLoading, setBulkLoading] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
 
-  const loadContent = async () => {
+  const loadContent = useCallback(async () => {
     setLoading(true)
     setError(null)
-
+    setSelected(new Set())
     try {
-      const response = await fetch(`/api/content/list?clientId=${clientId}`)
-      
-      if (!response.ok) {
-        throw new Error('Failed to load content')
-      }
-
-      const data = await response.json()
+      const res = await fetch(`/api/content/list?clientId=${clientId}`)
+      if (!res.ok) throw new Error('Failed to load content')
+      const data = await res.json()
       setContent(data.content)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load content')
     } finally {
       setLoading(false)
     }
+  }, [clientId])
+
+  useEffect(() => { loadContent() }, [loadContent, refreshTrigger])
+
+  // ── Selection helpers ────────────────────────────────────────────────────
+  const toggleOne = (id: number) =>
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+
+  const toggleAll = () =>
+    setSelected(selected.size === content.length ? new Set() : new Set(content.map(c => c.id)))
+
+  // ── Bulk actions ─────────────────────────────────────────────────────────
+  const bulkAction = async (action: 'approve' | 'archive') => {
+    if (selected.size === 0) return
+    setBulkLoading(true)
+    try {
+      const res = await fetch('/api/content/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ids: [...selected] }),
+      })
+      if (!res.ok) throw new Error('Bulk action failed')
+      const data = await res.json()
+      toast.success(`${data.updated} item${data.updated !== 1 ? 's' : ''} ${action === 'approve' ? 'approved' : 'archived'}`)
+      await loadContent()
+    } catch {
+      toast.error('Bulk action failed. Please try again.')
+    } finally {
+      setBulkLoading(false)
+    }
   }
 
-  useEffect(() => {
-    loadContent()
-  }, [clientId, refreshTrigger])
-
+  // ── Single delete ────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!selectedContent) return
-
     try {
-      const response = await fetch(`/api/content/${selectedContent.id}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete content')
-      }
-
-      toast.success('Content deleted successfully')
+      const res = await fetch(`/api/content/${selectedContent.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete content')
+      toast.success('Content deleted')
       setContent(prev => prev.filter(item => item.id !== selectedContent.id))
       setDeleteDialogOpen(false)
       setSelectedContent(null)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to delete content')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete content')
     }
   }
 
-  const handleEditSuccess = () => {
-    loadContent()
-  }
+  const getIcon = (type: string) =>
+    type === 'social' ? Share2 : type === 'meta' ? Hash : FileText
 
-  const getIcon = (contentType: string) => {
-    switch (contentType) {
-      case 'blog':
-        return FileText
-      case 'social':
-        return Share2
-      case 'meta':
-        return Hash
-      default:
-        return FileText
-    }
-  }
+  const getTypeLabel = (type: string) =>
+    ({ blog: 'Blog Post', social: 'Social Media', meta: 'Meta Description' }[type] ?? type)
 
-  const getTypeLabel = (contentType: string) => {
-    switch (contentType) {
-      case 'blog':
-        return 'Blog Post'
-      case 'social':
-        return 'Social Media'
-      case 'meta':
-        return 'Meta Description'
-      default:
-        return contentType
-    }
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  )
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
+  if (error) return (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+      {error}
+    </div>
+  )
 
-  if (error) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-        {error}
-      </div>
-    )
-  }
-
-  if (content.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
-        <h3 className="mt-4 text-lg font-medium">No content yet</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Generate content using the tools above to get started.
-        </p>
-      </div>
-    )
-  }
+  if (content.length === 0) return (
+    <div className="text-center py-12">
+      <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
+      <h3 className="mt-4 text-lg font-medium">No content yet</h3>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Generate content using the tools above to get started.
+      </p>
+    </div>
+  )
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Generated Content</h3>
-        <Button variant="outline" size="sm" onClick={loadContent}>
-          Refresh
-        </Button>
+      {/* Header row */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-medium">Generated Content</h3>
+          <Badge variant="secondary">{content.length}</Badge>
+        </div>
+        <Button variant="outline" size="sm" onClick={loadContent}>Refresh</Button>
       </div>
 
-      <div className="grid gap-4">
-        {content.map((item) => {
+      {/* Bulk action bar — visible when items selected */}
+      {isMaster && selected.size > 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-primary/20 bg-primary/5 text-sm">
+          <span className="font-medium text-primary">{selected.size} selected</span>
+          <div className="flex-1" />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => bulkAction('approve')}
+            disabled={bulkLoading}
+            className="gap-1.5"
+          >
+            <CheckCheck className="h-3.5 w-3.5" />
+            Approve
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => bulkAction('archive')}
+            disabled={bulkLoading}
+            className="gap-1.5 text-muted-foreground"
+          >
+            <Archive className="h-3.5 w-3.5" />
+            Archive
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setSelected(new Set())}
+            className="gap-1"
+          >
+            <X className="h-3.5 w-3.5" />
+            Clear
+          </Button>
+        </div>
+      )}
+
+      {/* Select-all row */}
+      {isMaster && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Checkbox
+            checked={selected.size === content.length && content.length > 0}
+            onCheckedChange={toggleAll}
+          />
+          <span>Select all</span>
+        </div>
+      )}
+
+      {/* Content list */}
+      <div className="grid gap-3">
+        {content.map(item => {
           const Icon = getIcon(item.contentType)
+          const isChecked = selected.has(item.id)
           return (
-            <Card key={item.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
-                    <Icon className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                    <div>
-                      <CardTitle className="text-base">
-                        {item.title || getTypeLabel(item.contentType)}
-                      </CardTitle>
-                      <CardDescription>
-                        {format(new Date(item.createdAt), 'MMM d, yyyy h:mm a')}
-                      </CardDescription>
-                    </div>
+            <Card key={item.id} className={isChecked ? 'ring-2 ring-primary/30' : ''}>
+              <CardHeader className="pb-2">
+                <div className="flex items-start gap-3">
+                  {isMaster && (
+                    <Checkbox
+                      checked={isChecked}
+                      onCheckedChange={() => toggleOne(item.id)}
+                      className="mt-0.5"
+                    />
+                  )}
+                  <Icon className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base truncate">
+                      {item.title || getTypeLabel(item.contentType)}
+                    </CardTitle>
+                    <CardDescription>
+                      {format(new Date(item.createdAt), 'MMM d, yyyy h:mm a')}
+                    </CardDescription>
                   </div>
-                  <Badge variant="secondary">{getTypeLabel(item.contentType)}</Badge>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${STATUS_COLORS[item.status] ?? STATUS_COLORS.draft}`}>
+                      {item.status}
+                    </span>
+                    <Badge variant="secondary">{getTypeLabel(item.contentType)}</Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -188,67 +247,36 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
                   <p className="text-sm text-muted-foreground line-clamp-3">
                     {item.content}
                   </p>
-                  
-                  {item.metadata && Object.keys(item.metadata).length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {item.metadata.keywords && (
-                        <Badge variant="outline" className="text-xs">
-                          {item.metadata.keywords.join(', ')}
-                        </Badge>
-                      )}
-                      {item.metadata.url && (
-                        <a
-                          href={item.metadata.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View Page
-                        </a>
-                      )}
-                    </div>
+                  {item.metadata?.keywords && (
+                    <Badge variant="outline" className="text-xs">
+                      {item.metadata.keywords.join(', ')}
+                    </Badge>
                   )}
-                  
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigator.clipboard.writeText(item.content)}
-                    >
-                      Copy Content
+                  {item.metadata?.url && (
+                    <a href={item.metadata.url} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 w-fit">
+                      <ExternalLink className="h-3 w-3" />
+                      View Page
+                    </a>
+                  )}
+                  <div className="flex gap-2 flex-wrap">
+                    <Button variant="outline" size="sm"
+                      onClick={() => navigator.clipboard.writeText(item.content)}>
+                      Copy
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedContent(item)
-                        setVersionHistoryOpen(true)
-                      }}
-                    >
+                    <Button variant="outline" size="sm"
+                      onClick={() => { setSelectedContent(item); setVersionHistoryOpen(true) }}>
                       <Clock className="h-4 w-4 mr-1" />
                       History
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedContent(item)
-                        setEditDialogOpen(true)
-                      }}
-                    >
+                    <Button variant="outline" size="sm"
+                      onClick={() => { setSelectedContent(item); setEditDialogOpen(true) }}>
                       <Pencil className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedContent(item)
-                        setDeleteDialogOpen(true)
-                      }}
-                      className="text-red-600 hover:text-red-700"
-                    >
+                    <Button variant="outline" size="sm"
+                      onClick={() => { setSelectedContent(item); setDeleteDialogOpen(true) }}
+                      className="text-red-600 hover:text-red-700">
                       <Trash2 className="h-4 w-4 mr-1" />
                       Delete
                     </Button>
@@ -260,7 +288,6 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
         })}
       </div>
 
-      {/* Edit Dialog */}
       {selectedContent && (
         <EditContentDialog
           contentId={selectedContent.id}
@@ -268,36 +295,29 @@ export function ContentList({ clientId, refreshTrigger }: ContentListProps) {
           initialContent={selectedContent.content}
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
-          onSuccess={handleEditSuccess}
+          onSuccess={loadContent}
         />
       )}
-
-      {/* Version History Dialog */}
       {selectedContent && (
         <VersionHistoryDialog
           open={versionHistoryOpen}
           onOpenChange={setVersionHistoryOpen}
           contentId={selectedContent.id}
           currentVersion={selectedContent.currentVersion}
-          onRestore={handleEditSuccess}
+          onRestore={loadContent}
         />
       )}
-
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Content</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this content? This action cannot be undone.
+              This will permanently delete the selected content. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

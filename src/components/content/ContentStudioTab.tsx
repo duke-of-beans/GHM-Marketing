@@ -16,9 +16,10 @@ import { processCompetitiveIntel, type PanelIntelMap, type LatestScan } from '@/
 
 interface ContentStudioTabProps {
   clientId: number
+  isMaster?: boolean
 }
 
-export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
+export function ContentStudioTab({ clientId, isMaster = false }: ContentStudioTabProps) {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [intel, setIntel] = useState<PanelIntelMap | null>(null)
 
@@ -132,6 +133,7 @@ export function ContentStudioTab({ clientId }: ContentStudioTabProps) {
               <ContentList
                 clientId={clientId}
                 refreshTrigger={refreshTrigger}
+                isMaster={isMaster}
               />
             </CardContent>
           </Card>
