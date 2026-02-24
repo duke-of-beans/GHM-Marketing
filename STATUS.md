@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 7 complete. Save Searches (7A), Audit PDF PPC section (7B), Brochure PPC version (7C) shipped.
+**Last Updated:** February 24, 2026 — Sprint 7 complete. Backlog updated: UX-AUDIT-001–009, FEAT-015–020 added. Sprint 8 starting.
 
 ---
 

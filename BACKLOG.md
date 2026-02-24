@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 7 shipped (7A Save Searches, 7B Audit PPC Section, 7C Brochure PPC). Open: UX-FEAT-001, FEAT-014, open UX bugs.
+**Last Updated:** February 24, 2026 — Sprint 7 shipped. Added UX-AUDIT-001–009, FEAT-015–020. Cleaned stale stubs (Save Searches shipped, Brochure PPC shipped, Audit Paid Search partially shipped).
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -12,22 +12,25 @@ Completed history lives in CHANGELOG.md. Never put ✅ items here.
 
 ---
 
-## 🗺️ RECOMMENDED SPRINT SEQUENCE (February 23, 2026)
+## 🗺️ RECOMMENDED SPRINT SEQUENCE
 
 Foundation → out. Each sprint unblocks the next.
 
 | Sprint | Focus | Items | Size | Why This Order |
 |--------|-------|-------|------|----------------|
-| ~~1~~ | ~~Production Foundation~~ | ~~Security Hardening + Sentry + Structured Logging~~ | ✅ SHIPPED | ~~Gates all external use.~~ |
-| ~~2~~ | ~~Ops Spine Completion~~ | ~~Client Portal Decision + Ops Sprint 6 (Reporting Pipeline)~~ | ✅ SHIPPED | ~~Fulfills contract promise of monthly delivery. Portal ambiguity off the board.~~ |
-| ~~3~~ | ~~Bulk Operations~~ | ~~Ops Sprint 7 (bulk content/task/pipeline)~~ | ✅ SHIPPED | ~~Team can't scale without batch actions. Additive to existing systems.~~ |
-| ~~4~~ | ~~Intelligence Layer~~ | ~~Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories)~~ | ✅ SHIPPED | ~~Synthesizes all collected data. Turns dashboard into indispensable ops platform.~~ |
-| ~~UX~~ | ~~UX Bug Batch~~ | ~~BUG-001–007 + ARCH-001~~ | ✅ SHIPPED | ~~First-impression fixes: search bar, nav, Wave error, OS key hints, doc cleanup.~~ |
-| ~~5~~ | ~~Data Access + Admin Visibility~~ | ~~Data Export + User Activity/Session Stats~~ | ✅ SHIPPED | ~~External data requests + internal usage intelligence.~~ |
-| ~~6~~ | ~~UX Completeness~~ | ~~Static Empty States · Pipeline Filter UX debt · UX-BUG-007/008 · Keyboard Shortcuts~~ | ✅ SHIPPED |ion | Closes gap between functional and polished. |
-| ~~7~~ | ~~Sales Enablement Polish~~ | ~~Audit PDF PPC + Brochure PPC + Save Searches~~ | ✅ SHIPPED | ~~Completed ITEM-001 scope. Power-user filter layer.~~ |
+| ~~1~~ | ~~Production Foundation~~ | ~~Security Hardening + Sentry + Structured Logging~~ | ✅ SHIPPED | |
+| ~~2~~ | ~~Ops Spine Completion~~ | ~~Client Portal Decision + Ops Sprint 6 (Reporting Pipeline)~~ | ✅ SHIPPED | |
+| ~~3~~ | ~~Bulk Operations~~ | ~~Ops Sprint 7 (bulk content/task/pipeline)~~ | ✅ SHIPPED | |
+| ~~4~~ | ~~Intelligence Layer~~ | ~~Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories)~~ | ✅ SHIPPED | |
+| ~~UX~~ | ~~UX Bug Batch~~ | ~~BUG-001–007 + ARCH-001~~ | ✅ SHIPPED | |
+| ~~5~~ | ~~Data Access + Admin Visibility~~ | ~~Data Export + User Activity/Session Stats~~ | ✅ SHIPPED | |
+| ~~6~~ | ~~UX Completeness~~ | ~~Static Empty States · Pipeline Filter UX debt · UX-BUG-007/008 · Keyboard Shortcuts~~ | ✅ SHIPPED | |
+| ~~7~~ | ~~Sales Enablement Polish~~ | ~~Audit PDF PPC + Brochure PPC + Save Searches~~ | ✅ SHIPPED | |
 | 8 | Content Power | Bulk Content Ops + Competitor Tracking Manual + Custom Report Builder | ~1 session | Makes content and competitive intelligence practical at scale. |
-| 9 | COVOS Self-Service | COVOS Admin Onboarding Wizard | ~2 sessions | Requires Sprint 1 security first. Unlocks white-label productization. |
+| 9 | Polish & Audit Sprint | UX-AUDIT-001–009 + Dark Theme + Responsiveness + Voice | ~2 sessions | Productization-readiness. Everything must look and feel right before external eyes. |
+| 10 | Admin First-Run Experience | FEAT-015 (Admin Onboarding Flow) + FEAT-018 (Logo Swap) | ~1 session | Enables real new-tenant activation without handholding. |
+| 11 | COVOS Analytics | FEAT-019 (Dashboard Usage Metrics) + FEAT-020 (COVOS Owner Telemetry) | ~1 session | Closes the loop: know what's working before scaling. |
+| 12 | COVOS Self-Service | FEAT-014 (PM Import) + Multi-tenant self-serve | ~2 sessions | Full productization. Requires Sprint 10 first. |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
@@ -35,160 +38,170 @@ Foundation → out. Each sprint unblocks the next.
 
 ---
 
-## 🐛 UX BUGS & POLISH — Added February 23, 2026
+## 🐛 UX BUGS (Pre-existing, open)
 
 ### UX-BUG-001: Search Bar — Click-Outside Should Close
-Search bar currently only closes on Escape key. Clicking anywhere outside should also dismiss it. Standard web convention.
-**Scope:** Add `onBlur` or click-outside handler (e.g., `useClickOutside` hook) to search component.
-**Size:** ~30 min.
+Escape only. Clicking anywhere outside should dismiss.
+**Fix:** `useClickOutside` hook on search component. **Size:** ~30 min.
 
 ### UX-BUG-002: Search Bar — Expansion Behavior Wrong, Not Layout-Aware
-When activated, clicking the search bar triggers a large gray transparent square overlay — the cmdk modal rendering broken/empty. The correct behavior: the search bar should stay in its top navbar position and expand responsively horizontally (smooth CSS transition, max-width expansion). Results dropdown renders inline below the bar, no modal, no overlay, no teleportation. The bar must also be aware of the Team Feed panel state — when the panel is open/expanded, the expanded search bar width should respect that boundary and not overlap or ignore it.
-**Recommended fix:** Replace modal-style cmdk trigger with an inline expanding input. Width transitions from collapsed (e.g., 200px) to expanded (fills available nav space minus Team Feed panel width when open). Results render as a positioned dropdown below the input. `useModifierKey()` already exists for the shortcut hint.
-**Related:** UX-BUG-001 (click-outside to close), UX-BUG-007 (cmdk transparent square — same root cause, can fix together).
-**Size:** ~2–3 hrs.
+Modal-style cmdk trigger renders a transparent gray square. Should be inline expanding input with dropdown results, layout-aware of Team Feed panel width.
+**Fix:** Replace cmdk modal with inline input. CSS transition max-width. Results as positioned dropdown below input. **Size:** ~2–3 hrs. **Closes:** UX-BUG-007.
 
 ### UX-BUG-003: Payments Page — Wave Widget Fails Without Graceful Degradation
-Wave GraphQL UNAUTHENTICATED error is surfaced raw in the UI: `Wave bank data unavailable — showing DB records only. (Error: Wave GraphQL error: [{"extensions":{"code":"UNAUTHENTICATED"...`. Raw JSON/stack traces must never reach the UI.
-**Fix:** Catch Wave auth errors specifically. Show a clean amber inline notice: "Live bank data unavailable. Showing payment records only." with a refresh icon. Error detail to server log only.
-**Size:** ~1 hr.
+Raw GraphQL error surfaced in UI. **Fix:** Catch Wave auth errors, show clean amber notice. **Size:** ~1 hr.
 
 ### UX-BUG-004: Left Nav — Auto-Scroll on Group Expand at Bottom of Panel
-When scrolled to the bottom of the nav and a collapsed group is expanded, new items render below the viewport. User has to manually scroll to see them.
-**Fix:** On expand, `scrollIntoView({ behavior: 'smooth' })` on the last item in the expanded group. Only trigger when the group is at/near the bottom of the scroll container.
-**Size:** ~1 hr.
+Expanded items render below viewport. **Fix:** `scrollIntoView({ behavior: 'smooth' })` on last item of expanded group. **Size:** ~1 hr.
 
 ### UX-BUG-005: "Team" Nav Group — Rename to Better Reflect Contents
-"Team" contains Service Catalog and Document Vault — neither of which is team-management in the conventional sense. Misleading label.
-**Suggested rename:** "Resources", "Operations", "Library", or "Workspace" — pick what fits the nav language and what a rep would intuitively scan for.
-**Size:** ~15 min.
+Contains Service Catalog + Document Vault. "Team" is misleading. **Fix:** Rename to "Resources" or "Workspace." **Size:** ~15 min.
 
-### UX-BUG-006: Command Palette — macOS Symbol Shown on Windows
-The command palette hint displays ⌘ instead of Ctrl on Windows. UI should detect the OS and show the correct modifier key.
-**Fix:** Use `navigator.platform` or `navigator.userAgentData.platform` to detect OS. Show `Ctrl+K` on Windows/Linux, `⌘K` on macOS. Create a shared `useModifierKey()` hook and apply globally to all shortcut hints.
-**Size:** ~30 min.
-
-### UX-BUG-007: Command Palette — Opens as Empty Transparent Square (Broken)
-When triggered, the command palette renders a transparent grey rectangle with no content. Confirmed still occurring. Same root cause as UX-BUG-002 — the modal/cmdk approach is broken. Fix is to eliminate the modal entirely in favor of the inline expanding search bar described in UX-BUG-002. Resolving UX-BUG-002 should close this simultaneously.
-**Scope:** Fix as part of UX-BUG-002 search bar overhaul. Do not attempt to patch cmdk in isolation — the modal pattern is being abandoned.
-**Size:** Resolved by UX-BUG-002 fix.
-
-### UX-BUG-008: Team Feed Panel — Mac/Apple Icon Showing (Wrong Platform Icon)
-The Team Feed panel is displaying a Mac/Apple keyboard icon. Should show the correct OS-aware modifier key icon, same as UX-BUG-006 (which fixed the command palette hint). The `useModifierKey()` hook exists but either isn't wired into the Team Feed send shortcut hint, or the Team Feed has a hardcoded Mac icon that wasn't caught in the UX Bug Batch.
-**Scope:** Find the send shortcut hint in the Team Feed panel component. Replace any hardcoded ⌘ or Apple icon with `useModifierKey()` output. ~15 min once located.
-**File:** Search `src/components/` for TeamFeed or team-feed component — look for keyboard hint near the send button.
-**Size:** ~15–30 min.
+### UX-BUG-007: Command Palette — Opens as Empty Transparent Square
+Resolved by UX-BUG-002 fix. Do not patch in isolation.
 
 ### ARCH-001: Orphaned File Audit
-Significant doc drift across sprints. Old sprint files, duplicate summaries, obsolete prompts, and stale handoff docs are cluttering the root and docs/.
-**Scope:** Audit root-level `.md` files — candidates for archive: PHASE_*.md, SESSION_*.md, DEPLOYMENT_SUMMARY_2025-*.md, INLINE_HANDOFF.md, HANDOFF_PROMPT.md, HANDOFF_CLIENT_OPS_SUITE.md, PHASE4_CONTINUATION.md, PHASE_3_POLISH_COMPLETE.md, UX_*.md in root, MISSING_FEATURES_TODO.md, PRODUCTIZING_BACKLOG.md, CONTENT_STUDIO_*.md, CLIENT_DETAIL_FIX.md, ADD_CLIENT_FEATURE.md. Audit docs/ for same. Create `docs/archive/` and move historical-only files there. Update FILE INDEX in STATUS.md.
-**Size:** ~1 hr.
+Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audit, move historical-only files to `docs/archive/`. **Size:** ~1 hr.
 
 ---
 
-## 🧭 HOW TO PICK WORK
+## 🔴 NEW: UX AUDITS & SYSTEMIC FIXES (February 24, 2026)
 
-Pick the top item in your current tier that unblocks the next thing.
+### UX-AUDIT-001: Tooltip / Help Text / Hover State Audit (Global)
+The dashboard has no consistent tooltip or contextual help layer. Users — especially new admins — encounter unlabeled icons, ambiguous controls, and metric labels with no explanation of what they mean or why they matter.
+**Scope:** Full global pass. Every icon button, every metric card, every non-obvious control gets a tooltip or `title` attribute. Focus areas: nav icons, action buttons without labels, score/metric displays (health score, churn risk, impact score, close likelihood), filter controls, audit sections, commission fields. Build a shared `<Tooltip>` component if one doesn't exist and standardize across the codebase. Also audit all static help/guide/how/why/what text (empty states, onboarding prompts, section intros) for accuracy and consistency.
+**Voice rule:** Tooltip and help text voice = reserved, informational. Same voice family as notifications but dialed back — factual, brief, no flair. "Health score reflects GBP engagement, citation accuracy, and ranking position over the last 30 days." Not "Check out your health score!"
+**Size:** ~1 session. **Priority:** 🟠 SHOULD.
 
-| Tier | Meaning |
-|------|---------|
-| 🔴 MUST | Blocking client or rep operations right now |
-| 🟠 SHOULD | Blocking productization, investor pitch, or next client tier |
-| 🟡 WOULD | High value, no current blocker |
-| ⚪ FUTURE | Vision items, deferred until scale |
+### UX-AUDIT-002: Voice Audit — Dashboard UI Copy (Global, SCRVNR Pass)
+The dashboard UI contains consumer-facing language that doesn't match the voice of a professional marketing platform. Example: "Upsells available" should be "Additional products available." The platform serves marketing agency operators and their reps — the copy should sound like a serious B2B tool, not a consumer app.
+**Scope:** All UI copy in the dashboard, excluding: notifications/alerts (direct system communications), tutorials/guides, contracts, and documents. Included: page titles, section headers, button labels, column headers, badge labels, empty states, filter labels, card labels, dialog titles, form labels, placeholder text, nav labels, status indicators. Also included: demos and promotional materials (brochures, audit reports, comp sheets, territory map page).
+**Method:** Run through SCRVNR. Voice target = reserved, professional, B2B. Remove colloquialisms, consumer-app language, unnecessary flair. Replace jargon visible to clients with plain business language.
+**Size:** ~1 session (can be broken into dashboard copy + promotional materials as two passes). **Priority:** 🟠 SHOULD.
+
+### UX-AUDIT-003: Brochure — Visual Design Overhaul (Marketing-Grade)
+The brochure represents a marketing company selling marketing services. It currently does not look like something a sharp marketing agency would send a prospect. It needs to look and feel like marketing collateral made by people who know what they're doing.
+**Direction:** Study what top-tier digital marketing agencies (Wpromote, Thrive, WebFX style) put in their client-facing collateral. Modern layout: strong typographic hierarchy, bold section breaks, purposeful whitespace, brand-consistent color application. Not a template — an actual designed piece. The current layout likely has too much text density and not enough visual breathing room.
+**Dependency:** This requires first capturing the marketing company's voice profile and visual style (see FEAT-016 below) and making those the defaults for all marketing deliverables. The brochure itself should be the first thing rendered with those captured defaults. Do not redesign the brochure as GHM-generic — redesign it as a system that renders each tenant's brand.
+**Size:** ~1 session for the structural redesign; additional pass once FEAT-016 voice/style capture is live. **Priority:** 🟠 SHOULD.
+
+### UX-AUDIT-004: Live Demo Navigation Bug — Dashboard State Lost on Return
+**Bug 1:** Clicking "Live Demo" from the dashboard routes directly to the Sales Pipeline page. The demo button should launch a guided demo experience, not just navigate to a random page. This is likely the wrong handler or a stale route.
+**Bug 2:** When returning to the dashboard after the demo navigation, widgets render differently — sizes, layouts, and component states are inconsistent with the pre-navigation state. This suggests the dashboard is not properly restoring its layout state on remount, or the demo navigation is corrupting some shared state.
+**Fix:** Audit the "Live Demo" button handler in the dashboard. Confirm what the intended demo experience is (separate demo route? Overlay? Guided walkthrough?). Fix the return-state issue by auditing dashboard layout persistence — likely a `useState` that resets on unmount, or a layout context that doesn't survive navigation.
+**Size:** ~1–2 hrs. **Priority:** 🔴 MUST before any sales demo.
+
+### UX-AUDIT-005: Dark Theme Audit (Global)
+Dark mode exists but has not been comprehensively audited. There are likely inconsistencies: components using hardcoded light colors, text with insufficient contrast, borders invisible in dark, shadows that don't adapt, images/SVGs that look wrong.
+**Scope:** Full global pass in dark mode. Check every page and major component: nav, dashboard widgets, client cards, leads pipeline, content studio, settings, payments, audit/demo output pages, brochure, onboarding pages, dialogs, toasts, tooltips, empty states. Fix all inconsistencies. Codify dark mode color usage in a shared token/variable system if not already done.
+**Size:** ~1 session. **Priority:** 🟠 SHOULD.
+
+### UX-AUDIT-006: Responsiveness Audit (Global — Split Screen + Mobile)
+The dashboard has never had a formal responsiveness audit. With reps using laptops in split-screen and managers potentially on tablets, breakage is likely.
+**Scope:** Test at common breakpoints: 1920px (wide), 1440px (standard laptop), 1280px, 1024px (split screen), 768px (tablet), 375px (mobile). Focus areas: nav collapse/overflow, dashboard widget grid reflow, leads kanban horizontal scroll, filter bars wrapping, modals/dialogs on small screens, tables overflowing, text truncation, touch targets. Fix all critical breakage at 1024px and 768px. Document 375px issues as future mobile sprint items.
+**Size:** ~1 session. **Priority:** 🟠 SHOULD.
+
+### UX-AUDIT-007: Admin Logo Swap (Productization)
+When onboarding a new tenant, the admin needs to replace the GHM logo in the dashboard navbar and on the login screen with their own logo. Currently hardcoded.
+**Scope:** Add `logoUrl` to `TenantConfig`. Upload flow in tenant Settings (admin-only). Persist to DB or object storage. Navbar + login screen pull from tenant config. Fallback to COVOS default logo.
+**Size:** ~2 hrs. **Priority:** 🟠 SHOULD (productization gate).
+
+### UX-AUDIT-008: Admin First-Run Experience (New Tenant Onboarding Flow)
+The real first sign-in for an admin at a new tenant is the most labor-intensive session they'll ever have: set up company profile, migrate tasks, connect accounting, add users, add clients, configure integrations. Currently there is no guided path — they land on an empty dashboard with no direction.
+**Scope:** Build a first-run wizard that activates on first admin login for a new tenant. Steps: (1) Company profile (name, logo, timezone, territory); (2) Team setup (invite users, assign roles); (3) Client import (CSV upload or PM platform adapter); (4) Integrations checklist (Wave, GBP, Google Ads — each with status indicator showing connected/pending); (5) "You're live" completion screen with suggested next actions.
+**Each step should be skippable** but progress persists so they can return. Wizard state stored per-tenant-per-user. Completion unlocks the "I4 GBP + Wave connected" achievement-style indicators in the dashboard (see FEAT-019).
+**Size:** ~2 sessions. **Priority:** 🟠 SHOULD (Sprint 10 target).
+**Related:** FEAT-014 (PM Import), FEAT-018 (Logo Swap).
+
+### UX-AUDIT-009: Psychological / Human Nature UX Audit
+The dashboard has multiple user archetypes with different emotional triggers and "magic moments" — the instant where the product clicks and the user feels the value. These moments are currently accidental. They need to be designed.
+**User archetypes and their magic moments:**
+- **Admin/Owner:** "The platform came alive" = first API connected, first enrichment run, first integration firing. Progress indicators, connection status, first-data celebrations.
+- **Sales Rep:** "The automation did my job" = seeing a prospect's enriched profile with score, seeing a demo generate in one click, seeing a brochure that looks professional enough to actually send.
+- **Manager/Operator:** "The AI just worked" = content drafted automatically, backlinks running, PPC campaign created, website built without a dev.
+**Audit direction:** Walk each user flow from first login. Identify the 3 most emotionally resonant moments per archetype. Design micro-interactions, state transitions, and copy that amplify those moments — not through gimmicks but through clarity, speed, and surprise-in-the-right-place. Remove friction from the path to each magic moment. This is not a feature audit — it's a flow audit with a psychological lens.
+**Output:** A written spec (PSYCH_UX_AUDIT.md in docs/) with findings + proposed interventions, then implementation sprint.
+**Size:** ~1 session for audit + spec; ~1 session to implement top interventions. **Priority:** 🟡 WOULD — high leverage before investor pitch or first external tenant.
 
 ---
 
 ## 🔴 MUST — Active Blockers
 
 ### W7 — Kill Gusto
-**Context:** Wave AP/payroll is fully built and validated. Gusto is running in parallel.
-**Gate:** Complete at least one successful payroll cycle through Wave → confirm Wave covers payroll + contractor 1099 → cancel Gusto.
-**Note:** Gavin is W-2/2% shareholder in Gusto. Do NOT migrate mid-year. Plan: close 2026 on Gusto, migrate to Wave Payroll Jan 2027 alongside equity restructure. Arian + future reps are 1099 via dashboard → Wave bills, no Gusto needed.
+Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
 **Action:** Ops decision, no code. ~30 min once gate is cleared.
 
 ### I4 — Google Business Profile OAuth (external wait)
-**Context:** GBP integration fully built — OAuth flow, reviews, insights, posts, Local Presence tab. App in Testing mode with David + Gavin as test users.
-**Gate:** Google API Console approval for external app status.
-**Action:** Monitor approval → flip from Testing to Published → verify OAuth flow with a real client listing. ~1 hr once approved.
+GBP integration built. App in Testing mode. Gate: Google API Console approval for external app status.
+**Action:** Monitor → flip to Published → verify OAuth with real client listing. ~1 hr once approved.
 
 ---
 
 ## 🟠 SHOULD — Productization & Growth
 
-### Ops Layer Sprints 7–8
-**Context:** Sprint 6 (Reporting Pipeline) shipped Feb 23. Sprints 7–8 remain.
-**Sprint 7 — Bulk Operations:** Bulk content approve/archive/assign, bulk task close, batch pipeline actions.
-**Sprint 8 — Advanced Analytics + Insights:** Trend analysis, MoM/YoY comparisons, churn risk scoring, client health trajectory charts.
-**Size:** ~1 session per sprint.
-**Files:** `src/components/content/BulkActions.tsx`, `src/app/(dashboard)/analytics/`
-
 ### UX-FEAT-001: Lead Gen Filter Bar — Presentation Overhaul
-The current filter bar buries the most powerful capabilities of the lead intelligence system behind a "More" toggle that expands into a dense accordion. The default visible state (just a search box, territory, rep, sort, and "More" button) undersells the system — a new user or client evaluating the product sees a basic search bar, not a sophisticated lead intelligence engine.
-**Goal:** The filter bar should lead with the system's differentiation. Priority scores, tier badges, and market intelligence filters are what makes this tool unique — they should be prominent, not hidden behind two clicks.
-**Direction:** Rethink the layout hierarchy. Consider a persistent "intelligence strip" above or alongside the kanban that shows the active filter posture at a glance (e.g., "Tier A · Impact 70+ · Wealthy Suburb excluded"). The expand/collapse sections need a better visual language — not a generic accordion but something that signals "here is the system's power." The default open state should surface at minimum: Tier filter, Impact Score slider, and Close Likelihood — the three fields that most directly represent the scoring engine. Status chips should be visually prominent, not buried in a checkbox list inside a collapsed section.
-**Constraint:** Don't change the data model or filter logic — this is purely a presentation and hierarchy overhaul. The `AdvancedFilterState` type and `filteredLeads` memo stay untouched.
-**Priority:** 🟠 SHOULD — this is the first thing a prospective agency client sees when evaluating the platform. Weak presentation of the intelligence layer is a sales liability.
-**Size:** ~1 session.
-**Files:** `src/components/leads/lead-filter-bar-advanced.tsx`
+The default visible state undersells the intelligence system. A new user sees a basic search bar, not a sophisticated lead scoring engine.
+**Direction:** Surface Tier, Impact Score, and Close Likelihood as the primary visible controls. Intelligence strip above kanban showing active filter posture. Better visual language for expand/collapse — not a generic accordion.
+**Constraint:** No data model or filter logic changes. Purely `lead-filter-bar-advanced.tsx` presentation.
+**Size:** ~1 session. **Files:** `src/components/leads/lead-filter-bar-advanced.tsx`
 
-### FEAT-014: Project Management Platform Import (Productization)
-For onboarding new agency customers — import their existing tasks/projects from whatever PM tool they're replacing. Makes migration frictionless and removes the "we'd have to re-enter everything" objection.
-**Scope:** Adapters for the most common platforms: Basecamp (already have a crawler in scripts/), Asana, Monday.com, ClickUp, Trello. Import can be per-user (just my tasks) or global (whole workspace). Maps external tasks to `ClientTask` records — fields: title, description, assignee, due date, status. Unmatched clients get a staging area (import queue) where admin maps external project names to GHM clients before finalizing. Non-matching tasks can be imported as admin tasks or discarded.
-**Implementation path:** OAuth or API key per platform (stored in Oktyv vault), generic `TaskImportAdapter` interface, platform-specific adapters, import wizard UI in Settings (admin-only), preview/mapping step before commit.
-**Priority:** 🟠 SHOULD — productization blocker for cold agency onboarding.
-**Size:** ~1 session per adapter (Basecamp adapter is mostly done via existing crawler). Full wizard ~1 additional session.
-**Files:** `scripts/basecamp-crawl.ts` (existing, adapt), `src/lib/importers/` (new), `src/app/(dashboard)/settings/` (import wizard tab)
-**Context:** Multi-tenant infrastructure is live (covos.app, TENANT_REGISTRY). This is the self-service onboarding a second agency would use to get onto the platform without GHM support. Spec documented in PRODUCTIZING_BACKLOG.md (commit c2a6daa).
-**Scope:** Guided in-product wizard — API config, vendor selection, contractor/vendor setup, env var checklist (live UI showing which env vars are set/missing), role/permission briefing.
-**Size:** ~2 sessions.
-**Files:** `src/app/(dashboard)/settings/onboarding/` (new), `src/lib/tenant/`
+### FEAT-014: Project Management Platform Import
+Onboarding adapters for Basecamp (existing crawler), Asana, Monday.com, ClickUp, Trello. Generic `TaskImportAdapter` interface + import wizard in Settings. Preview/mapping step before commit. Admin-only.
+**Size:** ~1 session per adapter; ~1 session for wizard UI. **Priority:** 🟠 Sprint 12 target.
 
+### FEAT-015: Admin First-Run Wizard
+See UX-AUDIT-008. Same item — cross-referenced here for sprint sequencing.
+**Sprint target:** 10.
 
+### FEAT-016: Tenant Voice + Visual Style Capture
+Before the brochure, audit reports, and comp sheets can represent a marketing company well, the system needs to know who that company is. The admin should be able to input (or the system should infer): brand color palette, primary font, logo, tagline, tone/voice profile (formal vs conversational, bold vs reserved). These become the defaults for all marketing deliverables rendered for that tenant.
+**Scope:** Voice profile schema on TenantConfig (tone, keywords, anti-keywords, sample approved copy). Visual style schema (primaryColor, accentColor, fontFamily, logoUrl). Settings UI for admin to configure. Template renderer reads tenant style when generating brochures, audit reports, comp sheets. Fallback to COVOS defaults.
+**Size:** ~1 session. **Priority:** 🟠 SHOULD — required before AUDIT-003 brochure redesign is meaningful.
+
+### FEAT-017: Brochure + Marketing Collateral Design Overhaul
+See UX-AUDIT-003. Depends on FEAT-016 (style capture). Redesign brochure as tenant-branded output. Extend to audit reports and comp sheet.
+**Sprint target:** After FEAT-016. ~1 session.
+
+### FEAT-018: Admin Logo Swap
+See UX-AUDIT-007. `logoUrl` on TenantConfig, upload UI, navbar + login pull from tenant config.
+**Sprint target:** 10. ~2 hrs.
+
+### FEAT-019: Dashboard Usage Analytics (Admin-Facing)
+The admin needs to know what's working in the dashboard itself — not business analytics, but platform analytics. What pages are used? What features are ignored? Where do users drop off? What integrations are connected vs never touched?
+**Scope:** Per-user, per-session event tracking: page views, feature interactions (audit generated, demo generated, filter used, search triggered, etc.), integration connection events, session duration and frequency. Admin-only analytics page: usage heatmap by feature, active users over time, most/least used pages, "dead zones" (features with <10% engagement). Sign-in metadata: device, time of day, session length. This is dashboard introspection — the admin benchmarking board for the platform itself, not for clients.
+**Instrument carefully:** No PII in events beyond userId. Events stored in `DashboardEvent` table. Aggregated views computed server-side. Export as CSV for manual analysis.
+**Size:** ~1 session (instrumentation + admin page). **Priority:** 🟠 SHOULD — Sprint 11 target.
+
+### FEAT-020: COVOS Owner Telemetry (Anonymous Backdoor)
+As the owner of COVOS managing multiple tenant clients, David needs aggregate visibility into platform health and adoption across tenants — anonymized, no tenant PII. Which features are being used across the fleet? Which tenants are active vs stale? Where is friction showing up across all users?
+**Scope:** Anonymous event pipeline from each tenant deployment → COVOS central analytics endpoint. Events: feature usage (no content, just event type + tenant hash), integration connection events, session frequency by tenant. Dashboard at a COVOS owner level (separate from tenant admin panel) showing fleet health. Must be architected to survive productization — when the platform has 50 tenants, this is how David knows what to build next.
+**Privacy:** Anonymous by design. Tenant hash only — never business name, client data, or user identity in the central pipeline. Tenants should be informed this telemetry exists (add to SERVICE_AGREEMENT).
+**Size:** ~1 session. **Priority:** 🟠 SHOULD — Sprint 11 target (alongside FEAT-019).
 
 ---
 
 ## 🟡 WOULD — High Value, No Current Blocker
 
-### Advanced Filter Persistence + Save Searches
-Pipeline filter bar has localStorage persistence. Next tier is named saved searches.
-**Scope:** "Save this filter" button → names the current combo → chips above filter bar (e.g., "Hot leads - Austin") → per-user, persisted to DB, max 5 per user.
-**Size:** ~2–3 hrs.
+### FEAT-008: Bulk Content Operations
+Content Studio one item at a time. **Scope:** Checkbox multi-select, bulk approve (master+ only), bulk archive, bulk assign. **Size:** ~2 hrs. (Sprint 8 target.)
 
-### Pipeline Filter — Remaining UX Debt
-Major UX pass done Feb 22. Three items left from original spec.
-**Scope:** "Lead Source" filter (organic/referral/discovery/import — in DB, not surfaced), "Deal Value" range slider, "Days in Stage" filter (stale leads > N days in current stage).
-**Size:** ~2 hrs total.
+### FEAT-009: Competitor Tracking — Manual Add + Refresh
+Competitors seeded at creation, no manual control. **Scope:** Add/remove competitor, manual refresh trigger. **Size:** ~2 hrs. (Sprint 8 target.)
 
-### Audit PDF — Paid Search Opportunity Section
-In original ITEM-001 scope, never built.
-**Scope:** Add section to audit PDF — estimated monthly search volume for target keywords, competitor ad spend indicators (DataForSEO), "you're leaving X/mo in paid visibility on the table" framing.
-**Size:** ~1 hr (template-driven).
+### FEAT-010: Reporting — Custom Report Builder
+Section toggle before generation, per-client template, AI-written Executive Summary from scan delta data. **Size:** ~1 session. (Sprint 8 target.)
 
-### Digital Brochure — PPC/Ads Highlight
-In ITEM-001 scope, never built. Brochure currently focuses only on SEO.
-**Scope:** Add section to `src/app/(onboarding)/brochure/page.tsx` covering Google Ads management + PPC as part of the $2,400/mo package. Include mock campaign metrics.
-**Size:** ~1 hr.
+### FEAT-011: Full Button / Route / Path / Pattern / Dependency & Logic Audit
+No formal audit has been run on the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers, and dependency mismatches accumulate over sprints and become invisible bugs or security gaps at productization.
+**Scope:** Enumerate every `<Button>`, `<Link>`, `router.push()`, and form `onSubmit` in the codebase. Map each to its handler and route. Flag: dead routes (handler exists, no UI pointing to it), broken routes (UI points, handler missing/wrong), duplicate logic (same operation done two ways in different components), permission gaps (route accessible without correct role check), and dependency tangles (component imported but unused, or used in multiple incompatible contexts).
+**Output:** `docs/ROUTE_AUDIT.md` with findings table. Fix critical gaps immediately; document non-critical for next sprint.
+**Size:** ~1 session (audit + doc); fix pass ~1 additional session. **Priority:** 🟡 WOULD — must happen before first external tenant.
 
-### Bulk Content Operations (Sprint 7 subset)
-Content Studio manages items one at a time.
-**Scope:** Checkbox multi-select on Content Studio list, bulk approve (master+ only), bulk archive, bulk assign.
-**Size:** ~2 hrs.
-
-### Competitor Tracking — Manual Add + Refresh
-Competitors seeded at client creation, updated by scans. No manual refresh or manual add.
-**Scope:** "Add Competitor" button (name + domain), "Remove Competitor", "Refresh Competitor Data" (re-runs enrichment on demand).
-**Size:** ~2 hrs.
-
-### Reporting — Custom Report Builder
-Reports auto-generated from scan data. Power users want section control.
-**Scope:** Section toggle UI before generation, per-client report template (save preferred sections), AI-written "Executive Summary" paragraph using scan delta data.
-**Size:** ~1 session.
+### Pipeline Filter — Lead Source Filter
+Lead Source field (organic/referral/discovery/import) exists in DB, not surfaced in filter bar. **Scope:** Add to filter UI and `filteredLeads` memo. **Size:** ~1 hr.
 
 ### Static Empty State Help Text
-### Static Empty State Help Text
-Noted in commit cb8dd9d. Current empty states are static.
-**Scope:** Context-aware empty states in Leads, Clients, Content Studio — suggest next action with direct button (e.g., "Run a Discovery scan to import leads"). Pairs with AI search layer.
+Context-aware empty states in Leads, Clients, Content Studio — suggest next action with direct button. Pairs with tooltip audit (UX-AUDIT-001).
 **Size:** ~2–3 hrs.
 
 ---
@@ -196,16 +209,14 @@ Noted in commit cb8dd9d. Current empty states are static.
 ## ⚪ FUTURE — Vision & Scale
 
 ### Accessibility (WCAG 2.1 AA)
-Required before enterprise sales. Start with keyboard navigation (highest ROI), then screen reader, focus indicators, high contrast mode. **Size:** ~1–2 weeks full audit + fix pass.
+Keyboard navigation first (highest ROI), then screen reader + focus indicators + high contrast. **Size:** ~1–2 weeks full audit + fix pass.
 
 ### Mobile-Optimized UX (Beyond Responsive)
-Full-screen mobile kanban, touch-optimized lead cards with swipe actions (right = claim, left = dismiss), mobile-specific quick actions. **Size:** ~2–3 sessions.
+Full-screen mobile kanban, touch-optimized lead cards with swipe actions, mobile-specific quick actions. **Size:** ~2–3 sessions.
 
 ### Native Mobile Apps (iOS + Android)
-React Native with shared business logic. Expo for faster iteration.
-**Prerequisite:** Security hardening + API documentation complete.
+React Native + Expo. **Prerequisite:** Security hardening + API documentation complete.
 
-### White-Label / Multi-Agency Productization (Covos)
-Multi-tenant infrastructure is live. Next tier: self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant admin panel, data isolation audit.
-**Prerequisite:** Vendor Flexibility Architecture ✅ complete. COVOS Admin Onboarding Wizard must ship first.
-**Size:** 2–3 sessions for core self-serve flow; ongoing for billing and admin.
+### White-Label / Multi-Agency Productization (Full COVOS)
+Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant admin panel, data isolation audit. Multi-tenant infra is live — this is the full productization layer.
+**Prerequisite:** FEAT-016 style capture, FEAT-018 logo swap, Sprint 10 admin first-run, Sprint 11 telemetry. **Size:** 2–3 sessions core flow; ongoing for billing and admin.
