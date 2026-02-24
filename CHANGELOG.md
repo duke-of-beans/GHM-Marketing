@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 4 Intelligence Layer + UX Bug Batch shipped.
+**Last Updated:** February 24, 2026 — Sprint 5 (Data Export + User Activity) shipped.
 
 ---
 
@@ -11,6 +11,15 @@ When you ship something:
 2. Delete the item from BACKLOG.md
 3. Update STATUS.md "Last Updated" line
 4. Then commit
+
+---
+
+## Sprint 5 — Data Access + Admin Visibility (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24, 2026 | **5A — Data Export**: `GET /api/export/leads` + `GET /api/export/clients` — CSV download with permission gate (admin = full DB, master = filtered by territory/permissions). Export button wired into Leads toolbar (current filtered view) and Clients portfolio toolbar (active or all). No new schema. |
+| Feb 24, 2026 | **5B — User Activity/Session Stats**: `GET /api/admin/user-activity` — aggregates 30d event count, last activity, and unique pages from AuditLog (no new schema). `UserActivityTab.tsx` admin-only settings tab with sortable table (Most Active / Last Login / Name). Wired into Settings page as "User Activity" tab. |
 
 ---
 

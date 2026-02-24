@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown } from "lucide-react";
+import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown, Download } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
 import { ChurnRiskBadge, computeClientChurnRisk } from "./churn-risk-badge";
 import { HealthSparkline } from "./health-sparkline";
@@ -277,6 +277,16 @@ export function ClientPortfolio({
     router.refresh();
   };
 
+  const handleExport = (statusFilter: "active" | "all") => {
+    const url = `/api/export/clients?status=${statusFilter}`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-6 pb-20 md:pb-0">
@@ -350,6 +360,25 @@ export function ClientPortfolio({
           <Upload className="h-4 w-4 mr-1" />
           Import
         </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <Download className="h-4 w-4 mr-1" />
+              Export
+              <ChevronDown className="h-3 w-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Export Clients</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleExport("active")}>
+              Active clients (CSV)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport("all")}>
+              All clients — full DB (CSV)
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {viewMode === "table" && filteredClients.length > 0 && (
           <Button variant="outline" size="sm" onClick={bulk.toggleAll} className="gap-1.5">
             <CheckSquare className="h-4 w-4" />

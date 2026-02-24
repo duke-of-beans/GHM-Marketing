@@ -15,11 +15,11 @@ import type { LeadStatus, UserRole } from "@prisma/client";
 import { useTour } from "@/lib/tutorials";
 import { LEADS_TOUR } from "@/lib/tutorials";
 import { TourButton } from "@/components/tutorials/TourButton";
-import {
+import { 
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Users, Archive, Trash2 } from "lucide-react";
+import { ChevronDown, Users, Archive, Trash2, Download } from "lucide-react";
 
 type KanbanLead = {
   id: number;
@@ -274,6 +274,17 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
     router.refresh();
   };
 
+  const handleExportLeads = () => {
+    const statusParam = filters.statuses.length > 0 ? `&status=${filters.statuses.join(",")}` : "";
+    const url = `/api/export/leads?${statusParam}`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const bulkLeadOp = async (operation: string, params?: Record<string, unknown>) => {
     const ids = filteredLeads.map(l => l.id);
     if (ids.length === 0) { toast.error("No leads visible to operate on"); return; }
@@ -343,6 +354,14 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                 </DropdownMenuContent>
               </DropdownMenu>
               <CSVImportDialog onComplete={handleImportComplete} />
+              <button
+                className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5"
+                onClick={handleExportLeads}
+                title="Export current filtered view as CSV"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Export CSV
+              </button>
             </>
           )}
         </div>

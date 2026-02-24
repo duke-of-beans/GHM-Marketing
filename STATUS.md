@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 4 (Intelligence Layer) complete. UX Bug Batch complete. ARCH-001 (doc archive) complete.
+**Last Updated:** February 24, 2026 — Sprint 5 (Data Export + User Activity) complete. Sprint 6 (UX Completeness) is next.
 
 ---
 

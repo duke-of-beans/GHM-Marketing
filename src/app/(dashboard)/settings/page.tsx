@@ -3,10 +3,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
+import { UserActivityTab } from "@/components/settings/UserActivityTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
 import { PositionsTab } from "@/components/settings/PositionsTab";
@@ -21,7 +22,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "positions", "territories", "permissions", "audit", "bugs", "wave", "integrations"];
+const VALID_TABS = ["general", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -72,6 +73,11 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="bugs" className="gap-1.5">
               <Bug className="h-4 w-4" />Bug Reports
+            </TabsTrigger>
+          )}
+          {isAdmin && (
+            <TabsTrigger value="activity" className="gap-1.5">
+              <Activity className="h-4 w-4" />User Activity
             </TabsTrigger>
           )}
           {isAdmin && (
@@ -149,6 +155,12 @@ export default function SettingsPage() {
         {isAdmin && (
           <TabsContent value="bugs">
             <BugReportsTab />
+          </TabsContent>
+        )}
+
+        {isAdmin && (
+          <TabsContent value="activity">
+            <UserActivityTab />
           </TabsContent>
         )}
 

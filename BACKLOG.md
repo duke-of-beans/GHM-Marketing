@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 4 (Intelligence Layer) shipped. UX Bug Batch shipped. Sprint 5 is next.
+**Last Updated:** February 24, 2026 — Sprint 5 (Data Export + User Activity) shipped. UX-BUG-002/007 descriptions updated (search bar overhaul, cmdk abandoned). UX-BUG-008 added (Mac icon in Team Feed). Sprint 6 is next.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -23,7 +23,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~3~~ | ~~Bulk Operations~~ | ~~Ops Sprint 7 (bulk content/task/pipeline)~~ | ✅ SHIPPED | ~~Team can't scale without batch actions. Additive to existing systems.~~ |
 | ~~4~~ | ~~Intelligence Layer~~ | ~~Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories)~~ | ✅ SHIPPED | ~~Synthesizes all collected data. Turns dashboard into indispensable ops platform.~~ |
 | ~~UX~~ | ~~UX Bug Batch~~ | ~~BUG-001–007 + ARCH-001~~ | ✅ SHIPPED | ~~First-impression fixes: search bar, nav, Wave error, OS key hints, doc cleanup.~~ |
-| 5 | Data Access + Admin Visibility | Data Export + User Activity/Session Stats | ~1 session | External data requests + internal usage intelligence. |
+| ~~5~~ | ~~Data Access + Admin Visibility~~ | ~~Data Export + User Activity/Session Stats~~ | ✅ SHIPPED | ~~External data requests + internal usage intelligence.~~ |
 | 6 | UX Completeness | Static Empty States + Pipeline Filter UX debt + Keyboard Shortcuts | ~1 session | Closes gap between functional and polished. |
 | 7 | Sales Enablement Polish | Audit PDF PPC + Brochure PPC + Save Searches | ~0.5 sessions | Completes ITEM-001 scope. Power-user filter layer. |
 | 8 | Content Power | Bulk Content Ops + Competitor Tracking Manual + Custom Report Builder | ~1 session | Makes content and competitive intelligence practical at scale. |
@@ -42,10 +42,11 @@ Search bar currently only closes on Escape key. Clicking anywhere outside should
 **Scope:** Add `onBlur` or click-outside handler (e.g., `useClickOutside` hook) to search component.
 **Size:** ~30 min.
 
-### UX-BUG-002: Search Bar — Animation Is Jarring and Off-Pattern
-When activated, a gray overlay appears at the top of the window and a second search bar renders lower on screen. Two instances + overlay = confusing and off-putting.
-**Recommended fix:** Keep search bar in place. On focus, elongate it horizontally with a smooth CSS transition (responsive max-width expansion). Results dropdown appears inline below. No overlay, no teleportation. Follow standard pattern (Linear, Vercel, GitHub).
-**Size:** ~1–2 hrs.
+### UX-BUG-002: Search Bar — Expansion Behavior Wrong, Not Layout-Aware
+When activated, clicking the search bar triggers a large gray transparent square overlay — the cmdk modal rendering broken/empty. The correct behavior: the search bar should stay in its top navbar position and expand responsively horizontally (smooth CSS transition, max-width expansion). Results dropdown renders inline below the bar, no modal, no overlay, no teleportation. The bar must also be aware of the Team Feed panel state — when the panel is open/expanded, the expanded search bar width should respect that boundary and not overlap or ignore it.
+**Recommended fix:** Replace modal-style cmdk trigger with an inline expanding input. Width transitions from collapsed (e.g., 200px) to expanded (fills available nav space minus Team Feed panel width when open). Results render as a positioned dropdown below the input. `useModifierKey()` already exists for the shortcut hint.
+**Related:** UX-BUG-001 (click-outside to close), UX-BUG-007 (cmdk transparent square — same root cause, can fix together).
+**Size:** ~2–3 hrs.
 
 ### UX-BUG-003: Payments Page — Wave Widget Fails Without Graceful Degradation
 Wave GraphQL UNAUTHENTICATED error is surfaced raw in the UI: `Wave bank data unavailable — showing DB records only. (Error: Wave GraphQL error: [{"extensions":{"code":"UNAUTHENTICATED"...`. Raw JSON/stack traces must never reach the UI.
@@ -68,9 +69,15 @@ The command palette hint displays ⌘ instead of Ctrl on Windows. UI should dete
 **Size:** ~30 min.
 
 ### UX-BUG-007: Command Palette — Opens as Empty Transparent Square (Broken)
-When triggered, the command palette renders a transparent grey rectangle with no content.
-**Scope:** Investigate the component — likely z-index, missing portal target, hydration mismatch, or cmdk misconfiguration. Verify items are passed, component mounts correctly, overlay renders with content.
-**Size:** ~1–2 hrs diagnosis + fix.
+When triggered, the command palette renders a transparent grey rectangle with no content. Confirmed still occurring. Same root cause as UX-BUG-002 — the modal/cmdk approach is broken. Fix is to eliminate the modal entirely in favor of the inline expanding search bar described in UX-BUG-002. Resolving UX-BUG-002 should close this simultaneously.
+**Scope:** Fix as part of UX-BUG-002 search bar overhaul. Do not attempt to patch cmdk in isolation — the modal pattern is being abandoned.
+**Size:** Resolved by UX-BUG-002 fix.
+
+### UX-BUG-008: Team Feed Panel — Mac/Apple Icon Showing (Wrong Platform Icon)
+The Team Feed panel is displaying a Mac/Apple keyboard icon. Should show the correct OS-aware modifier key icon, same as UX-BUG-006 (which fixed the command palette hint). The `useModifierKey()` hook exists but either isn't wired into the Team Feed send shortcut hint, or the Team Feed has a hardcoded Mac icon that wasn't caught in the UX Bug Batch.
+**Scope:** Find the send shortcut hint in the Team Feed panel component. Replace any hardcoded ⌘ or Apple icon with `useModifierKey()` output. ~15 min once located.
+**File:** Search `src/components/` for TeamFeed or team-feed component — look for keyboard hint near the send button.
+**Size:** ~15–30 min.
 
 ### ARCH-001: Orphaned File Audit
 Significant doc drift across sprints. Old sprint files, duplicate summaries, obsolete prompts, and stale handoff docs are cluttering the root and docs/.
@@ -163,24 +170,11 @@ Reports auto-generated from scan data. Power users want section control.
 **Scope:** Section toggle UI before generation, per-client report template (save preferred sections), AI-written "Executive Summary" paragraph using scan delta data.
 **Size:** ~1 session.
 
-### Data Export — Leads + Clients → CSV/XLSX
-Zero export capability currently.
-**Scope:** "Export" button on Leads table (current filtered view → CSV), "Export" on Clients table, column picker, admin-only full DB export.
-**Size:** ~3 hrs.
-
-
-
-
-
+### Static Empty State Help Text
 ### Static Empty State Help Text
 Noted in commit cb8dd9d. Current empty states are static.
 **Scope:** Context-aware empty states in Leads, Clients, Content Studio — suggest next action with direct button (e.g., "Run a Discovery scan to import leads"). Pairs with AI search layer.
 **Size:** ~2–3 hrs.
-
-### User Activity / Session Stats (Admin View)
-Discussed in Feb 18 copy audit session. No per-user session tracking exists.
-**Scope:** Admin-visible stats — last login, login count, average session duration, pages visited. Likely needs a `UserSession` table or extension of `AuditLog`.
-**Size:** ~1 session.
 
 ---
 
