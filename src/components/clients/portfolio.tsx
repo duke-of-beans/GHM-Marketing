@@ -442,16 +442,26 @@ export function ClientPortfolio({
             {clients.length === 0 ? (
               <>
                 <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-base font-medium">No clients yet</p>
-                <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+                <p className="text-base font-semibold">No clients yet</p>
+                <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
                   Clients are created automatically when a lead is marked as <strong>Won</strong> in the sales pipeline.
                 </p>
+                <div className="mt-4 flex items-center justify-center gap-4">
+                  <a href="/leads" className="text-sm underline text-muted-foreground hover:text-foreground">
+                    Go to Pipeline →
+                  </a>
+                  <a href="/discovery" className="text-sm underline text-muted-foreground hover:text-foreground">
+                    Find leads in Discovery →
+                  </a>
+                </div>
               </>
             ) : (
               <>
                 <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-base font-medium">No clients match these filters</p>
-                <p className="text-sm text-muted-foreground mt-1">Try broadening your search or clearing the filters.</p>
+                <p className="text-base font-semibold">No clients match these filters</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {clients.length} client{clients.length !== 1 ? "s" : ""} in your portfolio — try broadening your search.
+                </p>
                 <button
                   className="mt-4 text-sm underline text-muted-foreground hover:text-foreground"
                   onClick={() => setFilters(DEFAULT_CLIENT_FILTERS)}

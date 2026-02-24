@@ -1,7 +1,14 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 10 complete. Lead filter bar presentation overhaul: active filter chips for all dimensions, redesigned Filters button, reorganized advanced panel with 3 labeled sections, unified saved search affordance. See CHANGELOG.
+**Last Updated:** February 24, 2026 — Sprint 11 complete. Context-aware empty states on leads pipeline, client portfolio, and discovery. See CHANGELOG.
+
+### SPRINT 11 — Context-Aware Empty States ✅ COMPLETE (February 24, 2026)
+- [x] **Leads pipeline** — 3-state empty logic: (1) no leads anywhere → "pipeline is empty" + CTA to import or go to Discovery; (2) filters active + no results → "X leads exist, try broadening" + clear-all link; (3) no filters active but no leads visible → neutral "no leads in this view" (territory/assignment context).
+- [x] **Client portfolio** — "No clients" state upgraded with first-action links to Pipeline and Discovery. "No matches" state now shows the actual client count so the user knows data exists but is filtered.
+- [x] **Discovery dashboard** — Pre-search first-visit state added ("Ready to find leads" + explanation of quality scores and CSV option). Post-search no-results state cleaned up: removed bullet list, replaced with a single prose sentence, added emoji treatment matching other pages.
+- [x] **Zero new TypeScript errors** — pre-existing basecamp/dotenv script errors unaffected.
+**Files modified:** `src/app/(dashboard)/leads/client.tsx`, `src/components/clients/portfolio.tsx`, `src/components/discovery/discovery-dashboard.tsx`
 
 ### SPRINT 10 — Lead Filter Bar Presentation Overhaul ✅ COMPLETE (February 24, 2026)
 - [x] **Active filter chips** — `buildActiveChips()` helper generates dismissible chips for every active filter dimension (all 18 filter fields, not just statuses/dateRange/priorityTiers/marketTypes). Chips row appears below controls when any filter is active; each chip has an inline X to remove just that filter.

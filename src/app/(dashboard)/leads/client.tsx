@@ -415,18 +415,59 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       )}
 
       <div data-tour="leads-kanban">
-        {filteredLeads.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
-            <p className="text-muted-foreground font-medium">No leads match these filters.</p>
-            <p className="text-sm text-muted-foreground">Your criteria are very specific. That&apos;s fine — or broaden them.</p>
-            <button
-              className="mt-3 text-sm underline text-muted-foreground hover:text-foreground"
-              onClick={() => handleFiltersChange(DEFAULT_FILTERS)}
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
+        {filteredLeads.length === 0 && (() => {
+          const hasFilters = JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS);
+          const noLeadsAtAll = initialLeads.length === 0;
+
+          if (noLeadsAtAll) {
+            // Brand new pipeline — no leads exist anywhere
+            return (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+                <div className="text-4xl">📋</div>
+                <p className="font-semibold text-lg">Your pipeline is empty</p>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  Add your first lead manually, import a CSV, or use the Discovery engine to find local businesses that match your criteria.
+                </p>
+                <div className="flex items-center gap-3 mt-2">
+                  {userRole !== "sales" && <CSVImportDialog onComplete={handleImportComplete} />}
+                  <a href="/discovery" className="text-sm underline text-muted-foreground hover:text-foreground">
+                    Find leads in Discovery →
+                  </a>
+                </div>
+              </div>
+            );
+          }
+
+          if (hasFilters) {
+            // Leads exist but filters are hiding them all
+            return (
+              <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
+                <div className="text-3xl">🔍</div>
+                <p className="font-semibold">No leads match these filters</p>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  {initialLeads.length} lead{initialLeads.length !== 1 ? "s" : ""} exist in your pipeline — try broadening your criteria or clearing the filters.
+                </p>
+                <button
+                  className="mt-3 text-sm underline text-muted-foreground hover:text-foreground"
+                  onClick={() => handleFiltersChange(DEFAULT_FILTERS)}
+                >
+                  Clear all filters
+                </button>
+              </div>
+            );
+          }
+
+          // Leads exist, no filters active — territory or assignment context returning nothing
+          return (
+            <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
+              <div className="text-3xl">📭</div>
+              <p className="font-semibold">No leads visible here</p>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                There are no leads in this view. They may be assigned to a different territory, or not yet imported.
+              </p>
+            </div>
+          );
+        })()}
         <KanbanBoard
           initialLeads={filteredLeads}
           onLeadClick={(id) => setSelectedLeadId(id)}

@@ -222,18 +222,27 @@ export function DiscoveryDashboard() {
       </Card>
 
       {/* Results */}
+      {!hasSearched && (
+        <div className="flex flex-col items-center justify-center py-14 text-center space-y-3 border rounded-lg bg-muted/20">
+          <div className="text-4xl">🗺️</div>
+          <p className="font-semibold text-base">Ready to find leads</p>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            Enter a business type and location above to search Google Maps for prospects that match your criteria. Each result gets an instant quality score.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Or skip the search and <span className="font-medium">import a CSV</span> of leads you already have.
+          </p>
+        </div>
+      )}
+
       {hasSearched && results.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4 font-medium">
-              No businesses found matching your search
+            <div className="text-3xl mb-3">🔎</div>
+            <p className="font-semibold mb-1">No businesses found</p>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              Try a broader location (e.g. &quot;Dallas&quot; instead of &quot;Downtown Dallas&quot;), different keywords (e.g. &quot;lawyer&quot; instead of &quot;attorney&quot;), or a lower minimum review count.
             </p>
-            <p className="text-sm text-muted-foreground mb-2">Try:</p>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Broader location (e.g., &quot;Dallas&quot; instead of &quot;Downtown Dallas&quot;)</li>
-              <li>• Different keywords (e.g., &quot;lawyer&quot; instead of &quot;attorney&quot;)</li>
-              <li>• Lower minimum review count</li>
-            </ul>
           </CardContent>
         </Card>
       )}
