@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 7 complete. Backlog updated: UX-AUDIT-001–009, FEAT-015–020 added. Sprint 8 starting.
+**Last Updated:** February 24, 2026 — Pre-Sprint-8 fixes: management fee tooltip rewritten, Sales Tools panel tooltips added, dashboard grid mount flash fixed. Sprint 8 starting.
 
 ---
 

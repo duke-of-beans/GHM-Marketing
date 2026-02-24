@@ -90,7 +90,7 @@ export function ManagementFeesWidget() {
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  Your earnings as a Master Manager. You receive $240/month for each client you manage, starting in Month 1 after onboarding. Owner accounts are exempt from paying themselves management fees.
+                  Monthly earnings for Master Managers. You receive $240/month per active client, beginning in Month 1 after onboarding. Owner accounts do not accrue management fee income.
                 </p>
               </TooltipContent>
             </Tooltip>

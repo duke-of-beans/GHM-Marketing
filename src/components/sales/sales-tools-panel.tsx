@@ -4,6 +4,12 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Zap,
   FileSearch,
   MonitorPlay,
@@ -21,7 +27,7 @@ const tools = [
     href: "/leads",
     color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-50 dark:bg-blue-950/40",
-    description: "Your active leads",
+    tooltip: "Your active leads and pipeline.",
   },
   {
     label: "Claim Leads",
@@ -29,7 +35,7 @@ const tools = [
     href: "/leads?filter=available",
     color: "text-green-600 dark:text-green-400",
     bg: "bg-green-50 dark:bg-green-950/40",
-    description: "Available in territory",
+    tooltip: "Unclaimed leads available in your territory.",
   },
   {
     label: "Audit PDF",
@@ -37,7 +43,7 @@ const tools = [
     href: "/leads",
     color: "text-violet-600 dark:text-violet-400",
     bg: "bg-violet-50 dark:bg-violet-950/40",
-    description: "Open a lead to generate",
+    tooltip: "Open any lead, then use the Audit button to generate a prospect audit report.",
   },
   {
     label: "Live Demo",
@@ -45,7 +51,7 @@ const tools = [
     href: "/leads",
     color: "text-orange-600 dark:text-orange-400",
     bg: "bg-orange-50 dark:bg-orange-950/40",
-    description: "Open a lead to create",
+    tooltip: "Open any lead, then use the Live Demo button to generate a personalized demo page.",
   },
   {
     label: "Brochure",
@@ -53,7 +59,7 @@ const tools = [
     href: "/brochure",
     color: "text-pink-600 dark:text-pink-400",
     bg: "bg-pink-50 dark:bg-pink-950/40",
-    description: "Share during calls",
+    tooltip: "One-page overview of services. Share during calls or follow-ups.",
     external: true,
   },
   {
@@ -62,7 +68,7 @@ const tools = [
     href: "/comp-sheet",
     color: "text-yellow-600 dark:text-yellow-400",
     bg: "bg-yellow-50 dark:bg-yellow-950/40",
-    description: "Earnings breakdown",
+    tooltip: "Earnings projections by book size.",
     external: true,
   },
   {
@@ -71,7 +77,7 @@ const tools = [
     href: "/territory-map",
     color: "text-teal-600 dark:text-teal-400",
     bg: "bg-teal-50 dark:bg-teal-950/40",
-    description: "Markets overview",
+    tooltip: "Geographic overview of your assigned markets.",
     external: true,
   },
 ];
@@ -86,29 +92,37 @@ export function SalesToolsPanel() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-          {tools.map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <Link
-                key={tool.label}
-                href={tool.href}
-                target={tool.external ? "_blank" : undefined}
-                rel={tool.external ? "noopener noreferrer" : undefined}
-              >
-                <Button
-                  variant="ghost"
-                  className={`w-full h-auto flex-col items-center gap-1.5 p-3 ${tool.bg} hover:opacity-80 border-none rounded-xl`}
-                >
-                  <Icon className={`h-5 w-5 ${tool.color}`} />
-                  <span className="text-[11px] font-medium leading-tight text-center">
-                    {tool.label}
-                  </span>
-                </Button>
-              </Link>
-            );
-          })}
-        </div>
+        <TooltipProvider>
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            {tools.map((tool) => {
+              const Icon = tool.icon;
+              return (
+                <Tooltip key={tool.label}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={tool.href}
+                      target={tool.external ? "_blank" : undefined}
+                      rel={tool.external ? "noopener noreferrer" : undefined}
+                    >
+                      <Button
+                        variant="ghost"
+                        className={`w-full h-auto flex-col items-center gap-1.5 p-3 ${tool.bg} hover:opacity-80 border-none rounded-xl`}
+                      >
+                        <Icon className={`h-5 w-5 ${tool.color}`} />
+                        <span className="text-[11px] font-medium leading-tight text-center">
+                          {tool.label}
+                        </span>
+                      </Button>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-[200px] text-center">
+                    <p className="text-xs">{tool.tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </TooltipProvider>
       </CardContent>
     </Card>
   );

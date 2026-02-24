@@ -99,8 +99,12 @@ export function MasterDashboardGrid({
     () => readLocalLayout() ?? savedLayout ?? DEFAULT_LAYOUTS
   );
   const [isEditMode, setIsEditMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const { width, containerRef } = useContainerWidth();
+
+  // Suppress grid render until after hydration to prevent layout flash on navigation return
+  useEffect(() => { setMounted(true); }, []);
 
   // If no localStorage layout exists yet and the DB returned a layout, seed localStorage.
   // This handles first-load on a fresh browser without wiping a local session layout.
@@ -180,6 +184,11 @@ export function MasterDashboardGrid({
       </TooltipProvider>
 
       <div ref={containerRef as React.RefObject<HTMLDivElement>}>
+        {!mounted ? (
+          <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">
+            Loading dashboard...
+          </div>
+        ) : (
         <ResponsiveGridLayout
           className="layout"
           layouts={layouts}
@@ -216,6 +225,7 @@ export function MasterDashboardGrid({
           </div>
         ))}
       </ResponsiveGridLayout>
+        )}
       </div>
 
       <style jsx global>{`
