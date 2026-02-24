@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 23, 2026
+**Last Updated:** February 23, 2026 — Sprint 2 shipped.
 
 ---
 
@@ -15,6 +15,11 @@ When you ship something:
 ---
 
 ## Completed Work Log
+
+| Date | Commit | Item |
+|------|--------|------|
+| 2026-02-23 | pending | Client Portal Activation — portalToken field added to ClientProfile schema (db push), three .disabled files renamed to live routes: portal/page.tsx, generate-portal-token/route.ts, send-portal-invite/route.ts |
+| 2026-02-23 | pending | Sprint 6 Reporting Pipeline — reportDeliveryDay + reportDeliveryEmails on ClientProfile, sentAt on ClientReport, sendReportEmail() in email lib, deliver-reports cron (daily, matches per-client day), reports/schedule/ API (GET+PATCH), ReportSchedulePanel UI component, vercel.json cron entry |
 
 | Date | Commit | Item |
 |------|--------|------|

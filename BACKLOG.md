@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 23, 2026 — Added UX-BUG-001 through UX-BUG-007 + ARCH-001 from session review
+**Last Updated:** February 23, 2026 — Sprint 2 (Client Portal Activation + Reporting Pipeline) shipped. Sprint 3 is next.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -19,7 +19,7 @@ Foundation → out. Each sprint unblocks the next.
 | Sprint | Focus | Items | Size | Why This Order |
 |--------|-------|-------|------|----------------|
 | ~~1~~ | ~~Production Foundation~~ | ~~Security Hardening + Sentry + Structured Logging~~ | ✅ SHIPPED | ~~Gates all external use.~~ |
-| 2 | Ops Spine Completion | Client Portal Decision + Ops Sprint 6 (Reporting Pipeline) | ~1.5 sessions | Fulfills contract promise of monthly delivery. Portal ambiguity off the board. |
+| ~~2~~ | ~~Ops Spine Completion~~ | ~~Client Portal Decision + Ops Sprint 6 (Reporting Pipeline)~~ | ✅ SHIPPED | ~~Fulfills contract promise of monthly delivery. Portal ambiguity off the board.~~ |
 | 3 | Bulk Operations | Ops Sprint 7 (bulk content/task/pipeline) | ~1 session | Team can't scale without batch actions. Additive to existing systems. |
 | 4 | Intelligence Layer | Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories) | ~1 session | Synthesizes all collected data. Turns dashboard into indispensable ops platform. |
 | 5 | Data Access + Admin Visibility | Data Export + User Activity/Session Stats | ~1 session | External data requests + internal usage intelligence. |
@@ -108,27 +108,12 @@ Pick the top item in your current tier that unblocks the next thing.
 
 ## 🟠 SHOULD — Productization & Growth
 
-### Ops Layer Sprints 6–8
-**Context:** The ops-layer sprint plan (commit 04d2a92) laid out 9 sprints. Sprints 0–5 shipped. Sprints 6–8 were never committed.
-**Sprint 6 — Reporting Pipeline:** Scheduled monthly report generation, delivery queue, per-client schedule (1st/5th/15th), Resend delivery, delivery log on client record.
+### Ops Layer Sprints 7–8
+**Context:** Sprint 6 (Reporting Pipeline) shipped Feb 23. Sprints 7–8 remain.
 **Sprint 7 — Bulk Operations:** Bulk content approve/archive/assign, bulk task close, batch pipeline actions.
 **Sprint 8 — Advanced Analytics + Insights:** Trend analysis, MoM/YoY comparisons, churn risk scoring, client health trajectory charts.
 **Size:** ~1 session per sprint.
-**Files:** `src/app/api/reports/schedule/`, `src/components/content/BulkActions.tsx`, `src/app/(dashboard)/analytics/`
-
-### Client Portal — Activation Decision
-**Context:** Feb 17 portal was built with portalToken auth but disabled via `.disabled` extensions due to a missing ClientProfile.portalToken field. The Feb 20 OnboardingToken portal may have superseded it.
-**Current state — three files still disabled:**
-- `src/app/(portal)/portal/page.tsx.disabled`
-- `src/app/api/clients/[id]/generate-portal-token/route.ts.disabled`
-- `src/app/api/email/send-portal-invite/route.ts.disabled`
-**Decision needed:** If the old portal is still the right path → add `portalToken String? @unique` to ClientProfile, `prisma db push`, rename `.disabled` files. If superseded by OnboardingToken portal → delete disabled files and document the decision in CHANGELOG.md.
-**Size:** ~1 hr decision + cleanup.
-
-### Keyboard Shortcuts Layer
-**Context:** Cmd+K global search exists. Page navigation shortcuts don't. Wanted since early sessions.
-**Scope:** `G L` → Leads, `G C` → Clients, `N L` → New Lead, `N T` → New Task, `?` → shortcut hint overlay. Use `cmdk` library (shadcn already wraps it).
-**Size:** ~2–3 hrs additive to existing search bar.
+**Files:** `src/components/content/BulkActions.tsx`, `src/app/(dashboard)/analytics/`
 
 ### COVOS Admin Onboarding Wizard
 **Context:** Multi-tenant infrastructure is live (covos.app, TENANT_REGISTRY). This is the self-service onboarding a second agency would use to get onto the platform without GHM support. Spec documented in PRODUCTIZING_BACKLOG.md (commit c2a6daa).
@@ -141,11 +126,6 @@ Pick the top item in your current tier that unblocks the next thing.
 ---
 
 ## 🟡 WOULD — High Value, No Current Blocker
-
-### Reporting — Scheduled Delivery (Sprint 6 subset)
-Reports are manually generated. Contract implies monthly delivery.
-**Scope:** Per-client report schedule (1st, 5th, or 15th of month), delivery email + cc list, monthly cron, delivery log on client record.
-**Size:** ~1 session.
 
 ### Advanced Filter Persistence + Save Searches
 Pipeline filter bar has localStorage persistence. Next tier is named saved searches.

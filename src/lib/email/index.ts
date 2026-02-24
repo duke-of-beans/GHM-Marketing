@@ -427,3 +427,74 @@ export async function sendNotificationEmail(params: {
     return { success: false, error: String(err) };
   }
 }
+
+
+// ============================================================================
+// Send Monthly Report via email (Sprint 6 — Reporting Pipeline)
+// ============================================================================
+
+export async function sendReportEmail(params: {
+  reportId: number;
+  clientName: string;
+  periodLabel: string;    // e.g. "January 2026"
+  reportHtml: string;     // Full rendered HTML report body (inline)
+  recipientEmails: string[];
+  pdfUrl?: string;
+}) {
+  const { reportId, clientName, periodLabel, reportHtml, recipientEmails, pdfUrl } = params;
+
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not set, skipping report email");
+    return { success: false, error: "Email not configured" };
+  }
+
+  if (recipientEmails.length === 0) {
+    return { success: false, error: "No recipient emails" };
+  }
+
+  try {
+    const resend = getResend()!;
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+        <div style="background-color: #1a1a2e; padding: 24px; border-radius: 8px 8px 0 0;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 22px;">GHM Marketing</h1>
+          <p style="color: #a0a0b0; margin: 4px 0 0 0; font-size: 12px; letter-spacing: 1px;">MONTHLY PERFORMANCE REPORT</p>
+        </div>
+        <div style="padding: 32px 24px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+          <h2 style="color: #1a1a2e; margin: 0 0 8px 0;">${clientName}</h2>
+          <p style="color: #666; margin: 0 0 24px 0; font-size: 14px;">Performance Summary — ${periodLabel}</p>
+          ${reportHtml}
+          ${pdfUrl ? `
+          <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e5e5;">
+            <a href="${pdfUrl}" style="display: inline-block; background-color: #1a1a2e; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+              Download Full PDF Report
+            </a>
+          </div>` : ""}
+          <p style="color: #999; font-size: 12px; margin-top: 32px;">
+            Questions? Reply to this email or contact your account manager directly.
+            <br>Report ID: ${reportId}
+          </p>
+        </div>
+      </div>
+    `;
+
+    const { error } = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: recipientEmails[0],
+      cc: recipientEmails.slice(1),
+      subject: `${clientName} — ${periodLabel} Performance Report`,
+      html: emailHtml,
+    });
+
+    if (error) {
+      console.error("Resend error sending report:", error);
+      return { success: false, error: String(error) };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("sendReportEmail exception:", err);
+    return { success: false, error: String(err) };
+  }
+}

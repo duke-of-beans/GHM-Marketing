@@ -410,6 +410,13 @@ model ClientProfile {
   lockedResidualAmount  Decimal?  @map("locked_residual_amount") @db.Decimal(10, 2)
   closedInMonth         DateTime? @map("closed_in_month") @db.Date
 
+  // Client Portal
+  portalToken           String?   @unique @map("portal_token")
+
+  // Reporting Schedule (Sprint 6)
+  reportDeliveryDay     Int?      @map("report_delivery_day")     // 1, 5, or 15 — day of month to deliver
+  reportDeliveryEmails  String[]  @map("report_delivery_emails")  // cc list, defaults to client lead email
+
   // Churn tracking
   churnedAt         DateTime? @map("churned_at")
   churnReason       String?   @map("churn_reason") @db.Text
@@ -633,6 +640,7 @@ model ClientReport {
   content      Json
   pdfUrl       String?       @map("pdf_url")
   sentToClient Boolean       @default(false) @map("sent_to_client")
+  sentAt       DateTime?     @map("sent_at")        // When the report email was delivered
   createdAt    DateTime      @default(now()) @map("created_at")
   client       ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
