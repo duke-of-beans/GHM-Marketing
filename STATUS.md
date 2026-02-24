@@ -1,7 +1,16 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 9 complete. Import visibility, admin role elevation, branding system, admin first-run wizard. See CHANGELOG.
+**Last Updated:** February 24, 2026 — Sprint 10 complete. Lead filter bar presentation overhaul: active filter chips for all dimensions, redesigned Filters button, reorganized advanced panel with 3 labeled sections, unified saved search affordance. See CHANGELOG.
+
+### SPRINT 10 — Lead Filter Bar Presentation Overhaul ✅ COMPLETE (February 24, 2026)
+- [x] **Active filter chips** — `buildActiveChips()` helper generates dismissible chips for every active filter dimension (all 18 filter fields, not just statuses/dateRange/priorityTiers/marketTypes). Chips row appears below controls when any filter is active; each chip has an inline X to remove just that filter.
+- [x] **Filters button redesign** — "More/Less" replaced with `SlidersHorizontal` icon + "Filters" label + active count badge. Badge always shows regardless of saved search state. Chevron indicates open/close.
+- [x] **Advanced panel reorganized** — 3 clearly labeled sections: Pipeline (status + date range + priority tiers + deal value + days in stage + lead source), Quality Scores (collapsible, 5 sliders + website/email toggles), Market Intelligence (collapsible, market type checkboxes). Dense nested Collapsible/CollapsibleTrigger pattern replaced with simple button toggles + conditional render.
+- [x] **Saved search affordance unified** — Bookmark icon shows whenever `hasActiveFilters` OR saved searches exist (not gated on `savedSearches.length > 0`). "Save current filters…" always appears in dropdown when filters are active. Removed redundant standalone "Save" button.
+- [x] **Zero new TypeScript errors** — pre-existing basecamp/import-wave-history script errors unaffected.
+**Files modified:** `src/components/leads/lead-filter-bar-advanced.tsx`
+**Removed imports:** `Collapsible`, `CollapsibleContent`, `CollapsibleTrigger`, `Filter` (replaced by `SlidersHorizontal`)
 
 ### SPRINT 9 — Admin Infrastructure ✅ COMPLETE (February 24, 2026)
 - [x] **Import visibility fix** — `CSVImportDialog` on `/leads` moved outside master-only guard; now visible to admin + master. Discovery page gets "Import from CSV" card. Enrich/Bulk Actions/territory filter guards updated to admin|master.
