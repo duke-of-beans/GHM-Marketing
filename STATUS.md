@@ -1,7 +1,15 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 21 complete. All 5 bugs fixed + all 5 UX polish items shipped.
+**Last Updated:** February 25, 2026 — Sprint 22 complete. 3 UX bugs fixed + Settings IA restructured + tutorial restart fixed globally.
+
+### SPRINT 22 — UX Polish + Settings IA (February 25, 2026)
+- [x] **BUG-017 COMPLETE** — Login dark mode flash on logout. Created `src/app/(auth)/layout.tsx` forcing `className="light"` at layout level before hydration. Login is always rendered in light mode regardless of user theme preference.
+- [x] **BUG-018 COMPLETE** — Search bar `CtrlK` → `Ctrl+K`. Added `+` separator in `AISearchBar.tsx` kbd badge: `{modSymbol}+K`.
+- [x] **BUG-019 COMPLETE** — TeamFeed enter icon too small. Replaced unicode `↵` with `<CornerDownLeft className="h-3 w-3 inline" />` in both `TeamFeed.tsx` and `TeamFeedSidebar.tsx`.
+- [x] **UX-AUDIT-020 COMPLETE** — Settings IA: Commission Defaults + Monthly Goals extracted from General Settings into new `CompensationTab.tsx`. General Settings now contains only Appearance + Push Notifications. Compensation tab added as admin-only tab after General.
+- [x] **UX-AUDIT-021 COMPLETE** — Tutorial restart global nav awareness. `OnboardingTutorial` moved from `sales/page.tsx` + `manager/page.tsx` to `DashboardLayoutClient` (global mount on every dashboard page). `window.restartTutorial` now always registered. Help menu "Restart Tutorial" works on any page.
+**Files:** `src/app/(auth)/layout.tsx` (new), `src/components/settings/CompensationTab.tsx` (new), `src/components/search/AISearchBar.tsx`, `src/components/team-feed/TeamFeed.tsx`, `src/components/team-feed/TeamFeedSidebar.tsx`, `src/components/settings/GeneralSettingsTab.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/components/dashboard/DashboardLayoutClient.tsx`, `src/app/(dashboard)/layout.tsx`, `src/app/(dashboard)/sales/page.tsx`, `src/app/(dashboard)/manager/page.tsx`
 
 ### SPRINT 21 — Bug Fixes + UX Polish (February 24, 2026)
 - [x] **BUG-014 COMPLETE** — Recurring Tasks "New Rule" crash. Root: `/api/checklist-templates` missing + no array guards. Fixed: created route (Prisma `taskChecklistTemplate.findMany({ where: { isActive: true } })`); added `Array.isArray()` guards to both fetch handlers in `recurring-task-form.tsx`.

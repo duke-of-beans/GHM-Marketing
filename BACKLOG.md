@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Added BUG-017–019, UX-AUDIT-020–022 from David's Feb 24 audit. Sprint 22 proposal added.
+**Last Updated:** February 25, 2026 — Sprint 22 shipped. BUG-017/018/019 + UX-AUDIT-020/021 closed.
 
 **Owner:** David Kirsch
 
@@ -39,7 +39,7 @@ Foundation → out. Each sprint unblocks the next.
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
-| 22 | UX Polish + Settings IA | BUG-017 (login dark mode) + BUG-018 (Ctrl+K label) + BUG-019 (TeamFeed enter icon) + UX-AUDIT-020 (Settings IA audit) + UX-AUDIT-021 (tutorial global nav) | ~1 session | High visibility polish — all noticed in normal use. |
+| ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
