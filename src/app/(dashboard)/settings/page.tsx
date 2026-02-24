@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign, Database } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { CompensationTab } from "@/components/settings/CompensationTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
@@ -11,6 +11,7 @@ import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { UserActivityTab } from "@/components/settings/UserActivityTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
+import { DataImportTab } from "@/components/settings/DataImportTab";
 import { BrandingTab } from "@/components/settings/BrandingTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -25,7 +26,7 @@ const TerritoriesContent = dynamic(
 );
 
 // "positions" and "permissions" are now sub-sections inside the "team" tab
-const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations"];
+const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations", "data-import"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -93,6 +94,11 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="integrations" className="gap-1.5">
               <Zap className="h-4 w-4" />Integrations
+            </TabsTrigger>
+          )}
+          {isAdmin && (
+            <TabsTrigger value="data-import" className="gap-1.5">
+              <Database className="h-4 w-4" />Data Import
             </TabsTrigger>
           )}
         </TabsList>
@@ -163,6 +169,12 @@ export default function SettingsPage() {
         {isAdmin && (
           <TabsContent value="integrations">
             <IntegrationsTab />
+          </TabsContent>
+        )}
+
+        {isAdmin && (
+          <TabsContent value="data-import">
+            <DataImportTab />
           </TabsContent>
         )}
       </Tabs>

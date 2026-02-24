@@ -1,7 +1,19 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 19 complete. Content Automation: FEAT-022 (TeamFeed multimedia), FEAT-023 (stock photos), FEAT-024 (website audit).
+**Last Updated:** February 24, 2026 — Sprint 20 FEAT-014 complete. PM Data Migration Import: Basecamp/Asana/ClickUp/Monday/Trello/CSV adapters, Settings → Data Import wizard, 4 API routes, PmImportSession schema.
+
+### SPRINT 20 — Data Migration & PM Import (February 24, 2026)
+- [x] **FEAT-014 COMPLETE** — PM Data Migration Import system. One-time connect → scrape → preview → commit flow for migrating tasks and contacts out of external PM platforms into GHM. No ongoing integration — credentials cleared after import completes.
+  - **Schema:** `PmImportSession` model added to Prisma schema (`prisma db push` applied). Tracks platform, encrypted credentials (cleared post-import), preview JSON, commit stats.
+  - **Adapter layer:** `src/lib/pm-import/` — `TaskImportAdapter` interface + `ADAPTER_REGISTRY`. Six adapters: Basecamp (reuses existing `BasecampClient`), Asana (PAT + paginated REST), ClickUp (API token + teams/spaces/lists), Monday.com (GraphQL API), Trello (API key + token), CSV/XLSX (column-mapping import, reuses XLSX pattern from leads/import).
+  - **API routes:** `POST /api/import/pm/connect` (validate creds, create session), `POST /api/import/pm/preview` (scrape all data, store server-side; supports multipart for CSV), `POST /api/import/pm/commit` (write tasks to ClientTask, resolve assignees by email/name, clear creds), `GET /api/import/pm/sessions` (history).
+  - **Token bridge:** `GET /api/oauth/basecamp/token` — reads stored `AppSetting.basecamp_token` for Basecamp OAuth path.
+  - **UI:** `DataImportTab` component — 5-step wizard (Platform → Connect → Preview → Import → Complete). Platform cards, OAuth auto-connect for Basecamp, drag-drop CSV upload, task preview table with row-level selection, client ID assignment, category override, completion screen.
+  - **Settings wiring:** `data-import` tab added to Settings page (admin-only). `Database` icon from lucide-react. Tab trigger + content + `VALID_TABS` updated.
+  - **TypeScript:** Zero new errors. Pre-existing 5 errors (basecamp/dotenv) unaffected.
+**Files created:** `prisma/schema.prisma` (PmImportSession model + User relation), `src/lib/pm-import/types.ts`, `src/lib/pm-import/index.ts`, `src/lib/pm-import/adapters/{basecamp,asana,clickup,monday,trello,csv}.ts`, `src/app/api/import/pm/{connect,preview,commit,sessions}/route.ts`, `src/app/api/oauth/basecamp/token/route.ts`, `src/components/settings/DataImportTab.tsx`
+**Files modified:** `src/app/(dashboard)/settings/page.tsx` (DataImportTab import, tab trigger, tab content, VALID_TABS)
 
 ### SPRINT 19 — Content Automation (February 24, 2026)
 - [x] **FEAT-022 COMPLETE** — TeamFeed multimedia (Slack-grade). Full emoji picker (emoji-mart, dynamically imported) wired into compose box in both TeamFeed.tsx and TeamFeedSidebar.tsx. GIF search via Tenor API (`/api/gif-search`) with debounced search, 2-column grid preview, inline GIF rendering in messages via `InlineMedia`. Emoji reactions: `TeamMessageReaction` table already in schema and DB. `ReactionRow` component aggregates per-emoji with toggle-on-click, add-reaction button. Both the GET `/api/team-messages` query and replies sub-query updated to include `user.name` on reactions for tooltip display. `TeamFeedMultimedia.tsx` is the shared component barrel (EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia) — both feed variants import from it. TypeScript: zero new errors.
