@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint 3 (Bulk Operations — Global) shipped. Sprint 4 next.print 3 next.
+**Last Updated:** February 24, 2026 — Sprint 4 (Intelligence Layer) complete. Sprint 5 (AI Narratives) complete.
 
 ---
 
@@ -67,6 +67,16 @@ When a `website_deployment` task transitions to `deployed`, Wave invoice auto-cr
 - [x] 5 alert rules seeded — review avg <4.0 (critical), zero new reviews, search views -25%, keyword lost top 3, keyword entered top 3 (info)
 - [x] AlertSourceType extended with "gbp" + "rankings" in alert-engine.ts
 - [x] vercel.json — gbp-snapshot cron wired (0 4 * * 1 — Monday 4am UTC)
+
+### ✅ SPRINT 4 — Intelligence Layer (February 24, 2026)
+Portfolio analytics: trend visibility + churn early warning + health trajectory.
+- [x] **4A — MoM/YoY Trend Charts** — `src/lib/analytics/intelligence.ts` core lib: `buildMonthlyTrend()` computes MRR, active clients, new/churned, avg health score per month. API route `GET /api/analytics/trends`. `IntelligenceTrends` component: 4 recharts charts (revenue, clients, new vs churn bar, avg health). Wired into `/analytics` page.
+- [x] **4B — Churn Risk Scoring** — `computeChurnRisk()` runtime engine: 4 factors (overdue scan +25, payment not current +30, declining health trend +25, no recent tasks +20). Labels: low/medium/high/critical. API `GET /api/clients/churn-risk`. `ChurnRiskBadge` component with tooltip breakdown. Client-side `computeClientChurnRisk()` for portfolio cards. Badges wired into card view + table Risk column.
+- [x] **4C — Health Trajectory Sparklines** — `buildHealthTrajectory()` + `buildSparklinePath()` in intelligence lib. `HealthSparkline` inline SVG component (80×24px, delta indicator, tooltip). `HealthTrajectoryChart` full recharts chart for detail page. Sparkline data computed server-side in clients page, passed to portfolio. Wired into card footer.
+- [x] **TypeScript clean** — All Sprint 4 errors resolved: `requirePermission` pattern corrected for API routes, `churnedAt` added to analytics page select, recharts formatter types fixed. Zero Sprint 4 errors (pre-existing scripts/basecamp errors unrelated).
+
+**Files created:** `src/lib/analytics/intelligence.ts`, `src/app/api/analytics/trends/route.ts`, `src/app/api/clients/churn-risk/route.ts`, `src/components/analytics/intelligence-trends.tsx`, `src/components/clients/churn-risk-badge.tsx`, `src/components/clients/health-sparkline.tsx`
+**Files modified:** `src/app/(dashboard)/analytics/page.tsx`, `src/app/(dashboard)/clients/page.tsx`, `src/components/clients/portfolio.tsx`
 
 ### SPRINT 5 — AI Report Narratives ✅ COMPLETE (February 23, 2026)
 AI-generated narrative paragraphs embedded in client monthly reports, voice-profile tone-matched, zero new TypeScript errors.

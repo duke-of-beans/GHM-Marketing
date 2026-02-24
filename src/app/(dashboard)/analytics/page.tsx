@@ -1,12 +1,14 @@
 import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
+import { IntelligenceTrends } from "@/components/analytics/intelligence-trends";
+import { buildMonthlyTrend } from "@/lib/analytics/intelligence";
 
 export default async function AnalyticsPage() {
   await requirePermission("view_analytics");
 
   // Fetch analytics data
-  const [leads, clients, tasks, scans, opportunities] = await Promise.all([
+  const [leads, clients, tasks, scans, opportunities, allScans] = await Promise.all([
     prisma.lead.findMany({
       select: {
         id: true,
@@ -26,6 +28,7 @@ export default async function AnalyticsPage() {
         healthScore: true,
         status: true,
         onboardedAt: true,
+        churnedAt: true,
         lead: {
           select: {
             createdAt: true,
@@ -63,6 +66,12 @@ export default async function AnalyticsPage() {
         presentedAt: true,
       },
     }),
+    // For intelligence trends — all clients + all scans
+    prisma.competitiveScan.findMany({
+      select: { clientId: true, scanDate: true, healthScore: true },
+      orderBy: { scanDate: "desc" },
+      take: 2000,
+    }),
   ]);
 
   // Serialize data with proper Decimal handling
@@ -77,7 +86,22 @@ export default async function AnalyticsPage() {
     })),
   };
 
-  // Sample data for advanced charts (in production, calculate from real data)
+  // Build MoM trend for IntelligenceTrends (4A)
+  const clientRows = clients.map((c) => ({
+    id: c.id,
+    retainerAmount: Number(c.retainerAmount),
+    status: c.status,
+    onboardedAt: c.onboardedAt,
+    churnedAt: c.churnedAt ?? null,
+    healthScore: c.healthScore,
+  }));
+  const scanRows = allScans.map((s) => ({
+    clientId: s.clientId,
+    scanDate: s.scanDate,
+    healthScore: s.healthScore,
+  }));
+  const trend12 = buildMonthlyTrend(clientRows, scanRows, 12);
+
   return (
     <div className="space-y-6">
       <div>
@@ -89,29 +113,8 @@ export default async function AnalyticsPage() {
 
       <AnalyticsDashboard data={serialized} />
 
-      {/* Advanced Analytics Section — live data connections in progress */}
-      <div className="space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">Advanced Insights</h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              Deep dive into revenue trends, team performance, and service analytics
-            </p>
-          </div>
-          <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700/50 px-2.5 py-1 rounded-full font-medium">
-            🔧 Live data coming soon
-          </span>
-        </div>
-
-        {/* Coming Soon Placeholder */}
-        <div className="rounded-lg border-2 border-dashed border-amber-200 dark:border-amber-700/50 bg-amber-50/40 dark:bg-amber-950/20 p-8 text-center space-y-2">
-          <p className="text-base font-semibold text-amber-900 dark:text-amber-300">Advanced charts are being connected to live data</p>
-          <p className="text-sm text-amber-700 dark:text-amber-400/80">
-            Rep performance, territory comparisons, revenue trends, and service mix charts will appear here once real-time data pipelines are complete.
-            The analytics above already reflect accurate live data.
-          </p>
-        </div>
-      </div>
+      {/* Intelligence Layer — Sprint 4A: MoM Trend Charts */}
+      <IntelligenceTrends trend={trend12} />
     </div>
   );
 }

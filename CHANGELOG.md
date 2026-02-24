@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 23, 2026 — Sprint 3 shipped.
+**Last Updated:** February 24, 2026 — Sprint 4 Intelligence Layer shipped.
 
 ---
 
@@ -13,6 +13,18 @@ When you ship something:
 4. Then commit
 
 ---
+
+## Sprint 4 — Intelligence Layer (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24, 2026 | `src/lib/analytics/intelligence.ts` — `buildMonthlyTrend()`, `computeChurnRisk()`, `buildHealthTrajectory()`, `buildSparklinePath()` — full intelligence computation library |
+| Feb 24, 2026 | `src/app/api/analytics/trends/route.ts` — MoM trend + health trajectory data API (admin/master) |
+| Feb 24, 2026 | `src/app/api/clients/churn-risk/route.ts` — Churn risk scores for all active clients (admin/master) |
+| Feb 24, 2026 | `src/components/analytics/intelligence-trends.tsx` — 4-chart trend dashboard: MRR, active clients, new vs churn bar, avg health score |
+| Feb 24, 2026 | `src/components/clients/churn-risk-badge.tsx` — Colored risk badge (medium/high/critical) with factor tooltip + client-side scoring function |
+| Feb 24, 2026 | `src/components/clients/health-sparkline.tsx` — Inline SVG sparkline + full recharts trajectory chart |
+| Feb 24, 2026 | Modified: `analytics/page.tsx`, `clients/page.tsx`, `portfolio.tsx` — trend charts, sparklines, and churn badges wired in |
 
 ## Sprint 3 — Bulk Operations (February 23, 2026)
 

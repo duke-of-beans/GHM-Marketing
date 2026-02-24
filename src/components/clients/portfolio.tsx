@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/tooltip";
 import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
+import { ChurnRiskBadge, computeClientChurnRisk } from "./churn-risk-badge";
+import { HealthSparkline } from "./health-sparkline";
 import { ClientFilterBar, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
 import { useBulkSelect } from "@/hooks/use-bulk-select";
@@ -111,10 +113,13 @@ function healthDot(score: number): string {
 export function ClientPortfolio({
   clients,
   stats,
+  sparklines: sparklinesObj,
 }: {
   clients: ClientItem[];
   stats: PortfolioStats;
+  sparklines?: Record<string, { path: string | null; delta: number | null }>;
 }) {
+  const sparklines = sparklinesObj ?? {};
   const router = useRouter();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -445,6 +450,7 @@ export function ClientPortfolio({
                   <th className="text-center px-3 py-2.5 font-medium">Open Tasks</th>
                   <th className="text-center px-3 py-2.5 font-medium">Last Scan</th>
                   <th className="text-center px-3 py-2.5 font-medium">Payment</th>
+                  <th className="text-center px-3 py-2.5 font-medium">Risk</th>
                   <th className="text-center px-4 py-2.5 font-medium">Google Ads</th>
                 </tr>
               </thead>
@@ -504,6 +510,14 @@ export function ClientPortfolio({
                         {paymentLabel(client.paymentStatus)}
                       </Badge>
                     </td>
+                    <td className="px-3 py-3 text-center">
+                      {(() => {
+                        const risk = computeClientChurnRisk(client);
+                        return risk.level !== "low"
+                          ? <ChurnRiskBadge level={risk.level} score={risk.score} factors={risk.factors} />
+                          : <span className="text-xs text-muted-foreground">—</span>;
+                      })()}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       {client.googleAdsConnection?.isActive ? (
                         <span className="text-xs text-green-600 font-medium">Connected</span>
@@ -538,14 +552,18 @@ export function ClientPortfolio({
                     </div>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="shrink-0 flex flex-col items-end gap-0.5 cursor-help">
-                          <Badge
-                            variant="outline"
-                            className={`${healthColor(client.healthScore)}`}
-                          >
-                            {healthLabel(client.healthScore)}
-                          </Badge>
-                          <span className="text-[10px] text-muted-foreground">{client.healthScore}/100</span>
+                        <div className="shrink-0 flex flex-col items-end gap-1 cursor-help">
+                        <Badge
+                          variant="outline"
+                          className={`${healthColor(client.healthScore)}`}
+                        >
+                          {healthLabel(client.healthScore)}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground">{client.healthScore}/100</span>
+                        {(() => {
+                          const risk = computeClientChurnRisk(client);
+                          return <ChurnRiskBadge level={risk.level} score={risk.score} factors={risk.factors} />;
+                        })()}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent side="left" className="max-w-[200px]">
@@ -590,6 +608,19 @@ export function ClientPortfolio({
                       </p>
                     </div>
                   </div>
+
+                  {/* Health Sparkline */}
+                  {sparklines[client.id] && (
+                    <div className="flex items-center gap-2 border-t pt-2">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wide shrink-0">Trend</span>
+                      <HealthSparkline
+                        sparklinePath={sparklines[client.id].path}
+                        delta={sparklines[client.id].delta}
+                        width={80}
+                        height={24}
+                      />
+                    </div>
+                  )}
 
                   {/* Footer info */}
                   <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-2">
