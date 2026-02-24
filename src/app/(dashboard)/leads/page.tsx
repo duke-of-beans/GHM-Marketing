@@ -25,6 +25,7 @@ export default async function LeadsPage() {
         reviewCount: true,
         dealValueTotal: true,
         updatedAt: true,
+        statusChangedAt: true,
         assignedUser: { select: { id: true, name: true } },
         _count: { select: { notes: true } },
         // Lead gen engine fields (actual database field names)
@@ -38,6 +39,7 @@ export default async function LeadsPage() {
         distanceFromMetro: true,
         website: true,
         email: true, // Note: database has "email" not "publicEmail"
+        leadSourceId: true,
         // Note: database does NOT have municipalMismatch, isChain, isFranchise, isCorporate fields
       },
       orderBy: { updatedAt: "desc" },
@@ -63,6 +65,7 @@ export default async function LeadsPage() {
     reviewCount: lead.reviewCount,
     dealValueTotal: Number(lead.dealValueTotal),
     updatedAt: lead.updatedAt.toISOString(),
+    statusChangedAt: lead.statusChangedAt ? lead.statusChangedAt.toISOString() : lead.updatedAt.toISOString(),
     assignedUser: lead.assignedUser,
     _count: lead._count,
     // Map database fields to client type names
@@ -76,6 +79,7 @@ export default async function LeadsPage() {
     distanceFromMetro: lead.distanceFromMetro ? Number(lead.distanceFromMetro) : null,
     website: lead.website,
     publicEmail: lead.email, // DB: email → Client: publicEmail
+    leadSourceId: lead.leadSourceId ?? null,
     // Fields not yet in database schema
     municipalMismatch: null,
     isChain: null,

@@ -32,6 +32,7 @@ type KanbanLead = {
   reviewCount: number | null;
   dealValueTotal: number;
   updatedAt: string;
+  statusChangedAt: string;
   assignedUser: { id: number; name: string } | null;
   _count: { notes: number };
   
@@ -50,6 +51,7 @@ type KanbanLead = {
   isChain: boolean | null;
   isFranchise: boolean | null;
   isCorporate: boolean | null;
+  leadSourceId: number | null;
 };
 
 type LeadsClientPageProps = {
@@ -204,6 +206,30 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       const days = msMap[filters.dateRange];
       const cutoff = now - days * 24 * 60 * 60 * 1000;
       result = result.filter((lead) => new Date(lead.updatedAt).getTime() >= cutoff);
+    }
+
+    // Deal value filter
+    if (filters.dealValueMin > 0 || filters.dealValueMax < 50000) {
+      result = result.filter((lead) => {
+        return lead.dealValueTotal >= filters.dealValueMin &&
+               lead.dealValueTotal <= filters.dealValueMax;
+      });
+    }
+
+    // Days in stage filter
+    if (filters.daysInStageMin > 0 || filters.daysInStageMax < 365) {
+      const now = Date.now();
+      result = result.filter((lead) => {
+        const daysInStage = Math.floor((now - new Date(lead.statusChangedAt).getTime()) / (1000 * 60 * 60 * 24));
+        return daysInStage >= filters.daysInStageMin && daysInStage <= filters.daysInStageMax;
+      });
+    }
+
+    // Lead source filter
+    if (filters.leadSourceIds.length > 0) {
+      result = result.filter((lead) =>
+        lead.leadSourceId !== null && filters.leadSourceIds.includes(lead.leadSourceId)
+      );
     }
 
     // Sorting

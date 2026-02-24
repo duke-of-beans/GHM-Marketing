@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   Search, X, ArrowRight, Zap, LayoutDashboard,
@@ -89,12 +90,15 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const localTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const { symbol: modSymbol } = useModifierKey();
+
+  useEffect(() => { setMounted(true); }, []);
 
   // Global keyboard shortcut
   useEffect(() => {
@@ -195,8 +199,8 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
         </kbd>
       </button>
 
-      {/* Modal overlay */}
-      {open && (
+      {/* Modal overlay — rendered via portal to escape overflow:hidden layout containers */}
+      {mounted && open && createPortal(
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
           <div
             className="w-full max-w-xl mx-4 rounded-xl border border-border bg-background shadow-2xl overflow-hidden"
@@ -309,7 +313,8 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
           {results?.source === "local_fallback" && <span>Local results only</span>}
         </div>
         </div>
-      </div>
+      </div>,
+      document.body
       )}
     </>
   );

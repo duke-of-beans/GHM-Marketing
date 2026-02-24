@@ -12,11 +12,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown, Download } from "lucide-react";
+import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown, Download, Users, Search } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
 import { ChurnRiskBadge, computeClientChurnRisk } from "./churn-risk-badge";
 import { HealthSparkline } from "./health-sparkline";
-import { ClientFilterBar, type FilterState } from "./client-filter-bar";
+import { ClientFilterBar, DEFAULT_CLIENT_FILTERS, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
 import { useBulkSelect } from "@/hooks/use-bulk-select";
 import { BulkActionBar } from "@/components/bulk/bulk-action-bar";
@@ -124,14 +124,7 @@ export function ClientPortfolio({
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
-  const [filters, setFilters] = useState<FilterState>({
-    search: "",
-    healthFilter: "all",
-    revenueRange: "all",
-    taskFilter: "all",
-    scanFilter: "all",
-    sortBy: "health-low",
-  });
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_CLIENT_FILTERS);
 
   const filteredClients = useMemo(() => {
     let result = clients;
@@ -445,16 +438,27 @@ export function ClientPortfolio({
 
       {filteredClients.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className="py-16 text-center">
             {clients.length === 0 ? (
-              <p className="text-muted-foreground">
-                No active clients yet. Clients are created automatically when leads
-                are marked as &ldquo;won&rdquo; in the sales pipeline.
-              </p>
+              <>
+                <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-base font-medium">No clients yet</p>
+                <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+                  Clients are created automatically when a lead is marked as <strong>Won</strong> in the sales pipeline.
+                </p>
+              </>
             ) : (
-              <p className="text-muted-foreground">
-                No clients match your filters. Try adjusting your search criteria.
-              </p>
+              <>
+                <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-base font-medium">No clients match these filters</p>
+                <p className="text-sm text-muted-foreground mt-1">Try broadening your search or clearing the filters.</p>
+                <button
+                  className="mt-4 text-sm underline text-muted-foreground hover:text-foreground"
+                  onClick={() => setFilters(DEFAULT_CLIENT_FILTERS)}
+                >
+                  Clear filters
+                </button>
+              </>
             )}
           </CardContent>
         </Card>

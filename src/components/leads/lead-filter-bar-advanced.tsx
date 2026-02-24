@@ -29,6 +29,7 @@ import {
 
 type Territory = { id: number; name: string };
 type Rep = { id: number; name: string };
+type LeadSource = { id: number; name: string; type: string | null };
 
 export type AdvancedFilterState = {
   // Basic
@@ -69,6 +70,13 @@ export type AdvancedFilterState = {
   excludeChains: boolean;
   excludeFranchises: boolean;
   excludeCorporate: boolean;
+
+  // Pipeline debt additions
+  leadSourceIds: number[];
+  dealValueMin: number;
+  dealValueMax: number;
+  daysInStageMin: number;
+  daysInStageMax: number;
 };
 
 type AdvancedLeadFilterBarProps = {
@@ -136,6 +144,12 @@ export const DEFAULT_FILTERS: AdvancedFilterState = {
   excludeChains: false,
   excludeFranchises: false,
   excludeCorporate: false,
+
+  leadSourceIds: [],
+  dealValueMin: 0,
+  dealValueMax: 50000,
+  daysInStageMin: 0,
+  daysInStageMax: 365,
 };
 
 export function AdvancedLeadFilterBar({
@@ -145,6 +159,7 @@ export function AdvancedLeadFilterBar({
 }: AdvancedLeadFilterBarProps) {
   const [territories, setTerritories] = useState<Territory[]>([]);
   const [reps, setReps] = useState<Rep[]>([]);
+  const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showQuality, setShowQuality] = useState(false);
   const [showMarket, setShowMarket] = useState(false);
@@ -163,6 +178,13 @@ export function AdvancedLeadFilterBar({
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setReps(d.data);
+      })
+      .catch(() => {});
+
+    fetch("/api/lead-sources")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setLeadSources(d.data);
       })
       .catch(() => {});
   }, [showTerritoryFilter]);
@@ -188,6 +210,13 @@ export function AdvancedLeadFilterBar({
     onChange({ ...filters, priorityTiers: newTiers });
   };
 
+  const toggleLeadSource = (id: number) => {
+    const newIds = filters.leadSourceIds.includes(id)
+      ? filters.leadSourceIds.filter((s) => s !== id)
+      : [...filters.leadSourceIds, id];
+    onChange({ ...filters, leadSourceIds: newIds });
+  };
+
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
   };
@@ -210,6 +239,9 @@ export function AdvancedLeadFilterBar({
     filters.hasWebsite !== "all" && 1,
     filters.hasEmail !== "all" && 1,
     filters.marketTypes.length,
+    filters.leadSourceIds.length,
+    (filters.dealValueMin > 0 || filters.dealValueMax < 50000) && 1,
+    (filters.daysInStageMin > 0 || filters.daysInStageMax < 365) && 1,
   ].filter(Boolean).reduce((a, b) => Number(a) + Number(b), 0) as number;
 
   return (
@@ -592,6 +624,62 @@ export function AdvancedLeadFilterBar({
                     </Select>
                   </div>
                 </div>
+
+                {/* Deal Value Range */}
+                <div>
+                  <Label className="text-sm mb-2 block">
+                    Deal Value: ${filters.dealValueMin.toLocaleString()}–${filters.dealValueMax === 50000 ? "50k+" : filters.dealValueMax.toLocaleString()}
+                  </Label>
+                  <Slider
+                    value={[filters.dealValueMin, filters.dealValueMax]}
+                    onValueChange={([min, max]) => onChange({ ...filters, dealValueMin: min, dealValueMax: max })}
+                    min={0}
+                    max={50000}
+                    step={500}
+                    className="mt-2"
+                  />
+                </div>
+
+                {/* Days in Stage */}
+                <div>
+                  <Label className="text-sm mb-2 flex items-center gap-1.5">
+                    Days in Current Stage: {filters.daysInStageMin}–{filters.daysInStageMax === 365 ? "365+" : filters.daysInStageMax}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        How long a lead has been in their current pipeline stage. Use to surface stale leads.
+                      </TooltipContent>
+                    </Tooltip>
+                  </Label>
+                  <Slider
+                    value={[filters.daysInStageMin, filters.daysInStageMax]}
+                    onValueChange={([min, max]) => onChange({ ...filters, daysInStageMin: min, daysInStageMax: max })}
+                    min={0}
+                    max={365}
+                    step={1}
+                    className="mt-2"
+                  />
+                </div>
+
+                {/* Lead Source */}
+                {leadSources.length > 0 && (
+                  <div>
+                    <Label className="text-sm mb-2 block">Lead Source</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {leadSources.map((source) => (
+                        <label key={source.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={filters.leadSourceIds.includes(source.id)}
+                            onCheckedChange={() => toggleLeadSource(source.id)}
+                          />
+                          {source.name}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CollapsibleContent>
             </Collapsible>
 

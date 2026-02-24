@@ -33,6 +33,15 @@ type ClientFilterBarProps = {
   onChange: (filters: FilterState) => void;
 };
 
+export const DEFAULT_CLIENT_FILTERS: FilterState = {
+  search: "",
+  healthFilter: "all",
+  revenueRange: "all",
+  taskFilter: "all",
+  scanFilter: "all",
+  sortBy: "health-low",
+};
+
 export function ClientFilterBar({ filters, onChange }: ClientFilterBarProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 

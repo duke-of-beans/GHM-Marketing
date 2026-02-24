@@ -43,6 +43,7 @@ import {
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { voice, pick } from "@/lib/voice";
+import { useModifierKey } from "@/hooks/use-modifier-key";
 
 // ─── Types (duplicated from TeamFeed to avoid cross-import issues) ────────────
 
@@ -152,6 +153,7 @@ function ComposeBox({
   const [priority, setPriority] = useState("normal");
   const [isPinned, setIsPinned] = useState(false);
   const [sending, setSending] = useState(false);
+  const { symbol: modSymbol } = useModifierKey();
 
   async function send() {
     if (!content.trim()) return;
@@ -263,7 +265,7 @@ function ComposeBox({
         </div>
       )}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-muted-foreground">⌘↵ to send</p>
+        <p className="text-[10px] text-muted-foreground">{modSymbol}↵ to send</p>
         <Button size="sm" onClick={send} disabled={sending || !content.trim()} className="h-7 text-xs">
           <Send className="h-3 w-3 mr-1" />
           {sending ? "Sending…" : "Send"}

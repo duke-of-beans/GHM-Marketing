@@ -21,7 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, Users, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type StudioClient = {
@@ -144,8 +144,31 @@ export function StudioClientPicker({ studioName, studioIcon, renderStudio }: Pro
         </div>
       ) : filtered.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            {search ? `No clients match "${search}"` : "No active clients found"}
+          <CardContent className="py-16 text-center space-y-3">
+            {search ? (
+              <>
+                <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-1" />
+                <p className="text-base font-medium">No clients match &ldquo;{search}&rdquo;</p>
+                <p className="text-sm text-muted-foreground">Try a different name, city, or industry.</p>
+                <button
+                  className="text-sm underline text-muted-foreground hover:text-foreground"
+                  onClick={() => setSearch("")}
+                >
+                  Clear search
+                </button>
+              </>
+            ) : (
+              <>
+                <Users className="h-10 w-10 mx-auto text-muted-foreground/30 mb-1" />
+                <p className="text-base font-medium">No active clients yet</p>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                  Clients are added when a lead is marked as <strong>Won</strong> in the Sales Pipeline.
+                </p>
+                <a href="/leads" className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
+                  Go to Sales Pipeline <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </>
+            )}
           </CardContent>
         </Card>
       ) : (

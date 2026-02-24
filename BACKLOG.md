@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 5 (Data Export + User Activity) shipped. UX-BUG-002/007 descriptions updated (search bar overhaul, cmdk abandoned). UX-BUG-008 added (Mac icon in Team Feed). Sprint 6 is next.
+**Last Updated:** February 24, 2026 — Sprint 5 shipped. FEAT-014 (PM platform import) added. Sprint 6 is next.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -123,7 +123,13 @@ Pick the top item in your current tier that unblocks the next thing.
 **Size:** ~1 session per sprint.
 **Files:** `src/components/content/BulkActions.tsx`, `src/app/(dashboard)/analytics/`
 
-### COVOS Admin Onboarding Wizard
+### FEAT-014: Project Management Platform Import (Productization)
+For onboarding new agency customers — import their existing tasks/projects from whatever PM tool they're replacing. Makes migration frictionless and removes the "we'd have to re-enter everything" objection.
+**Scope:** Adapters for the most common platforms: Basecamp (already have a crawler in scripts/), Asana, Monday.com, ClickUp, Trello. Import can be per-user (just my tasks) or global (whole workspace). Maps external tasks to `ClientTask` records — fields: title, description, assignee, due date, status. Unmatched clients get a staging area (import queue) where admin maps external project names to GHM clients before finalizing. Non-matching tasks can be imported as admin tasks or discarded.
+**Implementation path:** OAuth or API key per platform (stored in Oktyv vault), generic `TaskImportAdapter` interface, platform-specific adapters, import wizard UI in Settings (admin-only), preview/mapping step before commit.
+**Priority:** 🟠 SHOULD — productization blocker for cold agency onboarding.
+**Size:** ~1 session per adapter (Basecamp adapter is mostly done via existing crawler). Full wizard ~1 additional session.
+**Files:** `scripts/basecamp-crawl.ts` (existing, adapt), `src/lib/importers/` (new), `src/app/(dashboard)/settings/` (import wizard tab)
 **Context:** Multi-tenant infrastructure is live (covos.app, TENANT_REGISTRY). This is the self-service onboarding a second agency would use to get onto the platform without GHM support. Spec documented in PRODUCTIZING_BACKLOG.md (commit c2a6daa).
 **Scope:** Guided in-product wizard — API config, vendor selection, contractor/vendor setup, env var checklist (live UI showing which env vars are set/missing), role/permission briefing.
 **Size:** ~2 sessions.
