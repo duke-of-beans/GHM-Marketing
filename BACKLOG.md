@@ -1,5 +1,6 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 7 shipped. Added UX-AUDIT-001–009, FEAT-015–020. Cleaned stale stubs (Save Searches shipped, Brochure PPC shipped, Audit Paid Search partially shipped).
+**Last Updated:** February 24, 2026 — Sprint 11 shipped. Added BUG-010–011, UX-AUDIT-012–015 from session review.
+
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -127,6 +128,17 @@ The dashboard has multiple user archetypes with different emotional triggers and
 
 ## 🔴 MUST — Active Blockers
 
+### BUG-010: Admin Onboarding — Logo Upload 500 Error
+**Observed:** `api/settings/branding` returns HTTP 500 when attempting to upload a logo during the admin setup wizard. Also flagged: `<meta name="apple-mobile-web-app-capable">` deprecation warning (low priority, cosmetic).
+**Root cause (investigate):** Likely a Vercel Blob config issue, missing env var in the branding API route, or a permission/auth guard mismatch between the wizard context and the settings API. The wizard may be calling the route before the session is fully hydrated as admin.
+**Fix:** Debug `/api/settings/branding` POST — check Blob token presence, auth guard, and any schema mismatch. Add graceful error fallback in the wizard UI so a failed upload doesn't block completion. Fix the apple-mobile-web-app-capable meta tag in `src/app/layout.tsx`.
+**Size:** ~1 hr. **Priority:** 🔴 MUST — blocks admin first-run flow.
+
+### BUG-011: Admin Onboarding Wizard — Steps Not Skippable, No Re-entry Path
+**Observed:** The wizard has no skip mechanism. If the admin doesn't have their branding assets, logo, or company details on hand during first login, they're stuck or forced to enter placeholder data.
+**Fix:** Add a "Skip for now" link to each wizard step (except the final confirmation). On wizard exit (skip or early close), show a brief message: "You can complete your setup anytime in Settings → Branding." Stamp `adminOnboardingCompletedAt` only on explicit "Finish" — skipped admins should be able to re-enter the wizard from Settings. Add a "Resume Setup" entry point in Settings or the dashboard header (visible until wizard is formally completed).
+**Size:** ~1–2 hrs. **Priority:** 🔴 MUST — any admin who isn't David will hit this immediately.
+
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
 **Action:** Ops decision, no code. ~30 min once gate is cleared.
@@ -138,6 +150,36 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 ---
 
 ## 🟠 SHOULD — Productization & Growth
+
+### UX-AUDIT-012: Branding System — Expanded Color Options + Reset/Delete
+**Context:** The current branding tab exposes a single brand color field. Three color roles are needed for a real brand system: Primary (CTAs, active states), Secondary (supporting UI), Accent (highlights, badges). Each is optional — admin can use one, two, or all three. When a field is blank, the system falls back to the shadcn/Tailwind default for that role.
+**Scope:**
+- Schema: extend `GlobalSettings` with `brandColorPrimary`, `brandColorSecondary`, `brandColorAccent` (nullable strings). Drop or deprecate the single `brandColor` field if it exists.
+- `BrandingTab` UI: three color pickers, each labeled with its role and a plain-English description of where it's applied. Optional indicator next to each ("not set — using default").
+- "Reset to defaults" button that clears all three color fields and reverts to the shadcn/Tailwind token values.
+- "Delete logo" already exists per Sprint 9. Confirm it still works post-500 fix (BUG-010).
+- CSS custom property injection: when colors are set, write them as CSS variables at the root level so all themed components pick them up without per-component changes.
+**Size:** ~2 hrs. **Priority:** 🟠 SHOULD. **Depends on:** BUG-010 fix first.
+
+### UX-AUDIT-013: Dialog / Modal Global Style Audit
+**Observed:** The CSV import dialog and likely other modals use default shadcn Dialog styles that feel dated or inconsistent with the overall dashboard aesthetic.
+**Scope:** Global pass across all Dialog/Sheet/AlertDialog usage. Standardize: consistent header treatment (title + optional description, always), consistent footer (primary action right-aligned, cancel/dismiss left or ghost), consistent padding/spacing, consistent close button placement, consistent backdrop. Consider a thin accent border at the top of modal headers using the brand primary color. Ensure dark mode renders correctly for all modals (UX-AUDIT-005 overlap).
+**Files to audit:** Search `src/` for `<Dialog`, `<Sheet`, `<AlertDialog`. Count expected: ~15–20 instances across settings, leads, clients, content, payments, vault, onboarding.
+**Size:** ~1–2 hrs (design pass) + ~1 hr (implementation). **Priority:** 🟠 SHOULD — visible to sales reps on every import/export/action flow.
+
+### UX-AUDIT-014: Pipeline Enrich Button — Intent-Aware Enrichment
+**Observed:** The "Enrich" button in the Sales Pipeline defaults to enriching up to 50 leads from the visible filtered set — no selection UI, no context about which leads should or shouldn't be enriched. Enriching "available" (cold, untouched) leads wastes API credits on leads that haven't been qualified for outreach.
+**Scope:**
+- Remove the flat "Enrich (50)" button from the pipeline header.
+- Replace with two access points: (1) a per-lead "Enrich" action in the lead detail sheet (for single targeted enrichment), and (2) a "Enrich selected" option inside the existing Bulk Actions dropdown — only activates when leads are selected in the kanban.
+- Add a warning when bulk enrichment is triggered on leads in "available" status: "You're about to enrich leads that haven't been contacted yet. Enrichment is most valuable for leads in Scheduled or later stages. Continue?" Dismissible with a "Don't show again" option.
+- The existing `handleBatchEnrich` logic (skip-if-fresh + force-re-enrich) stays intact — just rerouted through these new entry points.
+**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD — affects API cost hygiene and rep workflow clarity.
+
+### UX-AUDIT-015: Static Empty States — Mark as Shipped, Consolidate
+**Note:** "Static Empty States" was listed as a backlog item (see WOULD section). Sprint 11 shipped context-aware empty states for Leads, Portfolio, and Discovery. The remaining scope is Content Studio empty states — not yet addressed.
+**Remaining scope:** Content Studio shows generic "no content" when no briefs exist. Should distinguish: (a) no clients have Content Studio active, (b) Content Studio active but no briefs generated yet — prompt to generate first brief.
+**Size:** ~30 min. **Priority:** 🟡 WOULD — low effort, completes the Sprint 11 intent.
 
 ### UX-FEAT-001: Lead Gen Filter Bar — Presentation Overhaul
 The default visible state undersells the intelligence system. A new user sees a basic search bar, not a sophisticated lead scoring engine.
@@ -212,10 +254,6 @@ No formal audit has been run on the complete button-to-route-to-handler chain. S
 
 ### Pipeline Filter — Lead Source Filter
 Lead Source field (organic/referral/discovery/import) exists in DB, not surfaced in filter bar. **Scope:** Add to filter UI and `filteredLeads` memo. **Size:** ~1 hr.
-
-### Static Empty State Help Text
-Context-aware empty states in Leads, Clients, Content Studio — suggest next action with direct button. Pairs with tooltip audit (UX-AUDIT-001).
-**Size:** ~2–3 hrs.
 
 ---
 
