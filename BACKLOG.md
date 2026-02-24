@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 21 shipped. Removed BUG-012–016, UX-AUDIT-018/019, FEAT-030–032.
+**Last Updated:** February 24, 2026 — Added BUG-017–019, UX-AUDIT-020–022 from David's Feb 24 audit. Sprint 22 proposal added.
 
 **Owner:** David Kirsch
 
@@ -39,6 +39,7 @@ Foundation → out. Each sprint unblocks the next.
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
+| 22 | UX Polish + Settings IA | BUG-017 (login dark mode) + BUG-018 (Ctrl+K label) + BUG-019 (TeamFeed enter icon) + UX-AUDIT-020 (Settings IA audit) + UX-AUDIT-021 (tutorial global nav) | ~1 session | High visibility polish — all noticed in normal use. |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
@@ -65,6 +66,21 @@ Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audi
 
 ## 🔴 BUGS — Active Crashes & Broken Features
 
+### BUG-017: Login Screen — Dark Mode Bleed on Logout
+Logging out while in dark mode leaves the login page rendering with a dark background and dark panel styling. Login should always display in forced light mode — it's a marketing/branding surface, not a UI preference surface, and dark mode on the login page looks broken/unintentional.
+**Fix:** Add `className="light"` (or equivalent forced-light wrapper) to the login page root element, bypassing the global theme provider. The Tailwind `dark:` classes should not apply here regardless of system or user preference.
+**Size:** ~30 min. **Priority:** 🔴 Must fix — visible to every user on every logout.
+
+### BUG-018: Search Bar Keyboard Shortcut — "CtrlK" Missing "+" Separator
+The search bar trigger button displays `CtrlK` as a single string instead of `Ctrl+K`. The modifier key and the letter need a `+` separator to be legible and match platform conventions.
+**Fix:** Find where the shortcut label is rendered in `AISearchBar.tsx` (or the `useModifierKey` hook output). Ensure the format is `Ctrl+K` / `⌘K` — the Mac variant already uses the symbol convention correctly; Windows just needs the `+` inserted.
+**Size:** ~15 min. **Priority:** 🔴 Must fix — looks like a bug to every Windows user.
+
+### BUG-019: TeamFeed Compose Box — Enter Icon Too Small
+The `Ctrl[↵]` shortcut indicator in the TeamFeed compose box renders the enter/return icon at a very small size, making it hard to read and looking visually broken next to the `Ctrl` text.
+**Fix:** Find the enter icon in `TeamFeed.tsx` / `TeamFeedSidebar.tsx` compose area shortcut hint. Increase the icon size (likely a Lucide `CornerDownLeft` or similar) to match the text cap-height — probably `h-3.5 w-3.5` or `h-4 w-4`. Ensure vertical alignment is `align-middle` or `items-center`.
+**Size:** ~15 min. **Priority:** 🔴 Must fix — visible every time someone opens TeamFeed.
+
 ---
 
 ## 🔴 MUST — Active Blockers
@@ -82,13 +98,21 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 
 ## 🔴 UX AUDITS — Must Fix Before External Eyes
 
-### UX-AUDIT-004: Live Demo Navigation Bug — Dashboard State Lost on Return
-**Status:** Partially fixed (Sprint 13 — RefreshOnFocus debounce). Dashboard layout flash on return navigation resolved. Original Bug 1 (Live Demo button routes to wrong page) confirmed not a bug — `/leads` is the correct destination since demo generation is a per-lead action. **Monitor** — if repro'd in the wild, revisit.
-
 ### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
 Navigating away from `/sales` and returning shows a different dashboard layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
 **Direction:** Audit which dashboard component mounts on `/` or `/sales` depending on role and navigation history. Confirm component is stable on return.
 **Size:** ~1–2 hrs. **Priority:** 🔴 Fix before external users — inconsistent first impression is a trust issue.
+
+### UX-AUDIT-020: Settings — Information Architecture Audit (Global)
+Settings > General currently mixes unrelated concerns: commission defaults and monthly goals sit alongside app-level general config. This is unintuitive — financial configuration belongs near financial workflows, and goal-setting belongs near performance/analytics surfaces.
+**Scope:** Audit every item currently in Settings > General and every other settings tab. Ask for each item: "Is this the most intuitive place for this?" Proposed relocations to evaluate: (1) **Commission Defaults** → move to Settings > Team or a new Settings > Compensation tab, co-located with position config and payment settings where managers already think about money. (2) **Monthly Goals** → move to the Analytics page as a configuration panel, or to a Goals tab in Settings that groups all performance targets together. (3) After relocations, assess whether Settings > General still needs to exist or can be renamed to something more accurate (e.g., "Workspace" or "Platform").
+**Output:** Concrete list of moves with before/after tab mapping. Implement the moves. No data model changes expected — this is purely UI reorganization.
+**Size:** ~1–1.5 hrs. **Priority:** 🔴 Must fix before external users — Settings is the first place a new admin explores.
+
+### UX-AUDIT-021: Tutorial System — Global Navigation Awareness
+The "Restart Tutorial" button currently only works on the dashboard. On any other page it either does nothing, re-triggers the dashboard tour out of context, or silently fails. Tutorials should either (a) navigate the user to the correct page before starting the tour, or (b) only show the restart button for the current page's tour if one exists.
+**Scope:** Audit the tutorial restart mechanism. Two acceptable fix paths: **Path A (simpler)** — each page's restart button triggers `router.push('/relevant-page')` then fires the tour after navigation settles (use a short delay or `useEffect` on mount). **Path B (cleaner)** — the global restart control only shows the option for the current page's tour; a secondary "Tour this page" button appears on pages that have a tutorial; the dashboard restart becomes page-specific. Either way, a user clicking restart on `/clients` should get the clients tour, not be silently ignored or dumped into a mismatched tour.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD — actively confusing to any user who tries it.
 
 ---
 
