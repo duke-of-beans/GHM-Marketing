@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 6 (UX + Pipeline Filters) in progress.
+**Last Updated:** February 24, 2026 — Sprint 6 (UX + Pipeline Filters + Keyboard Shortcuts) shipped.
 
 ---
 
@@ -22,7 +22,7 @@ When you ship something:
 | Feb 24, 2026 | **UX-BUG-008 — Team Feed modifier key**: `ComposeMessage` (TeamFeed.tsx) and `ComposeBox` (TeamFeedSidebar.tsx) now use `useModifierKey` hook to show `⌘↵` on Mac and `Ctrl+↵` on Windows. |
 | Feb 24, 2026 | **Pipeline Filter Debt — Deal Value slider**: `dealValueMin/Max` filter (0–$50k) added to `AdvancedFilterState`, filter bar UI (range slider with live `$` labels), and `filteredLeads` memo in client.tsx. |
 | Feb 24, 2026 | **Pipeline Filter Debt — Days in Stage**: `daysInStageMin/Max` filter (0–365d) wired end-to-end. `statusChangedAt` now selected and serialized from server (fallback to `updatedAt` if null). Filter computes elapsed days at query time. |
-| Feb 24, 2026 | **Pipeline Filter Debt — Lead Source**: `GET /api/lead-sources` route created. `leadSourceIds` multi-select filter added to filter bar (renders when sources exist). `leadSourceId` added to `KanbanLead` type, server select, serialization, and filter memo. |
+| Feb 24, 2026 | **Keyboard Shortcuts**: `use-keyboard-shortcuts.ts` hook + `KeyboardShortcutsHelp` overlay component. Global `?` or `/` opens help panel. `G+D/L/C/T/R/S/P` navigation sequences. Wired into `DashboardLayoutClient`. Zero impact on existing shortcuts (Cmd+K search unchanged). |
 
 ---
 

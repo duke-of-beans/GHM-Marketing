@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 6 in progress. UX-BUG-007/008 done, pipeline filter debt done. Keyboard shortcuts remaining.
+**Last Updated:** February 24, 2026 — Sprint 6 shipped.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -24,7 +24,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~4~~ | ~~Intelligence Layer~~ | ~~Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories)~~ | ✅ SHIPPED | ~~Synthesizes all collected data. Turns dashboard into indispensable ops platform.~~ |
 | ~~UX~~ | ~~UX Bug Batch~~ | ~~BUG-001–007 + ARCH-001~~ | ✅ SHIPPED | ~~First-impression fixes: search bar, nav, Wave error, OS key hints, doc cleanup.~~ |
 | ~~5~~ | ~~Data Access + Admin Visibility~~ | ~~Data Export + User Activity/Session Stats~~ | ✅ SHIPPED | ~~External data requests + internal usage intelligence.~~ |
-| 6 | UX Completeness | ~~Static Empty States~~ · ~~Pipeline Filter UX debt~~ · ~~UX-BUG-007/008~~ · **Keyboard Shortcuts** (remaining) | 🔄 IN PROGRESS |ion | Closes gap between functional and polished. |
+| ~~6~~ | ~~UX Completeness~~ | ~~Static Empty States · Pipeline Filter UX debt · UX-BUG-007/008 · Keyboard Shortcuts~~ | ✅ SHIPPED |ion | Closes gap between functional and polished. |
 | 7 | Sales Enablement Polish | Audit PDF PPC + Brochure PPC + Save Searches | ~0.5 sessions | Completes ITEM-001 scope. Power-user filter layer. |
 | 8 | Content Power | Bulk Content Ops + Competitor Tracking Manual + Custom Report Builder | ~1 session | Makes content and competitive intelligence practical at scale. |
 | 9 | COVOS Self-Service | COVOS Admin Onboarding Wizard | ~2 sessions | Requires Sprint 1 security first. Unlocks white-label productization. |

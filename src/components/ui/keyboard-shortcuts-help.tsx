@@ -1,41 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useModifierKey } from "@/hooks/use-modifier-key";
-import { X, Keyboard } from "lucide-react";
-import { createPortal } from "react-dom";
 
 type ShortcutGroup = {
-  label: string;
-  shortcuts: { key: string; withMod?: boolean; description: string }[];
+  group: string;
+  shortcuts: { keys: string[]; description: string }[];
 };
 
-const SHORTCUT_GROUPS: ShortcutGroup[] = [
-  {
-    label: "Global",
-    shortcuts: [
-      { key: "K", withMod: true, description: "Open search" },
-      { key: "?", description: "Show keyboard shortcuts" },
-    ],
-  },
-  {
-    label: "Navigation",
-    shortcuts: [
-      { key: "G then D", description: "Go to Dashboard" },
-      { key: "G then L", description: "Go to Leads / Pipeline" },
-      { key: "G then C", description: "Go to Clients" },
-      { key: "G then T", description: "Go to Tasks" },
-      { key: "G then S", description: "Go to Settings" },
-    ],
-  },
-  {
-    label: "Lists & Filters",
-    shortcuts: [
-      { key: "F", description: "Focus search/filter bar" },
-      { key: "Escape", description: "Clear filter / close panel" },
-    ],
-  },
-];
+function buildShortcuts(mod: string): ShortcutGroup[] {
+  return [
+    {
+      group: "Global",
+      shortcuts: [
+        { keys: [`${mod}K`], description: "Open search" },
+        { keys: ["?", "/"], description: "Show this help" },
+        { keys: ["Esc"], description: "Close overlay / cancel" },
+      ],
+    },
+    {
+      group: "Navigation (G + key)",
+      shortcuts: [
+        { keys: ["G", "D"], description: "Go to Dashboard" },
+        { keys: ["G", "L"], description: "Go to Leads (Pipeline)" },
+        { keys: ["G", "C"], description: "Go to Clients" },
+        { keys: ["G", "T"], description: "Go to Tasks" },
+        { keys: ["G", "R"], description: "Go to Reports" },
+        { keys: ["G", "P"], description: "Go to Payments" },
+        { keys: ["G", "S"], description: "Go to Settings" },
+      ],
+    },
+    {
+      group: "Leads Page",
+      shortcuts: [
+        { keys: ["F"], description: "Focus filter / search bar" },
+        { keys: ["Esc"], description: "Clear active filters" },
+      ],
+    },
+  ];
+}
+
+function Kbd({ label }: { label: string }) {
+  return (
+    <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted px-1.5 py-0.5 text-[11px] font-mono text-foreground min-w-[1.6rem]">
+      {label}
+    </kbd>
+  );
+}
 
 interface Props {
   open: boolean;
@@ -43,25 +53,15 @@ interface Props {
 }
 
 export function KeyboardShortcutsHelp({ open, onClose }: Props) {
-  const [mounted, setMounted] = useState(false);
-  const { symbol: modSymbol } = useModifierKey();
+  const { symbol: mod } = useModifierKey();
 
-  useEffect(() => { setMounted(true); }, []);
+  if (!open) return null;
 
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const groups = buildShortcuts(mod);
 
-  if (!mounted || !open) return null;
-
-  return createPortal(
+  return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -69,31 +69,42 @@ export function KeyboardShortcutsHelp({ open, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Keyboard className="h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">Keyboard Shortcuts</span>
+        <div className="flex items-center justify-between px-5 py-4 border-b">
+          <div>
+            <h2 className="text-base font-semibold">Keyboard Shortcuts</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Press <Kbd label="?" /> or <Kbd label="/" /> to toggle this panel
+            </p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="h-4 w-4" />
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors text-lg leading-none"
+          >
+            ✕
           </button>
         </div>
 
         {/* Shortcut groups */}
-        <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto">
-          {SHORTCUT_GROUPS.map((group) => (
-            <div key={group.label}>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {group.label}
+        <div className="px-5 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+          {groups.map((group) => (
+            <div key={group.group}>
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                {group.group}
               </p>
               <div className="space-y-1.5">
-                {group.shortcuts.map((s) => (
-                  <div key={s.key} className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{s.description}</span>
-                    <kbd className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-muted text-xs font-mono">
-                      {s.withMod && <span>{modSymbol}</span>}
-                      {s.key}
-                    </kbd>
+                {group.shortcuts.map((s, i) => (
+                  <div key={i} className="flex items-center justify-between gap-4">
+                    <span className="text-sm text-foreground">{s.description}</span>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {s.keys.map((k, ki) => (
+                        <span key={ki} className="flex items-center gap-1">
+                          {ki > 0 && (
+                            <span className="text-muted-foreground text-xs">then</span>
+                          )}
+                          <Kbd label={k} />
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -101,11 +112,11 @@ export function KeyboardShortcutsHelp({ open, onClose }: Props) {
           ))}
         </div>
 
-        <div className="px-5 py-3 border-t border-border bg-muted/30 text-[10px] text-muted-foreground">
-          Press <kbd className="px-1 py-0.5 rounded border border-border bg-background font-mono">?</kbd> anywhere (outside inputs) to toggle this panel
+        {/* Footer */}
+        <div className="px-5 py-3 border-t bg-muted/30 text-xs text-muted-foreground">
+          Shortcuts are disabled while typing in inputs · <Kbd label="Esc" /> to close
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
