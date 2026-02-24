@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { format } from 'date-fns'
 import {
   Loader2, FileText, Share2, Hash, ExternalLink,
-  Pencil, Trash2, Clock, CheckSquare, Square, CheckCheck, Archive, X,
+  Pencil, Trash2, Clock, CheckCheck, Archive, X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -79,7 +79,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
   const toggleOne = (id: number) =>
     setSelected(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
 
