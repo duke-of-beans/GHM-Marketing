@@ -19,6 +19,7 @@ import {
   BarChart2, Settings, FolderOpen, MessageSquare, TrendingUp,
   Loader2,
 } from "lucide-react";
+import { useModifierKey } from "@/hooks/use-modifier-key";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,7 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
   const localTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+  const { symbol: modSymbol } = useModifierKey();
 
   // Global keyboard shortcut
   useEffect(() => {
@@ -178,28 +180,28 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
-  if (!open) {
-    return (
+  return (
+    <>
+      {/* Trigger button — hidden when modal is open to prevent double-bar effect */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/40 text-sm text-muted-foreground hover:bg-muted transition-colors"
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/40 text-sm text-muted-foreground hover:bg-muted transition-colors ${open ? "invisible" : ""}`}
         aria-label="Open search"
       >
         <Search className="h-3.5 w-3.5" />
         <span>Search</span>
         <kbd className="ml-2 hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
-          ⌘K
+          {modSymbol}K
         </kbd>
       </button>
-    );
-  }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
-      <div
-        className="w-full max-w-xl mx-4 rounded-xl border border-border bg-background shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* Modal overlay */}
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
+          <div
+            className="w-full max-w-xl mx-4 rounded-xl border border-border bg-background shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
         {/* Input row */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
           <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -306,7 +308,9 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
           )}
           {results?.source === "local_fallback" && <span>Local results only</span>}
         </div>
+        </div>
       </div>
-    </div>
+      )}
+    </>
   );
 }

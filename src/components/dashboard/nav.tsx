@@ -19,7 +19,7 @@
  * Dashboard link stays pinned above the groups (role-specific, not a group).
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -98,7 +98,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     id: "team",
-    label: "Team",
+    label: "Resources",
     defaultExpanded: false,
     links: [
       { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
@@ -161,6 +161,8 @@ function NavGroupSection({
     return readExpanded(group.id, group.defaultExpanded ?? false);
   });
 
+  const groupRef = useRef<HTMLDivElement>(null);
+
   // If the active route changes and lands in this group, auto-open
   useEffect(() => {
     if (hasActive && !open) {
@@ -175,10 +177,19 @@ function NavGroupSection({
     const next = !open;
     setOpen(next);
     writeExpanded(group.id, next);
+    // On expand, scroll the last item into view if group is near bottom of panel
+    if (next && groupRef.current) {
+      setTimeout(() => {
+        const links = groupRef.current?.querySelectorAll("a");
+        if (links && links.length > 0) {
+          links[links.length - 1].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }, 100); // wait for render
+    }
   }
 
   return (
-    <div>
+    <div ref={groupRef}>
       {/* Group header */}
       <button
         onClick={toggle}

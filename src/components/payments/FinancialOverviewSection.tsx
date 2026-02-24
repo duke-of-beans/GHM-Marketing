@@ -109,7 +109,11 @@ export function FinancialOverviewSection() {
       {waveError && (
         <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
-          Wave bank data unavailable — showing DB records only. ({waveError.slice(0, 120)})
+          <span>Live bank data unavailable. Showing payment records only.</span>
+          <Button size="sm" variant="ghost" className="ml-auto h-6 px-2 text-amber-600 hover:text-amber-700" onClick={load}>
+            <RefreshCw className="w-3 h-3 mr-1" />
+            Retry
+          </Button>
         </div>
       )}
 

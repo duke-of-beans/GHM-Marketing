@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 4 Intelligence Layer shipped.
+**Last Updated:** February 24, 2026 — Sprint 4 Intelligence Layer + UX Bug Batch shipped.
 
 ---
 
@@ -13,6 +13,18 @@ When you ship something:
 4. Then commit
 
 ---
+
+## UX Bug Batch (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24, 2026 | UX-BUG-001 — Confirmed fixed: search bar backdrop click already closed modal via overlay onClick handler |
+| Feb 24, 2026 | UX-BUG-002 + UX-BUG-007 — `AISearchBar.tsx`: trigger button now `invisible` (not unmounted) when modal open, eliminating double-bar effect. Modal renders conditionally via `{open && …}` with proper `<>` fragment wrapper |
+| Feb 24, 2026 | UX-BUG-003 — `FinancialOverviewSection.tsx`: Wave error banner now shows clean "Live bank data unavailable. Showing payment records only." with Retry button — raw error detail removed from UI |
+| Feb 24, 2026 | UX-BUG-004 — `nav.tsx`: `NavGroupSection` added `useRef` + `scrollIntoView({ behavior: "smooth", block: "nearest" })` on last link when group expands |
+| Feb 24, 2026 | UX-BUG-005 — `nav.tsx`: "Team" nav group renamed to "Resources" |
+| Feb 24, 2026 | UX-BUG-006 — `src/hooks/use-modifier-key.ts` created. `AISearchBar.tsx` applies `useModifierKey()` — shows `⌘K` on macOS, `CtrlK` on Windows/Linux |
+| Feb 24, 2026 | ARCH-001 — 19 stale root-level `.md` files moved to `docs/archive/`. 11 stale `docs/PHASE_*.md` + session summary files also archived. Root is now clean |
 
 ## Sprint 4 — Intelligence Layer (February 24, 2026)
 
