@@ -1,10 +1,10 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 13 complete. BUG-011 fixed (wizard skip links). BUG-010 root cause identified (Blob store — manual Vercel step needed). AUDIT-004 dashboard flash fixed (RefreshOnFocus debounce). One manual action pending: provision Vercel Blob store.
+**Last Updated:** February 24, 2026 — Sprint 13 fully closed. BUG-010 resolved (ghm-marketing-blob store provisioned on Vercel, token active in all environments). BUG-011 shipped (wizard skip links). AUDIT-004 fixed (RefreshOnFocus debounce). FEAT-022 added to backlog (Client Website Audit). 🔴 MUST queue is clear.
 
 ### SPRINT 13 — Bug Triage (February 24, 2026)
-- [x] **BUG-010 root cause identified** — `BLOB_READ_WRITE_TOKEN` missing from Vercel project (store never provisioned). Manual fix: Vercel dashboard → Storage → Create Blob store → `vercel env pull`. Code side: wizard now shows graceful amber fallback on upload failure instead of crashing. Partial data saves correctly. Admin can proceed to dashboard and add logo later from Settings → Branding.
+- [x] **BUG-010 FULLY RESOLVED** — Vercel Blob store (`ghm-marketing-blob`, IAD1, Public) created and connected to project. `BLOB_READ_WRITE_TOKEN` now active in all environments (Development, Preview, Production). Token pulled locally via `vercel env pull`. Logo upload is live. Graceful fallback code retained for future token expiry edge cases.
 - [x] **BUG-010 secondary fix** — `<meta name="apple-mobile-web-app-capable">` deprecation warning resolved. Added `mobile-web-app-capable` sibling in `src/app/layout.tsx`.
 - [x] **BUG-011 fixed** — Admin wizard steps 1 and 2 now have "Skip for now — finish in Settings → Branding" links. `handleSkip` saves partial branding data without stamping `adminOnboardingCompletedAt`. Done screen explains re-entry path (Settings → Branding).
 - [x] **UX-AUDIT-004 fixed** — Dashboard layout flash on return navigation. `RefreshOnFocus` now debounces: skips `router.refresh()` if focus fires within 2 seconds of a route change. Prevents master dashboard grid and sales dashboard from re-rendering on every back-navigation from `/leads`, `/clients`, etc.

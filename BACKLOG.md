@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 13 complete. BUG-011 fixed. BUG-010 root cause identified (Blob store not provisioned — manual Vercel step required). AUDIT-004 dashboard layout flash fixed (RefreshOnFocus debounce). Meta tag fixed.
+**Last Updated:** February 24, 2026 — Sprint 13 complete + BUG-010 fully resolved (Blob store provisioned, token active). BUG-011 shipped. AUDIT-004 fixed. FEAT-022 added (Client Website Audit).
 
 **Owner:** David Kirsch
 
@@ -128,25 +128,6 @@ The dashboard has multiple user archetypes with different emotional triggers and
 
 ## 🔴 MUST — Active Blockers
 
-### BUG-010: Admin Onboarding — Logo Upload 500 Error
-**Root cause identified:** `BLOB_READ_WRITE_TOKEN` is not set in Vercel project environment variables — the Blob store was never formally provisioned/linked. The token existed only as a manual `.env.local` entry, which was wiped by `vercel env pull` on Feb 24.
-
-**Manual step required (5 min):**
-1. Go to [vercel.com/davids-projects-b0509900/ghm-marketing](https://vercel.com/davids-projects-b0509900/ghm-marketing) → **Storage** tab
-2. Create a new **Blob store** (or link existing one if already exists in the team)
-3. Vercel will auto-inject `BLOB_READ_WRITE_TOKEN` into all environments + `.env.local` on next `vercel env pull`
-4. Run `npx vercel env pull .env.local` from `D:\Work\SEO-Services\ghm-dashboard` to pull the token locally
-5. Restart dev server — upload will work immediately
-
-**Code already done (Sprint 13):**
-- Graceful error fallback: upload failure no longer blocks wizard navigation. Shows amber notice pointing to Settings → Branding instead of crashing.
-- `<meta name="apple-mobile-web-app-capable">` deprecation warning fixed (added `mobile-web-app-capable` sibling tag in `layout.tsx`).
-
-**Size:** 5 min manual setup on Vercel dashboard. **Priority:** 🔴 MUST.
-
-### BUG-011: Admin Onboarding Wizard — Steps Not Skippable, No Re-entry Path
-**Status:** Fixed in Sprint 13. Steps 1 and 2 now have "Skip for now — finish in Settings → Branding" links. Done screen explains re-entry path. `handleSkip` saves partial data without marking `adminOnboardingCompletedAt`. **Remove from backlog next sync.**
-
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
 **Action:** Ops decision, no code. ~30 min once gate is cleared.
@@ -198,6 +179,18 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 **Note:** "Static Empty States" was listed as a backlog item (see WOULD section). Sprint 11 shipped context-aware empty states for Leads, Portfolio, and Discovery. The remaining scope is Content Studio empty states — not yet addressed.
 **Remaining scope:** Content Studio shows generic "no content" when no briefs exist. Should distinguish: (a) no clients have Content Studio active, (b) Content Studio active but no briefs generated yet — prompt to generate first brief.
 **Size:** ~30 min. **Priority:** 🟡 WOULD — low effort, completes the Sprint 11 intent.
+
+### FEAT-022: Client Website Audit — Review & Optimization Analysis
+**Context:** Clients often come with existing websites. Before GHM services can be positioned effectively, the team needs a fast, structured way to audit a client's current site (or any specified URL) for technical, SEO, UX, and performance issues — and generate a prioritized improvement list.
+**Scope:**
+- "Audit Website" button on the Client detail page (and optionally on the Lead detail sheet for prospect sites pre-close).
+- Input: pre-populated with the client's `websiteUrl` from their record, but editable so any URL can be analyzed.
+- Analysis dimensions: Page speed / Core Web Vitals (via PageSpeed Insights API), meta title/description presence and quality, heading structure (H1, H2 hierarchy), mobile responsiveness signal, SSL/HTTPS check, schema markup presence, broken link detection (surface-level), image alt tags, canonical tags, sitemap/robots.txt presence.
+- Output: structured report card rendered in the dashboard — score per dimension, prioritized issue list (Critical / Recommended / Optional), and a one-paragraph plain-English summary of the site's current state.
+- Export: "Download as PDF" button on the report — same branded PDF pipeline as the Prospect Audit.
+- History: store reports per client with timestamp so you can track improvement over time (before/after GHM engagement).
+**API dependency:** Google PageSpeed Insights API (free, requires API key in env). All other checks can be done server-side via fetch + HTML parsing (no external API needed).
+**Size:** ~2 sessions (API integration + report UI + PDF export). **Priority:** 🟠 SHOULD — high value for client onboarding and ongoing QBR conversations.
 
 ### UX-FEAT-001: Lead Gen Filter Bar — Presentation Overhaul
 The default visible state undersells the intelligence system. A new user sees a basic search bar, not a sophisticated lead scoring engine.
