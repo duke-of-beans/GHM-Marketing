@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 15 shipped. FEAT-025/026 + UX-FEAT-001 closed.
+**Last Updated:** February 25, 2026 — Sprint 15 shipped. Added BUG-020–024, UX-AUDIT-022, LEGAL-001.
 
 **Owner:** David Kirsch
 
@@ -34,6 +34,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~14~~ | ~~UX Polish Batch~~ | ~~UX-AUDIT-013 + UX-AUDIT-016/017 + UX-BUG-001/002~~ | ✅ SHIPPED | |
 | ~~15~~ | ~~Pipeline Intelligence~~ | ~~FEAT-025 (full Lead model filters) + FEAT-026 (filter UX defaults) + UX-FEAT-001 (filter bar presentation)~~ | ✅ SHIPPED | |
 | 16 | Admin Polish | FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + UX-AUDIT-015 (Content Studio empty states) | ~1 session | Small items, high finish quality. |
+| 16.5 | Critical Bug Batch | BUG-020 (forgot password) + BUG-022 (territories data sync) + BUG-023 (vault: preview/delete/message) + BUG-024 (service catalog edit prefill) | ~1 session | All broken UX before external eyes. Pull into 16 or run as its own sprint. |
 | 17 | Admin First-Run (Full) | FEAT-015 (onboarding wizard full scope) + FEAT-018 (logo swap) + UX-AUDIT-012 (3-color branding) | ~1 session | Enables real new-tenant activation. |
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
@@ -81,9 +82,39 @@ The `Ctrl[↵]` shortcut indicator in the TeamFeed compose box renders the enter
 **Fix:** Find the enter icon in `TeamFeed.tsx` / `TeamFeedSidebar.tsx` compose area shortcut hint. Increase the icon size (likely a Lucide `CornerDownLeft` or similar) to match the text cap-height — probably `h-3.5 w-3.5` or `h-4 w-4`. Ensure vertical alignment is `align-middle` or `items-center`.
 **Size:** ~15 min. **Priority:** 🔴 Must fix — visible every time someone opens TeamFeed.
 
----
+### BUG-020: Login Screen — No Forgot Password Flow
+There is no "Forgot password?" link or password reset flow on the login screen. Users who lose their password have no self-service recovery path — they're locked out with no recourse other than contacting an admin.
+**Fix:** Add "Forgot password?" link below the password field. Clicking it shows a single-field form (email) that sends a reset token via NextAuth's built-in email provider, or a custom `/api/auth/forgot-password` route that generates a signed token, stores it (expiry: 1 hr), and emails a reset link. Reset link leads to `/auth/reset-password?token=...` page where user sets new password. Token is invalidated on use or expiry.
+**Size:** ~2 hrs. **Priority:** 🔴 Must fix — any real deployment needs this.
 
-## 🔴 MUST — Active Blockers
+### BUG-021: Financial Overview — "Wave Accounts" Label Is Hardcoded
+The bank balance widget on the Financial Overview page displays "Wave accounts" as a fixed label beneath the dollar amount. If the admin connects a different accounting integration (QuickBooks, etc.), the label will be wrong.
+**Fix:** Audit the bank balance widget component. Replace the hardcoded "Wave accounts" string with a dynamic label derived from the active accounting integration setting (e.g., `integrationLabel ?? "Connected accounts"`). If the integration name is stored on `GlobalSettings` or the integration config, read it from there. Fallback: "Connected accounts."
+**Size:** ~30 min. **Priority:** 🟠 SHOULD — cosmetically wrong for any non-Wave tenant.
+
+### BUG-022: Sales Rep Territory Sheet — Does Not Reflect Actual Territories
+The sales rep territory showcase (the sheet/view that surfaces top territories up for grabs) is populated with placeholder or static data rather than pulling from the real territories defined in Territory Management.
+**Fix:** Audit the territory showcase component. Replace static/hardcoded territory data with a live query against the `Territory` model (same source as Territory Management settings). The showcase should reflect whatever territories the admin has actually configured — if five real territories exist, show those five. Order by whatever priority/ranking field exists; if none, add a `displayPriority` or `displayOrder` field to the Territory model (nullable int) so admin can control sequence.
+**Size:** ~1–1.5 hrs. **Priority:** 🔴 Must fix — showing reps fake territories actively undermines trust.
+
+### BUG-023: Document Vault — Three Broken Behaviors (Preview / Delete / Stale Message)
+Three related issues in the Shared Document Vault around file management:
+
+(1) **Stale-copy warning:** After uploading a contract and clicking to open it, the user sees "Saved copies may become outdated — always access contracts and agreements from the Shared folder" before being forced into a download. This message is confusing and shouldn't appear — vault files are already in the shared folder.
+
+(2) **No preview:** Clicking a file triggers a download rather than opening a preview. PDF and image files should render inline in a modal or side panel before offering a download option. At minimum, a new-tab preview (using the blob URL directly) is acceptable.
+
+(3) **No delete:** The three-dot menu only offers "Download." There is no way to remove a file once uploaded. Need a "Delete" option with a confirmation dialog (destructive action). Only the uploader and admins should be able to delete.
+
+**Fix:** (1) Remove or rewrite the stale-copy warning — it's misinformation in this context. (2) On file click, detect MIME type: PDFs and images open in a `<Dialog>` with an `<iframe>` or `<img>` and a secondary "Download" button. Other file types go straight to download as today. (3) Add "Delete" to the three-dot menu; on confirm, call `DELETE /api/vault/files/[id]`, remove from blob storage, remove DB record. Guard: admin or original uploader only.
+**Size:** ~2 hrs. **Priority:** 🔴 Must fix — a vault you can't manage is a liability, not a feature.
+
+### BUG-024: Service Catalog — Edit Form Opens with Blank Fields
+Clicking the Edit button on any existing service/product in the Service Catalog opens the edit form with all fields blank, rather than pre-populated with the service's current data. The user cannot see or modify what already exists — they would have to retype everything from scratch.
+**Fix:** Audit the edit handler in the Service Catalog component. The form should receive the selected service's current field values as initial state when opened. Identify whether the issue is (a) the form not receiving the `service` prop, (b) the `defaultValues` not being wired to the service object, or (c) the form resetting on open. Pass the full service record to the form on edit and set `defaultValues` accordingly.
+**Size:** ~1 hr. **Priority:** 🔴 Must fix — edit is completely broken.
+
+
 
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
@@ -98,7 +129,13 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 
 ## 🔴 UX AUDITS — Must Fix Before External Eyes
 
-### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
+### UX-AUDIT-022: Settings — Team / Positions / Permissions IA Consolidation
+These three Settings tabs are conceptually related (who's on the team, what roles they hold, what those roles can do) but currently exist as three separate flat tabs with no visual relationship to each other. The navigation between them is fragmented and the mental model isn't obvious to a new admin.
+**Direction:** Evaluate two paths: (A) **Merge into a single "Team & Permissions" tab** with internal sub-navigation (tabs or anchored sections): Team roster → Positions → Permissions matrix. (B) **Keep as separate tabs but group them visually** in the settings nav under a "People" or "Team" heading with clear hierarchy. Option A is preferred if the combined content fits without feeling cramped. Either way: eliminate any duplicate controls currently spread across tabs, ensure the permissions matrix is reachable from a user's row in the team roster (one click), and make "positions" feel like the bridge between the two (a position defines a role; a role has permissions; a user has a position).
+**Output:** Concrete IA proposal documented first, then implementation. No data model changes expected.
+**Size:** ~1.5 hrs (audit + design) + ~1.5 hrs (implementation). **Priority:** 🟠 SHOULD — confusing for any new admin setting up the team.
+
+
 Navigating away from `/sales` and returning shows a different dashboard layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
 **Direction:** Audit which dashboard component mounts on `/` or `/sales` depending on role and navigation history. Confirm component is stable on return.
 **Size:** ~1–2 hrs. **Priority:** 🔴 Fix before external users — inconsistent first impression is a trust issue.
@@ -264,6 +301,16 @@ No formal audit of the complete button-to-route-to-handler chain. Stale routes, 
 ### FEAT-021 subset: Pipeline Filter — Lead Source Filter
 `leadSourceId` field (organic/referral/discovery/import) exists in DB, not surfaced in filter bar. Covered by FEAT-025 full scope — can be pulled forward as a standalone quick win if needed.
 **Size:** ~1 hr standalone.
+
+---
+
+## 📋 LEGAL / CONTRACTUAL — No Code
+
+### LEGAL-001: Partner Agreement — Restrict Dashboard Use to GHM Business Only
+The partner agreement currently does not explicitly prohibit reps from using the GHM dashboard for non-GHM clients or personal purposes. This needs to be locked down.
+**Required language (to be drafted):** The dashboard is licensed for use solely in connection with the partner's sales and client management activities conducted on behalf of GHM. Use of the dashboard — including access to client data, marketing tools, pipeline intelligence, or any platform features — for the partner's own clients, third-party clients, or any purpose unrelated to GHM business is strictly prohibited and constitutes a material breach of this agreement.
+**Action:** Update `SERVICE_AGREEMENT.md` (or equivalent contract template) with the above restriction. Have legal review if/when this goes to real external partners. No code changes required unless the agreement is auto-generated from a template in the platform.
+**Size:** ~30 min (draft language). **Priority:** 🔴 Must resolve before any external partner onboarding.
 
 ---
 
