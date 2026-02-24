@@ -62,6 +62,14 @@ export interface AuditData {
   napScore: number | null;
   gaps: AuditGap[];
   repName: string | null;
+  ppc: {
+    connected: boolean;
+    monthlySpend: number | null; // null = no connection or no data
+    estimatedMissedClicks: number | null; // industry CPC × search volume proxy
+    recommendedBudget: string;
+    campaignTypes: string[];
+    expectedCtr: string;
+  };
 }
 
 export interface AuditGap {
@@ -109,12 +117,28 @@ export async function generateAuditData(
           fetchedAt: true,
         },
       },
+      clientProfile: {
+        select: {
+          googleAdsConnection: { select: { id: true, isActive: true } },
+        },
+      },
     },
   });
 
   if (!lead) throw new Error(`Lead ${leadId} not found`);
 
-  const ci = lead.competitiveIntel;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const leadAny = lead as any;
+  const ci = leadAny.competitiveIntel as {
+    domainRating: number | null;
+    backlinks: number | null;
+    reviewCount: number | null;
+    reviewAvg: unknown;
+    siteSpeedMobile: number | null;
+    siteSpeedDesktop: number | null;
+    competitors: unknown;
+    fetchedAt: Date | null;
+  } | null;
   const competitorsData = ci?.competitors as Record<string, unknown> | null;
 
   const intelAgeDays = ci?.fetchedAt
@@ -199,6 +223,24 @@ export async function generateAuditData(
   // ── Build gap analysis ──
   const gaps = buildGaps(intel, rankings, napResults, napScore);
 
+  // ── Build PPC data ──
+  const adsConnection = (leadAny.clientProfile?.googleAdsConnection ?? null) as { id: number; isActive: boolean } | null;
+  const adsConnected = !!adsConnection && adsConnection.isActive === true;
+
+  // Estimate missed clicks: search volume proxy (review count × 10, min 100) × 2% CTR
+  const reviewProxy = intel.reviewCount ?? 20;
+  const searchVolumeProxy = Math.max(100, reviewProxy * 10);
+  const estimatedMissedClicks = adsConnected ? null : Math.round(searchVolumeProxy * 0.02);
+
+  const ppc = {
+    connected: adsConnected,
+    monthlySpend: null as number | null,
+    estimatedMissedClicks,
+    recommendedBudget: "$500–$1,500/mo",
+    campaignTypes: ["Local Services Ads", "Google Search Ads", "Remarketing"],
+    expectedCtr: "4–8%",
+  };
+
   return {
     generatedAt: new Date(),
     lead: {
@@ -219,6 +261,7 @@ export async function generateAuditData(
     napScore,
     gaps,
     repName: repName ?? null,
+    ppc,
   };
 }
 

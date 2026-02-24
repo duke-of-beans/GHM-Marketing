@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronUp, X, HelpCircle, Filter } from "lucide-react";
+import { ChevronDown, ChevronUp, X, HelpCircle, Filter, BookmarkPlus, Bookmark } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -26,10 +26,18 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Territory = { id: number; name: string };
 type Rep = { id: number; name: string };
 type LeadSource = { id: number; name: string; type: string | null };
+type SavedSearch = { id: number; name: string; filtersJson: AdvancedFilterState; createdAt: string };
 
 export type AdvancedFilterState = {
   // Basic
@@ -164,30 +172,87 @@ export function AdvancedLeadFilterBar({
   const [showQuality, setShowQuality] = useState(false);
   const [showMarket, setShowMarket] = useState(false);
 
+  // Saved searches state
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
+  const [activeSavedSearch, setActiveSavedSearch] = useState<string | null>(null);
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [saveInputValue, setSaveInputValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const saveInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (showTerritoryFilter) {
       fetch("/api/territories")
         .then((r) => r.json())
-        .then((d) => {
-          if (d.success) setTerritories(d.data);
-        })
+        .then((d) => { if (d.success) setTerritories(d.data); })
         .catch(() => {});
     }
 
     fetch("/api/users")
       .then((r) => r.json())
-      .then((d) => {
-        if (d.success) setReps(d.data);
-      })
+      .then((d) => { if (d.success) setReps(d.data); })
       .catch(() => {});
 
     fetch("/api/lead-sources")
       .then((r) => r.json())
-      .then((d) => {
-        if (d.success) setLeadSources(d.data);
-      })
+      .then((d) => { if (d.success) setLeadSources(d.data); })
+      .catch(() => {});
+
+    fetch("/api/saved-searches")
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSavedSearches(d.data); })
       .catch(() => {});
   }, [showTerritoryFilter]);
+
+  useEffect(() => {
+    if (showSaveInput) {
+      setTimeout(() => saveInputRef.current?.focus(), 50);
+    }
+  }, [showSaveInput]);
+
+  const handleSaveSearch = async () => {
+    if (!saveInputValue.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/saved-searches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: saveInputValue.trim(), filters }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSavedSearches((prev) => [data.data, ...prev]);
+        setActiveSavedSearch(data.data.name);
+        setShowSaveInput(false);
+        setSaveInputValue("");
+      }
+    } catch {
+      // silently fail — filters still work
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLoadSearch = (search: SavedSearch) => {
+    onChange(search.filtersJson);
+    setActiveSavedSearch(search.name);
+  };
+
+  const handleDeleteSearch = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await fetch(`/api/saved-searches/${id}`, { method: "DELETE" });
+      setSavedSearches((prev) => prev.filter((s) => s.id !== id));
+      setSavedSearches((prev) => {
+        const remaining = prev.filter((s) => s.id !== id);
+        const active = remaining.find((s) => s.name === activeSavedSearch);
+        if (!active) setActiveSavedSearch(null);
+        return remaining;
+      });
+    } catch {
+      // silently fail
+    }
+  };
 
   const toggleStatus = (status: string) => {
     const newStatuses = filters.statuses.includes(status)
@@ -219,6 +284,7 @@ export function AdvancedLeadFilterBar({
 
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
+    setActiveSavedSearch(null);
   };
 
   const hasActiveFilters = JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS);
@@ -344,12 +410,89 @@ export function AdvancedLeadFilterBar({
           >
             <Filter className="h-4 w-4 mr-1" />
             {showAdvanced ? "Less" : "More"}
-            {activeFilterCount > 0 && (
+            {hasActiveFilters && !activeSavedSearch && (
               <Badge variant="secondary" className="ml-2 px-1.5 py-0 h-5">
                 {activeFilterCount}
               </Badge>
             )}
+            {activeSavedSearch && (
+              <Badge variant="default" className="ml-2 px-1.5 py-0 h-5 max-w-[120px] truncate">
+                {activeSavedSearch}
+              </Badge>
+            )}
           </Button>
+
+          {/* Saved searches dropdown */}
+          {savedSearches.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 px-2">
+                  <Bookmark className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {savedSearches.map((s) => (
+                  <DropdownMenuItem
+                    key={s.id}
+                    className="flex items-center justify-between cursor-pointer"
+                    onSelect={() => handleLoadSearch(s)}
+                  >
+                    <span className="truncate">{s.name}</span>
+                    <button
+                      className="ml-2 opacity-40 hover:opacity-100 text-destructive"
+                      onClick={(e) => handleDeleteSearch(s.id, e)}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-muted-foreground text-xs"
+                  onSelect={() => setShowSaveInput(true)}
+                >
+                  <BookmarkPlus className="h-3.5 w-3.5 mr-1.5" />
+                  Save current filters
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {/* Save button (shown when no saved searches yet, or as primary CTA) */}
+          {hasActiveFilters && !showSaveInput && savedSearches.length === 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 px-2"
+              onClick={() => setShowSaveInput(true)}
+            >
+              <BookmarkPlus className="h-4 w-4 mr-1" />
+              Save
+            </Button>
+          )}
+
+          {/* Inline save input */}
+          {showSaveInput && (
+            <div className="flex items-center gap-1.5">
+              <Input
+                ref={saveInputRef}
+                placeholder="Name this filter..."
+                value={saveInputValue}
+                onChange={(e) => setSaveInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveSearch();
+                  if (e.key === "Escape") { setShowSaveInput(false); setSaveInputValue(""); }
+                }}
+                className="h-9 w-44"
+              />
+              <Button size="sm" className="h-9" onClick={handleSaveSearch} disabled={saving || !saveInputValue.trim()}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+              <Button variant="ghost" size="sm" className="h-9 px-2" onClick={() => { setShowSaveInput(false); setSaveInputValue(""); }}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
           {hasActiveFilters && (
             <Button

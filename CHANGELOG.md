@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 6 (UX + Pipeline Filters + Keyboard Shortcuts) shipped.
+**Last Updated:** February 24, 2026 — Sprint 7 (Save Searches + Audit PPC Section + Brochure PPC) shipped.
 
 ---
 
@@ -11,6 +11,16 @@ When you ship something:
 2. Delete the item from BACKLOG.md
 3. Update STATUS.md "Last Updated" line
 4. Then commit
+
+---
+
+## Sprint 7 — Sales Enablement Polish (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24, 2026 | **7A — Save Searches**: `SavedSearch` Prisma model + migration. `GET/POST /api/saved-searches` + `DELETE /api/saved-searches/[id]`. Save button + inline name input + "Saved Searches" dropdown in `lead-filter-bar-advanced.tsx`. Active saved search shows as named badge. |
+| Feb 24, 2026 | **7B — Audit PDF PPC Section**: `AuditData.ppc` field added. `generator.ts` computes PPC block from `GoogleAdsConnection.isActive` + search volume proxy. Full PPC section in `template.ts`: account status, missed clicks, budget recommendation, campaign types, CTR, CTA. |
+| Feb 24, 2026 | **7C — Brochure PPC Version**: Full PPC section added to `brochure/page.tsx`: value prop, services list (LSAs + Search Ads + management + reporting), pricing/engagement reference, inline SVG funnel visual, matching brand style. |
 
 ---
 

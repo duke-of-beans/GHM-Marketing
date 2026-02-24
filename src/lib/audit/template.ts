@@ -1,7 +1,7 @@
 ﻿import type { AuditData, AuditGap } from "./generator";
 
 export function generateAuditHTML(data: AuditData): string {
-  const { lead, intel, rankings, nap, gaps, healthScore, generatedAt, repName } = data;
+  const { lead, intel, rankings, nap, gaps, healthScore, generatedAt, repName, ppc } = data;
 
   const fmt = (d: Date) =>
     d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -186,6 +186,45 @@ export function generateAuditHTML(data: AuditData): string {
       ? gaps.map(gapCard).join("")
       : `<p style="color:#10b981;font-weight:600;">No significant issues found — strong local presence detected.</p>`
     }
+  </div>
+
+  <!-- PAID SEARCH / PPC SECTION -->
+  <div class="section" style="background:#fafafa;">
+    <div class="section-title">💰 Paid Search Opportunity</div>
+    ${ppc.connected
+      ? `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+           <span style="background:#d1fae5;color:#065f46;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">✓ Google Ads Connected</span>
+           ${ppc.monthlySpend !== null ? `<span style="font-size:13px;color:#374151;">Current monthly spend: <strong>$${ppc.monthlySpend.toLocaleString()}</strong></span>` : ""}
+         </div>`
+      : `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+           <span style="background:#fee2e2;color:#991b1b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">No Active Campaigns Detected</span>
+           ${ppc.estimatedMissedClicks !== null ? `<span style="font-size:13px;color:#6b7280;">Estimated missed clicks/mo: <strong style="color:#ef4444;">${ppc.estimatedMissedClicks.toLocaleString()}</strong></span>` : ""}
+         </div>`
+    }
+    <p style="font-size:13px;color:#374151;line-height:1.7;margin-bottom:20px;">
+      Organic SEO captures intent at the research stage — but <strong>paid search captures buyers who are ready to act right now</strong>. 
+      A combined organic + paid strategy means ${lead.businessName} appears at the top of search results <em>and</em> in the ads section, 
+      dramatically increasing total search visibility and call volume. GHM manages paid campaigns at no additional management fee as part of the $2,400/mo retainer.
+    </p>
+    <div class="kpi-grid-3" style="margin-bottom:0;">
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
+        <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;">Campaign Types</div>
+        ${ppc.campaignTypes.map((t) => `<div style="font-size:12px;color:#374151;line-height:2;">→ ${t}</div>`).join("")}
+      </div>
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Recommended Budget</div>
+        <div style="font-size:22px;font-weight:800;color:#111827;">${ppc.recommendedBudget}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">ad spend (excl. management)</div>
+      </div>
+      <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center;">
+        <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Expected CTR</div>
+        <div style="font-size:22px;font-weight:800;color:#2563eb;">${ppc.expectedCtr}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">vs. ~2% organic avg</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;font-size:13px;color:#1e40af;">
+      <strong>Free PPC Audit Included:</strong> GHM will analyze your market's paid search landscape — keyword costs, competitor ad spend, and campaign structure — at no charge. Request your audit at the bottom of this report.
+    </div>
   </div>
 
   <!-- WHAT WE DO -->

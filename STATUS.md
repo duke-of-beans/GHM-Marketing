@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 6 shipped. UX-FEAT-001 + FEAT-014 added to backlog. Sprint 7 handoff written (SPRINT7_HANDOFF.md).
+**Last Updated:** February 24, 2026 — Sprint 7 complete. Save Searches (7A), Audit PDF PPC section (7B), Brochure PPC version (7C) shipped.
 
 ---
 
@@ -262,6 +262,15 @@ Makes the platform feel like a product.
 | S5 | Territory Map — initial definitions for first 4 reps | ✅ DONE — same as D5, `src/app/(onboarding)/territory-map/page.tsx` |
 | S6 | Sales Agreement Template — contractor terms | ✅ DONE — `D:\Work\SEO-Services\CLIENT_SERVICE_AGREEMENT.md` (complete 12-section agreement) |
 | S7 | Job Ad — draft and post | ✅ DONE — `D:\Work\SEO-Services\JOB_AD.md` (two versions: Indeed + LinkedIn, with posting notes) |
+
+### ✅ SPRINT 7 — Sales Enablement Polish (February 24, 2026)
+- [x] **7A — Save Searches (Pipeline)** — `SavedSearch` model added to schema, migrated. Three API routes (`GET/POST /api/saved-searches`, `DELETE /api/saved-searches/[id]`). UI in `lead-filter-bar-advanced.tsx`: Save button + inline name input + "Saved Searches" dropdown. Active saved search shows as named badge instead of "X active filters."
+- [x] **7B — Audit PDF: PPC / Google Ads Section** — `AuditData` extended with `ppc` field. `generator.ts` pulls `GoogleAdsConnection.isActive` via `clientProfile` relation. PPC section added to `template.ts`: Ads account status, missed clicks estimate, recommended budget, campaign types, CTR expectation, CTA.
+- [x] **7C — Brochure PDF: PPC Version** — Full PPC section added to `src/app/(onboarding)/brochure/page.tsx`: value prop, services list (LSAs + Search Ads + management + reporting), pricing reference (CLIENT_AGREEMENT.md §1.1 language), inline SVG funnel visual, matching brand style.
+- TypeScript: Zero Sprint 7 errors. Pre-existing errors in scripts/basecamp* are unrelated.
+
+**Files created:** `src/app/api/saved-searches/route.ts`, `src/app/api/saved-searches/[id]/route.ts`
+**Files modified:** `prisma/schema.prisma`, `src/components/leads/lead-filter-bar-advanced.tsx`, `src/lib/audit/generator.ts`, `src/lib/audit/template.ts`, `src/app/(onboarding)/brochure/page.tsx`
 
 ### Commission System Validation — ✅ COMPLETE (February 22, 2026)
 Validated via Apex North LLC test client. Cron generated residual ($200, Arian) + master_fee ($240, David). Approval flow confirmed. Cron rescheduled to 5th of month. Test client hard-deleted. See Sprint 1 + PAYMENTS-002/006 above.

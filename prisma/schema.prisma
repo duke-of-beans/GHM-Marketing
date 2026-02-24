@@ -96,6 +96,9 @@ model User {
   acknowledgedAlerts    AlertEvent[] @relation("AlertAcknowledger")
   notifications         NotificationEvent[]
 
+  // Saved searches (Sprint 7A)
+  savedSearches         SavedSearch[]
+
   // 2FA / TOTP (admin + master accounts only)
   // totpSecret is encrypted at rest — stored encrypted with server-side key
   totpEnabled           Boolean   @default(false) @map("totp_enabled")
@@ -2013,4 +2016,21 @@ model GbpSnapshot {
 
   @@index([clientId, scanDate(sort: Desc)])
   @@map("gbp_snapshots")
+}
+
+// ============================================================================
+// SAVED SEARCHES — Sprint 7A
+// ============================================================================
+
+model SavedSearch {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  name        String
+  filtersJson Json     @map("filters_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_searches")
 }

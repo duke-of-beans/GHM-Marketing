@@ -187,7 +187,116 @@ export default function BrochurePage() {
 
       <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 32px" }} />
 
-      {/* PRICING */}
+      {/* PPC / PAID SEARCH SECTION */}
+      <section style={{ padding: "48px 32px", maxWidth: 760, margin: "0 auto" }}>
+        <p
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: "#2563eb",
+            marginBottom: 8,
+          }}
+        >
+          Paid + Organic — The Full Stack
+        </p>
+        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>
+          SEO gets you there. Paid search keeps you there — and fills the gap while you climb.
+        </h2>
+        <p style={{ color: "#4b5563", lineHeight: 1.7, fontSize: 15, maxWidth: 620, marginBottom: 32 }}>
+          Organic rankings take time. Paid search starts working the day a campaign goes live.
+          GHM manages both under one roof — no separate ad agency, no double billing,
+          no coordination overhead. Your $2,400/mo retainer includes campaign management.
+          You own your ad accounts; we manage them.
+        </p>
+
+        {/* SVG funnel visual */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
+          <svg viewBox="0 0 480 180" width="100%" style={{ maxWidth: 480, height: "auto" }} aria-hidden="true">
+            {/* Funnel shape */}
+            <polygon points="40,20 440,20 360,90 120,90" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1.5" />
+            <polygon points="120,95 360,95 300,155 180,155" fill="#bfdbfe" stroke="#93c5fd" strokeWidth="1.5" />
+            {/* Labels */}
+            <text x="240" y="58" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e40af">Paid Search — Immediate Clicks</text>
+            <text x="240" y="73" textAnchor="middle" fontSize="11" fill="#3b82f6">Google Search Ads · Local Services Ads · Remarketing</text>
+            <text x="240" y="128" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1e3a5f">Organic SEO — Compounding Visibility</text>
+            <text x="240" y="143" textAnchor="middle" fontSize="11" fill="#2563eb">Local Pack · Satellite Sites · Authority Building</text>
+          </svg>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 14,
+          }}
+        >
+          {[
+            {
+              icon: "🎯",
+              title: "Local Services Ads",
+              body: "Google-verified listings that appear above all search results. Pay per lead, not per click. Ideal for service businesses.",
+            },
+            {
+              icon: "🔎",
+              title: "Google Search Ads",
+              body: "Keyword-targeted ads for high-intent searches. We write the copy, manage the bids, and optimize weekly.",
+            },
+            {
+              icon: "🔄",
+              title: "Remarketing",
+              body: "Re-engage visitors who saw your site but didn't call. Keep your business top of mind across the web.",
+            },
+            {
+              icon: "📋",
+              title: "Monthly Reporting",
+              body: "Impressions, clicks, calls, cost-per-lead, and conversion rate — every month, alongside your SEO report.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              style={{
+                background: "#f0f9ff",
+                border: "1px solid #bae6fd",
+                borderRadius: 10,
+                padding: "18px 16px",
+              }}
+            >
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{item.title}</div>
+              <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.6 }}>{item.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: 28,
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            borderRadius: 12,
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 16,
+          }}
+        >
+          <div style={{ fontSize: 28, flexShrink: 0 }}>💡</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, color: "#1e40af" }}>
+              What&apos;s included in your retainer
+            </div>
+            <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.7 }}>
+              PPC campaign setup, copywriting, bid management, landing page recommendations, and monthly reporting are included in your $2,400/mo retainer.
+              Ad spend (the budget you pay Google directly) is separate — we recommend starting at $500–$1,500/mo and scaling based on results.
+              You maintain full ownership of your Google Ads account.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 32px" }} />
       <section
         style={{
           padding: "48px 32px",
