@@ -18,8 +18,8 @@ When you ship something:
 
 | Date | Commit | Item |
 |------|--------|------|
-| 2026-02-23 | pending | Client Portal Activation — portalToken field added to ClientProfile schema (db push), three .disabled files renamed to live routes: portal/page.tsx, generate-portal-token/route.ts, send-portal-invite/route.ts |
-| 2026-02-23 | pending | Sprint 6 Reporting Pipeline — reportDeliveryDay + reportDeliveryEmails on ClientProfile, sentAt on ClientReport, sendReportEmail() in email lib, deliver-reports cron (daily, matches per-client day), reports/schedule/ API (GET+PATCH), ReportSchedulePanel UI component, vercel.json cron entry |
+| 2026-02-23 | be27179 | Client Portal Activation — portalToken field added to ClientProfile schema (db push), three .disabled files renamed to live routes: portal/page.tsx, generate-portal-token/route.ts, send-portal-invite/route.ts |
+| 2026-02-23 | be27179 | Sprint 6 Reporting Pipeline — reportDeliveryDay + reportDeliveryEmails on ClientProfile, sentAt on ClientReport, sendReportEmail() in email lib, deliver-reports cron (daily, matches per-client day), reports/schedule/ API (GET+PATCH), ReportSchedulePanel UI component, vercel.json cron entry |
 
 | Date | Commit | Item |
 |------|--------|------|
