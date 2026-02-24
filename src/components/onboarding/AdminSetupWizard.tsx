@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { CheckCircle2, ArrowRight, ArrowLeft, Upload, Trash2, Building2, Palette, Rocket } from "lucide-react";
+import { CheckCircle2, ArrowRight, ArrowLeft, Upload, Trash2, Building2, Palette, Rocket, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Branding = {
@@ -33,6 +33,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
   const [branding, setBranding] = useState<Branding>(initialBranding);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const update = (key: keyof Branding, value: string | null) =>
@@ -52,6 +53,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
 
   const handleLogoUpload = async (file: File) => {
     setUploading(true);
+    setUploadError(null);
     try {
       const fd = new FormData();
       fd.append("file", file);
@@ -61,7 +63,10 @@ export function AdminSetupWizard({ initialBranding }: Props) {
       update("logoUrl", data.url);
       toast.success("Logo uploaded");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(msg);
+      // Non-blocking — don't prevent wizard progression
+      toast.error(`Logo upload failed: ${msg}. You can add your logo later in Settings → Branding.`);
     } finally {
       setUploading(false);
     }
@@ -72,6 +77,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
     try {
       await fetch("/api/settings/branding", { method: "DELETE" });
       update("logoUrl", null);
+      setUploadError(null);
     } catch {
       toast.error("Failed to remove logo");
     } finally {
@@ -88,11 +94,23 @@ export function AdminSetupWizard({ initialBranding }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ complete: true }),
       });
-      setStep(3); // Done step
+      setStep(3);
     } catch {
       toast.error("Failed to save — please try again");
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Skip without marking complete — wizard re-entry via Settings → Branding
+  const handleSkip = async () => {
+    setSaving(true);
+    try {
+      // Save whatever partial data exists
+      await saveBranding();
+    } finally {
+      setSaving(false);
+      router.push("/master");
     }
   };
 
@@ -118,7 +136,6 @@ export function AdminSetupWizard({ initialBranding }: Props) {
           ))}
         </div>
 
-        {/* Card */}
         <div className="bg-card border rounded-2xl shadow-lg p-8 space-y-6">
 
           {/* ── Step 0: Welcome ── */}
@@ -130,7 +147,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
               <Button className="w-full mt-4" onClick={() => setStep(1)}>
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <button className="text-sm text-muted-foreground underline" onClick={handleFinish} disabled={saving}>
+              <button className="text-sm text-muted-foreground underline" onClick={handleSkip} disabled={saving}>
                 Skip setup and go to dashboard
               </button>
             </div>
@@ -146,16 +163,23 @@ export function AdminSetupWizard({ initialBranding }: Props) {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="companyName">Company Name</Label>
-                  <Input id="companyName" value={branding.companyName} placeholder="Acme Agency" onChange={(e) => update("companyName", e.target.value)} />
+                  <Input id="companyName" value={branding.companyName} placeholder="Acme Agency"
+                    onChange={(e) => update("companyName", e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tagline">Tagline <span className="text-muted-foreground text-xs">(optional)</span></Label>
-                  <Input id="tagline" value={branding.companyTagline} placeholder="Growing businesses online" onChange={(e) => update("companyTagline", e.target.value)} />
+                  <Input id="tagline" value={branding.companyTagline} placeholder="Growing businesses online"
+                    onChange={(e) => update("companyTagline", e.target.value)} />
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" onClick={() => setStep(0)}><ArrowLeft className="mr-2 h-4 w-4" />Back</Button>
                 <Button className="flex-1" onClick={() => setStep(2)}>Next <ArrowRight className="ml-2 h-4 w-4" /></Button>
+              </div>
+              <div className="text-center">
+                <button className="text-xs text-muted-foreground underline" onClick={handleSkip} disabled={saving}>
+                  Skip for now — finish in Settings → Branding
+                </button>
               </div>
             </div>
           )}
@@ -171,6 +195,18 @@ export function AdminSetupWizard({ initialBranding }: Props) {
                 {/* Logo */}
                 <div className="space-y-2">
                   <Label>Logo</Label>
+                  {/* Upload error notice — non-blocking */}
+                  {uploadError && (
+                    <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-sm text-amber-800 dark:text-amber-200">
+                      <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="font-medium">Logo upload unavailable</p>
+                        <p className="text-xs mt-0.5 text-amber-700 dark:text-amber-300">
+                          You can add your logo after setup in <strong>Settings → Branding</strong>.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {branding.logoUrl ? (
                     <div className="flex items-center gap-3 p-3 border rounded-lg">
                       <img src={branding.logoUrl} alt="Logo preview" className="h-10 max-w-32 object-contain" />
@@ -183,13 +219,16 @@ export function AdminSetupWizard({ initialBranding }: Props) {
                     </div>
                   ) : (
                     <div
-                      className="flex flex-col items-center gap-2 p-8 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
-                      onClick={() => fileRef.current?.click()}
+                      className={cn(
+                        "flex flex-col items-center gap-2 p-8 border-2 border-dashed rounded-lg transition-colors",
+                        uploadError ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-accent/50"
+                      )}
+                      onClick={() => !uploadError && fileRef.current?.click()}
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleLogoUpload(f); }}
+                      onDrop={(e) => { e.preventDefault(); if (!uploadError) { const f = e.dataTransfer.files[0]; if (f) handleLogoUpload(f); } }}
                     >
                       <Upload className="h-6 w-6 text-muted-foreground" />
-                      <p className="text-sm">{uploading ? "Uploading…" : "Click or drag to upload logo"}</p>
+                      <p className="text-sm">{uploading ? "Uploading…" : uploadError ? "Upload unavailable" : "Click or drag to upload logo"}</p>
                       <p className="text-xs text-muted-foreground">PNG, JPG, SVG, WebP · max 2 MB</p>
                     </div>
                   )}
@@ -212,6 +251,11 @@ export function AdminSetupWizard({ initialBranding }: Props) {
                   {saving ? "Saving…" : "Finish Setup"} <Rocket className="ml-2 h-4 w-4" />
                 </Button>
               </div>
+              <div className="text-center">
+                <button className="text-xs text-muted-foreground underline" onClick={handleSkip} disabled={saving}>
+                  Skip for now — finish in Settings → Branding
+                </button>
+              </div>
             </div>
           )}
 
@@ -220,12 +264,19 @@ export function AdminSetupWizard({ initialBranding }: Props) {
             <div className="space-y-4 text-center">
               <div className="text-5xl">🎉</div>
               <h2 className="text-2xl font-bold">You&apos;re all set!</h2>
-              <p className="text-muted-foreground">Your platform is configured and ready to use. You can update branding anytime in Settings → Branding.</p>
+              <p className="text-muted-foreground">
+                Your platform is configured and ready to use.
+              </p>
+              <div className="rounded-lg bg-muted/50 p-4 text-left text-sm space-y-1">
+                <p className="font-medium text-sm mb-2">Need to update anything later?</p>
+                <p className="text-muted-foreground text-xs">Go to <strong>Settings → Branding</strong> to update your logo, company name, and colors at any time.</p>
+              </div>
               <Button className="w-full mt-4" onClick={() => router.push("/master")}>
                 Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )}
+
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 12 complete. Added UX-AUDIT-016 (tooltip vs tour tip differentiation), UX-AUDIT-017 (bulk actions custom volume).
+**Last Updated:** February 24, 2026 — Sprint 13 complete. BUG-011 fixed. BUG-010 root cause identified (Blob store not provisioned — manual Vercel step required). AUDIT-004 dashboard layout flash fixed (RefreshOnFocus debounce). Meta tag fixed.
 
 **Owner:** David Kirsch
 
@@ -129,15 +129,23 @@ The dashboard has multiple user archetypes with different emotional triggers and
 ## 🔴 MUST — Active Blockers
 
 ### BUG-010: Admin Onboarding — Logo Upload 500 Error
-**Observed:** `api/settings/branding` returns HTTP 500 when attempting to upload a logo during the admin setup wizard. Also flagged: `<meta name="apple-mobile-web-app-capable">` deprecation warning (low priority, cosmetic).
-**Root cause (investigate):** Likely a Vercel Blob config issue, missing env var in the branding API route, or a permission/auth guard mismatch between the wizard context and the settings API. The wizard may be calling the route before the session is fully hydrated as admin.
-**Fix:** Debug `/api/settings/branding` POST — check Blob token presence, auth guard, and any schema mismatch. Add graceful error fallback in the wizard UI so a failed upload doesn't block completion. Fix the apple-mobile-web-app-capable meta tag in `src/app/layout.tsx`.
-**Size:** ~1 hr. **Priority:** 🔴 MUST — blocks admin first-run flow.
+**Root cause identified:** `BLOB_READ_WRITE_TOKEN` is not set in Vercel project environment variables — the Blob store was never formally provisioned/linked. The token existed only as a manual `.env.local` entry, which was wiped by `vercel env pull` on Feb 24.
+
+**Manual step required (5 min):**
+1. Go to [vercel.com/davids-projects-b0509900/ghm-marketing](https://vercel.com/davids-projects-b0509900/ghm-marketing) → **Storage** tab
+2. Create a new **Blob store** (or link existing one if already exists in the team)
+3. Vercel will auto-inject `BLOB_READ_WRITE_TOKEN` into all environments + `.env.local` on next `vercel env pull`
+4. Run `npx vercel env pull .env.local` from `D:\Work\SEO-Services\ghm-dashboard` to pull the token locally
+5. Restart dev server — upload will work immediately
+
+**Code already done (Sprint 13):**
+- Graceful error fallback: upload failure no longer blocks wizard navigation. Shows amber notice pointing to Settings → Branding instead of crashing.
+- `<meta name="apple-mobile-web-app-capable">` deprecation warning fixed (added `mobile-web-app-capable` sibling tag in `layout.tsx`).
+
+**Size:** 5 min manual setup on Vercel dashboard. **Priority:** 🔴 MUST.
 
 ### BUG-011: Admin Onboarding Wizard — Steps Not Skippable, No Re-entry Path
-**Observed:** The wizard has no skip mechanism. If the admin doesn't have their branding assets, logo, or company details on hand during first login, they're stuck or forced to enter placeholder data.
-**Fix:** Add a "Skip for now" link to each wizard step (except the final confirmation). On wizard exit (skip or early close), show a brief message: "You can complete your setup anytime in Settings → Branding." Stamp `adminOnboardingCompletedAt` only on explicit "Finish" — skipped admins should be able to re-enter the wizard from Settings. Add a "Resume Setup" entry point in Settings or the dashboard header (visible until wizard is formally completed).
-**Size:** ~1–2 hrs. **Priority:** 🔴 MUST — any admin who isn't David will hit this immediately.
+**Status:** Fixed in Sprint 13. Steps 1 and 2 now have "Skip for now — finish in Settings → Branding" links. Done screen explains re-entry path. `handleSkip` saves partial data without marking `adminOnboardingCompletedAt`. **Remove from backlog next sync.**
 
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
