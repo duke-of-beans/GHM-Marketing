@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 5 (Data Export + User Activity) complete. Sprint 6 (UX Completeness) is next.
+**Last Updated:** February 24, 2026 — Sprint 6 (UX + Pipeline Filters) in progress. UX-BUG-007/008 done, pipeline filter debt done (deal value, days in stage, lead source). Keyboard shortcuts and keyboard navigation remaining.
 
 ---
 
