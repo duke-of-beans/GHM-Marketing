@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 6 shipped.
+**Last Updated:** February 24, 2026 — Sprint 6 shipped. UX-FEAT-001 (filter bar presentation overhaul) + FEAT-014 (PM platform import) added. Sprint 7 handoff written.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -122,6 +122,15 @@ Pick the top item in your current tier that unblocks the next thing.
 **Sprint 8 — Advanced Analytics + Insights:** Trend analysis, MoM/YoY comparisons, churn risk scoring, client health trajectory charts.
 **Size:** ~1 session per sprint.
 **Files:** `src/components/content/BulkActions.tsx`, `src/app/(dashboard)/analytics/`
+
+### UX-FEAT-001: Lead Gen Filter Bar — Presentation Overhaul
+The current filter bar buries the most powerful capabilities of the lead intelligence system behind a "More" toggle that expands into a dense accordion. The default visible state (just a search box, territory, rep, sort, and "More" button) undersells the system — a new user or client evaluating the product sees a basic search bar, not a sophisticated lead intelligence engine.
+**Goal:** The filter bar should lead with the system's differentiation. Priority scores, tier badges, and market intelligence filters are what makes this tool unique — they should be prominent, not hidden behind two clicks.
+**Direction:** Rethink the layout hierarchy. Consider a persistent "intelligence strip" above or alongside the kanban that shows the active filter posture at a glance (e.g., "Tier A · Impact 70+ · Wealthy Suburb excluded"). The expand/collapse sections need a better visual language — not a generic accordion but something that signals "here is the system's power." The default open state should surface at minimum: Tier filter, Impact Score slider, and Close Likelihood — the three fields that most directly represent the scoring engine. Status chips should be visually prominent, not buried in a checkbox list inside a collapsed section.
+**Constraint:** Don't change the data model or filter logic — this is purely a presentation and hierarchy overhaul. The `AdvancedFilterState` type and `filteredLeads` memo stay untouched.
+**Priority:** 🟠 SHOULD — this is the first thing a prospective agency client sees when evaluating the platform. Weak presentation of the intelligence layer is a sales liability.
+**Size:** ~1 session.
+**Files:** `src/components/leads/lead-filter-bar-advanced.tsx`
 
 ### FEAT-014: Project Management Platform Import (Productization)
 For onboarding new agency customers — import their existing tasks/projects from whatever PM tool they're replacing. Makes migration frictionless and removes the "we'd have to re-enter everything" objection.
