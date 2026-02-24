@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Search, Plus, HelpCircle } from "lucide-react";
+import { CSVImportDialog } from "@/components/leads/csv-import-dialog";
 import { toast } from "sonner";
 
 type DiscoveryResult = {
@@ -206,14 +207,17 @@ export function DiscoveryDashboard() {
               <p className="text-xs text-muted-foreground">Rating from 1.0 to 5.0</p>
             </div>
           </div>
-          <Button
-            className="mt-4"
-            onClick={handleSearch}
-            disabled={!keyword || !location || isSearching}
-          >
-            <Search className="h-4 w-4 mr-2" />
-            {isSearching ? "Searching..." : "Search Maps"}
-          </Button>
+          <div className="mt-4 flex items-center gap-3">
+            <Button
+              onClick={handleSearch}
+              disabled={!keyword || !location || isSearching}
+            >
+              <Search className="h-4 w-4 mr-2" />
+              {isSearching ? "Searching..." : "Search Maps"}
+            </Button>
+            <span className="text-sm text-muted-foreground">or</span>
+            <CSVImportDialog onComplete={() => {}} />
+          </div>
         </CardContent>
       </Card>
 

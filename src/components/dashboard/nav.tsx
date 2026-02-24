@@ -234,9 +234,13 @@ function NavGroupSection({
 export function DashboardNav({
   user,
   permissions = {},
+  logoUrl = null,
+  companyName = null,
 }: {
   user: NavUser;
   permissions?: UserPermissions;
+  logoUrl?: string | null;
+  companyName?: string | null;
 }) {
   const pathname = usePathname();
   const elevated = isElevated(user.role);
@@ -265,14 +269,23 @@ export function DashboardNav({
         {/* Logo + user */}
         <div className="mb-4 flex-shrink-0">
           <Link href={dashboardHref}>
-            <Image
-              src="/logo.png"
-              alt="GHM Digital Marketing"
-              width={180}
-              height={59}
-              className="mb-1 dark:brightness-0 dark:invert hover:opacity-80 transition-opacity"
-              priority
-            />
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={companyName ?? "Company logo"}
+                className="mb-1 max-h-12 max-w-[180px] object-contain hover:opacity-80 transition-opacity"
+              />
+            ) : (
+              <Image
+                src="/logo.png"
+                alt="GHM Digital Marketing"
+                width={180}
+                height={59}
+                className="mb-1 dark:brightness-0 dark:invert hover:opacity-80 transition-opacity"
+                priority
+              />
+            )}
           </Link>
           <p className="text-xs text-muted-foreground">{user.name}</p>
         </div>

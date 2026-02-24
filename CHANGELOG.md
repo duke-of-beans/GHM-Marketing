@@ -1,7 +1,18 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 8 complete (Bulk Content Ops, Competitor Tracking, Custom Report Builder).
+**Last Updated:** February 24, 2026 — Sprint 9 complete (Import visibility, admin elevation, branding system, admin first-run wizard).
+
+---
+
+## Sprint 9 — Admin Infrastructure (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24 | **Import visibility** — `CSVImportDialog` on `/leads` unblocked from master-only guard (now admin+master). Discovery page gets "Import from CSV" card alongside search. Enrich/Bulk Actions/territory filter guards updated to `admin\|master`. |
+| Feb 24 | **Admin role elevation** — `isElevated()` applied to root redirect, work orders GET, team-messages pin, dashboard layout `isMaster` prop. Admins now have full master-level access everywhere. |
+| Feb 24 | **9C — Branding system** — `POST/DELETE /api/settings/branding` (Vercel Blob logo upload/delete). `BrandingTab` (logo drag-drop, company name/tagline, brand color). Settings Branding tab (admin-only). Dashboard layout passes `logoUrl`+`companyName` to nav; nav shows custom logo with `/logo.png` fallback. |
+| Feb 24 | **9B — Admin first-run wizard** — `/admin-setup` page + `AdminSetupWizard` (4 steps: Welcome → Company → Branding → Done). `GET/PATCH /api/admin/onboarding`. Dashboard layout redirects new admins to wizard; finish stamps `adminOnboardingCompletedAt` and routes to `/master`. |
 
 ---
 

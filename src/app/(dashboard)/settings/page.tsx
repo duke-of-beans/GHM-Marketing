@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity, Paintbrush } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
 import { BugReportsTab } from "@/components/settings/BugReportsTab";
@@ -11,6 +11,7 @@ import { UserActivityTab } from "@/components/settings/UserActivityTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
 import { PositionsTab } from "@/components/settings/PositionsTab";
+import { BrandingTab } from "@/components/settings/BrandingTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -22,7 +23,7 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
+const VALID_TABS = ["general", "branding", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -53,6 +54,11 @@ export default function SettingsPage() {
           <TabsTrigger value="general" className="gap-1.5">
             <Sliders className="h-4 w-4" />General
           </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="branding" className="gap-1.5">
+              <Paintbrush className="h-4 w-4" />Branding
+            </TabsTrigger>
+          )}
           <TabsTrigger value="team" className="gap-1.5">
             <Users className="h-4 w-4" />Team
           </TabsTrigger>
@@ -95,6 +101,12 @@ export default function SettingsPage() {
         <TabsContent value="general">
           <GeneralSettingsTab />
         </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="branding">
+            <BrandingTab />
+          </TabsContent>
+        )}
 
         <TabsContent value="team">
           <TeamManagementTab currentUserRole={currentUserRole} />

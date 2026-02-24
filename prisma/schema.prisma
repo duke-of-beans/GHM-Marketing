@@ -70,6 +70,9 @@ model User {
   repOnboardingCompletedAt  DateTime?  @map("rep_onboarding_completed_at")
   repOnboardingStep         Int        @default(0) @map("rep_onboarding_step") // last completed step (0 = not started)
 
+  // Admin first-run wizard (9B)
+  adminOnboardingCompletedAt DateTime? @map("admin_onboarding_completed_at")
+
   // Document Vault
   vaultUploads          VaultFile[]  @relation("VaultUploads")
   vaultPrivateFiles     VaultFile[]  @relation("VaultOwned")
@@ -997,6 +1000,12 @@ model GlobalSettings {
   goalsEnabled          Boolean  @default(false) @map("goals_enabled")
   monthlyDealTarget     Int?     @map("monthly_deal_target")
   monthlyRevenueTarget  Float?   @map("monthly_revenue_target")
+
+  // Branding (9B/9C — admin first-run wizard)
+  companyName           String?  @map("company_name")
+  companyTagline        String?  @map("company_tagline")
+  logoUrl               String?  @map("logo_url")          // Vercel Blob URL
+  brandColor            String?  @map("brand_color")       // hex e.g. "#1a56db"
   
   // Metadata
   updatedAt             DateTime @updatedAt @map("updated_at")

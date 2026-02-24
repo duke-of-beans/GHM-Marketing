@@ -5,6 +5,7 @@ import { DashboardLayoutClient } from "@/components/dashboard/DashboardLayoutCli
 import { BugTrackingInit } from "@/components/bug-report/BugTrackingInit";
 import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
+import { isElevated } from "@/lib/auth/roles";
 
 export default async function DashboardLayout({
   children,
@@ -20,7 +21,7 @@ export default async function DashboardLayout({
   const [fullUser, teamUsers, settings] = await Promise.all([
     prisma.user.findUnique({
       where: { id: parseInt(session.user.id) },
-      select: { permissions: true, permissionPreset: true },
+      select: { permissions: true, permissionPreset: true, adminOnboardingCompletedAt: true },
     }),
     prisma.user.findMany({
       where: { isActive: true },
@@ -28,9 +29,14 @@ export default async function DashboardLayout({
       orderBy: { name: "asc" },
     }),
     prisma.globalSettings.findFirst({
-      select: { pushMessagesEnabled: true, pushTasksEnabled: true },
+      select: { pushMessagesEnabled: true, pushTasksEnabled: true, logoUrl: true, companyName: true },
     }),
   ]);
+
+  // Admin first-run: redirect to setup wizard until completed
+  if (session.user.role === "admin" && !fullUser?.adminOnboardingCompletedAt) {
+    redirect("/admin-setup");
+  }
 
   const permissions = fullUser
     ? getUserPermissions({
@@ -40,17 +46,19 @@ export default async function DashboardLayout({
       })
     : {};
 
-  const isMaster = session.user.role === "master";
+  const elevated = isElevated(session.user.role);
   const currentUserId = parseInt(session.user.id);
   const pushEnabled = (settings?.pushMessagesEnabled ?? true) || (settings?.pushTasksEnabled ?? true);
+  const logoUrl = settings?.logoUrl ?? null;
+  const companyName = settings?.companyName ?? null;
 
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
-      <DashboardNav user={session.user} permissions={permissions} />
+      <DashboardNav user={session.user} permissions={permissions} logoUrl={logoUrl} companyName={companyName} />
       <DashboardLayoutClient
         users={teamUsers}
-        isMaster={isMaster}
+        isMaster={elevated}
         currentUserId={currentUserId}
         pushEnabled={pushEnabled}
       >

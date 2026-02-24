@@ -1,7 +1,15 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 8 complete. All 8A/8B/8C shipped + TS errors cleared. See CHANGELOG.
+**Last Updated:** February 24, 2026 — Sprint 9 complete. Import visibility, admin role elevation, branding system, admin first-run wizard. See CHANGELOG.
+
+### SPRINT 9 — Admin Infrastructure ✅ COMPLETE (February 24, 2026)
+- [x] **Import visibility fix** — `CSVImportDialog` on `/leads` moved outside master-only guard; now visible to admin + master. Discovery page gets "Import from CSV" card. Enrich/Bulk Actions/territory filter guards updated to admin|master.
+- [x] **Admin = master elevation** — `isElevated()` applied consistently: root redirect (`page.tsx`), work orders GET, team-messages pin permission, dashboard layout `isMaster` prop. Admins now access all master-level features.
+- [x] **Branding system (9C)** — `POST/DELETE /api/settings/branding` (logo upload/delete via Vercel Blob). `BrandingTab` component (logo drag-drop, company name/tagline, brand color picker). Settings page Branding tab wired (admin-only). Dashboard layout fetches `logoUrl`+`companyName` from `GlobalSettings` and passes to nav. Nav shows custom logo with `/logo.png` fallback.
+- [x] **Admin first-run wizard (9B)** — 4-step flow (Welcome → Company → Branding → Done) at `/admin-setup`. `GET/PATCH /api/admin/onboarding` routes. Dashboard layout redirects admin without `adminOnboardingCompletedAt` to wizard on first login. Finish marks completion, redirects to `/master`.
+
+---
 
 ### SPRINT 8 — Content Power ✅ COMPLETE (February 24, 2026)
 - [x] **8A — Bulk Content Operations** — Multi-select UI on ContentList, bulk action bar (Approve/Archive), `POST /api/content/bulk` route. Master+ only. `isMaster` prop threaded from page → profile → ContentStudioTab → ContentList.

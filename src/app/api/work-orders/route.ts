@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPermission, getCurrentUserWithPermissions } from "@/lib/auth/api-permissions";
 import { generateWorkOrder } from "@/lib/pdf/generate-work-order";
 import type { SessionUser } from "@/lib/auth/session";
-import { territoryFilter } from "@/lib/auth/session";
+import { territoryFilter, isElevated } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
   const where = leadId
     ? { leadId: parseInt(leadId, 10) }
-    : user.role === "master"
+    : isElevated(user.role)
       ? {}
       : { userId: Number(user.id) };
 

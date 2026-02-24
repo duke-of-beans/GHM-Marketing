@@ -99,11 +99,14 @@ export function MasterDashboardGrid({
     () => readLocalLayout() ?? savedLayout ?? DEFAULT_LAYOUTS
   );
   const [isEditMode, setIsEditMode] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  // Start as true if we're already in the browser (client-side navigation return).
+  // Start as false only on first SSR hydration to prevent React hydration mismatch.
+  // This prevents the "Loading dashboard..." skeleton from flashing on every return nav.
+  const [mounted, setMounted] = useState(() => typeof window !== "undefined");
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
   const { width, containerRef } = useContainerWidth();
 
-  // Suppress grid render until after hydration to prevent layout flash on navigation return
+  // On SSR hydration (mounted starts false), flip true after first paint.
   useEffect(() => { setMounted(true); }, []);
 
   // If no localStorage layout exists yet and the DB returned a layout, seed localStorage.

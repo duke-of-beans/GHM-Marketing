@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { isElevated } from "@/lib/auth/roles";
 
 export default async function Home() {
   const session = await auth();
@@ -8,7 +9,7 @@ export default async function Home() {
     redirect("/login");
   }
 
-  if (session.user.role === "master") {
+  if (isElevated(session.user.role)) {
     redirect("/master");
   }
 

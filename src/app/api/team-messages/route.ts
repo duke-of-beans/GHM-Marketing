@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sendPushToUsers } from "@/lib/push";
+import { isElevated } from "@/lib/auth/roles";
 
 // GET /api/team-messages — fetch messages visible to the current user
 export async function GET(req: NextRequest) {
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
 
   // Only masters can pin or set urgent priority
   const userRole = (session.user as any).role;
-  const canPin = userRole === "master";
+  const canPin = isElevated(userRole);
 
   const message = await prisma.teamMessage.create({
     data: {

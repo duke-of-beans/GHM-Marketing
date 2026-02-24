@@ -340,7 +340,11 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
         </div>
         <div className="flex items-center gap-2">
           <TourButton onStart={startTour} tooltip="Tour the Sales Pipeline" />
-          {userRole === "master" && (
+          {/* Import — available to admin + master, not sales reps */}
+          {userRole !== "sales" && (
+            <CSVImportDialog onComplete={handleImportComplete} />
+          )}
+          {(userRole === "master" || userRole === "admin") && (
             <>
               <button
                 className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
@@ -379,7 +383,6 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <CSVImportDialog onComplete={handleImportComplete} />
               <button
                 className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5"
                 onClick={handleExportLeads}
@@ -397,7 +400,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
         <AdvancedLeadFilterBar
           filters={filters}
           onChange={handleFiltersChange}
-          showTerritoryFilter={userRole === "master"}
+          showTerritoryFilter={userRole === "master" || userRole === "admin"}
         />
       </div>
 
