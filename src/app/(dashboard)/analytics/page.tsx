@@ -1,11 +1,15 @@
 import { requirePermission } from "@/lib/auth/permissions";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { AnalyticsDashboard } from "@/components/analytics/analytics-dashboard";
 import { IntelligenceTrends } from "@/components/analytics/intelligence-trends";
 import { buildMonthlyTrend } from "@/lib/analytics/intelligence";
+import { DashboardUsagePanel } from "@/components/analytics/dashboard-usage-panel";
 
 export default async function AnalyticsPage() {
   await requirePermission("view_analytics");
+  const session = await auth();
+  const isAdmin = (session?.user as any)?.role === "admin";
 
   // Fetch analytics data
   const [leads, clients, tasks, scans, opportunities, allScans] = await Promise.all([
@@ -115,6 +119,14 @@ export default async function AnalyticsPage() {
 
       {/* Intelligence Layer — Sprint 4A: MoM Trend Charts */}
       <IntelligenceTrends trend={trend12} />
+
+      {/* Platform Usage Analytics — FEAT-019 (admin only) */}
+      {isAdmin && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Platform Usage</h2>
+          <DashboardUsagePanel />
+        </div>
+      )}
     </div>
   );
 }

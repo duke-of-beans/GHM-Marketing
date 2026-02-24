@@ -1,5 +1,5 @@
-# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 16+16.5 shipped. Added INFRA-001, UI-CONST-001.
+﻿# GHM DASHBOARD — PRODUCT BACKLOG
+**Last Updated:** February 25, 2026 — Sprint 18 shipped. UX-AUDIT-022, FEAT-019, FEAT-020 complete.
 
 **Owner:** David Kirsch
 
@@ -37,7 +37,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~16.5~~ | ~~Critical Bug Batch~~ | ~~BUG-020 (forgot password) + BUG-021 (Wave label) + BUG-022 (territories data sync) + BUG-023 (vault: preview/delete/message) + BUG-024 (service catalog edit prefill)~~ | ✅ SHIPPED | |
 | ~~17~~ | ~~Admin First-Run (Full)~~ | ~~FEAT-015 (7-step wizard) + FEAT-018 (login logo) + UX-AUDIT-012 (3-color branding) + BrandThemeInjector~~ | ✅ SHIPPED | |
 | UI-CONST | UI/UX Constitution + Design System Saga | UI-CONST-001 — runs parallel to all sprints; audit → blueprint → build in groups | Multi-session initiative | Professional-grade UI indistinguishable from Xero/Slack/Monday. Prerequisite for White-Label/COVOS productization. |
-| 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
+| ~~18~~ | ~~Analytics + Telemetry~~ | ~~FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) + UX-AUDIT-022 (Settings IA consolidation)~~ | ✅ SHIPPED | |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
@@ -46,7 +46,6 @@ Foundation → out. Each sprint unblocks the next.
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
 - I4 GBP OAuth — monitor Google API Console approval
-
 
 ---
 
@@ -102,16 +101,9 @@ All outbound emails (notifications, forgot password, work orders, partner emails
 GBP integration built. App in Testing mode. Gate: Google API Console approval for external app status.
 **Action:** Monitor → flip to Published → verify OAuth with real client listing. ~1 hr once approved.
 
-
 ---
 
 ## 🔴 UX AUDITS — Must Fix Before External Eyes
-
-### UX-AUDIT-022: Settings — Team / Positions / Permissions IA Consolidation
-These three Settings tabs are conceptually related (who's on the team, what roles they hold, what those roles can do) but currently exist as three separate flat tabs with no visual relationship to each other. The navigation between them is fragmented and the mental model isn't obvious to a new admin.
-**Direction:** Evaluate two paths: (A) **Merge into a single "Team & Permissions" tab** with internal sub-navigation (tabs or anchored sections): Team roster → Positions → Permissions matrix. (B) **Keep as separate tabs but group them visually** in the settings nav under a "People" or "Team" heading with clear hierarchy. Option A is preferred if the combined content fits without feeling cramped. Either way: eliminate any duplicate controls currently spread across tabs, ensure the permissions matrix is reachable from a user's row in the team roster (one click), and make "positions" feel like the bridge between the two (a position defines a role; a role has permissions; a user has a position).
-**Output:** Concrete IA proposal documented first, then implementation. No data model changes expected.
-**Size:** ~1.5 hrs (audit + design) + ~1.5 hrs (implementation). **Priority:** 🟠 SHOULD — confusing for any new admin setting up the team.
 
 ### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
 Navigating away from `/sales` and returning shows a different dashboard layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
@@ -205,17 +197,6 @@ See UX-AUDIT-003. Depends on FEAT-016 (style capture). Redesign brochure as tena
 ### FEAT-018: Admin Logo Swap
 See UX-AUDIT-007. `logoUrl` on TenantConfig, upload UI in Settings, navbar + login pull from tenant config.
 **Sprint target:** 17. ~2 hrs.
-
-### FEAT-019: Dashboard Usage Analytics (Admin-Facing)
-Admin needs to know what's working in the platform itself — not business analytics, but platform analytics.
-**Scope:** Per-user, per-session event tracking: page views, feature interactions, integration events, session duration and frequency. Admin-only analytics page: usage heatmap by feature, active users over time, most/least used pages, "dead zones." Events in `DashboardEvent` table, no PII beyond userId.
-**Size:** ~1 session. **Priority:** 🟠 SHOULD — Sprint 18 target.
-
-### FEAT-020: COVOS Owner Telemetry (Anonymous Backdoor)
-Aggregate visibility into platform health and adoption across all tenants — anonymized.
-**Scope:** Anonymous event pipeline from each tenant → COVOS central analytics endpoint. Events: feature usage (event type + tenant hash only), integration events, session frequency by tenant. COVOS owner dashboard showing fleet health. Tenant hash only — never business name, client data, or user identity.
-**Privacy note:** Tenants should be informed this telemetry exists (add to SERVICE_AGREEMENT).
-**Size:** ~1 session. **Priority:** 🟠 SHOULD — Sprint 18 target.
 
 ### FEAT-021: Tenant Logo + Brand Asset Management
 Marketing materials currently use generic GHM placeholders. Each tenant needs their own brand applied.

@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  Loader2, Users, Plus, Search, SlidersHorizontal, Eye, EyeOff, Upload,
+  Loader2, Users, Plus, Search, SlidersHorizontal, Eye, EyeOff, Upload, Briefcase, Shield,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,9 +25,11 @@ import { UserImportDialog } from "@/components/bulk/import-dialogs";
 import { useBulkSelect } from "@/hooks/use-bulk-select";
 import { BulkActionBar } from "@/components/bulk/bulk-action-bar";
 import { UserPermissionCard } from "./UserPermissionCard";
+import { PositionsTab } from "@/components/settings/PositionsTab";
+import { PermissionManager } from "@/components/permissions/permission-manager";
+import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
 import { CompensationConfigSection } from "@/components/team/compensation-config";
 import { Separator } from "@/components/ui/separator";
-import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
 
 type AppRole = "admin" | "manager" | "sales";
 
@@ -45,9 +47,11 @@ interface User {
 
 interface TeamManagementTabProps {
   currentUserRole?: AppRole;
+  isAdmin?: boolean;
 }
 
-export function TeamManagementTab({ currentUserRole = "manager" }: TeamManagementTabProps) {
+export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false }: TeamManagementTabProps) {
+  const [section, setSection] = useState<"members" | "positions" | "permissions">("members");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -304,7 +308,7 @@ export function TeamManagementTab({ currentUserRole = "manager" }: TeamManagemen
     },
   ];
 
-  if (loading) {
+  if (loading && section === "members") {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -312,26 +316,56 @@ export function TeamManagementTab({ currentUserRole = "manager" }: TeamManagemen
     );
   }
 
+  const sectionButtons = [
+    { id: "members" as const, label: "Members", icon: Users },
+    ...(isAdmin ? [{ id: "positions" as const, label: "Positions", icon: Briefcase }] : []),
+    { id: "permissions" as const, label: "Permissions", icon: Shield },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Sub-section switcher */}
+      <div className="flex items-center gap-1 border-b pb-0">
+        {sectionButtons.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setSection(id)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              section === id
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/40"
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Positions section */}
+      {section === "positions" && <PositionsTab />}
+
+      {/* Permissions section */}
+      {section === "permissions" && <PermissionManager />}
+
+      {/* Members section */}
+      {section === "members" && (
+      <>
+      {/* Members header + actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6" />
-            Team Members
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            Manage user permissions and access levels
+          <p className="text-muted-foreground text-sm">
+            Manage team member accounts, roles, and compensation settings.
           </p>
         </div>
-        <Button onClick={() => setAddDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
-        <Button variant="outline" onClick={() => setImportOpen(true)}>
-          <Upload className="h-4 w-4 mr-2" />
-          Import
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />Add User
+          </Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />Import
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -507,6 +541,8 @@ export function TeamManagementTab({ currentUserRole = "manager" }: TeamManagemen
         actions={bulkUserActions}
         entityLabel="user"
       />
+      </>
+      )}
     </div>
   );
 }

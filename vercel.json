@@ -47,6 +47,10 @@
     {
       "path": "/api/cron/deliver-reports",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/covos-telemetry",
+      "schedule": "0 5 * * *"
     }
   ]
 }

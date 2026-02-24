@@ -6,7 +6,8 @@ import { PushPermissionPrompt } from "@/components/push/PushPermissionPrompt";
 import { AISearchBar } from "@/components/search/AISearchBar";
 import { KeyboardShortcutsHelp } from "@/components/ui/keyboard-shortcuts-help";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useDashboardEvent } from "@/hooks/use-dashboard-event";
 
 type TeamUser = { id: number; name: string; role: string };
 
@@ -33,6 +34,8 @@ export function DashboardLayoutClient({
   const [unreadCount, setUnreadCount] = useState(0);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const { trackPageView } = useDashboardEvent();
   // Track "G" prefix for two-key navigation sequences (e.g. G→D = go to dashboard)
   const gPrefixRef = useRef(false);
   const gPrefixTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +61,11 @@ export function DashboardLayoutClient({
     const saved = localStorage.getItem("team-feed-sidebar-open");
     if (saved === "true") setSidebarOpen(true);
   }, []);
+
+  // Track page views on route change
+  useEffect(() => {
+    trackPageView(pathname);
+  }, [pathname, trackPageView]);
 
   // Global keyboard shortcuts (fires when not in an input context)
   useEffect(() => {

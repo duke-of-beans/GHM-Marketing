@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, Shield, FileText, ArrowRight, Bug, Zap, Briefcase, Activity, Paintbrush, DollarSign } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { CompensationTab } from "@/components/settings/CompensationTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
@@ -11,13 +11,11 @@ import { BugReportsTab } from "@/components/settings/BugReportsTab";
 import { UserActivityTab } from "@/components/settings/UserActivityTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
-import { PositionsTab } from "@/components/settings/PositionsTab";
 import { BrandingTab } from "@/components/settings/BrandingTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { PermissionManager } from "@/components/permissions/permission-manager";
 
 // Import the client component directly — avoids server-only headers() call that occurs
 // when importing the territories page (which is a server component).
@@ -26,7 +24,8 @@ const TerritoriesContent = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
-const VALID_TABS = ["general", "compensation", "branding", "team", "positions", "territories", "permissions", "audit", "bugs", "activity", "wave", "integrations"];
+// "positions" and "permissions" are now sub-sections inside the "team" tab
+const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -70,16 +69,8 @@ export default function SettingsPage() {
           <TabsTrigger value="team" className="gap-1.5">
             <Users className="h-4 w-4" />Team
           </TabsTrigger>
-          {isAdmin && (
-            <TabsTrigger value="positions" className="gap-1.5">
-              <Briefcase className="h-4 w-4" />Positions
-            </TabsTrigger>
-          )}
           <TabsTrigger value="territories" className="gap-1.5">
             <Map className="h-4 w-4" />Territories
-          </TabsTrigger>
-          <TabsTrigger value="permissions" className="gap-1.5">
-            <Shield className="h-4 w-4" />Permissions
           </TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5">
             <FileText className="h-4 w-4" />Audit Log
@@ -123,21 +114,11 @@ export default function SettingsPage() {
         )}
 
         <TabsContent value="team">
-          <TeamManagementTab currentUserRole={currentUserRole} />
+          <TeamManagementTab currentUserRole={currentUserRole} isAdmin={isAdmin} />
         </TabsContent>
-
-        {isAdmin && (
-          <TabsContent value="positions">
-            <PositionsTab />
-          </TabsContent>
-        )}
 
         <TabsContent value="territories">
           <TerritoriesContent />
-        </TabsContent>
-
-        <TabsContent value="permissions">
-          <PermissionManager />
         </TabsContent>
 
         <TabsContent value="audit">

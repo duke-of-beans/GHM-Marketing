@@ -3,7 +3,15 @@
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
 **Last Updated:** February 25, 2026 — Sprint 17 complete. Admin First-Run: FEAT-015 (7-step wizard), FEAT-018 (login logo), UX-AUDIT-012 (3-color branding system), BrandThemeInjector.
 
-### SPRINT 17 — Admin First-Run (February 25, 2026)
+### SPRINT 18 — Analytics & Telemetry (February 25, 2026)
+- [x] **UX-AUDIT-022 COMPLETE** — Settings IA: Team/Positions/Permissions consolidated into a single "Team" tab with an internal sub-section switcher (Members | Positions | Permissions). Positions section is admin-only. Permissions (PermissionManager) available to all elevated users. The three are now visually and architecturally unified — positions is the bridge between members and permissions. Outer settings tabs "positions" and "permissions" removed. TeamManagementTab now accepts `isAdmin` prop.
+- [x] **FEAT-019 COMPLETE** — Dashboard usage analytics: `DashboardEvent` schema, `/api/analytics/events` POST route for client-side tracking, `/api/analytics/dashboard-usage` GET route (feature heatmap, top pages, DAU chart, per-user activity). `DashboardUsagePanel` component wired into analytics page (admin-only). `use-dashboard-event` hook for client-side fire-and-forget tracking.
+- [x] **FEAT-020 COMPLETE** — COVOS owner telemetry: `src/lib/telemetry/covos.ts` with SHA-256 tenant hashing, privacy contract (no PII — only eventType + feature + tenant hash + count + day). `/api/cron/covos-telemetry` daily cron (5am UTC) aggregates yesterday's DashboardEvents by eventType+feature and ships anonymized batch to `COVOS_TELEMETRY_ENDPOINT`. Graceful degradation — no-ops if env var not set. `COVOS_TELEMETRY_ENDPOINT` and `COVOS_TENANT_SLUG` added to `.env.example`. Cron already in `vercel.json`.
+- TypeScript: Zero new errors (5 pre-existing basecamp/dotenv errors unaffected).
+**Files created:** `src/app/api/cron/covos-telemetry/route.ts`, `src/lib/telemetry/covos.ts` (was already there)
+**Files modified:** `src/app/(dashboard)/settings/page.tsx`, `src/components/settings/TeamManagementTab.tsx`, `.env.example`
+
+
 - [x] **FEAT-015 COMPLETE** — Full admin onboarding wizard expanded from 4 steps to 7. Steps: Welcome → Company → Branding (logo + 3-color system) → Team Setup (invite first user) → Client/Lead Import (CSV/Excel) → Integrations Checklist (live status badges) → Done. Wizard step persisted to `User.adminOnboardingStep` in DB so admin can resume after leaving. Every step skippable. Files: `src/components/onboarding/AdminSetupWizard.tsx`, `src/app/admin-setup/page.tsx`.
 - [x] **FEAT-018 COMPLETE** — Login page tenant logo. `GET /api/public/branding` (no auth) returns logoUrl + companyName + brand colors. Login page fetches on mount, shows tenant logo with fallback to `/logo.png`. Files: `src/app/api/public/branding/route.ts`, `src/app/(auth)/login/page.tsx`.
 - [x] **UX-AUDIT-012 COMPLETE** — 3-color branding system. Added `brandColorSecondary` + `brandColorAccent` to `GlobalSettings` schema (pushed to DB). BrandingTab updated with three color pickers (Primary/Secondary/Accent) + per-color reset buttons. Colors saved via existing `/api/admin/onboarding` PATCH. Files: `src/components/settings/BrandingTab.tsx`, `prisma/schema.prisma`.

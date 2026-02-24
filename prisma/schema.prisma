@@ -104,6 +104,9 @@ model User {
   // Saved searches (Sprint 7A)
   savedSearches         SavedSearch[]
 
+  // Dashboard usage events (FEAT-019)
+  dashboardEvents       DashboardEvent[]
+
   // 2FA / TOTP (admin + master accounts only)
   // totpSecret is encrypted at rest — stored encrypted with server-side key
   totpEnabled           Boolean   @default(false) @map("totp_enabled")
@@ -2060,4 +2063,27 @@ model SavedSearch {
 
   @@index([userId])
   @@map("saved_searches")
+}
+
+// ============================================================================
+// DASHBOARD EVENTS — Sprint 18 / FEAT-019
+// Lightweight platform usage tracking. No PII beyond userId.
+// ============================================================================
+
+model DashboardEvent {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  eventType  String   @map("event_type")   // "page_view" | "feature_use" | "action"
+  page       String?                        // e.g. "/leads", "/clients/42"
+  feature    String?                        // e.g. "enrich_lead", "generate_report", "bulk_approve"
+  metadata   Json?                          // arbitrary key/value (no PII)
+  sessionId  String?  @map("session_id")   // random per-tab UUID, not persisted to DB
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, occurredAt(sort: Desc)])
+  @@index([eventType, occurredAt(sort: Desc)])
+  @@index([feature, occurredAt(sort: Desc)])
+  @@map("dashboard_events")
 }
