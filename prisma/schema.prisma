@@ -83,6 +83,7 @@ model User {
   sentMessages          TeamMessage[] @relation("MessageAuthor")
   receivedMessages      TeamMessage[] @relation("MessageRecipient")
   messageReads          TeamMessageRead[]
+  messageReactions      TeamMessageReaction[]
   pushSubscriptions     PushSubscription[]
 
   // Prospect history
@@ -479,6 +480,7 @@ model ClientProfile {
   recurringTaskRules    RecurringTaskRule[] @relation("RecurringTaskRuleClient")
   siteHealthSnapshots   SiteHealthSnapshot[]
   gbpSnapshots          GbpSnapshot[]
+  websiteAudits         WebsiteAudit[]
 
   @@map("client_profiles")
 }
@@ -1087,6 +1089,41 @@ model AuditLog {
 // TEAM MESSAGING
 // ============================================================================
 
+// ─── Website Audit (FEAT-024) ─────────────────────────────────────────────────
+model WebsiteAudit {
+  id          Int      @id @default(autoincrement())
+  clientId    Int      @map("client_id")
+  url         String   // audited URL
+  runAt       DateTime @default(now()) @map("run_at")
+
+  // Scores (0–100)
+  scorePerformance    Int? @map("score_performance")
+  scoreAccessibility  Int? @map("score_accessibility")
+  scoreSeo            Int? @map("score_seo")
+  scoreBestPractices  Int? @map("score_best_practices")
+
+  // Meta
+  metaTitle           String?  @map("meta_title")
+  metaDescription     String?  @map("meta_description")
+  h1                  String?
+  canonical           String?
+  hasSitemap          Boolean? @map("has_sitemap")
+  hasRobots           Boolean? @map("has_robots")
+  ssl                 Boolean?
+  mobile              Boolean?
+
+  // Full JSON payload from PageSpeed (for export/drill-down)
+  rawJson     Json?    @map("raw_json")
+
+  // Issues list: [{ category, severity, description }]
+  issues      Json?
+
+  client      ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, runAt(sort: Desc)])
+  @@map("website_audits")
+}
+
 model TeamMessage {
   id              Int      @id @default(autoincrement())
   
@@ -1126,12 +1163,28 @@ model TeamMessage {
   updatedAt       DateTime @updatedAt @map("updated_at")
   
   reads           TeamMessageRead[]
+  reactions       TeamMessageReaction[]
   
   @@index([authorId])
   @@index([recipientId])
   @@index([parentId])
   @@index([createdAt])
   @@map("team_messages")
+}
+
+model TeamMessageReaction {
+  id        Int      @id @default(autoincrement())
+  messageId Int      @map("message_id")
+  userId    Int      @map("user_id")
+  emoji     String   // Unicode emoji e.g. "👍" "❤️" "😂"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message   TeamMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@map("team_message_reactions")
 }
 
 model TeamMessageRead {

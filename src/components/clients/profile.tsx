@@ -56,6 +56,7 @@ import { UpsellOpportunities } from "@/components/upsell/upsell-opportunities";
 import { EditClientDialog } from "./edit-client-dialog";
 import { ClientCompensationSection } from "./client-compensation";
 import { ContentStudioTab } from "../content/ContentStudioTab";
+import { WebsiteAuditPanel } from "./website-audit/WebsiteAuditPanel";
 import { CompetitorsTab } from "./competitors/CompetitorsTab";
 import { WebsiteStudioTab } from "./website-studio/WebsiteStudioTab";
 import { VoiceProfileDialog } from "./voice/VoiceProfileDialog";
@@ -171,7 +172,7 @@ function timeAgo(d: string | null) {
 
 const VALID_TABS = [
   "scorecard", "tasks", "rankings", "citations", "local",
-  "content", "websites", "health", "reports", "domains", "compensation",
+  "content", "websites", "audit", "health", "reports", "domains", "compensation",
   "billing", "campaigns", "integrations", "notes", "competitors",
 ] as const;
 
@@ -412,6 +413,7 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
             { value: "local", label: "Local" },
             { value: "content", label: "Content" },
             { value: "websites", label: "Websites" },
+            { value: "audit", label: "Site Audit" },
             { value: "health", label: "Site Health" },
             { value: "notes", label: "Notes" },
           ];
@@ -532,6 +534,10 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
 
         <TabsContent value="websites" className="space-y-4">
           <WebsiteStudioTab clientId={client.id} businessName={client.businessName} />
+        </TabsContent>
+
+        <TabsContent value="audit" className="space-y-4">
+          <WebsiteAuditPanel clientId={client.id} websiteUrl={(client as any).website} />
         </TabsContent>
 
         <TabsContent value="health" className="space-y-4">

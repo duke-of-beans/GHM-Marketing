@@ -12,6 +12,7 @@ import { PPCGenerator } from './PPCGenerator'
 import { ContentList } from './ContentList'
 import { ContentCalendar } from './ContentCalendar'
 import { CompetitiveIntelBadge } from './CompetitiveIntelBadge'
+import { StockPhotoPicker } from './StockPhotoPicker'
 import { processCompetitiveIntel, type PanelIntelMap, type LatestScan } from '@/lib/competitive-scan/intel-processor'
 
 interface ContentStudioTabProps {
@@ -62,6 +63,7 @@ export function ContentStudioTab({ clientId, isMaster = false }: ContentStudioTa
           <TabsTrigger value="generate">Generate Content</TabsTrigger>
           <TabsTrigger value="library">Content Library</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="photos">Stock Photos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="generate">
@@ -141,6 +143,23 @@ export function ContentStudioTab({ clientId, isMaster = false }: ContentStudioTa
 
         <TabsContent value="calendar">
           <ContentCalendar clientId={clientId} />
+        </TabsContent>
+
+        <TabsContent value="photos">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-base font-semibold">Stock Photo Library</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Search millions of free, high-quality photos from Unsplash and Pexels. Click to copy the URL or use it directly in your content.
+              </p>
+            </div>
+            <StockPhotoPicker
+              inline
+              onSelect={(photo) => {
+                navigator.clipboard.writeText(photo.regularUrl).catch(() => {})
+              }}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

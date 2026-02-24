@@ -38,10 +38,16 @@ export async function GET(req: NextRequest) {
         include: {
           author: { select: { id: true, name: true, role: true } },
           reads: { where: { userId }, select: { readAt: true } },
+          reactions: {
+            select: { userId: true, emoji: true, user: { select: { name: true } } },
+          },
         },
         orderBy: { createdAt: "asc" },
       },
       reads: { where: { userId }, select: { readAt: true } },
+      reactions: {
+        select: { userId: true, emoji: true, user: { select: { name: true } } },
+      },
     },
     orderBy: [
       { isPinned: "desc" },

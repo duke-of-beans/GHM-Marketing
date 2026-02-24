@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { voice, pick } from "@/lib/voice";
 import { useModifierKey } from "@/hooks/use-modifier-key";
+import { EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia } from "./TeamFeedMultimedia";
 
 // ─── Types (duplicated from TeamFeed to avoid cross-import issues) ────────────
 
@@ -60,7 +61,8 @@ type TeamMessageData = {
   priority: string;
   createdAt: string;
   reads: { readAt: string }[];
-  replies: Array<Omit<TeamMessageData, "replies"> & { reads: { readAt: string }[] }>;
+  reactions: { userId: number; emoji: string }[];
+  replies: Array<Omit<TeamMessageData, "replies"> & { reads: { readAt: string }[]; reactions: { userId: number; emoji: string }[] }>;
   attachmentUrl?: string | null;
   attachmentName?: string | null;
   attachmentSize?: number | null;
@@ -154,27 +156,34 @@ function ComposeBox({
   const [priority, setPriority] = useState("normal");
   const [isPinned, setIsPinned] = useState(false);
   const [sending, setSending] = useState(false);
+  const [gifAttachment, setGifAttachment] = useState<{ url: string; title: string } | null>(null);
   const { symbol: modSymbol } = useModifierKey();
 
   async function send() {
-    if (!content.trim()) return;
+    if (!content.trim() && !gifAttachment) return;
     setSending(true);
     try {
       const res = await fetch("/api/team-messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          content,
+          content: content.trim() || (gifAttachment ? gifAttachment.title : ""),
           audienceType: parentId ? "user" : audienceType,
           audienceValue: audienceType === "role" ? audienceValue : undefined,
           recipientId: audienceType === "user" ? recipientId : undefined,
           parentId,
           priority,
           isPinned,
+          ...(gifAttachment && {
+            attachmentUrl: gifAttachment.url,
+            attachmentName: gifAttachment.title || "GIF",
+            attachmentMimeType: "image/gif",
+          }),
         }),
       });
       if (!res.ok) throw new Error("Failed");
       setContent("");
+      setGifAttachment(null);
       onSent();
       toast.success(parentId ? pick(voice.messages.replySent) : pick(voice.messages.sent));
     } catch {
@@ -194,6 +203,18 @@ function ComposeBox({
         className="resize-none text-sm"
         onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(); }}
       />
+      {gifAttachment && (
+        <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={gifAttachment.url} alt={gifAttachment.title} className="rounded-lg max-h-32 border" />
+          <button
+            onClick={() => setGifAttachment(null)}
+            className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-background border flex items-center justify-center hover:bg-muted"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      )}
       {!parentId && (
         <div className="flex flex-wrap gap-1.5">
           <TooltipProvider>
@@ -266,8 +287,12 @@ function ComposeBox({
         </div>
       )}
       <div className="flex items-center justify-between">
-        <p className="flex items-center gap-0.5 text-[10px] text-muted-foreground">{modSymbol}<CornerDownLeft className="h-3.5 w-3.5" /> to send</p>
-        <Button size="sm" onClick={send} disabled={sending || !content.trim()} className="h-7 text-xs">
+        <div className="flex items-center gap-0.5">
+          <EmojiPickerButton onPick={(emoji) => setContent((c) => c + emoji)} />
+          {!gifAttachment && <GifPickerButton onPick={setGifAttachment} />}
+          <p className="flex items-center gap-0.5 text-[10px] text-muted-foreground ml-1">{modSymbol}<CornerDownLeft className="h-3.5 w-3.5" /> to send</p>
+        </div>
+        <Button size="sm" onClick={send} disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs">
           <Send className="h-3 w-3 mr-1" />
           {sending ? "Sending…" : "Send"}
         </Button>
@@ -350,7 +375,14 @@ function MessageRow({
             {!isRead && <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />}
           </div>
           <p className="text-sm mt-1 leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
+          <InlineMedia url={msg.attachmentUrl ?? ""} name={msg.attachmentName} mimeType={msg.attachmentMimeType} />
           <AttachmentBlock msg={msg} />
+          <ReactionRow
+            messageId={msg.id}
+            reactions={msg.reactions ?? []}
+            currentUserId={currentUserId}
+            onUpdate={onRefresh}
+          />
           <div className="flex items-center gap-3 mt-2">
             <span className="text-[11px] text-muted-foreground">
               {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}

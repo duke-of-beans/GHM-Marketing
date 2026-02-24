@@ -38,7 +38,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~17~~ | ~~Admin First-Run (Full)~~ | ~~FEAT-015 (7-step wizard) + FEAT-018 (login logo) + UX-AUDIT-012 (3-color branding) + BrandThemeInjector~~ | ✅ SHIPPED | |
 | UI-CONST | UI/UX Constitution + Design System Saga | UI-CONST-001 — runs parallel to all sprints; audit → blueprint → build in groups | Multi-session initiative | Professional-grade UI indistinguishable from Xero/Slack/Monday. Prerequisite for White-Label/COVOS productization. |
 | ~~18~~ | ~~Analytics + Telemetry~~ | ~~FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) + UX-AUDIT-022 (Settings IA consolidation)~~ | ✅ SHIPPED | |
-| 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
+| ~~19~~ | ~~Content Automation~~ | ~~FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit)~~ | ✅ SHIPPED | |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
@@ -204,19 +204,19 @@ Marketing materials currently use generic GHM placeholders. Each tenant needs th
 **Relationship:** Depends on FEAT-016 (full style capture); this is a shippable subset.
 **Size:** ~1 session. **Priority:** 🟠 SHOULD. Pairs with FEAT-018.
 
-### FEAT-022: TeamFeed — Multimedia, GIF, and Emoji Support (Slack-Grade)
+### ~~FEAT-022: TeamFeed — Multimedia, GIF, and Emoji Support~~ ✅ SHIPPED Sprint 19
 TeamFeed is currently text-only. For team communication to actually get used, it needs to feel like Slack.
 **Scope:** Emoji picker (emoji-mart) inline in compose box. Emoji reactions per message (store per-message-per-user, aggregate + display below messages). GIF search via Giphy or Tenor API — renders inline in thread. Image/file attachment via drag-drop or click-to-upload (Vercel Blob, depends on BUG-010). Paste-from-clipboard image support. Server limits: images max 8 MB, PNG/JPG/GIF/WebP.
 **UX bar:** Everything should feel native and instant. The bar is Slack. If it feels worse than Slack, it's not done.
 **Dependencies:** BUG-010 Blob provisioning (for image upload). Giphy/Tenor API key (free tier sufficient).
 **Size:** ~2 sessions (emoji + reactions first; GIF + attachment second). **Priority:** 🟠 SHOULD.
 
-### FEAT-023: Stock Photo Library Integration (API-Based Media Automation)
+### ~~FEAT-023: Stock Photo Library Integration~~ ✅ SHIPPED Sprint 19
 Content production requires images. Currently no way to source or attach images from within the platform.
 **Scope:** Integrate Unsplash, Pexels, and/or Pixabay (all free, permissive licenses). Search interface accessible from Content Studio and any rich text field — keyword search returns photo grid with photographer credit, one-click insert. Automation layer: when AI generates content, system auto-suggests relevant stock image based on topic (keyword extraction → API query → attach top result). Attribution metadata stored with image reference (required for Unsplash compliance).
 **Size:** ~1 session (search UI + Unsplash/Pexels); ~1 session (automation layer). **Priority:** 🟠 SHOULD.
 
-### FEAT-024: Client Website Audit — Review & Optimization Analysis
+### ~~FEAT-024: Client Website Audit — Review & Optimization Analysis~~ ✅ SHIPPED Sprint 19
 Fast, structured way to audit a client's current site for technical, SEO, UX, and performance issues.
 **Scope:** "Audit Website" button on Client detail page (and optionally Lead detail sheet for prospect sites). Pre-populated with `websiteUrl`, editable. Analysis: Page speed / Core Web Vitals (PageSpeed Insights API), meta title/description, heading structure, mobile signal, SSL check, schema markup, broken links (surface-level), image alt tags, canonical tags, sitemap/robots.txt. Output: score per dimension, prioritized issue list (Critical / Recommended / Optional), plain-English summary. Export as branded PDF. Store per-client with timestamp for before/after tracking.
 **API dependency:** Google PageSpeed Insights API (free, requires API key in env).
