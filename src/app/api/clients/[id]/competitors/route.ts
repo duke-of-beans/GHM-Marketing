@@ -18,7 +18,7 @@ export async function GET(
   if (isNaN(clientId)) return NextResponse.json({ error: "Invalid client ID" }, { status: 400 });
 
   try {
-    const competitors = await prisma.competitor.findMany({
+    const competitors = await prisma.clientCompetitor.findMany({
       where: { clientId, isActive: true },
       orderBy: { addedAt: "asc" },
     });
@@ -45,7 +45,7 @@ export async function POST(
   }
 
   try {
-    const competitor = await prisma.competitor.create({
+    const competitor = await prisma.clientCompetitor.create({
       data: {
         clientId,
         businessName: businessName.trim(),

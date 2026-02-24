@@ -61,7 +61,7 @@ export function GenerateReportButton({ clientId }: { clientId: number }) {
         body: JSON.stringify({
           clientId,
           type: reportType,
-          sections: [...sections],
+          sections: Array.from(sections),
           includeAISummary,
           clientFacing,
         }),

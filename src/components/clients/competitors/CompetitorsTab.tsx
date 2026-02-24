@@ -105,7 +105,7 @@ export function CompetitorsTab({ clientId }: CompetitorsTabProps) {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h3 className="font-semibold">Tracked Competitors</h3>
-          <p className="text-sm text-muted-foreground">Monitored in weekly scans. Up to 5.</p>
+          <p className="text-sm text-muted-foreground">Monitored in weekly scans. Max 5.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleRefreshScan} disabled={scanLoading} className="gap-1.5">
@@ -189,7 +189,7 @@ export function CompetitorsTab({ clientId }: CompetitorsTabProps) {
         </div>
       )}
 
-      <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
+      <AlertDialog open={!!deleteTarget} onOpenChange={open => { if (!open) setDeleteTarget(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Competitor</AlertDialogTitle>

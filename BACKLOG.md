@@ -204,14 +204,6 @@ As the owner of COVOS managing multiple tenant clients, David needs aggregate vi
 **Direction:** Evaluate two models — (A) Keep tasks at top level for cross-client queue management (master view: "all tasks across all clients"), (B) Move tasks under Clients as a client-contextual tool, with a master queue accessible from a different entry point. Both are valid depending on how task work is actually done day-to-day. Audit actual usage pattern before committing.
 **Size:** ~2 hrs (decision + nav restructure). **Priority:** 🟡 WOULD — low disruption if changed early, high disruption if changed after user habits form. Decide by Sprint 10.
 
-Content Studio one item at a time. **Scope:** Checkbox multi-select, bulk approve (master+ only), bulk archive, bulk assign. **Size:** ~2 hrs. (Sprint 8 target.)
-
-### FEAT-009: Competitor Tracking — Manual Add + Refresh
-Competitors seeded at creation, no manual control. **Scope:** Add/remove competitor, manual refresh trigger. **Size:** ~2 hrs. (Sprint 8 target.)
-
-### FEAT-010: Reporting — Custom Report Builder
-Section toggle before generation, per-client template, AI-written Executive Summary from scan delta data. **Size:** ~1 session. (Sprint 8 target.)
-
 ### FEAT-011: Full Button / Route / Path / Pattern / Dependency & Logic Audit
 No formal audit has been run on the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers, and dependency mismatches accumulate over sprints and become invisible bugs or security gaps at productization.
 **Scope:** Enumerate every `<Button>`, `<Link>`, `router.push()`, and form `onSubmit` in the codebase. Map each to its handler and route. Flag: dead routes (handler exists, no UI pointing to it), broken routes (UI points, handler missing/wrong), duplicate logic (same operation done two ways in different components), permission gaps (route accessible without correct role check), and dependency tangles (component imported but unused, or used in multiple incompatible contexts).

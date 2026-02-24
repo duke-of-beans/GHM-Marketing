@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 8 build errors fixed (commit add4ec7). Backlog updated with UX-AUDIT-010, FEAT-021, UX-AUDIT-011.
+**Last Updated:** February 24, 2026 — Sprint 8 complete. All 8A/8B/8C shipped + TS errors cleared. See CHANGELOG.
 
 ### SPRINT 8 — Content Power ✅ COMPLETE (February 24, 2026)
 - [x] **8A — Bulk Content Operations** — Multi-select UI on ContentList, bulk action bar (Approve/Archive), `POST /api/content/bulk` route. Master+ only. `isMaster` prop threaded from page → profile → ContentStudioTab → ContentList.

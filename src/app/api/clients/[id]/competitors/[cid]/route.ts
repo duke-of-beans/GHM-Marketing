@@ -16,7 +16,7 @@ export async function DELETE(
   if (isNaN(competitorId)) return NextResponse.json({ error: "Invalid competitor ID" }, { status: 400 });
 
   try {
-    await prisma.competitor.update({
+    await prisma.clientCompetitor.update({
       where: { id: competitorId },
       data: { isActive: false },
     });

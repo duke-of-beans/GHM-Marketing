@@ -94,7 +94,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
       const res = await fetch('/api/content/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ids: [...selected] }),
+        body: JSON.stringify({ action, ids: Array.from(selected) }),
       })
       if (!res.ok) throw new Error('Bulk action failed')
       const data = await res.json()

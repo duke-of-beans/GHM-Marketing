@@ -1,20 +1,20 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 7 (Save Searches + Audit PPC Section + Brochure PPC) shipped.
+**Last Updated:** February 24, 2026 — Sprint 8 complete (Bulk Content Ops, Competitor Tracking, Custom Report Builder).
 
 ---
 
-## How items land here
-When you ship something:
-1. Add a row to the table below (date + commit + what shipped)
-2. Delete the item from BACKLOG.md
-3. Update STATUS.md "Last Updated" line
-4. Then commit
+## Sprint 8 — Content Power (February 24, 2026)
 
----
+| Date | What Shipped |
+|------|-------------|
+| Feb 24 | **8A — Bulk Content Operations** — Multi-select + bulk action bar (Approve/Archive) in ContentList. `POST /api/content/bulk`. Master+ only via `isMaster` prop threaded page → profile → ContentStudioTab → ContentList. |
+| Feb 24 | **8B — Competitor Tracking** — `CompetitorsTab` component (add/remove/scan-trigger, 5-slot limit, empty state). `GET/POST /api/clients/[id]/competitors`, `DELETE /api/clients/[id]/competitors/[cid]`. Wired into profile overflow nav under Operations. Fixed Prisma model name (`clientCompetitor`). |
+| Feb 24 | **8C — Custom Report Builder** — Dialog extended with 8-section toggle grid, select-all, AI Executive Summary switch, Client-Facing Mode switch. `Array.from()` spread fix for Set iteration TS error. |
+| Feb 24 | **Build fixes** — ESLint ternary-as-statement fix in ContentList + generate-report-button. Set spread → Array.from in both files. All Sprint 8 TS errors cleared. |
 
-## Sprint 7 — Sales Enablement Polish (February 24, 2026)
+
 
 | Date | What Shipped |
 |------|-------------|
