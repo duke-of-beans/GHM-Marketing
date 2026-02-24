@@ -257,11 +257,16 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
   }, [initialLeads, filters]);
 
   const [batchEnriching, setBatchEnriching] = useState(false);
+  const [enrichCount, setEnrichCount] = useState<number | "all">(50);
+  const [bulkCount, setBulkCount] = useState<number | "all">(200);
+  const resolvedCount = (count: number | "all", total: number) =>
+    count === "all" ? total : Math.min(count, total);
 
   const handleBatchEnrich = async (force = false) => {
     const leadIds = filteredLeads.map((l) => l.id);
     if (leadIds.length === 0) return;
-    const batch = leadIds.slice(0, 50);
+    const limit = resolvedCount(enrichCount, leadIds.length);
+    const batch = leadIds.slice(0, limit);
     setBatchEnriching(true);
     try {
       const res = await fetch("/api/leads/enrich-batch", {
@@ -346,21 +351,61 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
           )}
           {(userRole === "manager" || userRole === "admin") && (
             <>
-              <button
-                className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
-                onClick={() => handleBatchEnrich()}
-                disabled={batchEnriching || filteredLeads.length === 0}
-              >
-                {batchEnriching ? "Enriching..." : `🔍 Enrich (${Math.min(filteredLeads.length, 50)})`}
-              </button>
+              {/* Enrich button with count picker — split-button pattern using DropdownMenu */}
+              <div className="flex items-center border rounded overflow-hidden">
+                <button
+                  className="h-9 px-3 text-sm hover:bg-muted disabled:opacity-50"
+                  onClick={() => handleBatchEnrich()}
+                  disabled={batchEnriching || filteredLeads.length === 0}
+                >
+                  {batchEnriching
+                    ? "Enriching..."
+                    : `🔍 Enrich (${resolvedCount(enrichCount, filteredLeads.length)})`}
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="h-9 px-1.5 text-sm border-l hover:bg-muted disabled:opacity-50"
+                      disabled={batchEnriching || filteredLeads.length === 0}
+                      aria-label="Set enrich count"
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">Enrich up to</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {([25, 50, 100, "all"] as const).map((n) => (
+                      <DropdownMenuItem
+                        key={n}
+                        className={enrichCount === n ? "font-medium text-primary" : ""}
+                        onClick={() => setEnrichCount(n)}
+                      >
+                        {n === "all" ? `All (${filteredLeads.length})` : n}
+                        {(n === "all" || (typeof n === "number" && n > 100)) && (
+                          <span className="ml-auto text-xs text-amber-500">⚠ cost</span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Bulk Actions with configurable count */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5" disabled={filteredLeads.length === 0}>
-                    Bulk Actions ({Math.min(filteredLeads.length, 200)}) <ChevronDown className="h-3.5 w-3.5" />
+                  <button
+                    className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5 disabled:opacity-50"
+                    disabled={filteredLeads.length === 0}
+                  >
+                    Bulk Actions ({resolvedCount(bulkCount, filteredLeads.length)})
+                    <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel className="text-xs">On {Math.min(filteredLeads.length, 200)} filtered leads</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-xs">
+                    On {resolvedCount(bulkCount, filteredLeads.length)} filtered leads
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => bulkLeadOp("stage", { stage: "contacted" })}>
                     Mark as Contacted
@@ -375,14 +420,27 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                   <DropdownMenuItem
                     className="text-destructive"
                     onClick={() => {
-                      if (window.confirm(`Delete ${Math.min(filteredLeads.length, 200)} leads? Cannot be undone.`))
+                      const count = resolvedCount(bulkCount, filteredLeads.length);
+                      if (window.confirm(`Delete ${count} leads? Cannot be undone.`))
                         bulkLeadOp("delete");
                     }}
                   >
                     <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete All
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">Apply to</DropdownMenuLabel>
+                  {([25, 50, 100, 200, "all"] as const).map((n) => (
+                    <DropdownMenuItem
+                      key={n}
+                      className={bulkCount === n ? "font-medium text-primary" : ""}
+                      onClick={() => setBulkCount(n)}
+                    >
+                      {n === "all" ? `All (${filteredLeads.length})` : n}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+
               <button
                 className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5"
                 onClick={handleExportLeads}

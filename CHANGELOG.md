@@ -1,11 +1,27 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — FEAT-029 complete (master→manager rename).
+**Last Updated:** February 24, 2026 — Sprint 14 complete (UX-AUDIT-013, UX-AUDIT-016, UX-AUDIT-017, UX-BUG-002).
 
 ---
 
 ## Sprint 14 — UX Polish Batch (February 24, 2026)
+
+### UX-AUDIT-013 — Dialog / Modal Global Style Audit
+Base components upgraded: `dialog.tsx`, `sheet.tsx`, `alert-dialog.tsx`. All 30+ consumers inherit automatically. Changes: backdrop darkened to `bg-black/60` with `backdrop-blur-sm`, `DialogContent` gets `border-t-2 border-t-primary/30` accent top border and `shadow-xl`, close button upgraded from `rounded-sm` to `rounded-md p-1` with `hover:bg-muted` state, `DialogHeader` gains `pb-4 border-b` separator, `DialogFooter` and `AlertDialogFooter` get `gap-2 pt-2` tightening, `SheetContent` right variant gets `border-l-primary/20` accent.
+**Files:** `src/components/ui/dialog.tsx`, `src/components/ui/sheet.tsx`, `src/components/ui/alert-dialog.tsx`
+
+### UX-AUDIT-016 — Tooltip vs Tour Tip Visual Differentiation
+Created `InfoTip` component as the canonical info `?` — subdued `text-muted-foreground/60`, outline style, informational only. Updated `TourButton` to render in `text-primary/70 hover:text-primary hover:bg-primary/10` — visually distinct filled accent style signaling guided interaction. Design system note included in both files via JSDoc.
+**Files:** `src/components/ui/info-tip.tsx` (new), `src/components/tutorials/TourButton.tsx`
+
+### UX-AUDIT-017 — Bulk Actions Configurable Volume
+Replaced hardcoded `Enrich (50)` and `Bulk Actions (200)` with configurable count state. Enrich button becomes split-button: main action runs enrich at selected count, chevron opens DropdownMenu with presets (25/50/100/All) and ⚠ cost warning for 100+. Bulk Actions dropdown footer shows count presets (25/50/100/200/All). `resolvedCount()` helper. Default: enrich=50, bulk=200. Server-side caps unchanged.
+**Files:** `src/app/(dashboard)/leads/client.tsx`
+
+### UX-BUG-002 — Search Bar Layout-Aware Inline Trigger
+Trigger button upgraded to `flex-1 min-w-0 max-w-sm` — fills available space between left nav and TeamFeedToggle, layout-aware. Kbd shortcut badge moved to `ml-auto` right-aligned. Text truncates cleanly. Modal overlay already handled click-outside dismiss. Resolves UX-BUG-001 (click-outside) as a side effect.
+**Files:** `src/components/search/AISearchBar.tsx`
 
 ### FEAT-029 — Rename `master` role → `manager`
 

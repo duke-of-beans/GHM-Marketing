@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Removed FEAT-027 (logo nav — shipped) and BUG-010 (Blob provisioning — complete). Backlog reconciled against FEATURE_ROADMAP.md (now deleted).
+**Last Updated:** February 24, 2026 — Sprint 14 complete. Removed UX-AUDIT-013, UX-AUDIT-016, UX-AUDIT-017, UX-BUG-001, UX-BUG-002, UX-BUG-007.
 
 **Owner:** David Kirsch
 
@@ -31,7 +31,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~9~~ | ~~Admin Infrastructure~~ | ~~Import visibility + Admin elevation + Branding system + Admin first-run wizard~~ | ✅ SHIPPED | |
 | ~~12~~ | ~~Route/Permission Audit~~ | ~~3 unguarded pages + API role bug + stale ID~~ | ✅ SHIPPED | |
 | ~~13~~ | ~~Bug Triage~~ | ~~BUG-010/011 + AUDIT-004 dashboard flash~~ | ✅ SHIPPED | |
-| 14 | UX Polish Batch | UX-AUDIT-013 (modal style) + UX-AUDIT-016/017 (tooltip/bulk actions) + UX-BUG-002 (search bar) | ~1 session | Tighten interaction quality before any external eyes. |
+| ~~14~~ | ~~UX Polish Batch~~ | ~~UX-AUDIT-013 + UX-AUDIT-016/017 + UX-BUG-001/002~~ | ✅ SHIPPED | |
 | 15 | Pipeline Intelligence | FEAT-025 (full Lead model filters) + FEAT-026 (filter UX defaults) + UX-FEAT-001 (filter bar presentation) | ~1 session | Surface the scoring engine properly. |
 | 16 | Admin Polish | FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + FEAT-029 (master→manager rename) + UX-AUDIT-015 (Content Studio empty states) | ~1 session | Small items, high finish quality. |
 | 17 | Admin First-Run (Full) | FEAT-015 (onboarding wizard full scope) + FEAT-018 (logo swap) + UX-AUDIT-012 (3-color branding) | ~1 session | Enables real new-tenant activation. |
@@ -48,14 +48,6 @@ Foundation → out. Each sprint unblocks the next.
 
 ## 🐛 UX BUGS (Pre-existing, open)
 
-### UX-BUG-001: Search Bar — Click-Outside Should Close
-Escape only. Clicking anywhere outside should dismiss.
-**Fix:** `useClickOutside` hook on search component. **Size:** ~30 min.
-
-### UX-BUG-002: Search Bar — Expansion Behavior Wrong, Not Layout-Aware
-Modal-style cmdk trigger renders a transparent gray square. Should be inline expanding input with dropdown results, layout-aware of Team Feed panel width.
-**Fix:** Replace cmdk modal with inline input. CSS transition max-width. Results as positioned dropdown below input. **Size:** ~2–3 hrs. **Closes:** UX-BUG-007.
-
 ### UX-BUG-003: Payments Page — Wave Widget Fails Without Graceful Degradation
 Raw GraphQL error surfaced in UI. **Fix:** Catch Wave auth errors, show clean amber notice. **Size:** ~1 hr.
 
@@ -64,9 +56,6 @@ Expanded items render below viewport. **Fix:** `scrollIntoView({ behavior: 'smoo
 
 ### UX-BUG-005: "Team" Nav Group — Rename to Better Reflect Contents
 Contains Service Catalog + Document Vault. "Team" is misleading. **Fix:** Rename to "Resources" or "Workspace." **Size:** ~15 min.
-
-### UX-BUG-007: Command Palette — Opens as Empty Transparent Square
-Resolved by UX-BUG-002 fix. Do not patch in isolation.
 
 ### ARCH-001: Orphaned File Audit
 Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audit, move historical-only files to `docs/archive/`. **Size:** ~1 hr.
@@ -150,11 +139,6 @@ Current branding tab has a single brand color field. Need three roles: Primary (
 **Scope:** Extend `GlobalSettings` with `brandColorPrimary`, `brandColorSecondary`, `brandColorAccent` (nullable). `BrandingTab` UI with three pickers, role descriptions, "not set — using default" indicator, "Reset to defaults" button. CSS custom property injection at root level.
 **Size:** ~2 hrs. **Priority:** 🟠 SHOULD. **Depends on:** BUG-010 Blob provisioning first.
 
-### UX-AUDIT-013: Dialog / Modal Global Style Audit
-CSV import dialog and likely other modals use default shadcn styles that feel dated or inconsistent.
-**Scope:** Global pass across all `<Dialog>`, `<Sheet>`, `<AlertDialog>` usage (~15–20 instances). Standardize: consistent header, footer (primary right-aligned, cancel/ghost), padding, close button, backdrop. Consider thin accent border at modal header top. Dark mode check.
-**Size:** ~1–2 hrs design + ~1 hr implementation. **Priority:** 🟠 SHOULD.
-
 ### UX-AUDIT-014: Pipeline Enrich Button — Intent-Aware Enrichment
 "Enrich (50)" button enriches leads indiscriminately, wasting API credits on cold/unqualified leads.
 **Scope:** Remove flat header button. Replace with: (1) per-lead "Enrich" in lead detail sheet; (2) "Enrich selected" in Bulk Actions dropdown. Add warning when bulk enriching "available" status leads. Existing `handleBatchEnrich` logic unchanged.
@@ -163,17 +147,6 @@ CSV import dialog and likely other modals use default shadcn styles that feel da
 ### UX-AUDIT-015: Content Studio Empty States
 Content Studio shows generic "no content." Needs context-aware states: (a) no clients have Content Studio active, (b) active but no briefs yet — prompt to generate first.
 **Size:** ~30 min. **Priority:** 🟡 WOULD.
-
-### UX-AUDIT-016: Tooltip vs. Tour Tip — Visual Differentiation
-Both "?" types render identically. Users can't tell if clicking will give a quick definition or launch a tour step.
-**Scope:** Define two visually distinct components. Tooltip `?` = subdued, outline, info-only. Tour tip `?` = filled, branded accent, signals "guided step." Audit all instances, reclassify, update. Brief design-system note.
-**Size:** ~1–2 hrs. **Priority:** 🟠 SHOULD.
-
-### UX-AUDIT-017: Bulk Actions — Custom Volume Input (Global)
-Bulk actions use hardcoded integers (e.g., "Enrich 50", "Process 200"). No way to specify custom count or operate on full filtered set.
-**Scope:** Replace hardcoded integers with configurable input — numeric field or stepper with "All filtered" option plus presets (25, 50, 100, custom). Cap enforcement stays server-side. Apply globally across all bulk action entry points. Cost threshold warning for enrichment above N=100.
-**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD.
-
 
 ---
 

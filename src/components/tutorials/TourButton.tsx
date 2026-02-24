@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * TourButton — filled accent "?" that signals an interactive guided step.
+ * Visual contrast vs InfoTip (subdued outline): filled accent = "show me how to use this".
+ */
+
 import { HelpCircle } from "lucide-react";
 import {
   Tooltip,
@@ -11,21 +16,11 @@ import { Button } from "@/components/ui/button";
 
 type TourButtonProps = {
   onStart: () => void;
-  /** Optional label shown next to the icon (default: hidden, icon only) */
   label?: string;
-  /** Tooltip text (default: "Take a tour of this page") */
   tooltip?: string;
   className?: string;
 };
 
-/**
- * TourButton — a small ? icon button that launches the page tour.
- * Drop this anywhere in a page header to give users on-demand access to the tour.
- *
- * Usage:
- *   const { startTour } = useTour(LEADS_TOUR);
- *   <TourButton onStart={startTour} />
- */
 export function TourButton({
   onStart,
   label,
@@ -40,11 +35,11 @@ export function TourButton({
             variant="ghost"
             size="sm"
             onClick={onStart}
-            className={`gap-1.5 text-muted-foreground hover:text-foreground ${className}`}
+            className={`gap-1.5 text-primary/70 hover:text-primary hover:bg-primary/10 ${className}`}
             aria-label={tooltip}
           >
             <HelpCircle className="h-4 w-4" />
-            {label && <span className="text-xs">{label}</span>}
+            {label && <span className="text-xs font-medium">{label}</span>}
           </Button>
         </TooltipTrigger>
         <TooltipContent side="bottom">

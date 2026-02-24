@@ -1,12 +1,17 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — FEAT-029 complete (master→manager role rename, full codebase sweep, TypeScript clean).
+**Last Updated:** February 24, 2026 — Sprint 14 complete (UX-AUDIT-013 modal audit, UX-AUDIT-016 tooltip differentiation, UX-AUDIT-017 bulk count picker, UX-BUG-002 search bar).
 
 ### SPRINT 14 — UX Polish Batch (February 24, 2026)
 - [x] **FEAT-029 COMPLETE** — Full rename of `master` → `manager` role across entire codebase. DB enum migrated live (`ALTER TYPE`), Prisma regenerated, 87+ files updated, `/master` route directory renamed to `/manager`, all redirect/revalidate strings updated, preset names `master_lite/full` → `manager_lite/full`. TypeScript reports zero FEAT-029 errors. Pre-existing script errors (basecamp/dotenv) unaffected.
 **Files:** All `src/` .ts/.tsx except calculations; `prisma/schema.prisma`; `src/app/(dashboard)/manager/` (renamed from master)
 **Preserved intentionally:** `master_fee` payment type, `masterFeeEnabled/Amount`, `masterManagerId` Prisma field names, `masterManagerFee` settings key
+- [x] **UX-AUDIT-013 COMPLETE** — Global dialog/modal style audit. Base components upgraded (`dialog.tsx`, `sheet.tsx`, `alert-dialog.tsx`) — all 30+ consumers inherit. Backdrop blur, accent top border, improved close button, header separator, footer gap tightening.
+- [x] **UX-AUDIT-016 COMPLETE** — Tooltip vs tour tip visual differentiation. New `InfoTip` component (subdued, info-only). `TourButton` updated to accent primary style (filled, signals guided interaction). JSDoc design system notes on both.
+- [x] **UX-AUDIT-017 COMPLETE** — Bulk actions configurable volume. Split-button enrich with DropdownMenu preset picker (25/50/100/All + ⚠ cost warning). Bulk Actions count also configurable (25/50/100/200/All). `resolvedCount()` helper. Hardcoded 50/200 integers eliminated.
+- [x] **UX-BUG-002 COMPLETE** — Search bar inline trigger upgraded to layout-aware `flex-1` bar with `max-w-sm` cap. Fills space between nav and TeamFeedToggle. Also resolves UX-BUG-001 (click-outside dismiss already handled by overlay).
+**Files:** `src/components/ui/dialog.tsx`, `src/components/ui/sheet.tsx`, `src/components/ui/alert-dialog.tsx`, `src/components/ui/info-tip.tsx` (new), `src/components/tutorials/TourButton.tsx`, `src/app/(dashboard)/leads/client.tsx`, `src/components/search/AISearchBar.tsx`
 
 
 

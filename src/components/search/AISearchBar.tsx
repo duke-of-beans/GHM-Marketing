@@ -186,15 +186,15 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
 
   return (
     <>
-      {/* Trigger button — hidden when modal is open to prevent double-bar effect */}
+      {/* Trigger — full-width inline bar, layout-aware */}
       <button
         onClick={() => setOpen(true)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/40 text-sm text-muted-foreground hover:bg-muted transition-colors ${open ? "invisible" : ""}`}
+        className={`flex flex-1 items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/40 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors min-w-0 max-w-sm ${open ? "invisible" : ""}`}
         aria-label="Open search"
       >
-        <Search className="h-3.5 w-3.5" />
-        <span>Search</span>
-        <kbd className="ml-2 hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+        <Search className="h-3.5 w-3.5 flex-shrink-0" />
+        <span className="truncate">Search</span>
+        <kbd className="ml-auto hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground flex-shrink-0">
           {modSymbol}K
         </kbd>
       </button>
