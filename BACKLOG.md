@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Added 9 items from David's audit: BUG-012–016 (5 bugs), FEAT-030–031 (2 features), UX-AUDIT-018–019 (2 UX items). Sprint table updated.
+**Last Updated:** February 24, 2026 — Added 10 items from David's audit: BUG-012–016 (5 bugs), FEAT-030–032 (3 features), UX-AUDIT-018–019 (2 UX items). Sprint table updated.
 
 **Owner:** David Kirsch
 
@@ -38,7 +38,7 @@ Foundation → out. Each sprint unblocks the next.
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
-| 21 | Settings & Tasks Polish | BUG-012 (territories crash) + BUG-013 (permission preset 400) + BUG-014 (recurring tasks crash) + BUG-015 (Wave unconfigured state) + BUG-016 (pipeline dark mode headings) + UX-AUDIT-018 (integrations health panel) + UX-AUDIT-019 (permissions inline) + FEAT-030 (service catalog grid) + FEAT-031 (contextual task suggestions) | ~1–2 sessions | Fixes from David's Feb 24 audit — critical bugs first, then UX polish. |
+| 21 | Settings & Tasks Polish | BUG-012 (territories crash) + BUG-013 (permission preset 400) + BUG-014 (recurring tasks crash) + BUG-015 (Wave unconfigured state) + BUG-016 (pipeline dark mode headings) + UX-AUDIT-018 (integrations health panel) + UX-AUDIT-019 (permissions inline) + FEAT-030 (service catalog grid) + FEAT-031 (contextual task suggestions) + FEAT-032 (file display name) | ~1–2 sessions | Fixes from David's Feb 24 audit — critical bugs first, then UX polish. |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
@@ -275,7 +275,12 @@ Service catalog page currently only supports list view. Users want to browse vis
 **Scope:** Add a List/Grid toggle button to the service catalog page header (icon buttons, similar to leads kanban/list toggle). Grid view: card-based layout showing service name, category, price, and status at a glance. List view: existing table/list. Persist preference in localStorage or user settings. No data model changes required.
 **Size:** ~1 hr. **Priority:** 🟠 SHOULD.
 
-### FEAT-031: Tasks — Contextual Task Suggestions by User Role
+### FEAT-032: File Uploads — Display Name Override
+When uploading files (Document Vault, content attachments, or any file upload surface), the uploader should be able to set a display name that shows more prominently than the raw filename. Raw filenames are often cryptic (`Q3_FINAL_v2_REAL_USE_THIS.pdf`). A human-readable display name improves scannability for everyone who sees the file afterward.
+**Scope:** Add an optional "Display name" field to all file upload dialogs/flows. If set, display name renders as the primary label in file lists, cards, and previews; raw filename shown secondarily in smaller/muted text or on hover. Store `displayName` alongside file record in DB (nullable — falls back to filename if not set). Apply to: Document Vault uploads at minimum; audit other upload surfaces (content attachments, logo upload, CSV import) and apply where it makes sense contextually.
+**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD.
+
+
 When creating a new task, users should be prompted with suggestions relevant to what actually happens in the system for their role — not just a blank form.
 **Scope:** "New Task" dialog gains a "Suggested tasks" section showing role-aware quick-add options. Examples for admin: "Create new user", "Review bug reports", "Approve content brief". For manager: "Review client health scores", "Approve commission". For sales: "Follow up lead", "Generate audit report". Suggestions are one-click to pre-fill task title + optionally link to the relevant page/action. Suggestions are curated static lists per role (not AI-generated initially — keep it fast). Also surfaces any recurring tasks the user has active as "based on your rules."
 **Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD. **Related:** FEAT-014 (PM import), UX-AUDIT-011 (tasks nav placement).
