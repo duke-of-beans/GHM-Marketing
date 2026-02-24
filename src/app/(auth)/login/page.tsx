@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,23 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<LoginStep>("credentials");
   const [useBackupCode, setUseBackupCode] = useState(false);
+  const [tenantLogoUrl, setTenantLogoUrl] = useState<string | null>(null);
+  const [tenantName, setTenantName] = useState<string | null>(null);
 
   // Store credentials across the two-step flow
   const emailRef = useRef<string>("");
   const passwordRef = useRef<string>("");
+
+  // Fetch tenant branding (FEAT-018) — no auth required
+  useEffect(() => {
+    fetch("/api/public/branding")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.logoUrl) setTenantLogoUrl(d.logoUrl);
+        if (d.companyName) setTenantName(d.companyName);
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleCredentials(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -103,14 +116,23 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2 pb-4">
-          <Image
-            src="/logo.png"
-            alt="GHM Digital Marketing"
-            width={240}
-            height={80}
-            className="mx-auto"
-            priority
-          />
+          {tenantLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={tenantLogoUrl}
+              alt={tenantName ?? "Company logo"}
+              className="mx-auto max-h-16 max-w-48 object-contain"
+            />
+          ) : (
+            <Image
+              src="/logo.png"
+              alt="GHM Digital Marketing"
+              width={240}
+              height={80}
+              className="mx-auto"
+              priority
+            />
+          )}
           <p className="text-sm text-muted-foreground">
             {step === "credentials" ? "Sign in to your dashboard" : "Two-factor authentication"}
           </p>

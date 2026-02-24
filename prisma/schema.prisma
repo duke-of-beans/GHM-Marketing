@@ -71,8 +71,9 @@ model User {
   repOnboardingCompletedAt  DateTime?  @map("rep_onboarding_completed_at")
   repOnboardingStep         Int        @default(0) @map("rep_onboarding_step") // last completed step (0 = not started)
 
-  // Admin first-run wizard (9B)
+  // Admin first-run wizard (9B / Sprint 17)
   adminOnboardingCompletedAt DateTime? @map("admin_onboarding_completed_at")
+  adminOnboardingStep         Int       @default(0) @map("admin_onboarding_step") // last completed step index
 
   // Document Vault
   vaultUploads          VaultFile[]  @relation("VaultUploads")
@@ -1019,7 +1020,9 @@ model GlobalSettings {
   companyName           String?  @map("company_name")
   companyTagline        String?  @map("company_tagline")
   logoUrl               String?  @map("logo_url")          // Vercel Blob URL
-  brandColor            String?  @map("brand_color")       // hex e.g. "#1a56db"
+  brandColor            String?  @map("brand_color")       // hex e.g. "#1a56db" — primary (CTAs)
+  brandColorSecondary   String?  @map("brand_color_secondary") // supporting UI elements
+  brandColorAccent      String?  @map("brand_color_accent")    // highlights / badges
   
   // Metadata
   updatedAt             DateTime @updatedAt @map("updated_at")

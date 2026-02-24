@@ -1,7 +1,19 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 16+16.5 complete (admin polish + critical bug batch: FEAT-027/028, UX-AUDIT-015, BUG-020–024).
+**Last Updated:** February 25, 2026 — Sprint 17 complete (Admin First-Run: FEAT-015 + FEAT-018 + UX-AUDIT-012 + BrandThemeInjector).
+
+---
+
+## Sprint 17 — Admin First-Run (February 25, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 25 | **FEAT-015** — Admin onboarding wizard expanded from 4 steps to 7. Steps: Welcome → Company → Branding (logo + 3 colors) → Team Setup (invite user) → Lead Import (CSV/Excel) → Integrations Checklist (live status badges) → Done. Wizard step persisted to `User.adminOnboardingStep`; resume on re-entry. All steps skippable. `AdminSetupWizard.tsx` fully rewritten; `admin-setup/page.tsx` updated to pass `initialStep`. |
+| Feb 25 | **FEAT-018** — Login page tenant logo. `GET /api/public/branding` (no auth). Login page fetches on mount and renders tenant logo with fallback to `/logo.png`. |
+| Feb 25 | **UX-AUDIT-012** — 3-color branding system. `brandColorSecondary` + `brandColorAccent` added to `GlobalSettings` schema + pushed to DB. BrandingTab updated with three color pickers + per-color reset buttons. Saved via `/api/admin/onboarding` PATCH. |
+| Feb 25 | **BrandThemeInjector** — `src/components/branding/BrandThemeInjector.tsx` created. Injects `--brand-primary`, `--brand-secondary`, `--brand-accent` as CSS custom properties on `:root`. Dashboard layout already imports and mounts it. |
+| Feb 25 | **Onboarding API** — `GET /api/admin/onboarding` + `PATCH` extended: `step` field for wizard progress, all three brand color fields (`brandColorSecondary`, `brandColorAccent`). `GET /api/public/branding` created (no auth required). |
 
 ---
 

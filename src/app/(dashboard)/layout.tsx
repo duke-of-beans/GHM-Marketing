@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/nav";
 import { DashboardLayoutClient } from "@/components/dashboard/DashboardLayoutClient";
 import { BugTrackingInit } from "@/components/bug-report/BugTrackingInit";
+import { BrandThemeInjector } from "@/components/branding/BrandThemeInjector";
 import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
 import { isElevated } from "@/lib/auth/roles";
@@ -29,7 +30,7 @@ export default async function DashboardLayout({
       orderBy: { name: "asc" },
     }),
     prisma.globalSettings.findFirst({
-      select: { pushMessagesEnabled: true, pushTasksEnabled: true, logoUrl: true, companyName: true },
+      select: { pushMessagesEnabled: true, pushTasksEnabled: true, logoUrl: true, companyName: true, brandColor: true, brandColorSecondary: true, brandColorAccent: true },
     }),
   ]);
 
@@ -51,6 +52,11 @@ export default async function DashboardLayout({
   const pushEnabled = (settings?.pushMessagesEnabled ?? true) || (settings?.pushTasksEnabled ?? true);
   const logoUrl = settings?.logoUrl ?? null;
   const companyName = settings?.companyName ?? null;
+  const brandColors = {
+    primary: settings?.brandColor ?? null,
+    secondary: settings?.brandColorSecondary ?? null,
+    accent: settings?.brandColorAccent ?? null,
+  };
 
   // Normalise role for OnboardingTutorial — "admin" maps to the master/manager tutorial
   const tutorialRole: "sales" | "manager" | "owner" =
@@ -59,6 +65,7 @@ export default async function DashboardLayout({
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
+      <BrandThemeInjector colors={brandColors} />
       <DashboardNav user={session.user} permissions={permissions} logoUrl={logoUrl} companyName={companyName} />
       <DashboardLayoutClient
         users={teamUsers}

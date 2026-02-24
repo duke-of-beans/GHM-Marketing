@@ -1,7 +1,15 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 25, 2026 — Sprint 16 + 16.5 complete. Admin polish + critical bug batch: FEAT-027/028, UX-AUDIT-015, BUG-020/021/022/023/024.
+**Last Updated:** February 25, 2026 — Sprint 17 complete. Admin First-Run: FEAT-015 (7-step wizard), FEAT-018 (login logo), UX-AUDIT-012 (3-color branding system), BrandThemeInjector.
+
+### SPRINT 17 — Admin First-Run (February 25, 2026)
+- [x] **FEAT-015 COMPLETE** — Full admin onboarding wizard expanded from 4 steps to 7. Steps: Welcome → Company → Branding (logo + 3-color system) → Team Setup (invite first user) → Client/Lead Import (CSV/Excel) → Integrations Checklist (live status badges) → Done. Wizard step persisted to `User.adminOnboardingStep` in DB so admin can resume after leaving. Every step skippable. Files: `src/components/onboarding/AdminSetupWizard.tsx`, `src/app/admin-setup/page.tsx`.
+- [x] **FEAT-018 COMPLETE** — Login page tenant logo. `GET /api/public/branding` (no auth) returns logoUrl + companyName + brand colors. Login page fetches on mount, shows tenant logo with fallback to `/logo.png`. Files: `src/app/api/public/branding/route.ts`, `src/app/(auth)/login/page.tsx`.
+- [x] **UX-AUDIT-012 COMPLETE** — 3-color branding system. Added `brandColorSecondary` + `brandColorAccent` to `GlobalSettings` schema (pushed to DB). BrandingTab updated with three color pickers (Primary/Secondary/Accent) + per-color reset buttons. Colors saved via existing `/api/admin/onboarding` PATCH. Files: `src/components/settings/BrandingTab.tsx`, `prisma/schema.prisma`.
+- [x] **BrandThemeInjector COMPLETE** — Client leaf component that injects `--brand-primary`, `--brand-secondary`, `--brand-accent` as CSS custom properties on `:root`. Mounted in dashboard layout (already wired). Files: `src/components/branding/BrandThemeInjector.tsx`, `src/app/(dashboard)/layout.tsx` (import already present).
+- [x] **Onboarding API extended** — `/api/admin/onboarding` GET + PATCH now handles `step` field for wizard progress persistence and all three brand color fields. Files: `src/app/api/admin/onboarding/route.ts`.
+- TypeScript: Zero new errors (5 pre-existing basecamp/dotenv errors unaffected).
 
 ### SPRINT 16 + 16.5 — Admin Polish + Critical Bug Batch (February 25, 2026)
 - [x] **FEAT-027 COMPLETE** — Logo nav: already implemented in prior sprint (Link href={dashboardHref} wrapping logo in nav.tsx). Confirmed working, cleaned from open items.
