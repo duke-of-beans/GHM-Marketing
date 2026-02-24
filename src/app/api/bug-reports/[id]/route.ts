@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { createNotification } from "@/lib/ops/notification-service";
+
+const STATUS_LABELS: Record<string, string> = {
+  acknowledged: "Acknowledged",
+  "in-progress": "In Progress",
+  resolved: "Resolved",
+  "wont-fix": "Won't Fix",
+  new: "New",
+};
 
 /**
  * PATCH /api/bug-reports/[id]
@@ -59,6 +68,19 @@ export async function PATCH(
         resolver: { select: { id: true, name: true } },
       },
     });
+
+    // Notify submitter when status changes
+    if (status !== undefined && updated.userId) {
+      const label = STATUS_LABELS[status] ?? status;
+      await createNotification({
+        type: "system",
+        userIds: [updated.userId],
+        title: `Your report was updated: ${label}`,
+        body: updated.title,
+        href: "/settings/bugs",
+        channel: "in_app",
+      }).catch(() => {}); // non-blocking
+    }
 
     return NextResponse.json({ data: updated });
   } catch (error) {

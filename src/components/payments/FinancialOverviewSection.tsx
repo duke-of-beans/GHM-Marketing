@@ -130,7 +130,7 @@ export function FinancialOverviewSection() {
             <p className="text-xs text-muted-foreground mt-0.5">
               {bankAccounts.length > 0
                 ? bankAccounts.map(a => a.name).join(", ")
-                : "Wave accounts"}
+                : "Connected accounts"}
             </p>
           </CardContent>
         </Card>

@@ -1,9 +1,20 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 25, 2026 — Sprint 15 complete. Pipeline Intelligence: full Lead model filters + UX defaults + filter bar presentation overhaul.
+**Last Updated:** February 25, 2026 — Sprint 16 + 16.5 complete. Admin polish + critical bug batch: FEAT-027/028, UX-AUDIT-015, BUG-020/021/022/023/024.
 
-### SPRINT 15 — Pipeline Intelligence (February 25, 2026)
+### SPRINT 16 + 16.5 — Admin Polish + Critical Bug Batch (February 25, 2026)
+- [x] **FEAT-027 COMPLETE** — Logo nav: already implemented in prior sprint (Link href={dashboardHref} wrapping logo in nav.tsx). Confirmed working, cleaned from open items.
+- [x] **FEAT-028 COMPLETE** — Bug report status feedback loop. Admin bug view now has inline Status + Priority selects per report. PATCH route fires in-app notification to submitter on status change. Non-admin users see "My Submissions" view at /bugs (own reports only, read-only status badge). GET route updated to allow non-admins with `mine=true`. Files: `bugs-page-client.tsx`, `api/bug-reports/[id]/route.ts`, `api/bug-reports/route.ts`, `bugs/page.tsx`.
+- [x] **UX-AUDIT-015 COMPLETE** — Content Studio empty states: already handled in StudioClientPicker (context-aware empty states for no-clients and search-no-match). Confirmed, cleaned from open items.
+- [x] **BUG-020 COMPLETE** — Forgot password flow. PasswordReset model added to Prisma schema + `prisma db push`. API routes: `/api/auth/forgot-password` (POST, generates token, sends email via Resend) + `/api/auth/reset-password` (POST, validates token, updates password). Pages: `/auth/forgot-password` + `/auth/reset-password`. "Forgot password?" link added to login page beneath password field.
+- [x] **BUG-021 COMPLETE** — "Wave accounts" label hardcoded. Changed fallback in FinancialOverviewSection from `"Wave accounts"` → `"Connected accounts"`. Dynamic label already shown when accounts are returned by API.
+- [x] **BUG-022 COMPLETE** — Territory showcase now DB-driven. Territories page converted from hardcoded static array to live Prisma query (`territory.findMany({ where: { isActive: true } })`). Real territory names/cities/states render; color defaults applied gracefully for fields the model doesn't have.
+- [x] **BUG-023 COMPLETE** — Document vault three broken behaviors fixed: (1) Stale-copy warning removed — was firing erroneously on all clicks. (2) Preview-first: PDF/image files open in Dialog with iframe/img + secondary Download button; other types go straight to download. (3) Delete: three-dot menu now shows Delete for uploader + admins, confirmation dialog, `DELETE /api/vault/files/[id]` removes blob + DB record.
+- [x] **BUG-024 COMPLETE** — Service catalog edit form blank fields. ProductDialog `useEffect` added to reset `formData` when `product` prop or `open` state changes. Edit now pre-populates all fields from the selected service.
+- TypeScript: Zero new errors (5 pre-existing basecamp/dotenv errors unaffected).
+
+
 - [x] **FEAT-025 COMPLETE** — Pipeline filter full Lead model expansion. Added `closeScore` (range slider), `wealthScore` (multi-select: Low/Medium/High/Very High — stored as string), `pitchAngle` (multi-select), `suppressionSignal` (existing), `distanceFromMetro` (range slider), `intelNeedsRefresh` (3-state toggle: All/Stale/Fresh), `mrr` (range slider), `arr` (range slider). Also wired into `client.tsx` filter logic with null-safe casting. `leads/page.tsx` Prisma select extended with `mrr`, `arr`, `pitchAngle`, `intelNeedsRefresh`, `closeScore`.
 - [x] **FEAT-026 COMPLETE** — Pipeline Status section now collapsible (open by default, consistent with Quality Scores and Market Intelligence). Default visible top-bar reordered: Status, Assigned Rep, Territory, Sort — scores/intelligence in More Filters.
 - [x] **UX-FEAT-001 COMPLETE** — Tier A/B/C buttons, Impact ≥ inline input, Close Likelihood ≥ inline input surfaced as primary visible controls. Intelligence posture strip (Zap icon) appears above the advanced panel when active filters are set. Market Intelligence section expanded with Wealth Score, Pitch Angle, Distance from Metro, Intel Status. New "Deal Value & Revenue" collapsible section for MRR/ARR/deal value sliders.

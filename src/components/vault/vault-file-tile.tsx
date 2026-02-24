@@ -4,6 +4,12 @@ import { useState } from "react";
 import { VaultFileRecord } from "./vault-client";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   FileText, FileImage, FileVideo, FileArchive, File,
-  Download, Trash2, ArrowUpRight, MoreVertical, Globe,
+  Download, Trash2, Globe, MoreVertical, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -39,6 +45,10 @@ function formatDate(dateStr: string) {
   });
 }
 
+function isPreviewable(mimeType: string) {
+  return mimeType === "application/pdf" || mimeType.startsWith("image/");
+}
+
 interface Props {
   file: VaultFileRecord;
   currentUserId: number;
@@ -57,6 +67,7 @@ export function VaultFileTile({
   onTransfer,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const Icon = fileIcon(file.mimeType);
 
   const canDelete =
@@ -66,8 +77,22 @@ export function VaultFileTile({
   const showTransferToShared =
     canTransferToShared && file.space === "private";
 
+  const previewable = isPreviewable(file.mimeType);
+
+  function handleTileClick(e: React.MouseEvent) {
+    // Don't open preview if clicking the dropdown trigger
+    if ((e.target as HTMLElement).closest('[data-radix-dropdown-menu-trigger]')) return;
+    if ((e.target as HTMLElement).closest('[role="menuitem"]')) return;
+    if (previewable) {
+      setPreviewOpen(true);
+    } else {
+      // Non-previewable: trigger download directly
+      window.open(file.blobUrl, "_blank", "noopener,noreferrer");
+    }
+  }
+
   async function handleDelete() {
-    if (!confirm(`Delete "${file.name}"?`)) return;
+    if (!confirm(`Delete "${file.displayName ?? file.name}"?`)) return;
     setLoading(true);
     try {
       const res = await fetch(`/api/vault/files?id=${file.id}`, { method: "DELETE" });
@@ -110,98 +135,128 @@ export function VaultFileTile({
   }
 
   return (
-    <div
-      className={cn(
-        "group relative flex flex-col gap-2 rounded-xl border bg-card p-3 hover:border-primary/40 transition-colors",
-        loading && "opacity-50 pointer-events-none"
-      )}
-    >
-      {/* File icon */}
-      <div className="flex items-center justify-between">
-        <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-          <Icon className="h-5 w-5 text-muted-foreground" />
+    <>
+      {/* File tile */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleTileClick}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleTileClick(e as any); }}
+        className={cn(
+          "group relative flex flex-col gap-2 rounded-xl border bg-card p-3 cursor-pointer",
+          "hover:border-primary/40 hover:bg-muted/30 transition-colors",
+          loading && "opacity-50 pointer-events-none"
+        )}
+      >
+        {/* Icon row + dropdown */}
+        <div className="flex items-center justify-between">
+          <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+            <Icon className="h-5 w-5 text-muted-foreground" />
+          </div>
+          {(canDelete || showTransferToShared) && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild data-radix-dropdown-menu-trigger>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreVertical className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <a
+                    href={file.blobUrl}
+                    download={file.name}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Download className="h-3.5 w-3.5 mr-2" /> Download
+                  </a>
+                </DropdownMenuItem>
+                {showTransferToShared && (
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleTransferToShared(); }}>
+                    <Globe className="h-3.5 w-3.5 mr-2" /> Move to Shared
+                  </DropdownMenuItem>
+                )}
+                {canDelete && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
-        {(canDelete || showTransferToShared) && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
+
+        {/* Name + meta */}
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium truncate leading-tight" title={file.displayName ?? file.name}>
+            {file.displayName ?? file.name}
+          </p>
+          {file.client && (
+            <p className="text-[11px] text-muted-foreground truncate">{file.client.businessName}</p>
+          )}
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {formatBytes(file.size)} · {formatDate(file.createdAt)}
+          </p>
+          {previewable && (
+            <p className="text-[10px] text-primary/60 mt-0.5">Click to preview</p>
+          )}
+        </div>
+      </div>
+
+      {/* Preview modal */}
+      {previewable && (
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-4xl w-full h-[85vh] flex flex-col p-0 gap-0">
+            <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b shrink-0">
+              <DialogTitle className="text-sm font-medium truncate pr-4">
+                {file.displayName ?? file.name}
+              </DialogTitle>
+              <div className="flex items-center gap-2 shrink-0">
                 <a
                   href={file.blobUrl}
                   download={file.name}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => {
-                    if (file.space === "shared") {
-                      toast.warning("Saved copies may become outdated — always access contracts and agreements from the Shared folder.", {
-                        duration: 5000,
-                      });
-                    }
-                  }}
                 >
-                  <Download className="h-3.5 w-3.5 mr-2" /> Download
+                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                    <Download className="h-3 w-3" /> Download
+                  </Button>
                 </a>
-              </DropdownMenuItem>
-              {showTransferToShared && (
-                <DropdownMenuItem onClick={handleTransferToShared}>
-                  <Globe className="h-3.5 w-3.5 mr-2" /> Move to Shared
-                </DropdownMenuItem>
+              </div>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden">
+              {file.mimeType === "application/pdf" ? (
+                <iframe
+                  src={file.blobUrl}
+                  className="w-full h-full border-0"
+                  title={file.displayName ?? file.name}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-muted/20 p-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={file.blobUrl}
+                    alt={file.displayName ?? file.name}
+                    className="max-w-full max-h-full object-contain rounded"
+                  />
+                </div>
               )}
-              {canDelete && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleDelete}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      {/* Name + meta */}
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium truncate leading-tight" title={file.displayName ?? file.name}>
-          {file.displayName ?? file.name}
-        </p>
-        {file.client && (
-          <p className="text-[11px] text-muted-foreground truncate">{file.client.businessName}</p>
-        )}
-        <p className="text-[11px] text-muted-foreground mt-0.5">
-          {formatBytes(file.size)} · {formatDate(file.createdAt)}
-        </p>
-      </div>
-
-      {/* Quick download tap on the whole tile (mobile friendly) */}
-      <a
-        href={file.blobUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute inset-0 rounded-xl"
-        aria-label={`Open ${file.name}`}
-        onClick={(e) => {
-          // Don't fire if dropdown was clicked
-          if ((e.target as HTMLElement).closest('[role="menuitem"]')) e.preventDefault();
-          // Warn reps that saved copies may become outdated
-          if (file.space === "shared") {
-            toast.warning("Saved copies may become outdated — always access contracts and agreements from the Shared folder.", {
-              duration: 5000,
-            });
-          }
-        }}
-      />
-    </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

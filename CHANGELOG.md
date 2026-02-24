@@ -1,11 +1,26 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 15 complete (FEAT-025/026 + UX-FEAT-001: full pipeline filter expansion + filter bar overhaul).
+**Last Updated:** February 25, 2026 — Sprint 16+16.5 complete (admin polish + critical bug batch: FEAT-027/028, UX-AUDIT-015, BUG-020–024).
 
 ---
 
-## Sprint 15 — Pipeline Intelligence (February 25, 2026)
+## Sprint 16 + 16.5 — Admin Polish + Critical Bug Batch (February 25, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 25 | **FEAT-027** — Logo nav: confirmed already implemented (nav.tsx logo wrapped in Link). Closed. |
+| Feb 25 | **FEAT-028** — Bug report status feedback loop. Admin bug view: inline Status + Priority selects per card. PATCH route fires in-app notification to submitter on status change (via notification-service). Non-admin users see "My Submissions" at /bugs (own reports only, read-only status). GET route supports `mine=true` for non-admin scoping. |
+| Feb 25 | **UX-AUDIT-015** — Content Studio empty states: confirmed implemented in StudioClientPicker. Closed. |
+| Feb 25 | **BUG-020** — Forgot password flow. PasswordReset model + prisma db push. `/api/auth/forgot-password` + `/api/auth/reset-password` routes. `/auth/forgot-password` + `/auth/reset-password` pages. "Forgot password?" link on login screen. |
+| Feb 25 | **BUG-021** — "Wave accounts" hardcoded fallback replaced with "Connected accounts" in FinancialOverviewSection. |
+| Feb 25 | **BUG-022** — Territory showcase converted from hardcoded static array to live Prisma query (`territory.findMany({ where: { isActive: true } })`). |
+| Feb 25 | **BUG-023** — Vault: stale-copy warning removed. Preview modal for PDF/image files (iframe/img + Download button). Delete added to three-dot menu with confirmation dialog; DELETE API route removes blob + DB record. |
+| Feb 25 | **BUG-024** — Service catalog edit form blank fields fixed. ProductDialog useEffect resets formData when `product` or `open` changes. |
+
+---
+
+
 
 | Date | What Shipped |
 |------|-------------|

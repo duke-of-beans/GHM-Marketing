@@ -39,6 +39,7 @@ model User {
   paymentTransactions   PaymentTransaction[]
   salesRepClients       ClientProfile[] @relation("SalesRep")
   masterClients         ClientProfile[] @relation("MasterManager")
+  passwordResetTokens   PasswordResetToken[]
   
   // Bug reporting relations
   reportedBugs          BugReport[] @relation("BugReporter")
@@ -948,6 +949,19 @@ model BugReport {
 // ============================================================================
 // GLOBAL SETTINGS
 // ============================================================================
+
+// Password reset tokens — generated on forgot-password request, consumed on reset
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
 
 model GlobalSettings {
   id                    Int      @id @default(autoincrement())

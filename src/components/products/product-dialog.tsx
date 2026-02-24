@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -67,6 +67,20 @@ export function ProductDialog({
     isActive: product?.isActive ?? true,
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  // Reset form whenever the dialog opens or the product being edited changes
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: product?.name || "",
+        category: product?.category || "",
+        description: product?.description || "",
+        price: product?.price?.toString() || "",
+        pricingModel: product?.pricingModel || "monthly",
+        isActive: product?.isActive ?? true,
+      });
+    }
+  }, [open, product]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

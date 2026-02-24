@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 15 shipped. Added BUG-020–024, UX-AUDIT-022, LEGAL-001.
+**Last Updated:** February 25, 2026 — Sprint 16+16.5 shipped. FEAT-027/028, UX-AUDIT-015, BUG-020/021/022/023/024 closed.
 
 **Owner:** David Kirsch
 
@@ -33,8 +33,8 @@ Foundation → out. Each sprint unblocks the next.
 | ~~13~~ | ~~Bug Triage~~ | ~~BUG-010/011 + AUDIT-004 dashboard flash~~ | ✅ SHIPPED | |
 | ~~14~~ | ~~UX Polish Batch~~ | ~~UX-AUDIT-013 + UX-AUDIT-016/017 + UX-BUG-001/002~~ | ✅ SHIPPED | |
 | ~~15~~ | ~~Pipeline Intelligence~~ | ~~FEAT-025 (full Lead model filters) + FEAT-026 (filter UX defaults) + UX-FEAT-001 (filter bar presentation)~~ | ✅ SHIPPED | |
-| 16 | Admin Polish | FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + UX-AUDIT-015 (Content Studio empty states) | ~1 session | Small items, high finish quality. |
-| 16.5 | Critical Bug Batch | BUG-020 (forgot password) + BUG-022 (territories data sync) + BUG-023 (vault: preview/delete/message) + BUG-024 (service catalog edit prefill) | ~1 session | All broken UX before external eyes. Pull into 16 or run as its own sprint. |
+| ~~16~~ | ~~Admin Polish~~ | ~~FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + UX-AUDIT-015 (Content Studio empty states)~~ | ✅ SHIPPED | |
+| ~~16.5~~ | ~~Critical Bug Batch~~ | ~~BUG-020 (forgot password) + BUG-021 (Wave label) + BUG-022 (territories data sync) + BUG-023 (vault: preview/delete/message) + BUG-024 (service catalog edit prefill)~~ | ✅ SHIPPED | |
 | 17 | Admin First-Run (Full) | FEAT-015 (onboarding wizard full scope) + FEAT-018 (logo swap) + UX-AUDIT-012 (3-color branding) | ~1 session | Enables real new-tenant activation. |
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
@@ -82,39 +82,9 @@ The `Ctrl[↵]` shortcut indicator in the TeamFeed compose box renders the enter
 **Fix:** Find the enter icon in `TeamFeed.tsx` / `TeamFeedSidebar.tsx` compose area shortcut hint. Increase the icon size (likely a Lucide `CornerDownLeft` or similar) to match the text cap-height — probably `h-3.5 w-3.5` or `h-4 w-4`. Ensure vertical alignment is `align-middle` or `items-center`.
 **Size:** ~15 min. **Priority:** 🔴 Must fix — visible every time someone opens TeamFeed.
 
-### BUG-020: Login Screen — No Forgot Password Flow
-There is no "Forgot password?" link or password reset flow on the login screen. Users who lose their password have no self-service recovery path — they're locked out with no recourse other than contacting an admin.
-**Fix:** Add "Forgot password?" link below the password field. Clicking it shows a single-field form (email) that sends a reset token via NextAuth's built-in email provider, or a custom `/api/auth/forgot-password` route that generates a signed token, stores it (expiry: 1 hr), and emails a reset link. Reset link leads to `/auth/reset-password?token=...` page where user sets new password. Token is invalidated on use or expiry.
-**Size:** ~2 hrs. **Priority:** 🔴 Must fix — any real deployment needs this.
+---
 
-### BUG-021: Financial Overview — "Wave Accounts" Label Is Hardcoded
-The bank balance widget on the Financial Overview page displays "Wave accounts" as a fixed label beneath the dollar amount. If the admin connects a different accounting integration (QuickBooks, etc.), the label will be wrong.
-**Fix:** Audit the bank balance widget component. Replace the hardcoded "Wave accounts" string with a dynamic label derived from the active accounting integration setting (e.g., `integrationLabel ?? "Connected accounts"`). If the integration name is stored on `GlobalSettings` or the integration config, read it from there. Fallback: "Connected accounts."
-**Size:** ~30 min. **Priority:** 🟠 SHOULD — cosmetically wrong for any non-Wave tenant.
-
-### BUG-022: Sales Rep Territory Sheet — Does Not Reflect Actual Territories
-The sales rep territory showcase (the sheet/view that surfaces top territories up for grabs) is populated with placeholder or static data rather than pulling from the real territories defined in Territory Management.
-**Fix:** Audit the territory showcase component. Replace static/hardcoded territory data with a live query against the `Territory` model (same source as Territory Management settings). The showcase should reflect whatever territories the admin has actually configured — if five real territories exist, show those five. Order by whatever priority/ranking field exists; if none, add a `displayPriority` or `displayOrder` field to the Territory model (nullable int) so admin can control sequence.
-**Size:** ~1–1.5 hrs. **Priority:** 🔴 Must fix — showing reps fake territories actively undermines trust.
-
-### BUG-023: Document Vault — Three Broken Behaviors (Preview / Delete / Stale Message)
-Three related issues in the Shared Document Vault around file management:
-
-(1) **Stale-copy warning:** After uploading a contract and clicking to open it, the user sees "Saved copies may become outdated — always access contracts and agreements from the Shared folder" before being forced into a download. This message is confusing and shouldn't appear — vault files are already in the shared folder.
-
-(2) **No preview:** Clicking a file triggers a download rather than opening a preview. PDF and image files should render inline in a modal or side panel before offering a download option. At minimum, a new-tab preview (using the blob URL directly) is acceptable.
-
-(3) **No delete:** The three-dot menu only offers "Download." There is no way to remove a file once uploaded. Need a "Delete" option with a confirmation dialog (destructive action). Only the uploader and admins should be able to delete.
-
-**Fix:** (1) Remove or rewrite the stale-copy warning — it's misinformation in this context. (2) On file click, detect MIME type: PDFs and images open in a `<Dialog>` with an `<iframe>` or `<img>` and a secondary "Download" button. Other file types go straight to download as today. (3) Add "Delete" to the three-dot menu; on confirm, call `DELETE /api/vault/files/[id]`, remove from blob storage, remove DB record. Guard: admin or original uploader only.
-**Size:** ~2 hrs. **Priority:** 🔴 Must fix — a vault you can't manage is a liability, not a feature.
-
-### BUG-024: Service Catalog — Edit Form Opens with Blank Fields
-Clicking the Edit button on any existing service/product in the Service Catalog opens the edit form with all fields blank, rather than pre-populated with the service's current data. The user cannot see or modify what already exists — they would have to retype everything from scratch.
-**Fix:** Audit the edit handler in the Service Catalog component. The form should receive the selected service's current field values as initial state when opened. Identify whether the issue is (a) the form not receiving the `service` prop, (b) the `defaultValues` not being wired to the service object, or (c) the form resetting on open. Pass the full service record to the form on edit and set `defaultValues` accordingly.
-**Size:** ~1 hr. **Priority:** 🔴 Must fix — edit is completely broken.
-
-
+## 🔴 MUST — Active Blockers
 
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
@@ -135,21 +105,10 @@ These three Settings tabs are conceptually related (who's on the team, what role
 **Output:** Concrete IA proposal documented first, then implementation. No data model changes expected.
 **Size:** ~1.5 hrs (audit + design) + ~1.5 hrs (implementation). **Priority:** 🟠 SHOULD — confusing for any new admin setting up the team.
 
-
+### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
 Navigating away from `/sales` and returning shows a different dashboard layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
 **Direction:** Audit which dashboard component mounts on `/` or `/sales` depending on role and navigation history. Confirm component is stable on return.
 **Size:** ~1–2 hrs. **Priority:** 🔴 Fix before external users — inconsistent first impression is a trust issue.
-
-### UX-AUDIT-020: Settings — Information Architecture Audit (Global)
-Settings > General currently mixes unrelated concerns: commission defaults and monthly goals sit alongside app-level general config. This is unintuitive — financial configuration belongs near financial workflows, and goal-setting belongs near performance/analytics surfaces.
-**Scope:** Audit every item currently in Settings > General and every other settings tab. Ask for each item: "Is this the most intuitive place for this?" Proposed relocations to evaluate: (1) **Commission Defaults** → move to Settings > Team or a new Settings > Compensation tab, co-located with position config and payment settings where managers already think about money. (2) **Monthly Goals** → move to the Analytics page as a configuration panel, or to a Goals tab in Settings that groups all performance targets together. (3) After relocations, assess whether Settings > General still needs to exist or can be renamed to something more accurate (e.g., "Workspace" or "Platform").
-**Output:** Concrete list of moves with before/after tab mapping. Implement the moves. No data model changes expected — this is purely UI reorganization.
-**Size:** ~1–1.5 hrs. **Priority:** 🔴 Must fix before external users — Settings is the first place a new admin explores.
-
-### UX-AUDIT-021: Tutorial System — Global Navigation Awareness
-The "Restart Tutorial" button currently only works on the dashboard. On any other page it either does nothing, re-triggers the dashboard tour out of context, or silently fails. Tutorials should either (a) navigate the user to the correct page before starting the tour, or (b) only show the restart button for the current page's tour if one exists.
-**Scope:** Audit the tutorial restart mechanism. Two acceptable fix paths: **Path A (simpler)** — each page's restart button triggers `router.push('/relevant-page')` then fires the tour after navigation settles (use a short delay or `useEffect` on mount). **Path B (cleaner)** — the global restart control only shows the option for the current page's tour; a secondary "Tour this page" button appears on pages that have a tutorial; the dashboard restart becomes page-specific. Either way, a user clicking restart on `/clients` should get the clients tour, not be silently ignored or dumped into a mismatched tour.
-**Size:** ~1 hr. **Priority:** 🟠 SHOULD — actively confusing to any user who tries it.
 
 ---
 

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/bug-reports
- * List bug reports. Admin only.
+ * Admin: see all reports. Non-admin with ?mine=true: see own submissions only.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -80,22 +80,28 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const userId = parseInt(session.user.id);
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(session.user.id) },
+      where: { id: userId },
       select: { role: true },
     });
 
-    if (!isElevated(user?.role ?? "")) {
+    const { searchParams } = req.nextUrl;
+    const mine = searchParams.get("mine") === "true";
+    const isAdmin = isElevated(user?.role ?? "");
+
+    // Non-admins can only view their own submissions
+    if (!isAdmin && !mine) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { searchParams } = req.nextUrl;
     const status = searchParams.get("status");
     const type = searchParams.get("type");
     const category = searchParams.get("category");
     const severity = searchParams.get("severity");
 
     const where: any = {};
+    if (!isAdmin || mine) where.userId = userId; // scope to own reports
     if (status && status !== "all") where.status = status;
     if (type && type !== "all") where.type = type;
     if (category && category !== "all") where.category = category;
