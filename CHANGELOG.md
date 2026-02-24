@@ -1,7 +1,7 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 23, 2026 — Sprint 2 shipped.
+**Last Updated:** February 23, 2026 — Sprint 3 shipped.
 
 ---
 
@@ -13,6 +13,27 @@ When you ship something:
 4. Then commit
 
 ---
+
+## Sprint 3 — Bulk Operations (February 23, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 23, 2026 | `src/lib/bulk/types.ts` — Shared bulk operation types and `bulkResponse()` helper |
+| Feb 23, 2026 | `src/app/api/bulk/leads/route.ts` — Bulk lead ops: status transition, assign, archive, delete, enrich (200-lead cap, 50 for enrich) |
+| Feb 23, 2026 | `src/app/api/bulk/clients/route.ts` — Bulk client ops: status, assign_rep, assign_manager, scan trigger, report generate+send |
+| Feb 23, 2026 | `src/app/api/bulk/content/route.ts` — Bulk content ops: approve, reject, archive |
+| Feb 23, 2026 | `src/app/api/bulk/tasks/route.ts` — Bulk task ops: close, reassign, create_for_clients (power-user: assign same task to N clients) |
+| Feb 23, 2026 | `src/app/api/bulk/users/route.ts` — Bulk user ops: role, position, territory, activate, deactivate, reset_onboarding (protected: ID 1 never bulk-modified) |
+| Feb 23, 2026 | `src/app/api/clients/import/route.ts` — CSV/XLSX client import (productization unlock: agencies import existing client lists, 500-client cap, creates Lead + ClientProfile atomically) |
+| Feb 23, 2026 | `src/app/api/users/import/route.ts` — CSV/XLSX user/contractor import (bulk team onboarding, auto-generates temp passwords, returns credentials once) |
+| Feb 23, 2026 | `src/hooks/use-bulk-select.ts` — Reusable multi-select state hook (toggle, toggleAll, clear, allSelected, someSelected, selectedIds) |
+| Feb 23, 2026 | `src/components/bulk/bulk-action-bar.tsx` — Floating action bar with per-action loading states, toast results, confirm dialogs |
+| Feb 23, 2026 | `src/components/bulk/bulk-import-dialog.tsx` — Reusable CSV/XLSX upload dialog with template download, drag-drop, results view |
+| Feb 23, 2026 | `src/components/bulk/import-dialogs.tsx` — Thin wrappers: ClientImportDialog + UserImportDialog |
+| Feb 23, 2026 | `src/components/clients/portfolio.tsx` — Wired: checkbox column in table view, Import button, ClientImportDialog, BulkActionBar (scan, report, status) |
+| Feb 23, 2026 | `src/app/(dashboard)/leads/client.tsx` — Wired: Bulk Actions dropdown (status transition, archive, delete, enrich) on all filtered leads |
+| Feb 23, 2026 | `src/components/settings/TeamManagementTab.tsx` — Wired: checkbox overlay on user cards, Import button, UserImportDialog, BulkActionBar (role, deactivate, reset onboarding) |
+| Feb 23, 2026 | `src/components/tasks/task-queue-client.tsx` — Wired: Select mode toggle, checkbox list view (swaps DnD), BulkActionBar (close, unassign) |
 
 ## Completed Work Log
 

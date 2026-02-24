@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 23, 2026 — Sprint 2 (Client Portal Activation + Reporting Pipeline) shipped. Sprint 3 is next.
+**Last Updated:** February 23, 2026 — Sprint 3 (Bulk Operations — Global) shipped. Sprint 4 is next.
 **Owner:** David Kirsch
 
 This file contains ONLY open work. When an item ships:
@@ -20,7 +20,7 @@ Foundation → out. Each sprint unblocks the next.
 |--------|-------|-------|------|----------------|
 | ~~1~~ | ~~Production Foundation~~ | ~~Security Hardening + Sentry + Structured Logging~~ | ✅ SHIPPED | ~~Gates all external use.~~ |
 | ~~2~~ | ~~Ops Spine Completion~~ | ~~Client Portal Decision + Ops Sprint 6 (Reporting Pipeline)~~ | ✅ SHIPPED | ~~Fulfills contract promise of monthly delivery. Portal ambiguity off the board.~~ |
-| 3 | Bulk Operations | Ops Sprint 7 (bulk content/task/pipeline) | ~1 session | Team can't scale without batch actions. Additive to existing systems. |
+| ~~3~~ | ~~Bulk Operations~~ | ~~Ops Sprint 7 (bulk content/task/pipeline)~~ | ✅ SHIPPED | ~~Team can't scale without batch actions. Additive to existing systems.~~ |
 | 4 | Intelligence Layer | Ops Sprint 8 (MoM/YoY trends, churn risk, health trajectories) | ~1 session | Synthesizes all collected data. Turns dashboard into indispensable ops platform. |
 | 5 | Data Access + Admin Visibility | Data Export + User Activity/Session Stats | ~1 session | External data requests + internal usage intelligence. |
 | 6 | UX Completeness | Static Empty States + Pipeline Filter UX debt + Keyboard Shortcuts | ~1 session | Closes gap between functional and polished. |

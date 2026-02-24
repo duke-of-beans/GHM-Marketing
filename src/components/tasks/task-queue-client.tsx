@@ -46,6 +46,13 @@ import { toast } from "sonner";
 import { isElevated as checkElevated } from "@/lib/auth/roles";
 import type { UserRole } from "@prisma/client";
 import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, CheckCheck, UserMinus, CheckSquare, Square } from "lucide-react";
+import { useBulkSelect } from "@/hooks/use-bulk-select";
+import { BulkActionBar } from "@/components/bulk/bulk-action-bar";
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -318,6 +325,29 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [sortBy, setSortBy] = useState<string>("priority");
   const [viewMode, setViewMode] = useState<"list" | "board">("list");
+  const [selectMode, setSelectMode] = useState(false);
+  const bulk = useBulkSelect(tasks);
+
+  const bulkTaskActions = [
+    {
+      label: "Close Selected",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "close" }) });
+        const data = await res.json();
+        if (data.processed > 0) setTasks(prev => prev.filter(t => !ids.includes(t.id)));
+        return data;
+      },
+    },
+    {
+      label: "Unassign",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "reassign", params: { assignedToId: null } }) });
+        const data = await res.json();
+        if (data.processed > 0) { /* refresh will pick up */ }
+        return data;
+      },
+    },
+  ];
 
   const elevated = checkElevated(currentUserRole);
 
@@ -999,6 +1029,17 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
               <LayoutGrid className="h-4 w-4" />
             </Button>
           </div>
+          {viewMode === "list" && tasks.length > 0 && (
+            <Button
+              size="sm"
+              variant={selectMode ? "secondary" : "outline"}
+              className="h-8 gap-1.5"
+              onClick={() => { setSelectMode(p => !p); bulk.clear(); }}
+            >
+              <CheckSquare className="h-4 w-4" />
+              {selectMode ? "Cancel" : "Select"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -1013,6 +1054,40 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
         </Card>
       ) : viewMode === "list" ? (
         <Card className="overflow-hidden">
+        {selectMode ? (
+          /* Bulk select mode — no DnD, just checkboxes */
+          <div>
+            <div className="flex items-center gap-2 px-4 py-2 border-b bg-muted/30 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={bulk.allSelected}
+                ref={el => { if (el) el.indeterminate = bulk.someSelected; }}
+                onChange={bulk.toggleAll}
+                className="rounded"
+              />
+              <span>{bulk.count > 0 ? `${bulk.count} of ${tasks.length} selected` : `${tasks.length} tasks — click to select`}</span>
+            </div>
+            {tasks.map((task) => (
+              <div
+                key={task.id}
+                className={`flex items-center gap-3 px-4 py-3 border-b last:border-0 cursor-pointer hover:bg-muted/20 ${bulk.isSelected(task.id) ? "bg-primary/5" : ""}`}
+                onClick={() => bulk.toggle(task.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={bulk.isSelected(task.id)}
+                  onChange={() => bulk.toggle(task.id)}
+                  className="rounded shrink-0"
+                  onClick={e => e.stopPropagation()}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{task.title}</p>
+                  <p className="text-xs text-muted-foreground">{task.clientName} · {task.status}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
               {tasks.map((task) => (
@@ -1027,6 +1102,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
               ))}
             </SortableContext>
           </DndContext>
+        )}
         </Card>
       ) : (
         <BoardView />
@@ -1034,6 +1110,12 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
 
       <TaskDetailSheet />
       <CreateTaskDialog />
+      <BulkActionBar
+        selectedIds={bulk.selectedIds}
+        onClear={() => { bulk.clear(); setSelectMode(false); }}
+        actions={bulkTaskActions}
+        entityLabel="task"
+      />
     </>
   );
 }

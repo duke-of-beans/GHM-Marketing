@@ -7,11 +7,12 @@
 
 import { useState, useEffect } from "react";
 import {
-  Loader2, Users, Plus, Search, SlidersHorizontal, Eye, EyeOff,
+  Loader2, Users, Plus, Search, SlidersHorizontal, Eye, EyeOff, Upload,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -20,6 +21,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { UserImportDialog } from "@/components/bulk/import-dialogs";
+import { useBulkSelect } from "@/hooks/use-bulk-select";
+import { BulkActionBar } from "@/components/bulk/bulk-action-bar";
 import { UserPermissionCard } from "./UserPermissionCard";
 import { CompensationConfigSection } from "@/components/team/compensation-config";
 import { Separator } from "@/components/ui/separator";
@@ -53,6 +57,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
 
   // Add User dialog
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<AppRole>("sales");
@@ -270,6 +275,35 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
 
   const inactiveCount = users.filter((u) => !u.isActive).length;
 
+  const bulk = useBulkSelect(filteredUsers);
+
+  const bulkUserActions = [
+    {
+      label: "Deactivate",
+      variant: "destructive" as const,
+      confirm: "Deactivate {count} users? They will lose access immediately.",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "deactivate" }) });
+        return res.json();
+      },
+    },
+    {
+      label: "Activate",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "activate" }) });
+        await loadUsers();
+        return res.json();
+      },
+    },
+    {
+      label: "Reset Onboarding",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "reset_onboarding" }) });
+        return res.json();
+      },
+    },
+  ];
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -293,6 +327,10 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
         <Button onClick={() => setAddDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add User
+        </Button>
+        <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Upload className="h-4 w-4 mr-2" />
+          Import
         </Button>
       </div>
 
@@ -363,17 +401,27 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
           </Card>
         ) : (
           filteredUsers.map((user) => (
-            <UserPermissionCard
-              key={user.id}
-              user={user}
-              currentUserRole={currentUserRole}
-              onUpdate={(updates) => handlePermissionUpdate(user.id, updates)}
-              onRoleChange={(role) => handleRoleChange(user.id, role)}
-              onDeactivate={() => handleDeactivate(user.id)}
-              onReactivate={() => handleReactivate(user.id)}
-              onHardDelete={() => handleHardDelete(user.id)}
-              onResetOnboarding={() => handleResetOnboarding(user.id)}
-            />
+            <div key={user.id} className={`relative group ${bulk.isSelected(user.id) ? "ring-2 ring-primary/40 rounded-lg" : ""}`}>
+              {/* Checkbox overlay — top-left of card */}
+              <div className="absolute left-3 top-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  checked={bulk.isSelected(user.id)}
+                  onChange={() => bulk.toggle(user.id)}
+                  className="rounded h-4 w-4 cursor-pointer"
+                />
+              </div>
+              <UserPermissionCard
+                user={user}
+                currentUserRole={currentUserRole}
+                onUpdate={(updates) => handlePermissionUpdate(user.id, updates)}
+                onRoleChange={(role) => handleRoleChange(user.id, role)}
+                onDeactivate={() => handleDeactivate(user.id)}
+                onReactivate={() => handleReactivate(user.id)}
+                onHardDelete={() => handleHardDelete(user.id)}
+                onResetOnboarding={() => handleResetOnboarding(user.id)}
+              />
+            </div>
           ))
         )}
       </div>
@@ -444,6 +492,21 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* User Import Dialog */}
+      <UserImportDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onSuccess={() => { setImportOpen(false); loadUsers(); }}
+      />
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedIds={bulk.selectedIds}
+        onClear={bulk.clear}
+        actions={bulkUserActions}
+        entityLabel="user"
+      />
     </div>
   );
 }

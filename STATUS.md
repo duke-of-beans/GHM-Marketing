@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 23, 2026 — Sprint 2 (Client Portal Activation + Reporting Pipeline) shipped. Sprint 3 next.
+**Last Updated:** February 23, 2026 — Sprint 3 (Bulk Operations — Global) shipped. Sprint 4 next.print 3 next.
 
 ---
 

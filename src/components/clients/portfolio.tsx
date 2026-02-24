@@ -12,10 +12,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle } from "lucide-react";
+import { HelpCircle, Plus, LayoutGrid, List, AlertTriangle, Upload, CheckSquare, ChevronDown } from "lucide-react";
 import { AddClientDialog } from "./add-client-dialog";
 import { ClientFilterBar, type FilterState } from "./client-filter-bar";
 import { useRouter } from "next/navigation";
+import { useBulkSelect } from "@/hooks/use-bulk-select";
+import { BulkActionBar } from "@/components/bulk/bulk-action-bar";
+import { ClientImportDialog } from "@/components/bulk/import-dialogs";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ClientItem = {
   id: number;
@@ -110,6 +117,7 @@ export function ClientPortfolio({
 }) {
   const router = useRouter();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [filters, setFilters] = useState<FilterState>({
     search: "",
@@ -220,6 +228,46 @@ export function ClientPortfolio({
     return result;
   }, [clients, filters]);
 
+  const bulk = useBulkSelect(filteredClients);
+
+  const bulkActions = [
+    {
+      label: "Trigger Scans",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "scan" }) });
+        return res.json();
+      },
+    },
+    {
+      label: "Generate Reports",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "report", params: { send: false } }) });
+        return res.json();
+      },
+    },
+    {
+      label: "Send Reports",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "report", params: { send: true } }) });
+        return res.json();
+      },
+    },
+    {
+      label: "Set Active",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "status", params: { status: "active" } }) });
+        return res.json();
+      },
+    },
+    {
+      label: "Set Paused",
+      run: async (ids: number[]) => {
+        const res = await fetch("/api/bulk/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, operation: "status", params: { status: "paused" } }) });
+        return res.json();
+      },
+    },
+  ];
+
   const handleClientAdded = () => {
     router.refresh();
   };
@@ -293,6 +341,16 @@ export function ClientPortfolio({
           <Plus className="h-4 w-4 mr-1" />
           Add Client
         </Button>
+        <Button variant="outline" onClick={() => setIsImportOpen(true)}>
+          <Upload className="h-4 w-4 mr-1" />
+          Import
+        </Button>
+        {viewMode === "table" && filteredClients.length > 0 && (
+          <Button variant="outline" size="sm" onClick={bulk.toggleAll} className="gap-1.5">
+            <CheckSquare className="h-4 w-4" />
+            {bulk.allSelected ? "Deselect All" : `Select All (${filteredClients.length})`}
+          </Button>
+        )}
         <div className="flex items-center border rounded-md overflow-hidden">
           <button
             onClick={() => setViewMode("cards")}
@@ -372,6 +430,15 @@ export function ClientPortfolio({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
+                  <th className="w-8 px-3 py-2.5">
+                    <input
+                      type="checkbox"
+                      checked={bulk.allSelected}
+                      ref={el => { if (el) el.indeterminate = bulk.someSelected; }}
+                      onChange={bulk.toggleAll}
+                      className="rounded"
+                    />
+                  </th>
                   <th className="text-left px-4 py-2.5 font-medium">Client</th>
                   <th className="text-center px-3 py-2.5 font-medium">Health</th>
                   <th className="text-right px-3 py-2.5 font-medium">Retainer</th>
@@ -385,10 +452,17 @@ export function ClientPortfolio({
                 {filteredClients.map((client) => (
                   <tr
                     key={client.id}
-                    className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
-                    onClick={() => router.push(`/clients/${client.id}`)}
+                    className={`border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer ${bulk.isSelected(client.id) ? "bg-primary/5" : ""}`}
                   >
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={bulk.isSelected(client.id)}
+                        onChange={() => bulk.toggle(client.id)}
+                        className="rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-3" onClick={() => router.push(`/clients/${client.id}`)}>
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full shrink-0 ${healthDot(client.healthScore)}`} />
                         <div>
@@ -544,6 +618,21 @@ export function ClientPortfolio({
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         onSuccess={handleClientAdded}
+      />
+
+      {/* Client Import Dialog */}
+      <ClientImportDialog
+        open={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onSuccess={() => router.refresh()}
+      />
+
+      {/* Bulk Action Bar — floats when clients are selected in table view */}
+      <BulkActionBar
+        selectedIds={bulk.selectedIds}
+        onClear={bulk.clear}
+        actions={bulkActions}
+        entityLabel="client"
       />
     </div>
     </TooltipProvider>

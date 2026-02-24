@@ -15,6 +15,11 @@ import type { LeadStatus, UserRole } from "@prisma/client";
 import { useTour } from "@/lib/tutorials";
 import { LEADS_TOUR } from "@/lib/tutorials";
 import { TourButton } from "@/components/tutorials/TourButton";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Users, Archive, Trash2 } from "lucide-react";
 
 type KanbanLead = {
   id: number;
@@ -269,6 +274,24 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
     router.refresh();
   };
 
+  const bulkLeadOp = async (operation: string, params?: Record<string, unknown>) => {
+    const ids = filteredLeads.map(l => l.id);
+    if (ids.length === 0) { toast.error("No leads visible to operate on"); return; }
+    const cap = Math.min(ids.length, 200);
+    const res = await fetch("/api/bulk/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: ids.slice(0, cap), operation, params }),
+    });
+    const data = await res.json();
+    if (data.processed > 0) {
+      toast.success(`${data.processed} lead${data.processed !== 1 ? "s" : ""} updated`);
+      router.refresh();
+    } else {
+      toast.error(data.summary ?? "Operation failed");
+    }
+  };
+
   return (
     <div className="space-y-4 pb-20 md:pb-0">
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -289,6 +312,36 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
               >
                 {batchEnriching ? "Enriching..." : `🔍 Enrich (${Math.min(filteredLeads.length, 50)})`}
               </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="h-9 px-3 text-sm border rounded hover:bg-muted flex items-center gap-1.5" disabled={filteredLeads.length === 0}>
+                    Bulk Actions ({Math.min(filteredLeads.length, 200)}) <ChevronDown className="h-3.5 w-3.5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel className="text-xs">On {Math.min(filteredLeads.length, 200)} filtered leads</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => bulkLeadOp("stage", { stage: "contacted" })}>
+                    Mark as Contacted
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => bulkLeadOp("stage", { stage: "archived" })}>
+                    <Archive className="h-3.5 w-3.5 mr-1.5" /> Archive All
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => bulkLeadOp("enrich", { force: false })}>
+                    🔍 Enrich All (skip fresh)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => {
+                      if (window.confirm(`Delete ${Math.min(filteredLeads.length, 200)} leads? Cannot be undone.`))
+                        bulkLeadOp("delete");
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete All
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <CSVImportDialog onComplete={handleImportComplete} />
             </>
           )}
