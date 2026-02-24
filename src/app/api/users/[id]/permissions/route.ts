@@ -32,7 +32,7 @@ export async function PUT(
     const { permissionPreset, customPermissions } = body;
 
     // Validate inputs
-    if (permissionPreset && !["sales_basic", "sales_advanced", "master_lite", "master_full", null].includes(permissionPreset)) {
+    if (permissionPreset && !["sales_basic", "sales_advanced", "manager_lite", "manager_full", null].includes(permissionPreset)) {
       return NextResponse.json(
         { error: "Invalid permission preset" },
         { status: 400 }

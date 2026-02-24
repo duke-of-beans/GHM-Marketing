@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { getLeads } from "@/lib/db/leads";
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
   });
 
   // Bust dashboard caches so new lead counts are reflected
-  revalidatePath("/master");
+  revalidatePath("/manager");
   revalidatePath("/sales");
   revalidatePath("/leads");
 

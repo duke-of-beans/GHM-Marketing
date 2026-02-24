@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CompensationConfigSection
  * C5: Admin-editable tier thresholds + per-user compensation config
  *
@@ -300,7 +300,7 @@ function UserCompRow({ user }: { user: { id: number; name: string; email: string
   };
 
   const changed = draft && config && JSON.stringify(draft) !== JSON.stringify(config);
-  const roleBadge = user.role === "admin" ? "destructive" : user.role === "master" ? "default" : "secondary";
+  const roleBadge = user.role === "admin" ? "destructive" : user.role === "manager" ? "default" : "secondary";
 
   return (
     <div className="border rounded-lg p-3">
@@ -485,3 +485,4 @@ export function CompensationConfigSection({ users }: CompensationConfigSectionPr
     </TooltipProvider>
   );
 }
+

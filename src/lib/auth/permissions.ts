@@ -64,7 +64,7 @@ export const PERMISSION_PRESETS: Record<string, UserPermissions> = {
     manage_payments: false,
     manage_settings: false,
   },
-  master_lite: {
+  manager_lite: {
     view_all_leads: true,
     manage_leads: true,
     view_all_clients: true,
@@ -77,7 +77,7 @@ export const PERMISSION_PRESETS: Record<string, UserPermissions> = {
     manage_payments: true,
     manage_settings: true,
   },
-  master_full: {
+  manager_full: {
     view_all_leads: true,
     manage_leads: true,
     view_all_clients: true,
@@ -100,7 +100,7 @@ export function getUserPermissions(user: SessionUser & { permissions?: unknown; 
   // Admin role always gets all permissions — no preset or override needed
   if ((user as any).role === "admin") {
     return Object.fromEntries(
-      (Object.keys(PERMISSION_PRESETS.master_full) as PermissionKey[]).map((k) => [k, true])
+      (Object.keys(PERMISSION_PRESETS.manager_full) as PermissionKey[]).map((k) => [k, true])
     ) as UserPermissions;
   }
 
@@ -186,7 +186,7 @@ export async function requirePermission(permission: PermissionKey): Promise<Sess
 
   if (!hasPermission(userWithPermissions, permission)) {
     // Redirect to appropriate dashboard based on role
-    redirect(user.role === "master" ? "/master" : "/sales");
+    redirect(user.role === "manager" ? "/manager" : "/sales");
   }
 
   return user;
@@ -219,7 +219,7 @@ export async function requireAnyPermission(...permissions: PermissionKey[]): Pro
   };
 
   if (!hasAnyPermission(userWithPermissions, ...permissions)) {
-    redirect(isElevated(user.role) ? "/master" : "/sales");
+    redirect(isElevated(user.role) ? "/manager" : "/sales");
   }
 
   return user;
@@ -252,7 +252,7 @@ export async function requireAllPermissions(...permissions: PermissionKey[]): Pr
   };
 
   if (!hasAllPermissions(userWithPermissions, ...permissions)) {
-    redirect(isElevated(user.role) ? "/master" : "/sales");
+    redirect(isElevated(user.role) ? "/manager" : "/sales");
   }
 
   return user;

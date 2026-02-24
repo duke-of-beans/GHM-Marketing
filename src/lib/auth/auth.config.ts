@@ -19,8 +19,8 @@ type AuthUser = {
 // Paths that don't require authentication
 const PUBLIC_PATHS = ["/login", "/welcome", "/brochure", "/comp-sheet", "/territory-map"];
 
-// Paths that require master/admin role
-const ELEVATED_PATHS = ["/master", "/permissions", "/audit"];
+// Paths that require manager/admin role
+const ELEVATED_PATHS = ["/manager", "/permissions", "/audit"];
 
 export const authConfig = {
   session: {
@@ -68,7 +68,7 @@ export const authConfig = {
       const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
       if (isPublic) {
         if (isLoggedIn) {
-          const dest = user?.role === "master" || user?.role === "admin" ? "/master" : "/sales";
+          const dest = user?.role === "manager" || user?.role === "admin" ? "/manager" : "/sales";
           return Response.redirect(new URL(dest, nextUrl));
         }
         return true;

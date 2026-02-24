@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const users = await prisma.user.findMany({
     where: {
       isActive: true,
-      role: { in: ['sales', 'master'] },
+      role: { in: ['sales', 'manager'] },
     },
     select: { id: true, name: true, email: true, contractorVendorId: true, contractorEntityName: true },
   })

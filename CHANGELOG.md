@@ -1,11 +1,28 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 9 complete (Import visibility, admin elevation, branding system, admin first-run wizard).
+**Last Updated:** February 24, 2026 — FEAT-029 complete (master→manager rename).
 
 ---
 
-## Sprint 9 — Admin Infrastructure (February 24, 2026)
+## Sprint 14 — UX Polish Batch (February 24, 2026)
+
+### FEAT-029 — Rename `master` role → `manager`
+
+**Breaking schema change — fully migrated.**
+
+| Layer | Change |
+|---|---|
+| Database | `UserRole` enum: `master` → `manager` (live SQL); Gavin Muirhead (id=5) confirmed ✅ |
+| Prisma | Schema + client regenerated |
+| Auth | `AppRole`, `isElevated()`, `ROLE_LABELS`, redirects all updated |
+| Route | `/master` directory → `/manager`; all redirect/push/revalidate strings updated |
+| Presets | `master_lite/full` → `manager_lite/full` in types, presets, UI, API validation |
+| API | 87+ files: all `"master"` role string literals replaced |
+| Preserved | `master_fee` payment type, `masterFeeEnabled/Amount`, `masterManagerId` DB columns |
+
+---
+
 
 | Date | What Shipped |
 |------|-------------|

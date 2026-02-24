@@ -121,7 +121,7 @@ model Position {
   compensationType     String    @map("compensation_type")  // "commission_residual" | "management_fee" | "flat_monthly" | "per_deliverable" | "manual"
   defaultAmount        Decimal?  @map("default_amount") @db.Decimal(10, 2)
   defaultFrequency     String?   @map("default_frequency") // "monthly" | "per_close" | "per_deliverable" | "manual"
-  dashboardAccessLevel String    @map("dashboard_access_level") // "admin" | "master" | "sales" | "readonly"
+  dashboardAccessLevel String    @map("dashboard_access_level") // "admin" | "manager" | "sales" | "readonly"
   isActive             Boolean   @default(true) @map("is_active")
   notes                String?
   createdAt            DateTime  @default(now()) @map("created_at")
@@ -721,7 +721,7 @@ model UserCompensationConfig {
   residualAmount     Decimal  @default(200) @map("residual_amount") @db.Decimal(10, 2)
   residualStartMonth Int      @default(2) @map("residual_start_month")
   
-  // Master manager settings (for masters only)
+  // Manager settings (for managers only)
   masterFeeEnabled   Boolean  @default(false) @map("master_fee_enabled")
   masterFeeAmount    Decimal  @default(240) @map("master_fee_amount") @db.Decimal(10, 2)
   
@@ -795,8 +795,8 @@ model PaymentTransaction {
 }
 
 enum UserRole {
-  admin   // Super-admin: can manage masters, full system access
-  master  // Manager-level: territory management, team ops
+  admin   // Super-admin: can manage admins + managers, full system access
+  manager // Manager-level: territory management, team ops
   sales   // Sales rep: territory-scoped access
 }
 

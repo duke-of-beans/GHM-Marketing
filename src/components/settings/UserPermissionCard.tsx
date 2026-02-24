@@ -42,7 +42,7 @@ import { PermissionEditor } from "./PermissionEditor";
 import { PresetSelector } from "./PresetSelector";
 import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
 
-type AppRole = "admin" | "master" | "sales";
+type AppRole = "admin" | "manager" | "sales";
 
 interface User {
   id: number;
@@ -121,14 +121,14 @@ export function UserPermissionCard({
 
   const roleColors: Record<AppRole, string> = {
     admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    master: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    manager: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
     sales: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   };
 
   // Roles the current viewer is allowed to assign
   const assignableRoles: AppRole[] = viewerIsAdmin
-    ? ["admin", "master", "sales"]
-    : ["master", "sales"];
+    ? ["admin", "manager", "sales"]
+    : ["manager", "sales"];
 
   return (
     <>
@@ -426,3 +426,4 @@ export function UserPermissionCard({
     </>
   );
 }
+

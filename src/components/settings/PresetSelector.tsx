@@ -20,13 +20,13 @@ const PRESET_OPTIONS = [
     description: "Enhanced access for high-performing sales reps",
   },
   {
-    value: "master_lite",
-    label: "Master Lite",
+    value: "manager_lite",
+    label: "Manager Lite",
     description: "Client management without full master privileges",
   },
   {
-    value: "master_full",
-    label: "Master Full",
+    value: "manager_full",
+    label: "Manager Full",
     description: "Full manager access to all features",
   },
   {

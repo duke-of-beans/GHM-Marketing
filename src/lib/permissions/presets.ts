@@ -48,9 +48,9 @@ export const SALES_ADVANCED_PRESET: UserPermissions = {
 };
 
 /**
- * Preset 3: Master Lite (Post-sale manager)
+ * Preset 3: Manager Lite (Post-sale manager)
  */
-export const MASTER_LITE_PRESET: UserPermissions = {
+export const MANAGER_LITE_PRESET: UserPermissions = {
   canViewAllClients: true,
   canEditClients: true,
   canManageTasks: true,
@@ -69,9 +69,9 @@ export const MASTER_LITE_PRESET: UserPermissions = {
 };
 
 /**
- * Preset 4: Master Full
+ * Preset 4: Manager Full
  */
-export const MASTER_FULL_PRESET: UserPermissions = {
+export const MANAGER_FULL_PRESET: UserPermissions = {
   canViewAllClients: true,
   canEditClients: true,
   canManageTasks: true,
@@ -92,8 +92,8 @@ export const MASTER_FULL_PRESET: UserPermissions = {
 export const PERMISSION_PRESETS: Record<PermissionPreset, UserPermissions | null> = {
   sales_basic: SALES_BASIC_PRESET,
   sales_advanced: SALES_ADVANCED_PRESET,
-  master_lite: MASTER_LITE_PRESET,
-  master_full: MASTER_FULL_PRESET,
+  manager_lite: MANAGER_LITE_PRESET,
+  manager_full: MANAGER_FULL_PRESET,
   custom: null,
 };
 
@@ -112,13 +112,13 @@ export const PRESET_METADATA: Record<PermissionPreset, {
     description: 'Enhanced access for high-performing sales reps',
     recommendedFor: 'Top performers, senior sales reps',
   },
-  master_lite: {
-    label: 'Master Lite',
-    description: 'Client management without full master privileges',
+  manager_lite: {
+    label: 'Manager Lite',
+    description: 'Client management without full manager privileges',
     recommendedFor: 'Post-sale managers, client success roles',
   },
-  master_full: {
-    label: 'Master Full',
+  manager_full: {
+    label: 'Manager Full',
     description: 'Full manager access to all features',
     recommendedFor: 'Operations managers, team leads',
   },
@@ -134,7 +134,7 @@ export function getPreset(presetName: PermissionPreset): UserPermissions | null 
 }
 
 export function getDefaultPermissionsForRole(role: string): UserPermissions {
-  return (role === 'master' || role === 'admin') ? MASTER_FULL_PRESET : SALES_BASIC_PRESET;
+  return (role === 'manager' || role === 'admin') ? MANAGER_FULL_PRESET : SALES_BASIC_PRESET;
 }
 
 export function matchesPreset(
@@ -153,8 +153,8 @@ export function detectPreset(permissions: UserPermissions): PermissionPreset {
   const presets: Exclude<PermissionPreset, 'custom'>[] = [
     'sales_basic',
     'sales_advanced',
-    'master_lite',
-    'master_full',
+    'manager_lite',
+    'manager_full',
   ];
   
   for (const presetName of presets) {

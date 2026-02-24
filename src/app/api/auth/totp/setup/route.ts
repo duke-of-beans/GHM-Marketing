@@ -16,7 +16,7 @@ import { log } from "@/lib/logger";
 import { generateSecret, encryptSecret, buildOtpAuthUri, generateBackupCodes } from "@/lib/totp";
 import type { UserRole } from "@prisma/client";
 
-const ALLOWED_ROLES: UserRole[] = ["admin", "master"];
+const ALLOWED_ROLES: UserRole[] = ["admin", "manager"];
 
 export async function POST(req: NextRequest) {
   const session = await auth();

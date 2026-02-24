@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
       const escalatedStatuses = [PAYMENT_STATUS.PAUSED, PAYMENT_STATUS.COLLECTIONS] as string[]
       if (escalatedStatuses.includes(newPaymentStatus)) {
         const admins = await prisma.user.findMany({
-          where: { role: { in: ['admin', 'master'] }, isActive: true },
+          where: { role: { in: ['admin', 'manager'] }, isActive: true },
           select: { id: true },
         })
         for (const admin of admins) {

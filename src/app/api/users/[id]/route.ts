@@ -9,7 +9,7 @@ import { isElevated } from "@/lib/auth/session";
 const updateUserSchema = z.object({
   email: z.string().email().optional(),
   name: z.string().min(1).max(100).optional(),
-  role: z.enum(["admin", "master", "sales"]).optional(),
+  role: z.enum(["admin", "manager", "sales"]).optional(),
   territoryId: z.number().int().positive().nullable().optional(),
   password: z.string().min(8).optional(),
   isActive: z.boolean().optional(),

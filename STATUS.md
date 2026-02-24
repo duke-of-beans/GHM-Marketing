@@ -1,7 +1,14 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 13 fully closed. BUG-010 resolved (ghm-marketing-blob store provisioned on Vercel, token active in all environments). BUG-011 shipped (wizard skip links). AUDIT-004 fixed (RefreshOnFocus debounce). FEAT-022 added to backlog (Client Website Audit). 🔴 MUST queue is clear.
+**Last Updated:** February 24, 2026 — FEAT-029 complete (master→manager role rename, full codebase sweep, TypeScript clean).
+
+### SPRINT 14 — UX Polish Batch (February 24, 2026)
+- [x] **FEAT-029 COMPLETE** — Full rename of `master` → `manager` role across entire codebase. DB enum migrated live (`ALTER TYPE`), Prisma regenerated, 87+ files updated, `/master` route directory renamed to `/manager`, all redirect/revalidate strings updated, preset names `master_lite/full` → `manager_lite/full`. TypeScript reports zero FEAT-029 errors. Pre-existing script errors (basecamp/dotenv) unaffected.
+**Files:** All `src/` .ts/.tsx except calculations; `prisma/schema.prisma`; `src/app/(dashboard)/manager/` (renamed from master)
+**Preserved intentionally:** `master_fee` payment type, `masterFeeEnabled/Amount`, `masterManagerId` Prisma field names, `masterManagerFee` settings key
+
+
 
 ### SPRINT 13 — Bug Triage (February 24, 2026)
 - [x] **BUG-010 FULLY RESOLVED** — Vercel Blob store (`ghm-marketing-blob`, IAD1, Public) created and connected to project. `BLOB_READ_WRITE_TOKEN` now active in all environments (Development, Preview, Production). Token pulled locally via `vercel env pull`. Logo upload is live. Graceful fallback code retained for future token expiry edge cases.

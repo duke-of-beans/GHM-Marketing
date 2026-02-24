@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +27,7 @@ const VALID_TABS = ["general", "branding", "team", "positions", "territories", "
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const currentUserRole = (session?.user as any)?.role ?? "master";
+  const currentUserRole = (session?.user as any)?.role ?? "manager";
   const isAdmin = currentUserRole === "admin";
   const [activeTab, setActiveTab] = useState("general");
 
@@ -191,3 +191,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

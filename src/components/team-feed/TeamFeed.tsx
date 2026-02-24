@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -194,7 +194,7 @@ function ComposeMessage({
             <Select value={audienceValue} onValueChange={setAudienceValue}>
               <SelectTrigger className="h-7 w-28 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="master">Managers</SelectItem>
+                <SelectItem value="manager">Managers</SelectItem>
                 <SelectItem value="sales">Sales Reps</SelectItem>
               </SelectContent>
             </Select>
@@ -702,3 +702,4 @@ export function TeamFeedWidget({
     </Card>
   );
 }
+

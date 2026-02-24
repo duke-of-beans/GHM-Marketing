@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -283,7 +283,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
             <SelectContent>
               <SelectItem value="none">None</SelectItem>
               {users
-                .filter((u) => u.role === "master" || u.role === "admin")
+                .filter((u) => u.role === "manager" || u.role === "admin")
                 .map((user) => (
                   <SelectItem key={user.id} value={user.id.toString()}>
                     {user.name}
@@ -500,3 +500,4 @@ export function ClientCompensationSection({ clientId, users }: Props) {
     </Card>
   );
 }
+

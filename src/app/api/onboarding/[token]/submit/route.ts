@@ -205,7 +205,7 @@ export async function POST(
       try {
         // Find all admin/master users to notify ops team
         const opsUsers = await prisma.user.findMany({
-          where: { role: { in: ["admin", "master"] } },
+          where: { role: { in: ["admin", "manager"] } },
           select: { id: true, email: true },
         });
 

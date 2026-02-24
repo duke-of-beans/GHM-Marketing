@@ -79,7 +79,7 @@ async function deliverEmail(
 async function resolveTargetUsers(input: CreateNotificationInput): Promise<number[]> {
   if (input.userIds && input.userIds.length > 0) return input.userIds;
   const users = await prisma.user.findMany({
-    where: { isActive: true, role: { in: ["master", "admin"] } },
+    where: { isActive: true, role: { in: ["manager", "admin"] } },
     select: { id: true },
   });
   return users.map((u) => u.id);

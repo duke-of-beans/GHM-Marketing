@@ -10,7 +10,7 @@ import { sendContractorWaveInvite } from "@/lib/email";
 const createUserSchema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
-  role: z.enum(["admin", "master", "sales"]).default("sales"),
+  role: z.enum(["admin", "manager", "sales"]).default("sales"),
   positionId: z.number().int().positive().nullable().optional(),
   territoryId: z.number().int().positive().nullable().optional(),
   password: z.string().min(8).optional(),

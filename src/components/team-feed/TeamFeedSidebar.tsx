@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -219,7 +219,7 @@ function ComposeBox({
             <Select value={audienceValue} onValueChange={setAudienceValue}>
               <SelectTrigger className="h-7 w-24 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="master">Managers</SelectItem>
+                <SelectItem value="manager">Managers</SelectItem>
                 <SelectItem value="sales">Sales Reps</SelectItem>
               </SelectContent>
             </Select>
@@ -600,3 +600,4 @@ export function TeamFeedToggle({
     </TooltipProvider>
   );
 }
+

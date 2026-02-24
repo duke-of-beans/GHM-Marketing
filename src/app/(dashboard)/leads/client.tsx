@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import { KanbanBoard } from "@/components/leads/kanban-board";
@@ -344,7 +344,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
           {userRole !== "sales" && (
             <CSVImportDialog onComplete={handleImportComplete} />
           )}
-          {(userRole === "master" || userRole === "admin") && (
+          {(userRole === "manager" || userRole === "admin") && (
             <>
               <button
                 className="h-9 px-3 text-sm border rounded hover:bg-muted disabled:opacity-50"
@@ -400,7 +400,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
         <AdvancedLeadFilterBar
           filters={filters}
           onChange={handleFiltersChange}
-          showTerritoryFilter={userRole === "master" || userRole === "admin"}
+          showTerritoryFilter={userRole === "manager" || userRole === "admin"}
         />
       </div>
 
@@ -482,3 +482,4 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
     </div>
   );
 }
+

@@ -9,18 +9,18 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // ── Fast local suggestions (no AI) ───────────────────────────────────────────
 
 const NAV_ROUTES: Record<string, { label: string; url: string; icon: string; roles: string[] }> = {
-  dashboard:    { label: "Dashboard",       url: "/master",           icon: "dashboard",    roles: ["admin","master"] },
+  dashboard:    { label: "Dashboard",       url: "/manager",          icon: "dashboard",    roles: ["admin","manager"] },
   rep_dash:     { label: "Dashboard",       url: "/rep",              icon: "dashboard",    roles: ["admin","sales"] },
-  leads:        { label: "Leads Pipeline",  url: "/leads",            icon: "leads",        roles: ["admin","master","sales"] },
-  clients:      { label: "Client Roster",   url: "/clients",          icon: "clients",      roles: ["admin","master"] },
-  tasks:        { label: "Task Queue",      url: "/clients",          icon: "tasks",        roles: ["admin","master"] },
-  content:      { label: "Content Studio",  url: "/content",          icon: "content",      roles: ["admin","master"] },
-  payments:     { label: "Payments",        url: "/payments",         icon: "payments",     roles: ["admin","master"] },
-  reports:      { label: "Reports",         url: "/clients",          icon: "reports",      roles: ["admin","master"] },
-  team:         { label: "Team Feed",       url: "/master",           icon: "team",         roles: ["admin","master","sales"] },
-  vault:        { label: "Document Vault",  url: "/vault",            icon: "vault",        roles: ["admin","master","sales"] },
-  settings:     { label: "Settings",        url: "/settings",         icon: "settings",     roles: ["admin","master"] },
-  analytics:    { label: "Analytics",       url: "/master",           icon: "trending-up",  roles: ["admin","master"] },
+  leads:        { label: "Leads Pipeline",  url: "/leads",            icon: "leads",        roles: ["admin","manager","sales"] },
+  clients:      { label: "Client Roster",   url: "/clients",          icon: "clients",      roles: ["admin","manager"] },
+  tasks:        { label: "Task Queue",      url: "/clients",          icon: "tasks",        roles: ["admin","manager"] },
+  content:      { label: "Content Studio",  url: "/content",          icon: "content",      roles: ["admin","manager"] },
+  payments:     { label: "Payments",        url: "/payments",         icon: "payments",     roles: ["admin","manager"] },
+  reports:      { label: "Reports",         url: "/clients",          icon: "reports",      roles: ["admin","manager"] },
+  team:         { label: "Team Feed",       url: "/manager",          icon: "team",         roles: ["admin","manager","sales"] },
+  vault:        { label: "Document Vault",  url: "/vault",            icon: "vault",        roles: ["admin","manager","sales"] },
+  settings:     { label: "Settings",        url: "/settings",         icon: "settings",     roles: ["admin","manager"] },
+  analytics:    { label: "Analytics",       url: "/manager",          icon: "trending-up",  roles: ["admin","manager"] },
 };
 
 function getAccessibleRoutes(role: string): string[] {
@@ -49,7 +49,7 @@ async function localSearch(query: string, role: string, userId: number): Promise
   }
 
   // Client name match (top 3)
-  if (["admin", "master"].includes(role)) {
+  if (["admin", "manager"].includes(role)) {
     const clients = await prisma.clientProfile.findMany({
       where: { businessName: { contains: query, mode: "insensitive" }, status: "active" },
       select: { id: true, businessName: true, healthScore: true, leadId: true },
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
   }
 
   const systemPrompt = buildSearchSystemPrompt({
-    userRole: role as "admin" | "master" | "sales",
+    userRole: role as "admin" | "manager" | "sales",
     userName: session.user.name ?? "User",
     scopedClient,
     accessibleRoutes: getAccessibleRoutes(role),

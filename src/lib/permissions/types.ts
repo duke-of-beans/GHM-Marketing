@@ -44,11 +44,11 @@ export interface UserPermissions {
  * Permission preset identifiers
  */
 export type PermissionPreset = 
-  | 'sales_basic'      // Default for new sales reps
-  | 'sales_advanced'   // High performers
-  | 'master_lite'      // Post-sale manager (Arian's use case)
-  | 'master_full'      // Full manager
-  | 'custom';          // Manually configured
+  | 'sales_basic'       // Default for new sales reps
+  | 'sales_advanced'    // High performers
+  | 'manager_lite'      // Post-sale manager (Arian's use case)
+  | 'manager_full'      // Full manager
+  | 'custom';           // Manually configured
 
 /**
  * Feature categories for UI organization
@@ -150,8 +150,8 @@ export const PERMISSION_DESCRIPTIONS: Record<keyof UserPermissions, string> = {
 };
 
 /**
- * Master-only features that NEVER get permission toggles
- * These are hard-coded to role="master" or role="owner"
+ * Manager-only features that NEVER get permission toggles
+ * These are hard-coded to role="manager" or role="admin"
  */
 export const MASTER_ONLY_FEATURES = [
   'settings_panel',
@@ -198,7 +198,7 @@ export function isUserPermissions(obj: unknown): obj is UserPermissions {
  */
 export interface UserWithPermissions {
   id: number;
-  role: 'admin' | 'master' | 'sales';
+  role: 'admin' | 'manager' | 'sales';
   permissions: UserPermissions;
   permissionPreset: PermissionPreset;
 }

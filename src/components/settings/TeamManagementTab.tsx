@@ -29,7 +29,7 @@ import { CompensationConfigSection } from "@/components/team/compensation-config
 import { Separator } from "@/components/ui/separator";
 import { ROLE_LABELS, isElevated } from "@/lib/auth/roles";
 
-type AppRole = "admin" | "master" | "sales";
+type AppRole = "admin" | "manager" | "sales";
 
 interface User {
   id: number;
@@ -47,7 +47,7 @@ interface TeamManagementTabProps {
   currentUserRole?: AppRole;
 }
 
-export function TeamManagementTab({ currentUserRole = "master" }: TeamManagementTabProps) {
+export function TeamManagementTab({ currentUserRole = "manager" }: TeamManagementTabProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -356,7 +356,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
               {currentUserRole === "admin" && (
                 <SelectItem value="admin">{ROLE_LABELS.admin} Only</SelectItem>
               )}
-              <SelectItem value="master">{ROLE_LABELS.master} Only</SelectItem>
+              <SelectItem value="manager">{ROLE_LABELS.manager} Only</SelectItem>
               <SelectItem value="sales">{ROLE_LABELS.sales} Only</SelectItem>
             </SelectContent>
           </Select>
@@ -463,7 +463,7 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {currentUserRole === "admin" && <SelectItem value="admin">{ROLE_LABELS.admin}</SelectItem>}
-                    <SelectItem value="master">{ROLE_LABELS.master}</SelectItem>
+                    <SelectItem value="manager">{ROLE_LABELS.manager}</SelectItem>
                     <SelectItem value="sales">{ROLE_LABELS.sales}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -510,3 +510,4 @@ export function TeamManagementTab({ currentUserRole = "master" }: TeamManagement
     </div>
   );
 }
+

@@ -26,7 +26,7 @@ export async function getCurrentUser(): Promise<SessionUser> {
 }
 
 /**
- * Require elevated (master or admin) role, or redirect to sales dashboard.
+ * Require elevated (manager or admin) role, or redirect to sales dashboard.
  */
 export async function requireMaster(): Promise<SessionUser> {
   const user = await getCurrentUser();
@@ -35,11 +35,11 @@ export async function requireMaster(): Promise<SessionUser> {
 }
 
 /**
- * Require admin role specifically, or redirect to master dashboard.
+ * Require admin role specifically, or redirect to manager dashboard.
  */
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await getCurrentUser();
-  if (user.role !== "admin") redirect("/master");
+  if (user.role !== "admin") redirect("/manager");
   return user;
 }
 

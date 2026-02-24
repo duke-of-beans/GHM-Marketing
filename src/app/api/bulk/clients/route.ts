@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       const masterManagerId = params.masterManagerId as number | null;
       if (masterManagerId !== null) {
         const mgr = await prisma.user.findUnique({ where: { id: masterManagerId }, select: { id: true, isActive: true, role: true } });
-        if (!mgr?.isActive || (mgr.role !== "master" && mgr.role !== "admin"))
+        if (!mgr?.isActive || (mgr.role !== "manager" && mgr.role !== "admin"))
           return NextResponse.json({ error: "Manager not found, inactive, or wrong role" }, { status: 400 });
       }
       for (const id of ids) {

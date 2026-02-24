@@ -9,7 +9,7 @@ const positionSchema = z.object({
   compensationType: z.enum(["commission_residual", "management_fee", "flat_monthly", "per_deliverable", "manual"]),
   defaultAmount: z.number().nullable().optional(),
   defaultFrequency: z.enum(["monthly", "per_close", "per_deliverable", "manual"]).nullable().optional(),
-  dashboardAccessLevel: z.enum(["admin", "master", "sales", "readonly"]),
+  dashboardAccessLevel: z.enum(["admin", "manager", "sales", "readonly"]),
   isActive: z.boolean().optional(),
   notes: z.string().nullable().optional(),
 });

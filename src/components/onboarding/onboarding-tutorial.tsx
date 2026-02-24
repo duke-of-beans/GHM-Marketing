@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -135,7 +135,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Your Dashboard",
     description: "Everything you need to know about your team's performance is here. If a number looks bad, it's probably accurate.",
     icon: <LayoutDashboard className="h-12 w-12 text-green-600" />,
-    route: "/master",
+    route: "/manager",
     tips: [
       "Top row: total leads, active pipeline, won deals, MRR/ARR — company-wide, not just yours",
       "Pipeline Funnel shows where deals are converting (and where they're dying)",
@@ -149,7 +149,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "You Can Rearrange All of This",
     description: "The layout is yours. Every widget is moveable and resizable. The default is fine. Custom is better.",
     icon: <LayoutDashboard className="h-12 w-12 text-slate-600" />,
-    route: "/master",
+    route: "/manager",
     tips: [
       "'Arrange widgets' lives in the top right — click it to enter edit mode",
       "Drag handles appear at the top of each card in edit mode",
@@ -206,7 +206,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "How You Get Paid",
     description: "Management fees on every client you manage, starting Month 1. Sales commission and residuals on top if you're also closing. It compounds if you're doing both.",
     icon: <DollarSign className="h-12 w-12 text-green-600" />,
-    route: "/master",
+    route: "/manager",
     tips: [
       "Management fees: per-client monthly, every client you manage, from Month 1",
       "Sales commission: one-time per deal you personally close",
@@ -220,7 +220,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "Team Feed",
     description: "This is how you talk to your team. Posts, direct messages, pins, urgency flags — all here. Your reps see whatever you post.",
     icon: <MessageSquare className="h-12 w-12 text-violet-600" />,
-    route: "/master",
+    route: "/manager",
     tips: [
       "Post to Everyone, a specific role, or a single person (Direct) — your choice",
       "Pin messages to keep them at the top of everyone's feed indefinitely",
@@ -259,7 +259,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
     title: "That's everything.",
     description: "You've got the full picture. Keep health scores up, keep your reps moving, keep your managed book growing.",
     icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
-    route: "/master",
+    route: "/manager",
     tips: [
       "Every ? icon in the app has an inline explanation — hover before you ask",
       "Help menu (top right) has support options, bug reporting, and tour restarts",
@@ -272,7 +272,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 type OnboardingTutorialProps = {
-  userRole: "sales" | "master" | "owner";
+  userRole: "sales" | "manager" | "owner";
   userName: string;
 };
 
@@ -432,3 +432,4 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
     </Dialog>
   );
 }
+

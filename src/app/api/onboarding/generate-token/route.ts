@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { randomUUID } from "crypto";
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       select: { role: true },
     });
 
-    const isElevated = user?.role === "admin" || user?.role === "master";
+    const isElevated = user?.role === "admin" || user?.role === "manager";
     const isAssigned = lead.assignedTo === userId;
 
     if (!isElevated && !isAssigned) {

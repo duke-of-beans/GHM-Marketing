@@ -65,7 +65,7 @@ export async function PATCH(
     }
 
     // Bust cached server components so dashboard widgets reflect the change immediately
-    revalidatePath("/master");
+    revalidatePath("/manager");
     revalidatePath("/sales");
     revalidatePath("/leads");
 

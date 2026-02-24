@@ -43,7 +43,7 @@ export type BulkTaskOperation =
     }};
 
 export type BulkUserOperation =
-  | { operation: "role"; params: { role: "admin" | "master" | "sales" } }
+  | { operation: "role"; params: { role: "admin" | "manager" | "sales" } }
   | { operation: "position"; params: { positionId: number | null } }
   | { operation: "territory"; params: { territoryId: number | null } }
   | { operation: "deactivate"; params?: Record<string, never> }

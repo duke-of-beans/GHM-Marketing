@@ -1,4 +1,4 @@
-import { requirePermission } from "@/lib/auth/permissions";
+﻿import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { getDashboardMetrics, getFunnelStats } from "@/lib/db/leads";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
@@ -76,7 +76,7 @@ export default async function MasterDashboard() {
 
   // isOwner = David only (id=1). Seed user id=2 (Alex Johnson) was deleted in session Feb 22.
   const isOwner = Number(user.id) === 1;
-  const isMaster = user.role === "master";
+  const isMaster = user.role === "manager";
 
   // Goals widget or placeholder
   const goalsWidget = globalSettings?.goalsEnabled ? (
@@ -133,8 +133,9 @@ export default async function MasterDashboard() {
         }}
       </MasterDashboardGrid>
 
-      <OnboardingTutorial userRole={isOwner ? "owner" : "master"} userName={user.name} />
+      <OnboardingTutorial userRole={isOwner ? "owner" : "manager"} userName={user.name} />
       <RefreshOnFocus />
     </MasterPageClient>
   );
 }
+

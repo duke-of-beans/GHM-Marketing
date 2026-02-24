@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -85,7 +85,7 @@ export function OnboardingWizard({
     const next = stepIndex + 1;
     if (next >= TOTAL) {
       await saveProgress(TOTAL, true);
-      router.push(role === "sales" ? "/sales" : "/master");
+      router.push(role === "sales" ? "/sales" : "/manager");
       return;
     }
     await saveProgress(next);

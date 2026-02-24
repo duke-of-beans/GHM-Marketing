@@ -19,7 +19,7 @@ const COL: Record<string, string> = {
   "temp_password": "tempPassword", "password": "tempPassword", "initial_password": "tempPassword",
 };
 
-const VALID_ROLES = ["admin", "master", "sales"];
+const VALID_ROLES = ["admin", "manager", "sales"];
 
 function parseCSV(text: string): Record<string, string>[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
           name,
           email,
           passwordHash,
-          role: role as "admin" | "master" | "sales",
+          role: role as "admin" | "manager" | "sales",
           positionId,
           territoryId,
           contractorEntityName: mapped.contractorEntityName ? String(mapped.contractorEntityName) : null,

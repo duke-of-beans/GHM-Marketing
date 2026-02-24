@@ -47,8 +47,8 @@ const PRESET_OPTIONS = [
   { value: "none", label: "None (Custom Only)" },
   { value: "sales_basic", label: "Sales Basic" },
   { value: "sales_advanced", label: "Sales Advanced" },
-  { value: "master_lite", label: "Master Lite" },
-  { value: "master_full", label: "Master Full" },
+  { value: "manager_lite", label: "Manager Lite" },
+  { value: "manager_full", label: "Manager Full" },
 ];
 
 const PERMISSION_DEFINITIONS = [
@@ -223,7 +223,7 @@ export function PermissionManager() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium">{user.name}</span>
-                      <Badge variant={user.role === "master" ? "default" : "secondary"}>
+                      <Badge variant={user.role === "manager" ? "default" : "secondary"}>
                         {user.role}
                       </Badge>
                       {user.permissionPreset && (
@@ -345,3 +345,4 @@ export function PermissionManager() {
     </div>
   );
 }
+

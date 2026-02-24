@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+﻿import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
@@ -30,7 +30,7 @@ export default async function OnboardingSetupPage() {
   // Already completed? Go to appropriate dashboard
   if (dbUser.repOnboardingCompletedAt) {
     if (dbUser.role === "sales") redirect("/sales");
-    redirect("/master");
+    redirect("/manager");
   }
 
   const territory = dbUser.territory ?? null;

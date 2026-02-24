@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
 
   switch (operation) {
     case "role": {
-      const role = params.role as "admin" | "master" | "sales";
-      if (!["admin", "master", "sales"].includes(role))
+      const role = params.role as "admin" | "manager" | "sales";
+      if (!["admin", "manager", "sales"].includes(role))
         return NextResponse.json({ error: "Invalid role" }, { status: 400 });
       for (const id of safeIds) {
         if (!found.has(id)) { results.push({ id, error: "Not found" }); continue; }

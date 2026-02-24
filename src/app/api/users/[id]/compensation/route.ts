@@ -59,7 +59,7 @@ export async function GET(
           residualEnabled: true,
           residualAmount: 200,
           residualStartMonth: 2,
-          masterFeeEnabled: user.role === "master",
+          masterFeeEnabled: user.role === "manager",
           masterFeeAmount: 240,
           notes: null,
         },

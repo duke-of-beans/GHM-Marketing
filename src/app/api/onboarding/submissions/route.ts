@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       select: { role: true },
     });
 
-    if (user?.role !== "admin" && user?.role !== "master") {
+    if (user?.role !== "admin" && user?.role !== "manager") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

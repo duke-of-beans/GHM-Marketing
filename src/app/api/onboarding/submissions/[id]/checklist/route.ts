@@ -22,7 +22,7 @@ export async function PATCH(
       select: { role: true },
     });
 
-    if (user?.role !== "admin" && user?.role !== "master") {
+    if (user?.role !== "admin" && user?.role !== "manager") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

@@ -6,14 +6,14 @@
 import { UserPermissions, UserWithPermissions } from './types';
 import { SALES_BASIC_PRESET } from './presets';
 
-/** True for admin or master roles. */
+/** True for admin or manager roles. */
 function isElevated(role: string): boolean {
-  return role === 'admin' || role === 'master';
+  return role === 'admin' || role === 'manager';
 }
 
 /**
  * Check if a user has a specific permission.
- * Elevated users (admin/master) default to true for any permission.
+ * Elevated users (admin/manager) default to true for any permission.
  */
 export function hasPermission(
   user: UserWithPermissions | null | undefined,
@@ -45,7 +45,7 @@ export function hasAllPermissions(
 }
 
 /**
- * Check if user has elevated access (admin or master).
+ * Check if user has elevated access (admin or manager).
  * Replaces isMaster() — use this for manager-level gates.
  */
 export function isMaster(user: UserWithPermissions | null | undefined): boolean {

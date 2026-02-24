@@ -4,19 +4,19 @@
  * safe to use in both "use client" and server components.
  */
 
-export type AppRole = "admin" | "master" | "sales";
+export type AppRole = "admin" | "manager" | "sales";
 
 /** Human-readable role labels for display. */
 export const ROLE_LABELS: Record<AppRole, string> = {
   admin: "Admin",
-  master: "Manager",
+  manager: "Manager",
   sales: "Sales Rep",
 };
 
 /**
  * True for roles that have elevated (manager-level or above) access.
- * Replaces scattered `role === "master"` checks so admin is automatically included.
+ * Replaces scattered `role === "manager"` checks so admin is automatically included.
  */
 export function isElevated(role: string): boolean {
-  return role === "admin" || role === "master";
+  return role === "admin" || role === "manager";
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Loader2, Briefcase, Users, CheckCircle2, XCircle } from "lucide-react";
@@ -285,7 +285,7 @@ export function PositionsTab() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin (full)</SelectItem>
-                    <SelectItem value="master">Manager</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="sales">Sales</SelectItem>
                     <SelectItem value="readonly">Read Only</SelectItem>
                   </SelectContent>
@@ -374,3 +374,4 @@ export function PositionsTab() {
     </div>
   );
 }
+

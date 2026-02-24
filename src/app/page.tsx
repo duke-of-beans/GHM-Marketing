@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { isElevated } from "@/lib/auth/roles";
 
@@ -10,7 +10,7 @@ export default async function Home() {
   }
 
   if (isElevated(session.user.role)) {
-    redirect("/master");
+    redirect("/manager");
   }
 
   redirect("/sales");

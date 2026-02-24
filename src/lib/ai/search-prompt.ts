@@ -7,7 +7,7 @@
  */
 
 export interface SearchSystemPromptContext {
-  userRole: "admin" | "master" | "sales";
+  userRole: "admin" | "manager" | "sales";
   userName: string;
   /** If user is on a client page, inject that context */
   scopedClient?: {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * DashboardNav — grouped, collapsible sidebar navigation.
@@ -245,7 +245,7 @@ export function DashboardNav({
   const pathname = usePathname();
   const elevated = isElevated(user.role);
 
-  const dashboardHref = elevated ? "/master" : "/sales";
+  const dashboardHref = elevated ? "/manager" : "/sales";
 
   // Active path: exact match OR prefix match for nested routes (/clients/123)
   const isActivePath = useCallback(

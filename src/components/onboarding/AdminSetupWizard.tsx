@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -110,7 +110,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
       await saveBranding();
     } finally {
       setSaving(false);
-      router.push("/master");
+      router.push("/manager");
     }
   };
 
@@ -271,7 +271,7 @@ export function AdminSetupWizard({ initialBranding }: Props) {
                 <p className="font-medium text-sm mb-2">Need to update anything later?</p>
                 <p className="text-muted-foreground text-xs">Go to <strong>Settings → Branding</strong> to update your logo, company name, and colors at any time.</p>
               </div>
-              <Button className="w-full mt-4" onClick={() => router.push("/master")}>
+              <Button className="w-full mt-4" onClick={() => router.push("/manager")}>
                 Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

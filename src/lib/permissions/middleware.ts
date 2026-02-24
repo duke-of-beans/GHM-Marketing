@@ -30,8 +30,8 @@ export function requirePermission(
 }
 
 /**
- * Require master role
- * Use for hard-coded master-only features (settings, compensation, etc.)
+ * Require manager role
+ * Use for hard-coded manager-only features (settings, compensation, etc.)
  */
 export function requireMaster(
   user: { role?: string } | null | undefined
@@ -40,9 +40,9 @@ export function requireMaster(
     throw new PermissionError('Unauthorized', 401);
   }
   
-  if (user.role !== 'master') {
+  if (user.role !== 'manager' && user.role !== 'admin') {
     throw new PermissionError(
-      'Master role required',
+      'Manager role required',
       403
     );
   }

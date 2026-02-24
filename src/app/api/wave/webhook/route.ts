@@ -81,7 +81,7 @@ async function handleInvoicePayment(data: Record<string, unknown>) {
 
   // Notify admins
   const admins = await prisma.user.findMany({
-    where: { role: { in: ['admin', 'master'] }, isActive: true },
+    where: { role: { in: ['admin', 'manager'] }, isActive: true },
     select: { id: true },
   })
   const client = await prisma.clientProfile.findUnique({
