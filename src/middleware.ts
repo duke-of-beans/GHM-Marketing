@@ -9,7 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth/auth.config";
 import { getTenantFromHost, TENANT_HEADER } from "@/lib/tenant";
-import { randomUUID } from "crypto";
+// Use Web Crypto API — edge runtime does not support Node.js 'crypto' module.
+const randomUUID = () => crypto.randomUUID();
 
 export const REQUEST_ID_HEADER = "x-request-id";
 
