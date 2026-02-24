@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 16+16.5 shipped. FEAT-027/028, UX-AUDIT-015, BUG-020/021/022/023/024 closed.
+**Last Updated:** February 25, 2026 — Sprint 16+16.5 shipped. Added INFRA-001, UI-CONST-001.
 
 **Owner:** David Kirsch
 
@@ -36,6 +36,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~16~~ | ~~Admin Polish~~ | ~~FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + UX-AUDIT-015 (Content Studio empty states)~~ | ✅ SHIPPED | |
 | ~~16.5~~ | ~~Critical Bug Batch~~ | ~~BUG-020 (forgot password) + BUG-021 (Wave label) + BUG-022 (territories data sync) + BUG-023 (vault: preview/delete/message) + BUG-024 (service catalog edit prefill)~~ | ✅ SHIPPED | |
 | 17 | Admin First-Run (Full) | FEAT-015 (onboarding wizard full scope) + FEAT-018 (logo swap) + UX-AUDIT-012 (3-color branding) | ~1 session | Enables real new-tenant activation. |
+| UI-CONST | UI/UX Constitution + Design System Saga | UI-CONST-001 — runs parallel to all sprints; audit → blueprint → build in groups | Multi-session initiative | Professional-grade UI indistinguishable from Xero/Slack/Monday. Prerequisite for White-Label/COVOS productization. |
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
@@ -89,6 +90,13 @@ The `Ctrl[↵]` shortcut indicator in the TeamFeed compose box renders the enter
 ### W7 — Kill Gusto
 Wave AP/payroll fully built and validated. Gate: one successful full payroll cycle through Wave. Gavin is W-2 — do not migrate mid-year. Plan: Arian + future reps are 1099 via dashboard, close Gusto 2026, migrate W-2 to Wave Payroll Jan 2027.
 **Action:** Ops decision, no code. ~30 min once gate is cleared.
+
+### INFRA-001: Resend Sending Address — Configure & Verify Domain
+All outbound emails (notifications, forgot password, work orders, partner emails, reports) send from `noreply@ghmmarketing.com` (set via `FROM_EMAIL` env var, defaults to that address). This domain **must be verified in the Resend dashboard** for emails to deliver reliably. Without domain verification, Resend falls back to its shared sending pool which is unreliable and may land in spam.
+**Current state:** `FROM_EMAIL` env var controls the address; if unset it defaults to `noreply@ghmmarketing.com`. The `FROM_NAME` is hardcoded as `"GHM Marketing"` in `src/lib/email/index.ts`.
+**Action required:** (1) Log into Resend dashboard → Domains → Add `ghmmarketing.com` → add the three DNS records (SPF, DKIM, DMARC) in your DNS registrar → verify. (2) Confirm `FROM_EMAIL=noreply@ghmmarketing.com` is set in `.env.production`. (3) Send a test notification to confirm delivery. No code changes needed unless you want to change the address.
+**Future consideration:** When multi-tenant is live, each tenant may want their own sending domain. `FROM_EMAIL` should eventually be pulled from `TenantConfig` rather than a global env var. Track in FEAT-016 scope.
+**Size:** ~30 min DNS + verification. **Priority:** 🔴 Must resolve — email delivery is broken until this is done.
 
 ### I4 — Google Business Profile OAuth (external wait)
 GBP integration built. App in Testing mode. Gate: Google API Console approval for external app status.
@@ -274,6 +282,51 @@ The partner agreement currently does not explicitly prohibit reps from using the
 ---
 
 ## ⚪ FUTURE — Vision & Scale
+
+### UI-CONST-001: UI/UX Constitution + Professional Design System Saga
+The platform needs to be indistinguishable in quality from Xero, Slack, Monday, Linear, or Notion. Right now it uses stock icons, emoji, off-shelf components with default styling, and inconsistent visual language. This initiative establishes the aesthetic truth of the platform and delivers it systematically across every surface.
+
+**What this is:** Not a single sprint. A structured multi-session initiative with three phases per group: (1) Research & Audit — identify what exists and what's wrong, (2) Blueprint — design decisions documented in a UI Constitution, (3) Build — implement from blueprint in grouped batches.
+
+**Scope — every surface:**
+- Icons: custom icon set or curated premium set, zero emoji in UI, zero Lucide defaults without intentional selection
+- Favicon + app icons: professional multi-resolution favicon, PWA manifest icons, OG images
+- Typography: type scale, weight system, line-height, letter-spacing — codified and enforced
+- Color system: semantic token layer over raw colors — `color.surface.primary`, `color.interactive.default`, etc. not raw hex scattered through components
+- Spacing + layout: 4pt grid enforcement, consistent component padding, page margin standards
+- Component library: every button state, every input state, every card, every badge, every modal — designed with intention, not defaulted
+- Motion: micro-interactions, loading states, transitions — purposeful not decorative
+- Email templates: HTML emails should look as good as Mailchimp's own emails. Currently inline-styled and basic.
+- Notification design: in-app notification center visual quality, toast/alert design, empty states
+- Tutorial system: illustrated walkthroughs, not just tooltip text
+- Every page header, every panel, every sidebar, every empty state
+
+**Structure:**
+- Audit sessions cover one group at a time (e.g., "Icon System Audit", "Color Token Audit", "Email Template Audit")
+- Each audit produces a Blueprint section of the UI Constitution (`docs/UI_CONSTITUTION.md`)
+- Build sessions implement one Blueprint group at a time
+- No building without a Blueprint. No Blueprint without an Audit.
+
+**First deliverable before any building:** `docs/UI_CONSTITUTION.md` — our aesthetic truths. What does this platform feel like? Who does it serve? What does every design decision communicate about quality? Answers codified as enforceable standards.
+
+**Questions the Constitution answers:**
+- What are our aesthetic truths? (restraint, density, trust-signaling, professional precision)
+- What is the emotional register of this platform? (confident, not flashy; clear, not cold)
+- What are the rules for every component? (button variants, icon usage, color semantics, motion policy)
+- What is explicitly forbidden? (emoji in UI, decorative animation, inconsistent spacing)
+
+**Groups (audit + blueprint + build in sequence):**
+1. Foundations — color tokens, type scale, spacing grid, elevation/shadow
+2. Icon System — select or commission set, swap all stock/emoji
+3. Component Core — buttons, inputs, selects, badges, tags, modals
+4. Navigation — sidebar, topbar, breadcrumbs, tabs
+5. Data Display — tables, cards, metric tiles, charts
+6. Communication — email templates, in-app notifications, toasts, alerts, empty states
+7. Content — tutorial system, onboarding illustrations, marketing-facing pages
+8. Identity — favicon, OG images, PWA assets, logo usage standards
+
+**Size:** 8+ sessions (audit+blueprint) + 8+ sessions (build). Runs parallel to product sprints.
+**Priority:** 🟣 Strategic — prerequisite for White-Label/COVOS, external demo quality, investor readiness.
 
 ### Accessibility (WCAG 2.1 AA)
 Keyboard navigation first (highest ROI), then screen reader + focus indicators + high contrast. **Size:** ~1–2 weeks full audit + fix pass.
