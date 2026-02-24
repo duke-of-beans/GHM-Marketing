@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 14 complete (UX-AUDIT-013 modal audit, UX-AUDIT-016 tooltip differentiation, UX-AUDIT-017 bulk count picker, UX-BUG-002 search bar).
+**Last Updated:** February 24, 2026 — Backlog updated: 9 new items from David's audit (BUG-012–016, UX-AUDIT-018–019, FEAT-030–031). Sprint 21 added. FEAT-029 removed from backlog (shipped).
 
 ### SPRINT 14 — UX Polish Batch (February 24, 2026)
 - [x] **FEAT-029 COMPLETE** — Full rename of `master` → `manager` role across entire codebase. DB enum migrated live (`ALTER TYPE`), Prisma regenerated, 87+ files updated, `/master` route directory renamed to `/manager`, all redirect/revalidate strings updated, preset names `master_lite/full` → `manager_lite/full`. TypeScript reports zero FEAT-029 errors. Pre-existing script errors (basecamp/dotenv) unaffected.
