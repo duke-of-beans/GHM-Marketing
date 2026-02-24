@@ -861,6 +861,54 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
           <DialogTitle>Create Task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleCreateTask} className="space-y-4">
+          {/* ── Suggested Tasks ── */}
+          {(() => {
+            const suggestions: Record<string, { label: string; category: string }[]> = {
+              admin: [
+                { label: "Review monthly performance reports", category: "general" },
+                { label: "Audit team task completion rates", category: "general" },
+                { label: "Update client pricing agreements", category: "general" },
+                { label: "Review and approve invoices", category: "general" },
+              ],
+              manager: [
+                { label: "Conduct weekly client check-in", category: "general" },
+                { label: "Review Google Business Profile updates", category: "local_seo" },
+                { label: "Audit backlink profile for client", category: "backlinks" },
+                { label: "Prepare monthly client report", category: "general" },
+                { label: "Review competitor keyword gaps", category: "competitor" },
+              ],
+              sales: [
+                { label: "Follow up on outstanding proposal", category: "general" },
+                { label: "Prepare audit for prospect meeting", category: "technical_seo" },
+                { label: "Request Google review from client", category: "reviews" },
+                { label: "Send monthly retainer invoice reminder", category: "general" },
+                { label: "Update CRM notes after client call", category: "general" },
+              ],
+            };
+            const roleSuggestions = suggestions[currentUserRole] ?? suggestions.sales;
+            return (
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground">Quick add</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {roleSuggestions.map((s) => (
+                    <button
+                      key={s.label}
+                      type="button"
+                      className="text-[11px] px-2 py-1 rounded-md border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                      onClick={() => {
+                        const titleInput = document.querySelector<HTMLInputElement>('input[name="title"]');
+                        const categorySelect = document.querySelector<HTMLSelectElement>('select[name="category"]');
+                        if (titleInput) titleInput.value = s.label;
+                        if (categorySelect) categorySelect.value = s.category;
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           <div>
             <Label htmlFor="clientId" className="text-xs">Client</Label>
             <select

@@ -155,30 +155,52 @@ export function WaveSettingsTab() {
                 {status.businessName && <span className="text-muted-foreground">— {status.businessName}</span>}
               </div>
               {status.error && <p className="text-destructive text-xs">{status.error}</p>}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div>
-                  <p className="text-xs text-muted-foreground">Business ID</p>
-                  <p className="font-mono text-xs truncate">{status.businessId ?? "—"}</p>
+              {!status.connected && (
+                <div className="mt-3 border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40 rounded-lg p-3 space-y-2 text-xs text-orange-900 dark:text-orange-100">
+                  <p className="font-medium">Wave is not configured for this environment.</p>
+                  <p>Add the following to your <code className="bg-orange-100 dark:bg-orange-900 px-1 rounded">.env</code> file:</p>
+                  <ul className="space-y-1 font-mono">
+                    <li>WAVE_API_KEY=your_api_key</li>
+                    <li>WAVE_BUSINESS_ID=your_business_id</li>
+                    <li>WAVE_WEBHOOK_SECRET=your_webhook_secret</li>
+                    <li>WAVE_SEO_PRODUCT_ID=your_product_id</li>
+                  </ul>
+                  <a
+                    href="https://developer.waveapps.com/hc/en-us/articles/360019493652-API-Access-and-Authentication"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 underline font-medium"
+                  >
+                    Get your Wave API credentials <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">SEO Product ID</p>
-                  <div className="flex items-center gap-1">
-                    <p className="font-mono text-xs truncate">{status.currentProductId ?? "not set"}</p>
-                    {status.currentProductId
-                      ? <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0" />
-                      : <XCircle className="w-3 h-3 text-orange-500 flex-shrink-0" />}
+              )}
+              {status.connected && (
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Business ID</p>
+                    <p className="font-mono text-xs truncate">{status.businessId ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">SEO Product ID</p>
+                    <div className="flex items-center gap-1">
+                      <p className="font-mono text-xs truncate">{status.currentProductId ?? "not set"}</p>
+                      {status.currentProductId
+                        ? <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0" />
+                        : <XCircle className="w-3 h-3 text-orange-500 flex-shrink-0" />}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Webhook</p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs">{status.webhookConfigured ? "Configured" : "Not configured"}</p>
+                      {status.webhookConfigured
+                        ? <CheckCircle2 className="w-3 h-3 text-green-600" />
+                        : <XCircle className="w-3 h-3 text-orange-500" />}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Webhook</p>
-                  <div className="flex items-center gap-1">
-                    <p className="text-xs">{status.webhookConfigured ? "Configured" : "Not configured"}</p>
-                    {status.webhookConfigured
-                      ? <CheckCircle2 className="w-3 h-3 text-green-600" />
-                      : <XCircle className="w-3 h-3 text-orange-500" />}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">Could not load Wave status.</p>

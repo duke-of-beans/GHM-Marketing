@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Added 10 items from David's audit: BUG-012–016 (5 bugs), FEAT-030–032 (3 features), UX-AUDIT-018–019 (2 UX items). Sprint table updated.
+**Last Updated:** February 24, 2026 — Sprint 21 shipped. Removed BUG-012–016, UX-AUDIT-018/019, FEAT-030–032.
 
 **Owner:** David Kirsch
 
@@ -38,7 +38,7 @@ Foundation → out. Each sprint unblocks the next.
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
 | 19 | Content Automation | FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit) | ~2 sessions | Content quality and velocity. |
 | 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
-| 21 | Settings & Tasks Polish | BUG-012 (territories crash) + BUG-013 (permission preset 400) + BUG-014 (recurring tasks crash) + BUG-015 (Wave unconfigured state) + BUG-016 (pipeline dark mode headings) + UX-AUDIT-018 (integrations health panel) + UX-AUDIT-019 (permissions inline) + FEAT-030 (service catalog grid) + FEAT-031 (contextual task suggestions) + FEAT-032 (file display name) | ~1–2 sessions | Fixes from David's Feb 24 audit — critical bugs first, then UX polish. |
+| ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
@@ -64,31 +64,6 @@ Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audi
 ---
 
 ## 🔴 BUGS — Active Crashes & Broken Features
-
-### BUG-012: Territories Tab Crashes — `headers()` Called Outside Request Scope
-Settings → Territories tab throws: `` `headers` was called outside a request scope ``. Next.js server API called in wrong context (likely a Server Component function invoked client-side or in middleware without a request). Page is unusable.
-**Fix:** Identify where `headers()` is called in the territories settings flow. Move to a proper server action or API route. Ensure the component is structured correctly as a Server Component with an async data fetch, or convert to client-side fetch pattern.
-**Size:** ~1 hr. **Priority:** 🔴 Must fix — page broken.
-
-### BUG-013: Custom Permission Preset Assigns With "Invalid Request" Error
-Settings → Permissions → assigning "Custom" preset from the dropdown on a user (reproduced with Test Account) fires a toast: "Invalid request." API likely rejects the `custom` preset value as not in the allowed enum/list.
-**Fix:** Audit `POST /api/users/[id]/permissions` (or equivalent). Check how `preset` value is validated server-side. `custom` likely needs special handling — either skip preset validation when `custom` is selected, or send permissions object directly. Confirm the correct payload shape for custom presets.
-**Size:** ~1 hr. **Priority:** 🔴 Must fix — permissions system broken for custom configs.
-
-### BUG-014: Recurring Tasks "New Rule" Crashes — `$.map is not a function`
-Tasks → Recurring Tasks → clicking "New Rule" briefly flashes the form UI then navigates to a new page and throws: `$.map is not a function`. Likely a jQuery or lodash `$` reference where a plain array was expected, or a non-array value being passed to `.map()` (e.g., an API response that returns `null` or an object instead of an array).
-**Fix:** Find the recurring task form component and locate the `.map()` call failing. Add null/type guard before mapping. If `$` is a stale jQuery artifact, remove it. Check that the API route returns `[]` not `null` when no data exists.
-**Size:** ~1–2 hrs. **Priority:** 🔴 Must fix — feature completely broken.
-
-### BUG-015: Wave Settings Tab — No Unconfigured State
-Settings → Wave tab renders Wave UI regardless of whether the tenant has connected a Wave account. If unconfigured, it should show a clear "Connect Wave" prompt — OAuth link or API key entry — not a blank or broken UI. Once connected, content should reflect the specific tenant's Wave org (not hardcoded GHM context).
-**Fix:** Add `isConfigured` check at top of Wave tab. If not configured: show connection prompt with OAuth flow or API key field + link to Wave API docs. If configured: show current connection status, org name, and a Disconnect option. Tenant-aware: pull Wave credentials from tenant settings, not global env.
-**Size:** ~1.5 hrs. **Priority:** 🔴 Must fix before external tenants — currently shows broken/confusing state.
-
-### BUG-016: Sales Pipeline Kanban — Column Heading Colors Too Bright in Dark Mode
-Kanban column headings in the Sales Pipeline are hardcoded to light-mode colors and don't adapt to dark mode. They appear too bright, washed out, or visually inconsistent in dark mode.
-**Fix:** Audit heading color classes in the kanban board column header component. Replace any hardcoded `text-*` or `bg-*` color values with semantic dark mode-aware tokens (`text-foreground`, `text-muted-foreground`, `dark:text-*`). Do not do a full dark mode audit here — targeted fix for pipeline headings only.
-**Size:** ~30 min. **Priority:** 🟠 SHOULD — visible on every sales rep session.
 
 ---
 
@@ -178,16 +153,6 @@ Current branding tab has a single brand color field. Need three roles: Primary (
 Content Studio shows generic "no content." Needs context-aware states: (a) no clients have Content Studio active, (b) active but no briefs yet — prompt to generate first.
 **Size:** ~30 min. **Priority:** 🟡 WOULD.
 
-### UX-AUDIT-018: Integrations Health Panel — Actionable States
-Settings → Integrations health panel currently shows status indicators but non-configured integrations have no path to configure them, and healthy ones have no way to refresh or disconnect.
-**Scope:** For each integration card: (a) NOT CONFIGURED → show "Configure" CTA. For API-key integrations: inline key entry or link to settings field. For OAuth integrations: "Connect" button that launches OAuth flow. Include link to relevant docs. (b) HEALTHY/CONNECTED → show "Refresh" button (re-runs health check) and "Disconnect" button (clears credentials, resets to unconfigured state with confirmation). (c) ERROR → show error message + retry + reconfigure option. This makes integrations self-service — no hunting for where to enter credentials.
-**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD — required for external tenant self-serve.
-
-### UX-AUDIT-019: Permissions Tab — Inline Manager, No Separate Page
-Settings → Permissions tab has a button that navigates to a separate `/permissions` page (PermissionManager). This double click-through is unnecessary friction. The full permission manager should be inline within the Settings tab — no separate route needed.
-**Scope:** Evaluate whether the permissions manager component can be embedded directly in the Permissions settings tab rather than being linked as a separate page. If the component is large, use an accordion or expandable panel within the tab. Remove the standalone `/permissions` route (or keep as a redirect for any existing links). Goal: settings flow stays within settings.
-**Size:** ~1 hr. **Priority:** 🟠 SHOULD.
-
 ---
 
 ## 🟠 SHOULD — Features & Productization
@@ -269,22 +234,6 @@ Two specific UX issues with the current filter panel.
 Bug and feature submissions currently go into a void from the submitter's perspective. Reports are visible to admin but submitters get no status updates.
 **Scope:** When admin updates ticket status (new → acknowledged → in-progress → resolved → won't-fix), the submitter receives an in-app notification (and optionally push if enabled). Lightweight "My Submissions" view for non-admin users to check ticket status without seeing everyone else's. Existing `BugReportsTab` (admin) already has status management — this is the submitter-facing layer only.
 **Size:** ~1 hr. **Priority:** 🟠 SHOULD.
-
-### FEAT-030: Service Catalog — Grid View Toggle
-Service catalog page currently only supports list view. Users want to browse visually as well.
-**Scope:** Add a List/Grid toggle button to the service catalog page header (icon buttons, similar to leads kanban/list toggle). Grid view: card-based layout showing service name, category, price, and status at a glance. List view: existing table/list. Persist preference in localStorage or user settings. No data model changes required.
-**Size:** ~1 hr. **Priority:** 🟠 SHOULD.
-
-### FEAT-032: File Uploads — Display Name Override
-When uploading files (Document Vault, content attachments, or any file upload surface), the uploader should be able to set a display name that shows more prominently than the raw filename. Raw filenames are often cryptic (`Q3_FINAL_v2_REAL_USE_THIS.pdf`). A human-readable display name improves scannability for everyone who sees the file afterward.
-**Scope:** Add an optional "Display name" field to all file upload dialogs/flows. If set, display name renders as the primary label in file lists, cards, and previews; raw filename shown secondarily in smaller/muted text or on hover. Store `displayName` alongside file record in DB (nullable — falls back to filename if not set). Apply to: Document Vault uploads at minimum; audit other upload surfaces (content attachments, logo upload, CSV import) and apply where it makes sense contextually.
-**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD.
-
-
-When creating a new task, users should be prompted with suggestions relevant to what actually happens in the system for their role — not just a blank form.
-**Scope:** "New Task" dialog gains a "Suggested tasks" section showing role-aware quick-add options. Examples for admin: "Create new user", "Review bug reports", "Approve content brief". For manager: "Review client health scores", "Approve commission". For sales: "Follow up lead", "Generate audit report". Suggestions are one-click to pre-fill task title + optionally link to the relevant page/action. Suggestions are curated static lists per role (not AI-generated initially — keep it fast). Also surfaces any recurring tasks the user has active as "based on your rules."
-**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD. **Related:** FEAT-014 (PM import), UX-AUDIT-011 (tasks nav placement).
-
 
 ---
 

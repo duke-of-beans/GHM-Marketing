@@ -22,6 +22,7 @@ export async function POST(req: Request) {
   const category = (formData.get("category") as string) ?? null;
   const clientId = formData.get("clientId") ? parseInt(formData.get("clientId") as string) : null;
   const leadId = formData.get("leadId") ? parseInt(formData.get("leadId") as string) : null;
+  const displayName = (formData.get("displayName") as string | null)?.trim() || null;
 
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
 
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
     data: {
       name: file.name,
       originalName: file.name,
+      displayName: displayName ?? null,
       mimeType: file.type,
       size: file.size,
       blobUrl: blob.url,

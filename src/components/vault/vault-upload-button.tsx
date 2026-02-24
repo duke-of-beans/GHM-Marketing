@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload, CloudUpload } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { VaultFileRecord } from "./vault-client";
@@ -44,6 +46,7 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [displayName, setDisplayName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function upload(file: File) {
@@ -53,14 +56,17 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
       form.append("file", file);
       form.append("space", selectedSpace);
       if (selectedSpace === "shared") form.append("category", category);
+      if (displayName.trim()) form.append("displayName", displayName.trim());
+      if (displayName.trim()) form.append("displayName", displayName.trim());
 
       const res = await fetch("/api/vault/upload", { method: "POST", body: form });
       const json = await res.json();
 
       if (json.success) {
         onUpload(json.file as VaultFileRecord);
-        toast.success(`"${file.name}" uploaded`);
+        toast.success(`"${displayName.trim() || file.name}" uploaded`);
         setPendingFile(null);
+        setDisplayName("");
         setOpen(false);
       } else {
         toast.error(json.error ?? "Upload failed");
@@ -76,6 +82,9 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
     if (!files?.length) return;
     const file = files[0];
     setPendingFile(file);
+    // Pre-fill display name with filename minus extension
+    const nameWithoutExt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ").trim();
+    setDisplayName(nameWithoutExt);
   }
 
   return (
@@ -170,6 +179,22 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
               </div>
             )}
           </div>
+
+          {/* Optional display name */}
+          {pendingFile && (
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">
+                Display name <span className="text-muted-foreground/60">(optional)</span>
+              </Label>
+              <Input
+                placeholder={pendingFile.name}
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="text-sm"
+              />
+              <p className="text-[11px] text-muted-foreground">Leave blank to use the filename</p>
+            </div>
+          )}
 
           <Button
             className="w-full"

@@ -1,7 +1,26 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 14 complete (UX-AUDIT-013, UX-AUDIT-016, UX-AUDIT-017, UX-BUG-002).
+**Last Updated:** February 24, 2026 — Sprint 21 complete (5 bugs + 5 UX/feature items).
+
+---
+
+## Sprint 21 — Bug Fixes + UX Polish (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24 | **BUG-012** — Territories Settings tab crash. `headers()` called inside client component via dynamic server import. Fixed: import `TerritoriesClient` directly instead of page wrapper. |
+| Feb 24 | **BUG-013** — Custom permission preset 400 error. Validation array in `/api/users/[id]/permissions` missing `"custom"`. Fixed: added `"custom"` to allowed preset values. |
+| Feb 24 | **BUG-014** — Recurring Tasks "New Rule" crash. Missing `/api/checklist-templates` route + no array guards. Fixed: created route (`taskChecklistTemplate.findMany`), added `Array.isArray()` guards in `recurring-task-form.tsx`. |
+| Feb 24 | **BUG-015** — Wave settings tab broken when unconfigured. Fixed: actionable setup prompt with env var names and Wave API docs link when `!status.connected`. |
+| Feb 24 | **BUG-016** — Kanban column headings too bright in dark mode. Fixed: all 8 status heading colors changed from `dark:text-{color}-300` → `dark:text-{color}-400` in `src/types/index.ts`. |
+| Feb 24 | **UX-AUDIT-019** — Permission manager embedded inline in Settings → Permissions tab. Removed link-out card; `<PermissionManager />` renders directly. |
+| Feb 24 | **UX-AUDIT-018** — Integration health panel CTAs. Non-configured integrations: "Configure ↗" link to provider docs. Configured integrations: per-row Refresh icon button. Global button renamed "Refresh All". |
+| Feb 24 | **FEAT-030** — Service catalog list/grid toggle. `LayoutList`/`LayoutGrid` button pair, localStorage-persisted. Grid: compact 1–3 column responsive cards with name, category badge, active/inactive badge, price, truncated description. |
+| Feb 24 | **FEAT-031** — Role-aware suggested tasks in New Task dialog. Quick-add chip bar above Title field; 4–5 curated suggestions per role (admin/manager/sales). Chip click populates title + sets category. |
+| Feb 24 | **FEAT-032** — File uploads optional Display Name field. `display_name` column added to `vault_files` (schema + `prisma db push`). Upload dialog shows Display Name input after file selected. Tile renders `displayName ?? name`. Search covers displayName. `VaultFileRecord` type updated. |
+
+**Files:** `src/app/api/checklist-templates/route.ts` (new), `src/components/tasks/recurring-task-form.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/app/api/users/[id]/permissions/route.ts`, `src/components/settings/WaveSettingsTab.tsx`, `src/types/index.ts`, `src/components/permissions/permission-manager.tsx`, `src/components/settings/IntegrationsTab.tsx`, `src/components/products/product-catalog.tsx`, `src/components/tasks/task-queue-client.tsx`, `src/app/api/vault/upload/route.ts`, `src/components/vault/vault-upload-button.tsx`, `src/components/vault/vault-file-tile.tsx`, `src/components/vault/vault-client.tsx`, `prisma/schema.prisma`
 
 ---
 

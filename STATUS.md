@@ -1,7 +1,20 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Backlog updated: 10 new items from David's audit (BUG-012–016, UX-AUDIT-018–019, FEAT-030–032). Sprint 21 added. FEAT-029 removed from backlog (shipped).
+**Last Updated:** February 24, 2026 — Sprint 21 complete. All 5 bugs fixed + all 5 UX polish items shipped.
+
+### SPRINT 21 — Bug Fixes + UX Polish (February 24, 2026)
+- [x] **BUG-014 COMPLETE** — Recurring Tasks "New Rule" crash. Root: `/api/checklist-templates` missing + no array guards. Fixed: created route (Prisma `taskChecklistTemplate.findMany({ where: { isActive: true } })`); added `Array.isArray()` guards to both fetch handlers in `recurring-task-form.tsx`.
+- [x] **BUG-012 COMPLETE** — Territories Settings tab crash. Root: dynamic import of server component with `headers()` call inside client component. Fixed: import `TerritoriesClient` directly instead of the page wrapper.
+- [x] **BUG-013 COMPLETE** — Custom permission preset 400 error. Root: validation array in `/api/users/[id]/permissions` missing `"custom"`. Fixed: added `"custom"` to allowed preset values.
+- [x] **BUG-015 COMPLETE** — Wave settings broken UI when unconfigured. Fixed: added actionable setup prompt with env var names and Wave API docs link when `!status.connected`.
+- [x] **BUG-016 COMPLETE** — Kanban column headings too bright in dark mode. Fixed: all 8 status heading colors changed from `dark:text-{color}-300` to `dark:text-{color}-400` in `src/types/index.ts`.
+- [x] **UX-AUDIT-019 COMPLETE** — Permission manager embedded inline in Settings → Permissions tab. Removed "Open Permissions Manager →" link; `<PermissionManager />` now renders directly.
+- [x] **UX-AUDIT-018 COMPLETE** — Integration health panel CTAs. Non-configured integrations show a "Configure ↗" button linking to provider API console. Configured integrations show per-row Refresh icon button. Renamed global button to "Refresh All".
+- [x] **FEAT-030 COMPLETE** — Service catalog list/grid toggle. `LayoutList`/`LayoutGrid` button pair persisted to `localStorage`. Grid renders compact 1–3 column responsive cards with name, category badge, active/inactive badge, price, and truncated description.
+- [x] **FEAT-031 COMPLETE** — Role-aware suggested tasks in New Task dialog. Quick-add chip bar above Title field; 4–5 curated suggestions per role (admin/manager/sales). Clicking a chip populates title + sets category via DOM querySelector.
+- [x] **FEAT-032 COMPLETE** — File uploads optional Display Name field. Added `display_name` column to `vault_files` (schema + `prisma db push`). Upload dialog shows Display Name input after file is selected. Tile renders `displayName ?? name`. Search also covers displayName. `VaultFileRecord` type updated.
+**Files:** `src/app/api/checklist-templates/route.ts` (new), `src/components/tasks/recurring-task-form.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/app/api/users/[id]/permissions/route.ts`, `src/components/settings/WaveSettingsTab.tsx`, `src/types/index.ts`, `src/components/permissions/permission-manager.tsx` (inline embed), `src/components/settings/IntegrationsTab.tsx`, `src/components/products/product-catalog.tsx`, `src/components/tasks/task-queue-client.tsx`, `src/app/api/vault/upload/route.ts`, `src/components/vault/vault-upload-button.tsx`, `src/components/vault/vault-file-tile.tsx`, `src/components/vault/vault-client.tsx`, `prisma/schema.prisma`
 
 ### SPRINT 14 — UX Polish Batch (February 24, 2026)
 - [x] **FEAT-029 COMPLETE** — Full rename of `master` → `manager` role across entire codebase. DB enum migrated live (`ALTER TYPE`), Prisma regenerated, 87+ files updated, `/master` route directory renamed to `/manager`, all redirect/revalidate strings updated, preset names `master_lite/full` → `manager_lite/full`. TypeScript reports zero FEAT-029 errors. Pre-existing script errors (basecamp/dotenv) unaffected.

@@ -173,8 +173,8 @@ export function VaultFileTile({
 
       {/* Name + meta */}
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium truncate leading-tight" title={file.name}>
-          {file.name}
+        <p className="text-xs font-medium truncate leading-tight" title={file.displayName ?? file.name}>
+          {file.displayName ?? file.name}
         </p>
         {file.client && (
           <p className="text-[11px] text-muted-foreground truncate">{file.client.businessName}</p>

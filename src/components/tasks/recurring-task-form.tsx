@@ -62,9 +62,13 @@ export function RecurringTaskForm({ rule, onClose, onSaved }: Props) {
 
   useEffect(() => {
     fetch("/api/clients?limit=200&fields=id,businessName&status=active")
-      .then((r) => r.json()).then((j) => { if (j.success) setClients(j.data); });
+      .then((r) => r.json())
+      .then((j) => { if (j.success) setClients(Array.isArray(j.data) ? j.data : []); })
+      .catch(() => { /* leave clients as [] */ });
     fetch("/api/checklist-templates")
-      .then((r) => r.json()).then((j) => { if (j.success) setTemplates(j.data); });
+      .then((r) => r.json())
+      .then((j) => { if (j.success) setTemplates(Array.isArray(j.data) ? j.data : []); })
+      .catch(() => { /* leave templates as [] */ });
 
     if (rule) {
       const preset = CRON_PRESETS.find((p) => p.value === rule.cronExpression && p.value !== "custom");

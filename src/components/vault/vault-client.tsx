@@ -12,6 +12,7 @@ export interface VaultFileRecord {
   id: number;
   name: string;
   originalName: string;
+  displayName: string | null;
   mimeType: string;
   size: number;
   blobUrl: string;
@@ -55,7 +56,8 @@ export function VaultClient({
     (files: VaultFileRecord[]) =>
       search.trim()
         ? files.filter((f) =>
-            f.name.toLowerCase().includes(search.toLowerCase())
+            f.name.toLowerCase().includes(search.toLowerCase()) ||
+            (f.displayName ?? "").toLowerCase().includes(search.toLowerCase())
           )
         : files,
     [search]

@@ -16,10 +16,12 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { PermissionManager } from "@/components/permissions/permission-manager";
 
-// Territories is a client component — safe to embed
+// Import the client component directly — avoids server-only headers() call that occurs
+// when importing the territories page (which is a server component).
 const TerritoriesContent = dynamic(
-  () => import("@/app/(dashboard)/territories/page"),
+  () => import("@/components/territories/territories-client").then((m) => ({ default: m.TerritoriesClient })),
   { ssr: false, loading: () => <div className="animate-pulse h-32 bg-muted rounded-lg" /> }
 );
 
@@ -123,24 +125,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="permissions">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Permission Presets
-              </CardTitle>
-              <CardDescription>
-                Manage role-based permission presets that control what each team member can see and do across the dashboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild>
-                <Link href="/permissions">
-                  Open Permissions Manager <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <PermissionManager />
         </TabsContent>
 
         <TabsContent value="audit">

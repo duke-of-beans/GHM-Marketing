@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, Edit, Trash2, Search, SlidersHorizontal, LayoutList, LayoutGrid } from "lucide-react";
 import { ProductDialog } from "./product-dialog";
 import { toast } from "sonner";
 
@@ -36,6 +36,17 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [sortBy, setSortBy] = useState<"name" | "price" | "category">("name");
+  const [viewMode, setViewMode] = useState<"list" | "grid">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("product-catalog-view") as "list" | "grid") ?? "list";
+    }
+    return "list";
+  });
+
+  const toggleView = (mode: "list" | "grid") => {
+    setViewMode(mode);
+    localStorage.setItem("product-catalog-view", mode);
+  };
 
   const handleAdd = () => {
     setEditingProduct(null);
@@ -178,10 +189,32 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
           <span className="text-muted-foreground/60">|</span>
           <span>{filteredProducts.length} of {products.length} shown</span>
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Service
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center border rounded-md">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8 rounded-r-none border-r"
+              onClick={() => toggleView("list")}
+              title="List view"
+            >
+              <LayoutList className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8 rounded-l-none"
+              onClick={() => toggleView("grid")}
+              title="Grid view"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          <Button onClick={handleAdd}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Service
+          </Button>
+        </div>
       </div>
 
       {filteredProducts.length === 0 ? (
@@ -220,6 +253,69 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
           </CardContent>
         </Card>
       ) : (
+        <>
+          {viewMode === "grid" ? (
+        /* ── Grid view ── */
+        <>
+          {activeProducts.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm">Active Services</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {activeProducts.map((product) => (
+                  <div key={product.id} className="border rounded-lg p-4 bg-card hover:bg-muted/30 transition-colors space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium text-sm leading-snug">{product.name}</p>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEdit(product)}>
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.category && <Badge variant="outline" className="text-[10px]">{product.category}</Badge>}
+                      <Badge className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">Active</Badge>
+                    </div>
+                    <p className="text-sm font-semibold">${Number(product.price)}<span className="text-xs font-normal text-muted-foreground ml-1 capitalize">{product.pricingModel}</span></p>
+                    {product.description && <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {inactiveProducts.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-muted-foreground">Inactive Services</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {inactiveProducts.map((product) => (
+                  <div key={product.id} className="border rounded-lg p-4 bg-card opacity-60 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium text-sm leading-snug">{product.name}</p>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEdit(product)}>
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.category && <Badge variant="outline" className="text-[10px]">{product.category}</Badge>}
+                      <Badge variant="secondary" className="text-[10px]">Inactive</Badge>
+                    </div>
+                    <p className="text-sm font-semibold">${Number(product.price)}<span className="text-xs font-normal text-muted-foreground ml-1 capitalize">{product.pricingModel}</span></p>
+                    {product.description && <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        /* ── List view (original) ── */
         <>
           {activeProducts.length > 0 && (
             <div className="space-y-3">
@@ -337,6 +433,8 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
               ))}
             </div>
           )}
+        </>
+      )}
         </>
       )}
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, Circle, RefreshCw, Zap } from "lucide-react";
+import { CheckCircle2, XCircle, Circle, RefreshCw, Zap, ExternalLink, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { CostDashboard } from "./CostDashboard";
 
@@ -17,6 +17,17 @@ interface IntegrationStatus {
   error:      string | null;
   note:       string | null;
 }
+
+// Docs / setup links per integration ID
+const CONFIGURE_LINKS: Record<string, string> = {
+  anthropic:    "https://console.anthropic.com/settings/keys",
+  outscraper:   "https://app.outscraper.com/profile",
+  google_ads:   "https://ads.google.com/aw/apicenter",
+  godaddy:      "https://developer.godaddy.com/keys",
+  wave:         "https://developer.waveapps.com/hc/en-us/articles/360019493652",
+  google_oauth: "https://console.cloud.google.com/apis/credentials",
+  postgres:     "https://neon.tech/docs/connect/connect-intro",
+};
 
 export function IntegrationsTab() {
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
@@ -49,7 +60,7 @@ export function IntegrationsTab() {
 
   function StatusBadge({ status }: { status: IntegrationStatus }) {
     if (!status.configured) return <Badge variant="outline">Not Configured</Badge>;
-    if (status.healthy === true)  return <Badge className="bg-green-500/10 text-green-700 border-green-200">Healthy</Badge>;
+    if (status.healthy === true)  return <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">Healthy</Badge>;
     if (status.healthy === false) return <Badge variant="destructive">Error</Badge>;
     return <Badge variant="secondary">Unknown</Badge>;
   }
@@ -76,7 +87,7 @@ export function IntegrationsTab() {
             className="gap-1.5"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${checking ? "animate-spin" : ""}`} />
-            {checking ? "Checking…" : "Refresh"}
+            {checking ? "Checking…" : "Refresh All"}
           </Button>
         </div>
       </CardHeader>
@@ -95,12 +106,12 @@ export function IntegrationsTab() {
                 key={integration.id}
                 className="flex items-center justify-between rounded-lg border px-4 py-3"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <StatusIcon status={integration} />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium">{integration.name}</p>
                     {integration.note && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{integration.note}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{integration.note}</p>
                     )}
                     {integration.error && (
                       <p className="text-xs text-destructive mt-0.5">{integration.error}</p>
@@ -108,13 +119,39 @@ export function IntegrationsTab() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 ml-3 flex-shrink-0">
                   {integration.latencyMs !== null && (
-                    <span className="text-xs text-muted-foreground">
-                      {integration.latencyMs}ms
-                    </span>
+                    <span className="text-xs text-muted-foreground">{integration.latencyMs}ms</span>
                   )}
                   <StatusBadge status={integration} />
+
+                  {/* CTA: configure if not set, refresh if healthy/error */}
+                  {!integration.configured && CONFIGURE_LINKS[integration.id] && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5 h-7 text-xs"
+                      asChild
+                    >
+                      <a href={CONFIGURE_LINKS[integration.id]} target="_blank" rel="noopener noreferrer">
+                        <Settings2 className="h-3 w-3" />
+                        Configure
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </Button>
+                  )}
+                  {integration.configured && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={load}
+                      disabled={checking}
+                      title="Re-check connection"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${checking ? "animate-spin" : ""}`} />
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

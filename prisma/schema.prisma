@@ -1694,6 +1694,7 @@ model VaultFile {
   id           Int       @id @default(autoincrement())
   name         String
   originalName String    @map("original_name")
+  displayName  String?   @map("display_name")
   mimeType     String    @map("mime_type")
   size         Int
   blobUrl      String    @map("blob_url")
