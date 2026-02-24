@@ -182,7 +182,28 @@ As the owner of COVOS managing multiple tenant clients, David needs aggregate vi
 
 ## 🟡 WOULD — High Value, No Current Blocker
 
-### FEAT-008: Bulk Content Operations
+### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
+**Observed:** Navigating away from `/sales` (Sales Dashboard) and returning shows a different dashboard — "Sales Tools + Quick Actions" on first load vs. a different widget layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
+**Direction:** Audit which dashboard component mounts on `/` or `/sales` depending on role and navigation history. Confirm the component is stable on return navigation. This may be the same mount-flash issue as the pre-Sprint 8 grid fix, or a separate role/route resolution problem.
+**Size:** ~1–2 hrs. **Priority:** 🔴 Should fix before external users — inconsistent first impression is a trust issue.
+
+### FEAT-021: Tenant Logo + Brand Asset Management
+**Context:** Marketing materials (brochures, audit reports, comp sheets, proposals) currently use generic GHM placeholders. When productized as COVOS, each tenant needs their own brand applied.
+**Scope:**
+- `logoUrl` field on TenantConfig (or extend existing config table). Admin-only upload UI in Settings > Branding.
+- Toggle per material type: "Include logo on marketing materials" (default: on). Granular controls: brochure, audit PDF, comp sheet, proposal, portal.
+- Rendered materials pull `logoUrl` + toggle state before generating. Fallback to text-only if no logo uploaded.
+- GHM default: upload GHM logo assets now so they appear immediately in all current output.
+- COVOS productization: when a new tenant admin onboards, branding step in first-run wizard (FEAT-015).
+**Relationship:** Depends on FEAT-016 (full style capture); FEAT-021 is a subset that can ship independently.
+**Size:** ~1 session. **Priority:** 🟠 SHOULD — Sprint 10 target. Pairs with FEAT-018 (navbar logo swap).
+
+### UX-AUDIT-011: Tasks/Recurring Tasks Nav Placement
+**Question:** Should Tasks and Recurring Tasks live under "Clients" in the left nav, rather than as standalone nav items?
+**Current state:** Tasks appear as a top-level section. Most task work is client-contextual (tied to a specific client's deliverables, deadlines, and onboarding).
+**Direction:** Evaluate two models — (A) Keep tasks at top level for cross-client queue management (master view: "all tasks across all clients"), (B) Move tasks under Clients as a client-contextual tool, with a master queue accessible from a different entry point. Both are valid depending on how task work is actually done day-to-day. Audit actual usage pattern before committing.
+**Size:** ~2 hrs (decision + nav restructure). **Priority:** 🟡 WOULD — low disruption if changed early, high disruption if changed after user habits form. Decide by Sprint 10.
+
 Content Studio one item at a time. **Scope:** Checkbox multi-select, bulk approve (master+ only), bulk archive, bulk assign. **Size:** ~2 hrs. (Sprint 8 target.)
 
 ### FEAT-009: Competitor Tracking — Manual Add + Refresh
