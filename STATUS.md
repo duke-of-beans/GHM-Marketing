@@ -1,7 +1,14 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 25, 2026 — Sprint 22 complete. 3 UX bugs fixed + Settings IA restructured + tutorial restart fixed globally.
+**Last Updated:** February 25, 2026 — Sprint 15 complete. Pipeline Intelligence: full Lead model filters + UX defaults + filter bar presentation overhaul.
+
+### SPRINT 15 — Pipeline Intelligence (February 25, 2026)
+- [x] **FEAT-025 COMPLETE** — Pipeline filter full Lead model expansion. Added `closeScore` (range slider), `wealthScore` (multi-select: Low/Medium/High/Very High — stored as string), `pitchAngle` (multi-select), `suppressionSignal` (existing), `distanceFromMetro` (range slider), `intelNeedsRefresh` (3-state toggle: All/Stale/Fresh), `mrr` (range slider), `arr` (range slider). Also wired into `client.tsx` filter logic with null-safe casting. `leads/page.tsx` Prisma select extended with `mrr`, `arr`, `pitchAngle`, `intelNeedsRefresh`, `closeScore`.
+- [x] **FEAT-026 COMPLETE** — Pipeline Status section now collapsible (open by default, consistent with Quality Scores and Market Intelligence). Default visible top-bar reordered: Status, Assigned Rep, Territory, Sort — scores/intelligence in More Filters.
+- [x] **UX-FEAT-001 COMPLETE** — Tier A/B/C buttons, Impact ≥ inline input, Close Likelihood ≥ inline input surfaced as primary visible controls. Intelligence posture strip (Zap icon) appears above the advanced panel when active filters are set. Market Intelligence section expanded with Wealth Score, Pitch Angle, Distance from Metro, Intel Status. New "Deal Value & Revenue" collapsible section for MRR/ARR/deal value sliders.
+- TypeScript: Zero new errors (5 pre-existing basecamp/dotenv errors unaffected).
+**Files:** `src/components/leads/lead-filter-bar-advanced.tsx`, `src/app/(dashboard)/leads/client.tsx`, `src/app/(dashboard)/leads/page.tsx`
 
 ### SPRINT 22 — UX Polish + Settings IA (February 25, 2026)
 - [x] **BUG-017 COMPLETE** — Login dark mode flash on logout. Created `src/app/(auth)/layout.tsx` forcing `className="light"` at layout level before hydration. Login is always rendered in light mode regardless of user theme preference.

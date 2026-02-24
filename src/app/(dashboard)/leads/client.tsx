@@ -232,6 +232,62 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       );
     }
 
+    // Close score filter
+    if (filters.closeScoreMin > 0 || filters.closeScoreMax < 100) {
+      result = result.filter((lead) => {
+        const s = (lead as Record<string, unknown>).closeScore as number | null | undefined ?? 0;
+        return s >= filters.closeScoreMin && s <= filters.closeScoreMax;
+      });
+    }
+
+    // MRR filter
+    if (filters.mrrMin > 0 || filters.mrrMax < 10000) {
+      result = result.filter((lead) => {
+        const v = (lead as Record<string, unknown>).mrr as number | null | undefined ?? 0;
+        return v >= filters.mrrMin && v <= filters.mrrMax;
+      });
+    }
+
+    // ARR filter
+    if (filters.arrMin > 0 || filters.arrMax < 120000) {
+      result = result.filter((lead) => {
+        const v = (lead as Record<string, unknown>).arr as number | null | undefined ?? 0;
+        return v >= filters.arrMin && v <= filters.arrMax;
+      });
+    }
+
+    // Distance from metro filter
+    if (filters.distanceFromMetroMin > 0 || filters.distanceFromMetroMax < 50) {
+      result = result.filter((lead) => {
+        const d = (lead as Record<string, unknown>).distanceFromMetro as number | null | undefined ?? 0;
+        return d >= filters.distanceFromMetroMin && d <= filters.distanceFromMetroMax;
+      });
+    }
+
+    // Wealth score filter (string-based)
+    if (filters.wealthScores.length > 0) {
+      result = result.filter((lead) => {
+        const ws = (lead as Record<string, unknown>).wealthScore as string | null | undefined;
+        return ws && filters.wealthScores.includes(ws);
+      });
+    }
+
+    // Pitch angle filter
+    if (filters.pitchAngles.length > 0) {
+      result = result.filter((lead) => {
+        const pa = (lead as Record<string, unknown>).pitchAngle as string | null | undefined;
+        return pa && filters.pitchAngles.includes(pa);
+      });
+    }
+
+    // Intel needs refresh filter
+    if (filters.intelNeedsRefresh !== null) {
+      result = result.filter((lead) => {
+        const v = (lead as Record<string, unknown>).intelNeedsRefresh as boolean | null | undefined ?? false;
+        return v === filters.intelNeedsRefresh;
+      });
+    }
+
     // Sorting
     if (filters.sortBy === "newest") {
       // Already sorted by updatedAt desc from server

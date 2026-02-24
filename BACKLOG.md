@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 22 shipped. BUG-017/018/019 + UX-AUDIT-020/021 closed.
+**Last Updated:** February 25, 2026 — Sprint 15 shipped. FEAT-025/026 + UX-FEAT-001 closed.
 
 **Owner:** David Kirsch
 
@@ -32,7 +32,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~12~~ | ~~Route/Permission Audit~~ | ~~3 unguarded pages + API role bug + stale ID~~ | ✅ SHIPPED | |
 | ~~13~~ | ~~Bug Triage~~ | ~~BUG-010/011 + AUDIT-004 dashboard flash~~ | ✅ SHIPPED | |
 | ~~14~~ | ~~UX Polish Batch~~ | ~~UX-AUDIT-013 + UX-AUDIT-016/017 + UX-BUG-001/002~~ | ✅ SHIPPED | |
-| 15 | Pipeline Intelligence | FEAT-025 (full Lead model filters) + FEAT-026 (filter UX defaults) + UX-FEAT-001 (filter bar presentation) | ~1 session | Surface the scoring engine properly. |
+| ~~15~~ | ~~Pipeline Intelligence~~ | ~~FEAT-025 (full Lead model filters) + FEAT-026 (filter UX defaults) + UX-FEAT-001 (filter bar presentation)~~ | ✅ SHIPPED | |
 | 16 | Admin Polish | FEAT-027 (logo nav) + FEAT-028 (bug report feedback) + UX-AUDIT-015 (Content Studio empty states) | ~1 session | Small items, high finish quality. |
 | 17 | Admin First-Run (Full) | FEAT-015 (onboarding wizard full scope) + FEAT-018 (logo swap) + UX-AUDIT-012 (3-color branding) | ~1 session | Enables real new-tenant activation. |
 | 18 | Analytics + Telemetry | FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) | ~1 session | Know what's working before scaling. |
@@ -181,12 +181,6 @@ Content Studio shows generic "no content." Needs context-aware states: (a) no cl
 
 ## 🟠 SHOULD — Features & Productization
 
-### UX-FEAT-001: Lead Gen Filter Bar — Presentation Overhaul
-Default visible state undersells the intelligence system. A new user sees a basic search bar, not a sophisticated lead scoring engine.
-**Direction:** Surface Tier, Impact Score, and Close Likelihood as primary visible controls. Intelligence strip above kanban showing active filter posture. Better visual language for expand/collapse.
-**Constraint:** No data model or filter logic changes. Purely `lead-filter-bar-advanced.tsx` presentation.
-**Size:** ~1 session.
-
 ### FEAT-014: Project Management Platform Import
 Onboarding adapters for Basecamp (existing crawler), Asana, Monday.com, ClickUp, Trello. Generic `TaskImportAdapter` interface + import wizard in Settings. Preview/mapping step before commit. Admin-only.
 **Strategic note (Feb 24):** This is a customer acquisition lever — absorbing PM platform users entirely by migrating their existing tasks. Prioritize the most popular platforms first (Asana, ClickUp). The import wizard should feel effortless: connect → preview → confirm → done.
@@ -242,17 +236,6 @@ Fast, structured way to audit a client's current site for technical, SEO, UX, an
 **Scope:** "Audit Website" button on Client detail page (and optionally Lead detail sheet for prospect sites). Pre-populated with `websiteUrl`, editable. Analysis: Page speed / Core Web Vitals (PageSpeed Insights API), meta title/description, heading structure, mobile signal, SSL check, schema markup, broken links (surface-level), image alt tags, canonical tags, sitemap/robots.txt. Output: score per dimension, prioritized issue list (Critical / Recommended / Optional), plain-English summary. Export as branded PDF. Store per-client with timestamp for before/after tracking.
 **API dependency:** Google PageSpeed Insights API (free, requires API key in env).
 **Size:** ~2 sessions. **Priority:** 🟠 SHOULD.
-
-### FEAT-025: Pipeline Filter — Full Lead Model Expansion
-Current filter set is far narrower than what the data supports. The Lead model has rich scoring fields that aren't surfaced.
-**Scope:** Audit the Lead model and expose relevant fields in the filter bar: `closeScore`, `impactScore`, `wealthScore` (range sliders or tiers), `priorityTier` (dropdown), `marketType` (dropdown), `pitchAngle` (dropdown), `suppressionSignal` (boolean / exclude toggle), `distanceFromMetro` (range), `domainRating` (range), `intelNeedsRefresh` (boolean), `dealValueTotal` / `mrr` / `arr` (range), `leadSourceId` (multi-select), `createdAt` (date range). Also review Outscraper qualification scoring fields that can be filtered on.
-**Size:** ~1 session. **Priority:** 🟠 SHOULD.
-
-### FEAT-026: Pipeline Filter — UX Defaults + Collapsibility Overhaul
-Two specific UX issues with the current filter panel.
-**Issue 1:** "Pipeline Status" section in More Filters is not collapsible, unlike the other two sections. All three sections should be collapsible and open by default — consistent behavior.
-**Issue 2:** Default visible filter/sort options don't reflect what reps actually use. Most-used options should be always-visible above the More Filters button. Suggested top-level defaults: Status, Assigned Rep, Territory, Sort (newest / deal value / close score). Secondary options go into More Filters: Score range, Market type, Lead source, Deal value, Distance, Wealth score, etc.
-**Size:** ~1 hr. **Priority:** 🟠 SHOULD.
 
 ### FEAT-028: Bug Report Status Feedback Loop
 Bug and feature submissions currently go into a void from the submitter's perspective. Reports are visible to admin but submitters get no status updates.

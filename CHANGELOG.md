@@ -1,11 +1,21 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 21 complete (5 bugs + 5 UX/feature items).
+**Last Updated:** February 25, 2026 — Sprint 15 complete (FEAT-025/026 + UX-FEAT-001: full pipeline filter expansion + filter bar overhaul).
 
 ---
 
-## Sprint 21 — Bug Fixes + UX Polish (February 24, 2026)
+## Sprint 15 — Pipeline Intelligence (February 25, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 25 | **FEAT-025** — Full Lead model filter expansion. Added closeScore (range slider), wealthScore (multi-select: Low/Medium/High/Very High), pitchAngle (multi-select from enum), suppressionSignal (text search), distanceFromMetro (range slider), intelNeedsRefresh (boolean toggle), mrr/arr (range sliders) as filter controls in `lead-filter-bar-advanced.tsx`. client.tsx and leads/page.tsx updated to pass/apply all new fields. |
+| Feb 25 | **FEAT-026** — Filter UX defaults + collapsibility. Pipeline Status section made collapsible (was the only non-collapsible section). Default visible top-bar filters reordered to: Status, Assigned Rep, Territory, Sort. Score/intelligence filters moved to More Filters panel. |
+| Feb 25 | **UX-FEAT-001** — Filter bar presentation overhaul. Tier, Impact Score, and Close Likelihood surfaced as primary visible controls. Intelligence posture strip added above kanban when filters are active, showing active filter summary. Improved expand/collapse visual language throughout. No data model changes. |
+
+---
+
+
 
 | Date | What Shipped |
 |------|-------------|

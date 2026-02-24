@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronUp, X, HelpCircle, SlidersHorizontal, BookmarkPlus, Bookmark } from "lucide-react";
+import { ChevronDown, ChevronUp, X, HelpCircle, SlidersHorizontal, BookmarkPlus, Bookmark, Zap } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -43,12 +43,16 @@ export type AdvancedFilterState = {
   dateRange: "all" | "7d" | "30d" | "90d";
   sortBy: "newest" | "oldest" | "value-high" | "value-low" | "updated" | "impact-high" | "impact-low" | "close-high" | "close-low";
 
-  // Priority/Quality
+  // Priority/Quality — primary visible
   impactScoreMin: number;
   impactScoreMax: number;
   closeLikelihoodMin: number;
   closeLikelihoodMax: number;
   priorityTiers: string[];
+
+  // Scores
+  closeScoreMin: number;
+  closeScoreMax: number;
 
   // Business Quality
   ratingMin: number;
@@ -64,20 +68,25 @@ export type AdvancedFilterState = {
   marketTypes: string[];
   suppressionSignals: string[];
   municipalMismatch: "all" | "yes" | "no";
-  wealthScoreMin: number;
-  wealthScoreMax: number;
+  wealthScores: string[];
   distanceFromMetroMin: number;
   distanceFromMetroMax: number;
+  pitchAngles: string[];
+  intelNeedsRefresh: boolean | null;
 
   // Exclusions
   excludeChains: boolean;
   excludeFranchises: boolean;
   excludeCorporate: boolean;
 
-  // Pipeline debt additions
+  // Pipeline
   leadSourceIds: number[];
   dealValueMin: number;
   dealValueMax: number;
+  mrrMin: number;
+  mrrMax: number;
+  arrMin: number;
+  arrMax: number;
   daysInStageMin: number;
   daysInStageMax: number;
 };
@@ -113,6 +122,21 @@ const PRIORITY_TIER_OPTIONS = [
   { value: "C", label: "Tier C" },
 ];
 
+const WEALTH_SCORE_OPTIONS = [
+  { value: "very_high", label: "Very High" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+];
+
+const PITCH_ANGLE_OPTIONS = [
+  { value: "reputation", label: "Reputation" },
+  { value: "visibility", label: "Visibility" },
+  { value: "competition", label: "Competition" },
+  { value: "growth", label: "Growth" },
+  { value: "retention", label: "Retention" },
+];
+
 export const DEFAULT_FILTERS: AdvancedFilterState = {
   search: "",
   territoryId: null,
@@ -127,6 +151,9 @@ export const DEFAULT_FILTERS: AdvancedFilterState = {
   closeLikelihoodMax: 100,
   priorityTiers: [],
 
+  closeScoreMin: 0,
+  closeScoreMax: 100,
+
   ratingMin: 0,
   ratingMax: 5,
   reviewCountMin: 0,
@@ -139,10 +166,11 @@ export const DEFAULT_FILTERS: AdvancedFilterState = {
   marketTypes: [],
   suppressionSignals: [],
   municipalMismatch: "all",
-  wealthScoreMin: 0,
-  wealthScoreMax: 500,
+  wealthScores: [],
   distanceFromMetroMin: 0,
   distanceFromMetroMax: 50,
+  pitchAngles: [],
+  intelNeedsRefresh: null,
 
   excludeChains: false,
   excludeFranchises: false,
@@ -151,6 +179,10 @@ export const DEFAULT_FILTERS: AdvancedFilterState = {
   leadSourceIds: [],
   dealValueMin: 0,
   dealValueMax: 50000,
+  mrrMin: 0,
+  mrrMax: 10000,
+  arrMin: 0,
+  arrMax: 120000,
   daysInStageMin: 0,
   daysInStageMax: 365,
 };
@@ -167,49 +199,44 @@ function buildActiveChips(
   const chips: FilterChip[] = [];
   const set = (patch: Partial<AdvancedFilterState>) => onChange({ ...filters, ...patch });
 
-  // statuses
   for (const s of filters.statuses) {
     const label = STATUS_OPTIONS.find((o) => o.value === s)?.label ?? s;
     chips.push({ label, onRemove: () => set({ statuses: filters.statuses.filter((x) => x !== s) }) });
   }
 
-  // dateRange
   if (filters.dateRange !== "all") {
     const map = { "7d": "Last 7d", "30d": "Last 30d", "90d": "Last 90d" };
     chips.push({ label: map[filters.dateRange], onRemove: () => set({ dateRange: "all" }) });
   }
 
-  // priorityTiers
   for (const t of filters.priorityTiers) {
     chips.push({ label: `Tier ${t}`, onRemove: () => set({ priorityTiers: filters.priorityTiers.filter((x) => x !== t) }) });
   }
 
-  // impact score
   if (filters.impactScoreMin > 0 || filters.impactScoreMax < 100) {
     chips.push({ label: `Impact ${filters.impactScoreMin}–${filters.impactScoreMax}`, onRemove: () => set({ impactScoreMin: 0, impactScoreMax: 100 }) });
   }
 
-  // close likelihood
   if (filters.closeLikelihoodMin > 0 || filters.closeLikelihoodMax < 100) {
     chips.push({ label: `Close ${filters.closeLikelihoodMin}–${filters.closeLikelihoodMax}`, onRemove: () => set({ closeLikelihoodMin: 0, closeLikelihoodMax: 100 }) });
   }
 
-  // rating
+  if (filters.closeScoreMin > 0 || filters.closeScoreMax < 100) {
+    chips.push({ label: `Close Score ${filters.closeScoreMin}–${filters.closeScoreMax}`, onRemove: () => set({ closeScoreMin: 0, closeScoreMax: 100 }) });
+  }
+
   if (filters.ratingMin > 0 || filters.ratingMax < 5) {
     chips.push({ label: `Rating ${filters.ratingMin.toFixed(1)}–${filters.ratingMax.toFixed(1)}★`, onRemove: () => set({ ratingMin: 0, ratingMax: 5 }) });
   }
 
-  // reviews
   if (filters.reviewCountMin > 0 || filters.reviewCountMax < 1000) {
     chips.push({ label: `Reviews ${filters.reviewCountMin}–${filters.reviewCountMax}`, onRemove: () => set({ reviewCountMin: 0, reviewCountMax: 1000 }) });
   }
 
-  // domain rating
   if (filters.domainRatingMin > 0 || filters.domainRatingMax < 100) {
     chips.push({ label: `DR ${filters.domainRatingMin}–${filters.domainRatingMax}`, onRemove: () => set({ domainRatingMin: 0, domainRatingMax: 100 }) });
   }
 
-  // hasWebsite / hasEmail
   if (filters.hasWebsite !== "all") {
     chips.push({ label: `Website: ${filters.hasWebsite}`, onRemove: () => set({ hasWebsite: "all" }) });
   }
@@ -217,24 +244,46 @@ function buildActiveChips(
     chips.push({ label: `Email: ${filters.hasEmail}`, onRemove: () => set({ hasEmail: "all" }) });
   }
 
-  // deal value
   if (filters.dealValueMin > 0 || filters.dealValueMax < 50000) {
     const maxLabel = filters.dealValueMax === 50000 ? "50k+" : `$${filters.dealValueMax.toLocaleString()}`;
     chips.push({ label: `Value $${filters.dealValueMin.toLocaleString()}–${maxLabel}`, onRemove: () => set({ dealValueMin: 0, dealValueMax: 50000 }) });
   }
 
-  // days in stage
+  if (filters.mrrMin > 0 || filters.mrrMax < 10000) {
+    chips.push({ label: `MRR $${filters.mrrMin}–$${filters.mrrMax === 10000 ? "10k+" : filters.mrrMax}`, onRemove: () => set({ mrrMin: 0, mrrMax: 10000 }) });
+  }
+
+  if (filters.arrMin > 0 || filters.arrMax < 120000) {
+    chips.push({ label: `ARR $${filters.arrMin}–$${filters.arrMax === 120000 ? "120k+" : filters.arrMax}`, onRemove: () => set({ arrMin: 0, arrMax: 120000 }) });
+  }
+
   if (filters.daysInStageMin > 0 || filters.daysInStageMax < 365) {
     chips.push({ label: `Stage ${filters.daysInStageMin}–${filters.daysInStageMax === 365 ? "365+" : filters.daysInStageMax}d`, onRemove: () => set({ daysInStageMin: 0, daysInStageMax: 365 }) });
   }
 
-  // market types
+  if (filters.distanceFromMetroMin > 0 || filters.distanceFromMetroMax < 50) {
+    chips.push({ label: `Distance ${filters.distanceFromMetroMin}–${filters.distanceFromMetroMax === 50 ? "50+" : filters.distanceFromMetroMax}mi`, onRemove: () => set({ distanceFromMetroMin: 0, distanceFromMetroMax: 50 }) });
+  }
+
   for (const m of filters.marketTypes) {
     const label = MARKET_TYPE_OPTIONS.find((o) => o.value === m)?.label.split(" ")[0] ?? m;
     chips.push({ label, onRemove: () => set({ marketTypes: filters.marketTypes.filter((x) => x !== m) }) });
   }
 
-  // lead sources
+  for (const w of filters.wealthScores) {
+    const label = WEALTH_SCORE_OPTIONS.find((o) => o.value === w)?.label ?? w;
+    chips.push({ label: `Wealth: ${label}`, onRemove: () => set({ wealthScores: filters.wealthScores.filter((x) => x !== w) }) });
+  }
+
+  for (const p of filters.pitchAngles) {
+    const label = PITCH_ANGLE_OPTIONS.find((o) => o.value === p)?.label ?? p;
+    chips.push({ label: `Pitch: ${label}`, onRemove: () => set({ pitchAngles: filters.pitchAngles.filter((x) => x !== p) }) });
+  }
+
+  if (filters.intelNeedsRefresh === true) {
+    chips.push({ label: "Intel stale", onRemove: () => set({ intelNeedsRefresh: null }) });
+  }
+
   for (const id of filters.leadSourceIds) {
     const label = leadSources.find((s) => s.id === id)?.name ?? `Source ${id}`;
     chips.push({ label, onRemove: () => set({ leadSourceIds: filters.leadSourceIds.filter((x) => x !== id) }) });
@@ -242,6 +291,20 @@ function buildActiveChips(
 
   return chips;
 }
+
+// Intelligence posture summary -----------------------------------------------
+function buildPostureSummary(filters: AdvancedFilterState): string | null {
+  const parts: string[] = [];
+  if (filters.priorityTiers.length > 0) parts.push(`Tier ${filters.priorityTiers.join("/")}`);
+  if (filters.impactScoreMin > 0) parts.push(`Impact ≥${filters.impactScoreMin}`);
+  if (filters.closeLikelihoodMin > 0) parts.push(`Close ≥${filters.closeLikelihoodMin}`);
+  if (filters.closeScoreMin > 0) parts.push(`CloseScore ≥${filters.closeScoreMin}`);
+  if (filters.statuses.length > 0) parts.push(filters.statuses.map(s => STATUS_OPTIONS.find(o => o.value === s)?.label ?? s).join(", "));
+  if (filters.intelNeedsRefresh) parts.push("Stale intel");
+  if (filters.wealthScores.length > 0) parts.push(`Wealth: ${filters.wealthScores.map(w => WEALTH_SCORE_OPTIONS.find(o => o.value === w)?.label ?? w).join("/")}`);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
 
 // ---------------------------------------------------------------------------
 
@@ -254,8 +317,10 @@ export function AdvancedLeadFilterBar({
   const [reps, setReps] = useState<Rep[]>([]);
   const [leadSources, setLeadSources] = useState<LeadSource[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showPipeline, setShowPipeline] = useState(true);
   const [showQuality, setShowQuality] = useState(false);
   const [showMarket, setShowMarket] = useState(false);
+  const [showDealMetrics, setShowDealMetrics] = useState(false);
 
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [activeSavedSearch, setActiveSavedSearch] = useState<string | null>(null);
@@ -360,6 +425,20 @@ export function AdvancedLeadFilterBar({
     onChange({ ...filters, leadSourceIds: newIds });
   };
 
+  const toggleWealthScore = (val: string) => {
+    const updated = filters.wealthScores.includes(val)
+      ? filters.wealthScores.filter((x) => x !== val)
+      : [...filters.wealthScores, val];
+    onChange({ ...filters, wealthScores: updated });
+  };
+
+  const togglePitchAngle = (val: string) => {
+    const updated = filters.pitchAngles.includes(val)
+      ? filters.pitchAngles.filter((x) => x !== val)
+      : [...filters.pitchAngles, val];
+    onChange({ ...filters, pitchAngles: updated });
+  };
+
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
     setActiveSavedSearch(null);
@@ -377,24 +456,42 @@ export function AdvancedLeadFilterBar({
     (filters.impactScoreMin > 0 || filters.impactScoreMax < 100) && 1,
     (filters.closeLikelihoodMin > 0 || filters.closeLikelihoodMax < 100) && 1,
     filters.priorityTiers.length,
+    (filters.closeScoreMin > 0 || filters.closeScoreMax < 100) && 1,
     (filters.ratingMin > 0 || filters.ratingMax < 5) && 1,
     (filters.reviewCountMin > 0 || filters.reviewCountMax < 1000) && 1,
     (filters.domainRatingMin > 0 || filters.domainRatingMax < 100) && 1,
     filters.hasWebsite !== "all" && 1,
     filters.hasEmail !== "all" && 1,
     filters.marketTypes.length,
+    filters.wealthScores.length,
+    filters.pitchAngles.length,
+    filters.intelNeedsRefresh !== null && 1,
     filters.leadSourceIds.length,
     (filters.dealValueMin > 0 || filters.dealValueMax < 50000) && 1,
+    (filters.mrrMin > 0 || filters.mrrMax < 10000) && 1,
+    (filters.arrMin > 0 || filters.arrMax < 120000) && 1,
     (filters.daysInStageMin > 0 || filters.daysInStageMax < 365) && 1,
+    (filters.distanceFromMetroMin > 0 || filters.distanceFromMetroMax < 50) && 1,
   ].filter(Boolean).reduce((a, b) => Number(a) + Number(b), 0) as number;
 
   const activeChips = buildActiveChips(filters, onChange, leadSources);
+  const postureSummary = buildPostureSummary(filters);
+
 
   return (
     <TooltipProvider>
       <div className="space-y-2 p-3 border rounded-lg bg-card">
 
-        {/* ── Row 1: Controls ────────────────────────────────────────────── */}
+        {/* ── Intelligence Posture Strip ─────────────────────────────────── */}
+        {hasActiveFilters && postureSummary && (
+          <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-primary/5 border border-primary/20 text-xs text-primary">
+            <Zap className="h-3.5 w-3.5 shrink-0" />
+            <span className="font-medium">Active filter posture:</span>
+            <span className="text-muted-foreground truncate">{postureSummary}</span>
+          </div>
+        )}
+
+        {/* ── Row 1: Primary visible controls ────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2">
           <Input
             placeholder="Search businesses, phone, city..."
@@ -403,25 +500,32 @@ export function AdvancedLeadFilterBar({
             className="w-full md:w-64 h-9"
           />
 
-          {showTerritoryFilter && territories.length > 0 && (
-            <Select
-              value={filters.territoryId?.toString() || "all"}
-              onValueChange={(value) =>
-                onChange({ ...filters, territoryId: value === "all" ? null : Number(value) })
-              }
-            >
-              <SelectTrigger className="w-[140px] h-9">
-                <SelectValue placeholder="Territory" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All territories</SelectItem>
-                {territories.map((t) => (
-                  <SelectItem key={t.id} value={t.id.toString()}>{t.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          {/* Status — primary visible */}
+          <Select
+            value={filters.statuses.length === 1 ? filters.statuses[0] : filters.statuses.length > 1 ? "__multi__" : "all"}
+            onValueChange={(value) => {
+              if (value === "all") onChange({ ...filters, statuses: [] });
+              else onChange({ ...filters, statuses: [value] });
+            }}
+          >
+            <SelectTrigger className="w-[130px] h-9">
+              <SelectValue placeholder="Status">
+                {filters.statuses.length > 1
+                  ? `${filters.statuses.length} statuses`
+                  : filters.statuses.length === 1
+                  ? STATUS_OPTIONS.find((o) => o.value === filters.statuses[0])?.label ?? "Status"
+                  : "All statuses"}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {STATUS_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
+          {/* Assigned Rep */}
           {reps.length > 0 && (
             <Select
               value={
@@ -437,7 +541,7 @@ export function AdvancedLeadFilterBar({
               }
             >
               <SelectTrigger className="w-[130px] h-9">
-                <SelectValue placeholder="Assigned" />
+                <SelectValue placeholder="Rep" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All reps</SelectItem>
@@ -449,9 +553,30 @@ export function AdvancedLeadFilterBar({
             </Select>
           )}
 
+          {/* Territory */}
+          {showTerritoryFilter && territories.length > 0 && (
+            <Select
+              value={filters.territoryId?.toString() || "all"}
+              onValueChange={(value) =>
+                onChange({ ...filters, territoryId: value === "all" ? null : Number(value) })
+              }
+            >
+              <SelectTrigger className="w-[130px] h-9">
+                <SelectValue placeholder="Territory" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All territories</SelectItem>
+                {territories.map((t) => (
+                  <SelectItem key={t.id} value={t.id.toString()}>{t.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Sort */}
           <Select
             value={filters.sortBy}
-            onValueChange={(value: any) => onChange({ ...filters, sortBy: value })}
+            onValueChange={(value: AdvancedFilterState["sortBy"]) => onChange({ ...filters, sortBy: value })}
           >
             <SelectTrigger className="w-[160px] h-9">
               <SelectValue placeholder="Sort by" />
@@ -468,6 +593,59 @@ export function AdvancedLeadFilterBar({
               <SelectItem value="value-low">Value: Low → High</SelectItem>
             </SelectContent>
           </Select>
+
+
+          {/* Primary intelligence controls — Tier, Impact Score, Close Likelihood */}
+          <div className="flex items-center gap-1.5 border rounded-md px-2 h-9 bg-muted/30">
+            <span className="text-xs text-muted-foreground font-medium">Tier:</span>
+            {PRIORITY_TIER_OPTIONS.map((o) => (
+              <button
+                key={o.value}
+                onClick={() => togglePriorityTier(o.value)}
+                className={`text-xs px-1.5 py-0.5 rounded font-semibold transition-colors ${
+                  filters.priorityTiers.includes(o.value)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {o.value}
+              </button>
+            ))}
+          </div>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 border rounded-md px-2 h-9 bg-muted/30 cursor-default min-w-[110px]">
+                <span className="text-xs text-muted-foreground font-medium">Impact ≥</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={filters.impactScoreMin}
+                  onChange={(e) => onChange({ ...filters, impactScoreMin: Math.max(0, Math.min(100, Number(e.target.value))) })}
+                  className="w-10 bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Revenue opportunity (0–100). High = strong fundamentals but poor visibility.</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 border rounded-md px-2 h-9 bg-muted/30 cursor-default min-w-[110px]">
+                <span className="text-xs text-muted-foreground font-medium">Close ≥</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={filters.closeLikelihoodMin}
+                  onChange={(e) => onChange({ ...filters, closeLikelihoodMin: Math.max(0, Math.min(100, Number(e.target.value))) })}
+                  className="w-10 bg-transparent text-xs font-semibold text-foreground focus:outline-none"
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Sales engagement probability (0–100). High = likely to respond.</TooltipContent>
+          </Tooltip>
 
           {/* More filters toggle */}
           <Button
@@ -562,6 +740,7 @@ export function AdvancedLeadFilterBar({
           )}
         </div>
 
+
         {/* ── Row 2: Active filter chips ─────────────────────────────────── */}
         {activeChips.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -588,111 +767,169 @@ export function AdvancedLeadFilterBar({
         {showAdvanced && (
           <div className="pt-3 border-t space-y-5">
 
-            {/* Pipeline group */}
+            {/* Pipeline group — collapsible, open by default */}
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pipeline</p>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Status</Label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {STATUS_OPTIONS.map((option) => (
-                      <label key={option.value} className="flex items-center gap-2 text-sm cursor-pointer">
-                        <Checkbox
-                          checked={filters.statuses.includes(option.value)}
-                          onCheckedChange={() => toggleStatus(option.value)}
-                        />
-                        {option.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
+              <button
+                className="flex items-center justify-between w-full text-left group"
+                onClick={() => setShowPipeline(!showPipeline)}
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  Pipeline Status
+                </p>
+                {showPipeline ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+              </button>
 
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Date Range</Label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {[
-                        { value: "all", label: "All time" },
-                        { value: "7d", label: "Last 7 days" },
-                        { value: "30d", label: "Last 30 days" },
-                        { value: "90d", label: "Last 90 days" },
-                      ].map((option) => (
-                        <Button
-                          key={option.value}
-                          variant={filters.dateRange === option.value ? "default" : "outline"}
-                          size="sm"
-                          className="h-8 text-xs"
-                          onClick={() => onChange({ ...filters, dateRange: option.value as any })}
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
+              {showPipeline && (
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Status</Label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {STATUS_OPTIONS.map((option) => (
+                          <label key={option.value} className="flex items-center gap-2 text-sm cursor-pointer">
+                            <Checkbox
+                              checked={filters.statuses.includes(option.value)}
+                              onCheckedChange={() => toggleStatus(option.value)}
+                            />
+                            {option.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">Date Range</Label>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {[
+                            { value: "all", label: "All time" },
+                            { value: "7d", label: "Last 7 days" },
+                            { value: "30d", label: "Last 30 days" },
+                            { value: "90d", label: "Last 90 days" },
+                          ].map((option) => (
+                            <Button
+                              key={option.value}
+                              variant={filters.dateRange === option.value ? "default" : "outline"}
+                              size="sm"
+                              className="h-8 text-xs"
+                              onClick={() => onChange({ ...filters, dateRange: option.value as AdvancedFilterState["dateRange"] })}
+                            >
+                              {option.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">Priority Tier</Label>
+                        <div className="flex gap-2">
+                          {PRIORITY_TIER_OPTIONS.map((option) => (
+                            <label key={option.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                              <Checkbox
+                                checked={filters.priorityTiers.includes(option.value)}
+                                onCheckedChange={() => togglePriorityTier(option.value)}
+                              />
+                              {option.label}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Days in stage */}
                   <div>
-                    <Label className="text-sm font-medium mb-2 block">Priority Tier</Label>
-                    <div className="flex gap-2">
-                      {PRIORITY_TIER_OPTIONS.map((option) => (
-                        <label key={option.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                          <Checkbox
-                            checked={filters.priorityTiers.includes(option.value)}
-                            onCheckedChange={() => togglePriorityTier(option.value)}
-                          />
-                          {option.label}
-                        </label>
-                      ))}
-                    </div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Days in Stage: {filters.daysInStageMin}–{filters.daysInStageMax === 365 ? "365+" : filters.daysInStageMax}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          How long a lead has been in their current pipeline stage. Use to surface stale leads.
+                        </TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <Slider
+                      value={[filters.daysInStageMin, filters.daysInStageMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, daysInStageMin: min, daysInStageMax: max })}
+                      min={0} max={365} step={1}
+                    />
                   </div>
-                </div>
-              </div>
 
-              {/* Deal value & Days in stage side-by-side */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">
-                    Deal Value: ${filters.dealValueMin.toLocaleString()}–{filters.dealValueMax === 50000 ? "$50k+" : `$${filters.dealValueMax.toLocaleString()}`}
-                  </Label>
-                  <Slider
-                    value={[filters.dealValueMin, filters.dealValueMax]}
-                    onValueChange={([min, max]) => onChange({ ...filters, dealValueMin: min, dealValueMax: max })}
-                    min={0} max={50000} step={500}
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
-                    Days in Stage: {filters.daysInStageMin}–{filters.daysInStageMax === 365 ? "365+" : filters.daysInStageMax}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        How long a lead has been in their current pipeline stage. Use to surface stale leads.
-                      </TooltipContent>
-                    </Tooltip>
-                  </Label>
-                  <Slider
-                    value={[filters.daysInStageMin, filters.daysInStageMax]}
-                    onValueChange={([min, max]) => onChange({ ...filters, daysInStageMin: min, daysInStageMax: max })}
-                    min={0} max={365} step={1}
-                  />
-                </div>
-              </div>
+                  {/* Lead Source */}
+                  {leadSources.length > 0 && (
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Lead Source</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
+                        {leadSources.map((source) => (
+                          <label key={source.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                            <Checkbox
+                              checked={filters.leadSourceIds.includes(source.id)}
+                              onCheckedChange={() => toggleLeadSource(source.id)}
+                            />
+                            {source.name}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-              {/* Lead Source */}
-              {leadSources.length > 0 && (
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Lead Source</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5">
-                    {leadSources.map((source) => (
-                      <label key={source.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                        <Checkbox
-                          checked={filters.leadSourceIds.includes(source.id)}
-                          onCheckedChange={() => toggleLeadSource(source.id)}
-                        />
-                        {source.name}
-                      </label>
-                    ))}
+
+            {/* Deal Metrics group — collapsible */}
+            <div className="space-y-3">
+              <button
+                className="flex items-center justify-between w-full text-left group"
+                onClick={() => setShowDealMetrics(!showDealMetrics)}
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
+                  Deal Value &amp; Revenue
+                </p>
+                {showDealMetrics ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+              </button>
+
+              {showDealMetrics && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Deal Value: ${filters.dealValueMin.toLocaleString()}–{filters.dealValueMax === 50000 ? "$50k+" : `$${filters.dealValueMax.toLocaleString()}`}
+                    </Label>
+                    <Slider
+                      value={[filters.dealValueMin, filters.dealValueMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, dealValueMin: min, dealValueMax: max })}
+                      min={0} max={50000} step={500}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      MRR: ${filters.mrrMin}–${filters.mrrMax === 10000 ? "10k+" : filters.mrrMax}
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Monthly Recurring Revenue estimate for this lead.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <Slider
+                      value={[filters.mrrMin, filters.mrrMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, mrrMin: min, mrrMax: max })}
+                      min={0} max={10000} step={100}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      ARR: ${filters.arrMin.toLocaleString()}–${filters.arrMax === 120000 ? "120k+" : filters.arrMax.toLocaleString()}
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Annual Recurring Revenue estimate for this lead.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <Slider
+                      value={[filters.arrMin, filters.arrMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, arrMin: min, arrMax: max })}
+                      min={0} max={120000} step={1000}
+                    />
                   </div>
                 </div>
               )}
@@ -716,12 +953,8 @@ export function AdvancedLeadFilterBar({
                     <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
                       Impact Score: {filters.impactScoreMin}–{filters.impactScoreMax}
                       <Tooltip>
-                        <TooltipTrigger asChild>
-                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-xs">
-                          Revenue opportunity (0–100). High = strong fundamentals but poor visibility.
-                        </TooltipContent>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="max-w-xs">Revenue opportunity (0–100). High = strong fundamentals but poor visibility.</TooltipContent>
                       </Tooltip>
                     </Label>
                     <Slider
@@ -735,17 +968,28 @@ export function AdvancedLeadFilterBar({
                     <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
                       Close Likelihood: {filters.closeLikelihoodMin}–{filters.closeLikelihoodMax}
                       <Tooltip>
-                        <TooltipTrigger asChild>
-                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-xs">
-                          Sales engagement probability (0–100). High = likely to respond and engage.
-                        </TooltipContent>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="max-w-xs">Sales engagement probability (0–100). High = likely to respond and engage.</TooltipContent>
                       </Tooltip>
                     </Label>
                     <Slider
                       value={[filters.closeLikelihoodMin, filters.closeLikelihoodMax]}
                       onValueChange={([min, max]) => onChange({ ...filters, closeLikelihoodMin: min, closeLikelihoodMax: max })}
+                      min={0} max={100} step={5}
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Close Score: {filters.closeScoreMin}–{filters.closeScoreMax}
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent className="max-w-xs">Composite close readiness score. Combines engagement, timing, and fit signals.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <Slider
+                      value={[filters.closeScoreMin, filters.closeScoreMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, closeScoreMin: min, closeScoreMax: max })}
                       min={0} max={100} step={5}
                     />
                   </div>
@@ -786,7 +1030,7 @@ export function AdvancedLeadFilterBar({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label className="text-sm font-medium mb-1.5 block">Has Website</Label>
-                      <Select value={filters.hasWebsite} onValueChange={(v: any) => onChange({ ...filters, hasWebsite: v })}>
+                      <Select value={filters.hasWebsite} onValueChange={(v: AdvancedFilterState["hasWebsite"]) => onChange({ ...filters, hasWebsite: v })}>
                         <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All</SelectItem>
@@ -797,7 +1041,7 @@ export function AdvancedLeadFilterBar({
                     </div>
                     <div>
                       <Label className="text-sm font-medium mb-1.5 block">Has Email</Label>
-                      <Select value={filters.hasEmail} onValueChange={(v: any) => onChange({ ...filters, hasEmail: v })}>
+                      <Select value={filters.hasEmail} onValueChange={(v: AdvancedFilterState["hasEmail"]) => onChange({ ...filters, hasEmail: v })}>
                         <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">All</SelectItem>
@@ -810,6 +1054,7 @@ export function AdvancedLeadFilterBar({
                 </div>
               )}
             </div>
+
 
             {/* Market Intelligence group — collapsible */}
             <div className="space-y-3">
@@ -824,17 +1069,111 @@ export function AdvancedLeadFilterBar({
               </button>
 
               {showMarket && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                  {MARKET_TYPE_OPTIONS.map((option) => (
-                    <label key={option.value} className="flex items-start gap-2 text-sm cursor-pointer">
-                      <Checkbox
-                        checked={filters.marketTypes.includes(option.value)}
-                        onCheckedChange={() => toggleMarketType(option.value)}
-                        className="mt-0.5"
-                      />
-                      <span>{option.label}</span>
-                    </label>
-                  ))}
+                <div className="space-y-4">
+                  {/* Market Types */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Market Type</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {MARKET_TYPE_OPTIONS.map((option) => (
+                        <label key={option.value} className="flex items-start gap-2 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={filters.marketTypes.includes(option.value)}
+                            onCheckedChange={() => toggleMarketType(option.value)}
+                            className="mt-0.5"
+                          />
+                          <span>{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Wealth Score */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Wealth Score
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Area wealth tier relative to metro average. Affects suppression modeling.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {WEALTH_SCORE_OPTIONS.map((o) => (
+                        <label key={o.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={filters.wealthScores.includes(o.value)}
+                            onCheckedChange={() => toggleWealthScore(o.value)}
+                          />
+                          {o.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pitch Angle */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Pitch Angle
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Recommended sales angle for this lead based on their profile.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <div className="flex flex-wrap gap-2">
+                      {PITCH_ANGLE_OPTIONS.map((o) => (
+                        <label key={o.value} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                          <Checkbox
+                            checked={filters.pitchAngles.includes(o.value)}
+                            onCheckedChange={() => togglePitchAngle(o.value)}
+                          />
+                          {o.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Distance from Metro */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Distance from Metro: {filters.distanceFromMetroMin}–{filters.distanceFromMetroMax === 50 ? "50+" : filters.distanceFromMetroMax} mi
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Distance from nearest metro area in miles. Higher values = less competition.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <Slider
+                      value={[filters.distanceFromMetroMin, filters.distanceFromMetroMax]}
+                      onValueChange={([min, max]) => onChange({ ...filters, distanceFromMetroMin: min, distanceFromMetroMax: max })}
+                      min={0} max={50} step={1}
+                    />
+                  </div>
+
+                  {/* Intel Needs Refresh */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 flex items-center gap-1.5">
+                      Intel Status
+                      <Tooltip>
+                        <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
+                        <TooltipContent>Filter leads whose intelligence data is flagged as stale and needs re-enrichment.</TooltipContent>
+                      </Tooltip>
+                    </Label>
+                    <div className="flex gap-3">
+                      {[
+                        { value: null, label: "All" },
+                        { value: true, label: "Stale only" },
+                        { value: false, label: "Fresh only" },
+                      ].map((o) => (
+                        <Button
+                          key={String(o.value)}
+                          variant={filters.intelNeedsRefresh === o.value ? "default" : "outline"}
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => onChange({ ...filters, intelNeedsRefresh: o.value })}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

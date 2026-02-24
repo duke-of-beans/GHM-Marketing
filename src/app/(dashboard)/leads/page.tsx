@@ -40,6 +40,10 @@ export default async function LeadsPage() {
         website: true,
         email: true, // Note: database has "email" not "publicEmail"
         leadSourceId: true,
+        mrr: true,
+        arr: true,
+        pitchAngle: true,
+        intelNeedsRefresh: true,
         // Note: database does NOT have municipalMismatch, isChain, isFranchise, isCorporate fields
       },
       orderBy: { updatedAt: "desc" },
@@ -80,6 +84,11 @@ export default async function LeadsPage() {
     website: lead.website,
     publicEmail: lead.email, // DB: email → Client: publicEmail
     leadSourceId: lead.leadSourceId ?? null,
+    mrr: Number(lead.mrr),
+    arr: Number(lead.arr),
+    pitchAngle: lead.pitchAngle,
+    intelNeedsRefresh: lead.intelNeedsRefresh,
+    closeScore: lead.closeScore,
     // Fields not yet in database schema
     municipalMismatch: null,
     isChain: null,
