@@ -15,10 +15,10 @@ type Props = {
 };
 
 const CONFIG: Record<ChurnRiskLevel, { label: string; className: string; dot: string }> = {
-  low:      { label: "Low Risk",      className: "bg-green-100 text-green-800 border-green-200",   dot: "bg-green-500" },
-  medium:   { label: "Watch",         className: "bg-yellow-100 text-yellow-800 border-yellow-200", dot: "bg-yellow-500" },
-  high:     { label: "At Risk",       className: "bg-orange-100 text-orange-800 border-orange-200", dot: "bg-orange-500" },
-  critical: { label: "Churn Risk",    className: "bg-red-100 text-red-800 border-red-200",          dot: "bg-red-500" },
+  low:      { label: "Low Risk",      className: "bg-status-success-bg text-status-success border-status-success-border",   dot: "bg-green-500 dark:bg-green-400" },
+  medium:   { label: "Watch",         className: "bg-status-warning-bg text-status-warning border-status-warning-border", dot: "bg-yellow-500 dark:bg-yellow-400" },
+  high:     { label: "At Risk",       className: "bg-status-warning-bg text-status-warning border-status-warning-border", dot: "bg-orange-500 dark:bg-orange-400" },
+  critical: { label: "Churn Risk",    className: "bg-status-danger-bg text-status-danger border-status-danger-border",   dot: "bg-red-500 dark:bg-red-400" },
 };
 
 const FACTOR_LABELS: Record<string, string> = {

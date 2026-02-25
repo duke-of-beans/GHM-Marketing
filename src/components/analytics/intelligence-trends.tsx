@@ -13,6 +13,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
 import type { MonthlyTrendPoint } from "@/lib/analytics/intelligence";
 
 type Props = {
@@ -57,7 +58,7 @@ export function IntelligenceTrends({ trend }: Props) {
               <Line
                 type="monotone"
                 dataKey="mrr"
-                stroke="#10b981"
+                stroke={CHART_FALLBACKS[0]}
                 strokeWidth={2}
                 dot={{ r: 3 }}
                 name="MRR"
@@ -83,7 +84,7 @@ export function IntelligenceTrends({ trend }: Props) {
                 <Line
                   type="monotone"
                   dataKey="activeClients"
-                  stroke="#3b82f6"
+                  stroke={CHART_FALLBACKS[1]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   name="Active Clients"
@@ -106,8 +107,8 @@ export function IntelligenceTrends({ trend }: Props) {
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="newClients" fill="#10b981" name="New" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="churnedClients" fill="#ef4444" name="Churned" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="newClients" fill={CHART_FALLBACKS[0]} name="New" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="churnedClients" fill={CHART_FALLBACKS[3]} name="Churned" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -134,7 +135,7 @@ export function IntelligenceTrends({ trend }: Props) {
                 <Line
                   type="monotone"
                   dataKey="avgHealthScore"
-                  stroke="#f59e0b"
+                  stroke={CHART_FALLBACKS[1]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   name="Avg Health Score"

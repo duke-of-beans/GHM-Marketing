@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 23-C shipped (Signal Token Implementation).
+**Last Updated:** February 25, 2026 — Sprint 23-D shipped (StatusBadge + chart color migration).
 
 **Owner:** David Kirsch
 

@@ -1,7 +1,35 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 23-C shipped (Signal Token Implementation).
+**Last Updated:** February 25, 2026 — Sprint 23-D shipped (StatusBadge + chart color migration).
+
+---
+
+## Sprint 23-D — UI Constitution Phase 1: StatusBadge + Chart Color Migration — February 25, 2026
+
+**Two new utility files + 6 component migrations.** Built the reusable foundation components that enable systematic color migration across the rest of the codebase.
+
+**New: `StatusBadge` component** (`src/components/ui/status-badge.tsx`) — Universal status indicator consuming COVOS semantic tokens. 5 variants: success, warning, danger, info, neutral. Props: variant, children, dot (optional status dot), size (sm/md). Includes `scoreToVariant()` helper for mapping numeric scores to status variants. Uses `bg-status-{variant}-bg text-status-{variant} border-status-{variant}-border` tokens.
+
+**New: `useChartColors` hook** (`src/hooks/use-chart-colors.ts`) — Resolves `--chart-N` CSS variables to hex strings for recharts (which can't consume CSS variables directly). Reads computed styles from DOM, converts HSL to hex via canvas. Exports `CHART_FALLBACKS` for static/server contexts. Auto-updates when dark mode toggles via MutationObserver on `<html>` class attribute.
+
+**Migrated: `churn-risk-badge.tsx`** — Replaced hardcoded green/yellow/orange/red Tailwind classes with `bg-status-{variant}-bg text-status-{variant} border-status-{variant}-border`. Added dark mode dot variants.
+
+**Migrated: `advanced-charts.tsx`** — Replaced 7-color hardcoded COLORS array with `CHART_FALLBACKS` import. All 12 inline hex references in RevenueTrendChart, SalesRepPerformanceChart, TerritoryComparisonChart, TaskCompletionTrendChart converted to `COLORS[N]`.
+
+**Migrated: `intelligence-trends.tsx`** — Replaced 5 hardcoded hex values with `CHART_FALLBACKS` references across trend lines.
+
+**Migrated: `analytics-dashboard.tsx`** — Replaced 3 hardcoded hex values with `CHART_FALLBACKS` references.
+
+**Migrated: `performance-dashboard.tsx`** — Replaced 3 hardcoded hex values (request count line, avg duration line, error bar) with `CHART_FALLBACKS` references.
+
+**Migrated: `SiteHealthTab.tsx`** — Replaced 3 hardcoded hex values (Mobile/Desktop/SEO score lines) with `CHART_FALLBACKS` references.
+
+**Remaining chart hex (deferred):** `health-sparkline.tsx` (1 value — status-semantic green, not chart color), `LocalPresenceTab.tsx` (1 value — grid line structural neutral). Both are edge cases for future status/structural token migration, not chart color migration.
+
+**TypeScript check:** Fixed `ImageData` destructuring error in `use-chart-colors.ts` (Uint8ClampedArray needs index access, not array destructuring without `downlevelIteration`). No new errors.
+**Files created:** `src/components/ui/status-badge.tsx`, `src/hooks/use-chart-colors.ts`
+**Files modified:** `src/components/clients/churn-risk-badge.tsx`, `src/components/analytics/advanced-charts.tsx`, `src/components/analytics/intelligence-trends.tsx`, `src/components/analytics/analytics-dashboard.tsx`, `src/components/monitoring/performance-dashboard.tsx`, `src/components/clients/site-health/SiteHealthTab.tsx`
 
 ---
 

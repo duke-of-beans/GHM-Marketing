@@ -26,7 +26,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ChartData = any[];
 
-const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
+import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
+
+// Uses COVOS chart token fallbacks (resolved hex). For dynamic dark-mode
+// support, components should use useChartColors() hook instead.
+const COLORS = [...CHART_FALLBACKS];
 
 /**
  * Revenue Trend Chart - Show MRR growth over time
@@ -42,8 +46,8 @@ export function RevenueTrendChart({ data }: { data: ChartData }) {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorMRR" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                <stop offset="5%" stopColor={COLORS[0]} stopOpacity={0.8}/>
+                <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" />
@@ -53,7 +57,7 @@ export function RevenueTrendChart({ data }: { data: ChartData }) {
             <Area 
               type="monotone" 
               dataKey="mrr" 
-              stroke="#10b981" 
+              stroke={COLORS[0]} 
               fillOpacity={1} 
               fill="url(#colorMRR)" 
             />
@@ -113,8 +117,8 @@ export function SalesRepPerformanceChart({ data }: { data: ChartData }) {
             <XAxis type="number" />
             <YAxis dataKey="name" type="category" width={100} />
             <Tooltip formatter={(value) => `$${value}`} />
-            <Bar dataKey="revenue" fill="#3b82f6" />
-            <Bar dataKey="deals" fill="#10b981" />
+            <Bar dataKey="revenue" fill={COLORS[0]} />
+            <Bar dataKey="deals" fill={COLORS[1]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -140,15 +144,15 @@ export function TerritoryComparisonChart({ data }: { data: ChartData }) {
             <Radar 
               name="Territory A" 
               dataKey="territoryA" 
-              stroke="#3b82f6" 
-              fill="#3b82f6" 
+              stroke={COLORS[0]} 
+              fill={COLORS[0]} 
               fillOpacity={0.3} 
             />
             <Radar 
               name="Territory B" 
               dataKey="territoryB" 
-              stroke="#10b981" 
-              fill="#10b981" 
+              stroke={COLORS[2]} 
+              fill={COLORS[2]} 
               fillOpacity={0.3} 
             />
             <Legend />
@@ -180,21 +184,21 @@ export function TaskCompletionTrendChart({ data }: { data: ChartData }) {
             <Line 
               type="monotone" 
               dataKey="completed" 
-              stroke="#10b981" 
+              stroke={COLORS[0]} 
               strokeWidth={2}
               name="Completed"
             />
             <Line 
               type="monotone" 
               dataKey="created" 
-              stroke="#3b82f6" 
+              stroke={COLORS[1]} 
               strokeWidth={2}
               name="Created"
             />
             <Line 
               type="monotone" 
               dataKey="pending" 
-              stroke="#f59e0b" 
+              stroke={COLORS[2]} 
               strokeWidth={2}
               name="Pending"
             />
@@ -222,10 +226,10 @@ export function ServiceMixChart({ data }: { data: ChartData }) {
             <YAxis />
             <Tooltip formatter={(value) => `$${value}`} />
             <Legend />
-            <Bar dataKey="seo" stackId="a" fill="#3b82f6" name="SEO" />
-            <Bar dataKey="ppc" stackId="a" fill="#10b981" name="PPC" />
-            <Bar dataKey="social" stackId="a" fill="#f59e0b" name="Social" />
-            <Bar dataKey="content" stackId="a" fill="#8b5cf6" name="Content" />
+            <Bar dataKey="seo" stackId="a" fill={COLORS[0]} name="SEO" />
+            <Bar dataKey="ppc" stackId="a" fill={COLORS[2]} name="PPC" />
+            <Bar dataKey="social" stackId="a" fill={COLORS[1]} name="Social" />
+            <Bar dataKey="content" stackId="a" fill={COLORS[4]} name="Content" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

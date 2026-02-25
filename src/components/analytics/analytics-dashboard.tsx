@@ -33,7 +33,8 @@ type AnalyticsData = {
   opportunities: any[];
 };
 
-const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
+import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
+const COLORS = [...CHART_FALLBACKS];
 
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const metrics = useMemo(() => calculateMetrics(data), [data]);
@@ -164,14 +165,14 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
               <Line
                 type="monotone"
                 dataKey="actual"
-                stroke="#10b981"
+                stroke={COLORS[0]}
                 strokeWidth={2}
                 name="Actual MRR"
               />
               <Line
                 type="monotone"
                 dataKey="projected"
-                stroke="#3b82f6"
+                stroke={COLORS[1]}
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 name="Projected MRR"
@@ -194,7 +195,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 <XAxis dataKey="stage" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" />
+                <Bar dataKey="count" fill={COLORS[0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

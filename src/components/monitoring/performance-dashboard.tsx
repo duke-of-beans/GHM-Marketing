@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Activity, AlertTriangle, TrendingUp, Clock } from "lucide-react";
+import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
 
 export function PerformanceMonitoringDashboard() {
   const [data, setData] = useState<any>(null);
@@ -143,14 +144,14 @@ export function PerformanceMonitoringDashboard() {
                 yAxisId="left"
                 type="monotone"
                 dataKey="count"
-                stroke="#3b82f6"
+                stroke={CHART_FALLBACKS[0]}
                 name="Requests"
               />
               <Line
                 yAxisId="right"
                 type="monotone"
                 dataKey="avgDuration"
-                stroke="#10b981"
+                stroke={CHART_FALLBACKS[2]}
                 name="Avg Duration (ms)"
               />
             </LineChart>
@@ -213,7 +214,7 @@ export function PerformanceMonitoringDashboard() {
                   <XAxis dataKey="endpoint" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#ef4444" />
+                  <Bar dataKey="count" fill={CHART_FALLBACKS[3]} />
                 </BarChart>
               </ResponsiveContainer>
             )}

@@ -25,6 +25,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
 import { ArrowUp, ArrowDown, Minus, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -407,7 +408,7 @@ export function SiteHealthTab({ clientId }: Props) {
                     <Line
                       type="monotone"
                       dataKey="Mobile"
-                      stroke="#2563eb"
+                      stroke={CHART_FALLBACKS[0]}
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
@@ -415,7 +416,7 @@ export function SiteHealthTab({ clientId }: Props) {
                     <Line
                       type="monotone"
                       dataKey="Desktop"
-                      stroke="#16a34a"
+                      stroke={CHART_FALLBACKS[2]}
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
@@ -423,7 +424,7 @@ export function SiteHealthTab({ clientId }: Props) {
                     <Line
                       type="monotone"
                       dataKey="SEO"
-                      stroke="#9333ea"
+                      stroke={CHART_FALLBACKS[4]}
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
