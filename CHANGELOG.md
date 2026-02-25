@@ -1,7 +1,20 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Bug batch audit complete. 5 backlog items confirmed pre-shipped, closed. ARCH-001 executed.
+**Last Updated:** February 24, 2026 — Sprint 21-D complete. GIF rendering fixed, compose UX rebuilt to Slack-bar standard.
+
+---
+
+## Sprint 21-D — TeamFeed Rework — February 24, 2026
+
+**BUG-029 / BUG-028 — GIF Rendering Fixed**
+Root cause: `POST /api/team-messages` destructured `content, audienceType, audienceValue, recipientId, parentId, priority, isPinned, mentions` from body but never destructured or persisted `attachmentUrl, attachmentName, attachmentSize, attachmentMimeType, attachmentVaultId`. Attachment fields were silently dropped on every POST. Fix: destructured all 5 attachment fields, added them to `prisma.teamMessage.create` data block. Also relaxed validation — empty content is now allowed when `attachmentUrl` is present (required for GIF-only messages). Push notification body now falls back to `"📎 Attachment"` when content is empty.
+**Files modified:** `src/app/api/team-messages/route.ts`
+
+**UX-AUDIT-026 — Compose UX Full Rethink (Slack-Bar Standard)**
+Killed the `⋯ options` hidden drawer entirely. Rebuilt `ComposeBox` in `TeamFeedSidebar.tsx` to Slack-bar standard. Always visible: textarea, send button, emoji picker, GIF picker. Audience: compact `Users`-icon chip showing current audience label ("Everyone", "Managers", "Sales", or person name) — one click expands an inline picker with role buttons and per-user direct buttons, auto-dismisses on selection. Priority: single icon button cycling `normal → important → urgent` — icon changes color to reflect state (grey→amber→red), no dropdown needed. Pin: icon button visible to masters only. Removed all `Select` component imports from compose (no longer needed). No hidden drawers. No required discovery. Bar is: open feed → type → hit send in under 5 seconds.
+**Files modified:** `src/components/team-feed/TeamFeedSidebar.tsx`
+**TypeScript:** Zero new errors. Pre-existing 5 errors (scripts/basecamp/dotenv) unaffected.
 
 ---
 

@@ -84,10 +84,25 @@ export async function POST(req: NextRequest) {
 
   const userId = parseInt(session.user.id);
   const body = await req.json();
-  const { content, audienceType = "all", audienceValue, recipientId, parentId, priority = "normal", isPinned = false, mentions } = body;
+  const {
+    content,
+    audienceType = "all",
+    audienceValue,
+    recipientId,
+    parentId,
+    priority = "normal",
+    isPinned = false,
+    mentions,
+    // Attachment fields — persisted for GIF and file rendering (BUG-029)
+    attachmentUrl,
+    attachmentName,
+    attachmentSize,
+    attachmentMimeType,
+    attachmentVaultId,
+  } = body;
 
-  if (!content?.trim()) {
-    return NextResponse.json({ error: "Content required" }, { status: 400 });
+  if (!content?.trim() && !attachmentUrl) {
+    return NextResponse.json({ error: "Content or attachment required" }, { status: 400 });
   }
 
   // Only masters can pin or set urgent priority
@@ -96,7 +111,7 @@ export async function POST(req: NextRequest) {
 
   const message = await prisma.teamMessage.create({
     data: {
-      content: content.trim(),
+      content: content?.trim() ?? "",
       authorId: userId,
       audienceType,
       audienceValue: audienceValue ?? null,
@@ -105,6 +120,11 @@ export async function POST(req: NextRequest) {
       priority,
       isPinned: canPin ? isPinned : false,
       mentions: mentions ?? null,
+      attachmentUrl: attachmentUrl ?? null,
+      attachmentName: attachmentName ?? null,
+      attachmentSize: attachmentSize ?? null,
+      attachmentMimeType: attachmentMimeType ?? null,
+      attachmentVaultId: attachmentVaultId ?? null,
     },
     include: {
       author: { select: { id: true, name: true, role: true } },
@@ -122,7 +142,8 @@ export async function POST(req: NextRequest) {
   const settings = await prisma.globalSettings.findFirst({ select: { pushMessagesEnabled: true } });
   if (settings?.pushMessagesEnabled !== false) {
     const authorName = message.author.name;
-    const preview = content.length > 80 ? content.slice(0, 80) + "…" : content;
+    const msgContent = content ?? "";
+    const preview = msgContent.length > 80 ? msgContent.slice(0, 80) + "…" : (msgContent || "📎 Attachment");
     const pushPayload = {
       title: `💬 ${authorName}`,
       body: preview,

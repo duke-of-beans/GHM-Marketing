@@ -22,9 +22,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -33,7 +30,7 @@ import {
 import {
   MessageSquare, Pin, ChevronDown, ChevronUp, MoreHorizontal, Send, Reply,
   Trash2, X, PanelRightOpen, PanelRightClose, CornerDownLeft,
-  Search, ChevronRight, Pencil, Check,
+  Search, ChevronRight, Pencil, Check, Users, AlertCircle, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -131,6 +128,8 @@ function MentionAutocomplete({
 }
 
 // ─── Compose Box ──────────────────────────────────────────────────────────────
+// Slack-bar standard: everything visible, nothing hidden behind drawers.
+// Layout: [textarea] / [audience chip] [priority toggle] [emoji] [gif] [attach] ... [send]
 
 function ComposeBox({
   onSent, users, isMaster, parentId,
@@ -149,18 +148,17 @@ function ComposeBox({
   const [recipientId, setRecipientId] = useState("");
   const [priority, setPriority] = useState("normal");
   const [isPinned, setIsPinned] = useState(false);
-  const [optionsOpen, setOptionsOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [gifAttachment, setGifAttachment] = useState<{ url: string; title: string } | null>(null);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentions, setMentions] = useState<{ userId: number; name: string }[]>([]);
+  const [showAudiencePicker, setShowAudiencePicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { symbol: modSymbol } = useModifierKey();
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const val = e.target.value;
     setContent(val);
-    // Detect @mention trigger
     const cursor = e.target.selectionStart ?? val.length;
     const textBeforeCursor = val.slice(0, cursor);
     const match = textBeforeCursor.match(/@(\w*)$/);
@@ -179,6 +177,31 @@ function ComposeBox({
     }
     setTimeout(() => textareaRef.current?.focus(), 0);
   }
+
+  function audienceChipLabel() {
+    if (parentId) return null;
+    if (audienceType === "all") return "Everyone";
+    if (audienceType === "role") {
+      if (audienceValue === "manager") return "Managers";
+      if (audienceValue === "sales") return "Sales";
+      return "By role";
+    }
+    if (audienceType === "user") {
+      const u = users.find((u) => String(u.id) === recipientId);
+      return u ? u.name : "Direct";
+    }
+    return "Everyone";
+  }
+
+  function cyclePriority() {
+    setPriority((p) => p === "normal" ? "important" : p === "important" ? "urgent" : "normal");
+  }
+
+  const priorityIcon = priority === "urgent"
+    ? <Zap className="h-3.5 w-3.5 text-red-500" />
+    : priority === "important"
+    ? <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+    : <AlertCircle className="h-3.5 w-3.5 text-muted-foreground/40" />;
 
   async function send() {
     if (!content.trim() && !gifAttachment) return;
@@ -204,7 +227,7 @@ function ComposeBox({
         }),
       });
       if (!res.ok) throw new Error("Failed");
-      setContent(""); setGifAttachment(null); setMentions([]); setOptionsOpen(false);
+      setContent(""); setGifAttachment(null); setMentions([]);
       onSent();
       toast.success(parentId ? pick(voice.messages.replySent) : pick(voice.messages.sent));
     } catch {
@@ -214,11 +237,15 @@ function ComposeBox({
     }
   }
 
+  const chipLabel = audienceChipLabel();
+
   return (
-    <div className={`space-y-2 relative ${compact ? "" : "border rounded-lg p-3 bg-muted/30"}`}>
+    <div className={`space-y-1.5 relative ${compact ? "" : ""}`}>
       {mentionQuery !== null && (
         <MentionAutocomplete query={mentionQuery} users={users} onSelect={insertMention} />
       )}
+
+      {/* Textarea */}
       <Textarea
         ref={textareaRef}
         value={content}
@@ -228,6 +255,8 @@ function ComposeBox({
         className="resize-none text-sm"
         onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(); }}
       />
+
+      {/* GIF preview */}
       {gifAttachment && (
         <div className="relative inline-block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -238,67 +267,109 @@ function ComposeBox({
           </button>
         </div>
       )}
-      {/* Audience / priority options — collapsed by default */}
-      {!parentId && optionsOpen && (
-        <div className="flex flex-wrap gap-1.5">
-          <Select value={audienceType} onValueChange={setAudienceType}>
-            <SelectTrigger className="h-7 w-28 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Everyone</SelectItem>
-              <SelectItem value="role">By role</SelectItem>
-              <SelectItem value="user">Direct</SelectItem>
-            </SelectContent>
-          </Select>
-          {audienceType === "role" && (
-            <Select value={audienceValue} onValueChange={setAudienceValue}>
-              <SelectTrigger className="h-7 w-24 text-xs"><SelectValue placeholder="Role" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="manager">Managers</SelectItem>
-                <SelectItem value="sales">Sales Reps</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          {audienceType === "user" && (
-            <Select value={recipientId} onValueChange={setRecipientId}>
-              <SelectTrigger className="h-7 w-32 text-xs"><SelectValue placeholder="Person" /></SelectTrigger>
-              <SelectContent>
-                {users.map((u) => <SelectItem key={u.id} value={String(u.id)}>{u.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )}
-          <Select value={priority} onValueChange={setPriority}>
-            <SelectTrigger className="h-7 w-24 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="normal">Normal</SelectItem>
-              <SelectItem value="important">Important</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-            </SelectContent>
-          </Select>
-          {isMaster && (
-            <Button variant={isPinned ? "default" : "outline"} size="sm" className="h-7 text-xs px-2"
-              onClick={() => setIsPinned(!isPinned)}>
-              <Pin className="h-3 w-3 mr-1" />{isPinned ? "Pinned" : "Pin"}
-            </Button>
-          )}
+
+      {/* Audience picker dropdown (only when expanded) */}
+      {!parentId && showAudiencePicker && (
+        <div className="rounded-lg border bg-popover p-2 shadow-md space-y-1.5 text-xs">
+          <p className="font-medium text-muted-foreground px-1">Who sees this?</p>
+          <div className="flex flex-wrap gap-1">
+            {[
+              { value: "all", label: "Everyone" },
+              { value: "role_manager", label: "Managers" },
+              { value: "role_sales", label: "Sales" },
+            ].map((opt) => {
+              const active =
+                opt.value === "all" ? audienceType === "all"
+                : opt.value === "role_manager" ? audienceType === "role" && audienceValue === "manager"
+                : audienceType === "role" && audienceValue === "sales";
+              return (
+                <button key={opt.value}
+                  onClick={() => {
+                    if (opt.value === "all") { setAudienceType("all"); setAudienceValue(""); }
+                    else if (opt.value === "role_manager") { setAudienceType("role"); setAudienceValue("manager"); }
+                    else { setAudienceType("role"); setAudienceValue("sales"); }
+                    setShowAudiencePicker(false);
+                  }}
+                  className={`px-2 py-1 rounded border text-xs transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"}`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="font-medium text-muted-foreground px-1 pt-0.5">Direct message</p>
+          <div className="flex flex-wrap gap-1">
+            {users.map((u) => (
+              <button key={u.id}
+                onClick={() => {
+                  setAudienceType("user");
+                  setRecipientId(String(u.id));
+                  setShowAudiencePicker(false);
+                }}
+                className={`px-2 py-1 rounded border text-xs transition-colors ${
+                  audienceType === "user" && recipientId === String(u.id)
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "hover:bg-muted"
+                }`}
+              >
+                {u.name}
+              </button>
+            ))}
+          </div>
         </div>
       )}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-0.5">
+
+      {/* Action bar */}
+      <div className="flex items-center gap-1">
+        {/* Audience chip — always visible, one click to change */}
+        {!parentId && chipLabel && (
+          <button
+            onClick={() => setShowAudiencePicker(!showAudiencePicker)}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium transition-colors ${
+              audienceType !== "all"
+                ? "bg-primary/10 border-primary/40 text-primary"
+                : "bg-muted/60 border-muted-foreground/20 text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+          >
+            <Users className="h-3 w-3" />
+            {chipLabel}
+          </button>
+        )}
+
+        {/* Priority toggle — cycles normal→important→urgent */}
+        {!parentId && (
+          <button
+            onClick={cyclePriority}
+            title={`Priority: ${priority} (click to change)`}
+            className="p-1 rounded hover:bg-muted transition-colors"
+          >
+            {priorityIcon}
+          </button>
+        )}
+
+        {/* Pin toggle (masters only) */}
+        {isMaster && !parentId && (
+          <button
+            onClick={() => setIsPinned(!isPinned)}
+            title={isPinned ? "Pinned" : "Pin message"}
+            className={`p-1 rounded transition-colors ${isPinned ? "text-amber-500" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
+          >
+            <Pin className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        <div className="flex items-center gap-0.5 ml-0.5">
           <EmojiPickerButton onPick={(emoji) => setContent((c) => c + emoji)} />
           {!gifAttachment && <GifPickerButton onPick={setGifAttachment} />}
-          {!parentId && (
-            <button onClick={() => setOptionsOpen(!optionsOpen)}
-              className="text-[10px] text-muted-foreground hover:text-foreground px-1.5 transition-colors">
-              {optionsOpen ? "▲ less" : "⋯ options"}
-            </button>
-          )}
-          <p className="flex items-center gap-0.5 text-[10px] text-muted-foreground ml-1">
-            {modSymbol}<CornerDownLeft className="h-3.5 w-3.5" />
-          </p>
         </div>
+
+        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground ml-auto">
+          {modSymbol}<CornerDownLeft className="h-3 w-3" />
+        </span>
+
         <Button size="sm" onClick={send}
-          disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs">
-          <Send className="h-3 w-3 mr-1" />{sending ? "Sending…" : "Send"}
+          disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs px-3 ml-1">
+          {sending ? "…" : <><Send className="h-3 w-3 mr-1" />Send</>}
         </Button>
       </div>
     </div>
