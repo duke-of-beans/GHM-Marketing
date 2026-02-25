@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 20 FEAT-014 shipped. 7 new items added: BUG-026–031 + FEAT-033.
+**Last Updated:** February 24, 2026 — Sprint 21-A complete. BUG-026 (forgot pw URL fix + error logging), BUG-027 (goals widget hint → Compensation tab), BUG-028 (emoji z-index fix, GIF error logging, orphaned /api/gifs route identified). BUG-017/018/019 removed (shipped Sprint 22). INFRA-001 remains required ops action before forgot-pw email delivers.
 
 **Owner:** David Kirsch
 
@@ -40,7 +40,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~18~~ | ~~Analytics + Telemetry~~ | ~~FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) + UX-AUDIT-022 (Settings IA consolidation)~~ | ✅ SHIPPED | |
 | ~~19~~ | ~~Content Automation~~ | ~~FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit)~~ | ✅ SHIPPED | |
 | ~~20~~ | ~~COVOS Self-Service~~ | ~~FEAT-014 (PM Import) + BUG-025 (auth loop)~~ | ✅ SHIPPED | |
-| 21-A | Bug Triage Batch | BUG-026 (forgot pw email) + BUG-027 (goals hint) + BUG-028 (emoji/gif) + BUG-017/018/019 | ~1 session | Broken in production right now |
+| ~~21-A~~ | ~~Bug Triage Batch~~ | ~~BUG-026 (forgot pw email) + BUG-027 (goals hint) + BUG-028 (emoji/gif) + BUG-017/018/019~~ | ✅ SHIPPED | |
 | 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed UX pass) + BUG-028 carry | ~1 session | Sprint 19 deliverable needs finishing |
 | 21-C | Import Hardening | FEAT-033 (edge cases + validation + rollback) | ~2 sessions | Trust/integrity layer for FEAT-014 |
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ~1 session | Investor/demo readiness |
@@ -72,7 +72,7 @@ Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audi
 
 ## 🔴 BUGS — Active Crashes & Broken Features
 
-### BUG-026: Forgot Password — Email Not Delivered
+
 The forgot password flow exists (BUG-020 shipped) but the email is not arriving. Root cause is almost certainly INFRA-001 (Resend domain not verified) — but also need to confirm the route is actually calling Resend correctly and the `FROM_EMAIL` env var is set in production. Check: (1) Resend dashboard delivery logs for attempted sends, (2) `FROM_EMAIL` env var in Vercel, (3) `src/app/api/auth/forgot-password/route.ts` error handling for silent failures.
 **Fix:** Resolve INFRA-001 first (domain verification). Then add explicit error logging to the forgot-password route so failures surface in Vercel runtime logs rather than silently swallowing.
 **Size:** ~1 hr. **Priority:** 🔴 Must fix — auth recovery is broken.
@@ -87,22 +87,7 @@ Two distinct failures in the multimedia layer shipped in Sprint 19: (1) Emoji pi
 **Fix:** (1) Check emoji-mart dynamic import — confirm the `EmojiPicker` component is rendering client-side only and the import path is correct. Add error boundary. (2) Check Vercel env vars for `TENOR_API_KEY` (or `GIPHY_API_KEY`). Check `/api/gif-search` route for silent error swallowing.
 **Size:** ~1–2 hrs. **Priority:** 🔴 Must fix — these were Sprint 19 deliverables that are broken in production.
 
-### BUG-017: Login Screen — Dark Mode Bleed on Logout
-Logging out while in dark mode leaves the login page rendering with a dark background and dark panel styling. Login should always display in forced light mode — it's a marketing/branding surface, not a UI preference surface, and dark mode on the login page looks broken/unintentional.
-**Fix:** Add `className="light"` (or equivalent forced-light wrapper) to the login page root element, bypassing the global theme provider. The Tailwind `dark:` classes should not apply here regardless of system or user preference.
-**Size:** ~30 min. **Priority:** 🔴 Must fix — visible to every user on every logout.
 
-### BUG-018: Search Bar Keyboard Shortcut — "CtrlK" Missing "+" Separator
-The search bar trigger button displays `CtrlK` as a single string instead of `Ctrl+K`. The modifier key and the letter need a `+` separator to be legible and match platform conventions.
-**Fix:** Find where the shortcut label is rendered in `AISearchBar.tsx` (or the `useModifierKey` hook output). Ensure the format is `Ctrl+K` / `⌘K` — the Mac variant already uses the symbol convention correctly; Windows just needs the `+` inserted.
-**Size:** ~15 min. **Priority:** 🔴 Must fix — looks like a bug to every Windows user.
-
-### BUG-019: TeamFeed Compose Box — Enter Icon Too Small
-The `Ctrl[↵]` shortcut indicator in the TeamFeed compose box renders the enter/return icon at a very small size, making it hard to read and looking visually broken next to the `Ctrl` text.
-**Fix:** Find the enter icon in `TeamFeed.tsx` / `TeamFeedSidebar.tsx` compose area shortcut hint. Increase the icon size (likely a Lucide `CornerDownLeft` or similar) to match the text cap-height — probably `h-3.5 w-3.5` or `h-4 w-4`. Ensure vertical alignment is `align-middle` or `items-center`.
-**Size:** ~15 min. **Priority:** 🔴 Must fix — visible every time someone opens TeamFeed.
-
----
 
 ## 🔴 MUST — Active Blockers
 

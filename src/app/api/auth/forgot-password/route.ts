@@ -31,15 +31,22 @@ export async function POST(req: Request) {
     });
 
     const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+    const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
-    await sendNotificationEmail({
+    const emailResult = await sendNotificationEmail({
       to: user.email,
       name: user.name,
       subject: "Reset your GHM Dashboard password",
       body: `You requested a password reset for your GHM Dashboard account.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\nIf you did not request this, you can safely ignore this email — your password has not changed.`,
       href: resetUrl,
     });
+
+    if (!emailResult?.success) {
+      console.error("Forgot password: email send failed", {
+        to: user.email,
+        error: emailResult?.error,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

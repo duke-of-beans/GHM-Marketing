@@ -88,7 +88,7 @@ export default async function MasterDashboard() {
   ) : (
     <div className="flex flex-col items-center justify-center h-full rounded-lg border border-dashed text-sm text-muted-foreground p-6 text-center gap-1">
       <span>Goals widget disabled.</span>
-      <a href="/settings" className="underline text-xs">Configure in Settings → General</a>
+      <a href="/settings?tab=compensation" className="underline text-xs">Configure in Settings → Compensation</a>
     </div>
   );
 

@@ -1,11 +1,21 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — BUG-025 fix: middleware auth redirect loop causing all browser windows to navigate to dashboard. PM Data Migration Import: Basecamp/Asana/ClickUp/Monday/Trello/CSV adapters, Settings → Data Import wizard, 4 API routes, PmImportSession schema.
+**Last Updated:** February 24, 2026 — Sprint 21-A complete. BUG-026 (forgot pw: dead link `/reset-password` → `/auth/reset-password` + error logging), BUG-027 (goals widget hint: Settings→General → Settings→Compensation), BUG-028 (emoji picker z-index `z-[200]` + GIF popover z-index + error logging on both). BUG-017/018/019 removed from BACKLOG (shipped Sprint 22). INFRA-001 (Resend domain verification) is a required manual ops action — email won't deliver until that's done.
 
 ### BUG-025 — Middleware auth redirect loop (February 24, 2026)
 - [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.
 **Files modified:** `src/lib/auth/auth.config.ts`
+
+### SPRINT 21-A — Bug Triage Batch (February 24, 2026)
+- [x] **BUG-026 COMPLETE** — Forgot password email dead link + silent failures fixed. Root cause 1: reset URL path was `/reset-password` — page lives at `/auth/reset-password`. All generated links were 404s even if email arrived. Fixed to correct path. Root cause 2: `sendNotificationEmail` result was not checked — silent failures swallowed. Added explicit `emailResult.success` check with `console.error` logging so Vercel runtime logs surface Resend failures. **Remaining ops gate:** INFRA-001 (Resend domain verification) must be completed for email to actually deliver — DNS action, no code.
+**Files modified:** `src/app/api/auth/forgot-password/route.ts`
+
+- [x] **BUG-027 COMPLETE** — Goals widget hint text pointed to "Settings → General" after `CompensationTab` was extracted in UX-AUDIT-020 (Sprint 22). Fixed link to `/settings?tab=compensation` with updated label "Settings → Compensation".
+**Files modified:** `src/app/(dashboard)/manager/page.tsx`
+
+- [x] **BUG-028 COMPLETE (partial)** — Two failures in TeamFeed multimedia (Sprint 19 deliverables). Emoji fix: added `z-[200]` and `sideOffset={8}` to `EmojiPickerButton` PopoverContent — was rendering behind the TeamFeed panel overlay due to stacking context. GIF fix: added `z-[200]` and `sideOffset={8}` to GIF picker PopoverContent; added explicit error logging in `search()` callback to surface Tenor API failures in browser console. Note: `/api/gifs` route uses a fake Tenor demo key — identified as orphaned/broken. Active GIF path is `/api/gif-search` (uses real Tenor demo key `LIVDSRZULELA`) — this is what `TeamFeedMultimedia.tsx` calls. If GIFs still return no results in production, check Vercel runtime logs for Tenor API response and verify `TENOR_API_KEY` env var.
+**Files modified:** `src/components/team-feed/TeamFeedMultimedia.tsx`
 
 ### SPRINT 20 — Data Migration & PM Import (February 24, 2026)
 - [x] **FEAT-014 COMPLETE** — PM Data Migration Import system. One-time connect → scrape → preview → commit flow for migrating tasks and contacts out of external PM platforms into GHM. No ongoing integration — credentials cleared after import completes.

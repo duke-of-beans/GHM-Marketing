@@ -24,11 +24,14 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-// Dynamically import emoji-mart to avoid SSR issues
+// Dynamically import emoji-mart to avoid SSR issues.
+// We pass `data` explicitly to prevent emoji-mart from fetching from CDN at runtime,
+// which is unreliable in production edge environments.
 const EmojiPicker = dynamic(
   () => import("@emoji-mart/react").then((mod) => mod.default),
   { ssr: false, loading: () => <div className="h-80 w-72 bg-muted animate-pulse rounded-lg" /> }
 );
+import emojiData from "@emoji-mart/data";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,8 +72,9 @@ export function EmojiPickerButton({
           <SmilePlus className={size === "xs" ? "h-3.5 w-3.5" : "h-4 w-4"} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 border-0 shadow-xl w-auto" align="start" side="top">
+      <PopoverContent className="p-0 border-0 shadow-xl w-auto z-[200]" align="start" side="top" sideOffset={8}>
         <EmojiPicker
+          data={emojiData}
           onEmojiSelect={(em: { native: string }) => {
             onPick(em.native);
             setOpen(false);
@@ -103,9 +107,15 @@ export function GifPickerButton({
     setLoading(true);
     try {
       const res = await fetch(`/api/gif-search?q=${encodeURIComponent(q)}&limit=16`);
+      if (!res.ok) {
+        console.error("[GifPicker] API error:", res.status, res.statusText);
+        setResults([]);
+        return;
+      }
       const data = await res.json();
       setResults(data.results ?? []);
-    } catch {
+    } catch (err) {
+      console.error("[GifPicker] Fetch failed:", err);
       setResults([]);
     } finally {
       setLoading(false);
@@ -125,7 +135,7 @@ export function GifPickerButton({
           <span className="text-[10px] font-bold tracking-tight">GIF</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-3" align="start" side="top">
+      <PopoverContent className="w-80 p-3 z-[200]" align="start" side="top" sideOffset={8}>
         <div className="flex items-center gap-2 mb-2">
           <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
           <Input

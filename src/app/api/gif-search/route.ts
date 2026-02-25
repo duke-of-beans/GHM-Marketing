@@ -28,8 +28,11 @@ export async function GET(req: NextRequest) {
     url.searchParams.set("media_filter", "gif,tinygif");
     url.searchParams.set("contentfilter", "medium");
 
-    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
-    if (!res.ok) throw new Error(`Tenor ${res.status}`);
+    const res = await fetch(url.toString(), { cache: "no-store" });
+    if (!res.ok) {
+      console.error(`[gif-search] Tenor API error: ${res.status} ${res.statusText}`);
+      throw new Error(`Tenor ${res.status}`);
+    }
 
     const data = await res.json();
 

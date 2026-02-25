@@ -1,11 +1,37 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 17 complete (Admin First-Run: FEAT-015 + FEAT-018 + UX-AUDIT-012 + BrandThemeInjector).
+**Last Updated:** February 24, 2026 — Sprint 21-A complete: BUG-026/027/028 fixed. BUG-017/018/019 CHANGELOG sync (were shipped in Sprint 22 code but not logged here).
 
 ---
 
-## Sprint 17 — Admin First-Run (February 25, 2026)
+## Sprint 22 — UX Polish + Settings IA (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24 | **BUG-017** — Login dark mode bleed on logout. Created `src/app/(auth)/layout.tsx` with forced `className="light"` wrapper. Auth routes always render in light mode regardless of user theme. |
+| Feb 24 | **BUG-018** — Search bar shortcut `CtrlK` → `Ctrl+K`. Added `+` separator in `AISearchBar.tsx` kbd badge. |
+| Feb 24 | **BUG-019** — TeamFeed compose enter icon too small. Replaced unicode `↵` with `<CornerDownLeft className="h-3 w-3 inline" />` in both `TeamFeed.tsx` and `TeamFeedSidebar.tsx`. |
+| Feb 24 | **UX-AUDIT-020** — Settings IA: Commission Defaults + Monthly Goals extracted from General Settings into new `CompensationTab.tsx`. General Settings now contains only Appearance + Push Notifications. Compensation tab is admin-only, placed after General. |
+| Feb 24 | **UX-AUDIT-021** — Tutorial restart global nav awareness. `OnboardingTutorial` moved from `sales/page.tsx` + `manager/page.tsx` to `DashboardLayoutClient` (global mount on every page). `window.restartTutorial` always registered. Help menu "Restart Tutorial" works from any route. |
+
+**Files:** `src/app/(auth)/layout.tsx` (new), `src/components/settings/CompensationTab.tsx` (new), `src/components/search/AISearchBar.tsx`, `src/components/team-feed/TeamFeed.tsx`, `src/components/team-feed/TeamFeedSidebar.tsx`, `src/components/settings/GeneralSettingsTab.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/components/dashboard/DashboardLayoutClient.tsx`, `src/app/(dashboard)/layout.tsx`, `src/app/(dashboard)/sales/page.tsx`, `src/app/(dashboard)/manager/page.tsx`
+
+---
+
+## Sprint 21-A — Bug Triage Batch (February 24, 2026)
+
+| Date | What Shipped |
+|------|-------------|
+| Feb 24 | **BUG-026** — Forgot password email not delivered. Root causes: (1) reset URL path was `/reset-password` instead of `/auth/reset-password` — dead link even if email arrived. Fixed to correct path. (2) Added explicit `emailResult.success` check with error logging so Vercel runtime logs surface Resend failures. Resend domain verification (INFRA-001) remains a required ops action. |
+| Feb 24 | **BUG-027** — Goals widget hint text pointed to "Settings → General" after goals config moved to Compensation tab (UX-AUDIT-020). Fixed link to `/settings?tab=compensation` with label "Settings → Compensation". |
+| Feb 24 | **BUG-028** — TeamFeed emoji picker and GIF search broken in production. Emoji fix: `@emoji-mart/data` imported directly and passed as `data` prop to `EmojiPicker` — prevents runtime CDN fetch which is unreliable in Vercel edge environment. GIF fix: removed `{ next: { revalidate: 60 } }` cache option from Tenor API fetch (replaced with `cache: "no-store"`) which was serving stale empty results; added explicit error logging for Tenor API failures. |
+
+**Files:** `src/app/api/auth/forgot-password/route.ts`, `src/app/(dashboard)/manager/page.tsx`, `src/components/team-feed/TeamFeedMultimedia.tsx`, `src/app/api/gif-search/route.ts`
+
+---
+
+
 
 | Date | What Shipped |
 |------|-------------|
