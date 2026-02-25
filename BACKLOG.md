@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — BUG-029 + UX-AUDIT-026 added (TeamFeed UX rework + GIF bug).
+**Last Updated:** February 24, 2026 — Bug batch audit: UX-BUG-003/004/005, BUG-027, UX-AUDIT-010 confirmed pre-shipped and closed. BUG-028 absorbed into 21-D. ARCH-001 executed. Sprint 21-D added.
 
 **Owner:** David Kirsch
 
@@ -44,7 +44,7 @@ Foundation → out. Each sprint unblocks the next.
 | 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed full overhaul) | ✅ SHIPPED | |
 | 21-C | Import Hardening | FEAT-033 (edge cases + validation + rollback) | ✅ SHIPPED | |
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ✅ SHIPPED | |
-| 21-D | TeamFeed Rework | BUG-029 (GIF render) + UX-AUDIT-026 (compose UX full rethink) | ~1 session | Feed is broken + unintuitive — fix before showing anyone |
+| 21-D | TeamFeed Rework | BUG-029 (GIF render) + UX-AUDIT-026 (compose UX full rethink) + BUG-028 absorbed | ~1 session | Feed is broken + unintuitive — fix before showing anyone |
 | 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
@@ -76,27 +76,15 @@ Expanded items render below viewport. **Fix:** `scrollIntoView({ behavior: 'smoo
 ### UX-BUG-005: "Team" Nav Group — Rename to Better Reflect Contents
 Contains Service Catalog + Document Vault. "Team" is misleading. **Fix:** Rename to "Resources" or "Workspace." **Size:** ~15 min.
 
-### ARCH-001: Orphaned File Audit
-Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audit, move historical-only files to `docs/archive/`. **Size:** ~1 hr.
-
 ---
 
 ## 🔴 BUGS — Active Crashes & Broken Features
 
 
-The forgot password flow exists (BUG-020 shipped) but the email is not arriving. Root cause is almost certainly INFRA-001 (Resend domain not verified) — but also need to confirm the route is actually calling Resend correctly and the `FROM_EMAIL` env var is set in production. Check: (1) Resend dashboard delivery logs for attempted sends, (2) `FROM_EMAIL` env var in Vercel, (3) `src/app/api/auth/forgot-password/route.ts` error handling for silent failures.
-**Fix:** Resolve INFRA-001 first (domain verification). Then add explicit error logging to the forgot-password route so failures surface in Vercel runtime logs rather than silently swallowing.
-**Size:** ~1 hr. **Priority:** 🔴 Must fix — auth recovery is broken.
-
-### BUG-027: Goals Widget — Wrong Settings Location in Hint Text
-The Goals widget tells users to go to "Settings → General" to configure goals data. That section has moved. Update the hint text to point to the correct location.
-**Fix:** Find the goals widget hint copy (likely in a Goals component or dashboard widget). Update the path reference to wherever goals config actually lives now.
-**Size:** ~15 min. **Priority:** 🔴 Must fix — actively misdirects users.
-
-### BUG-028: TeamFeed — Emoji Picker Broken, GIF Search Returns No Results
-Two distinct failures in the multimedia layer shipped in Sprint 19: (1) Emoji picker button does nothing when clicked — likely a dynamic import failure or the emoji-mart component isn't mounting correctly in production. (2) GIF search via Tenor API returns no results regardless of query — likely a missing `TENOR_API_KEY` env var in production, or the `/api/gif-search` route is silently failing.
-**Fix:** (1) Check emoji-mart dynamic import — confirm the `EmojiPicker` component is rendering client-side only and the import path is correct. Add error boundary. (2) Check Vercel env vars for `TENOR_API_KEY` (or `GIPHY_API_KEY`). Check `/api/gif-search` route for silent error swallowing.
-**Size:** ~1–2 hrs. **Priority:** 🔴 Must fix — these were Sprint 19 deliverables that are broken in production.
+### BUG-026: Forgot Password Email Not Arriving
+Forgot password flow exists but email is not arriving. Root cause: INFRA-001 (Resend domain not verified). Also confirm route calls Resend correctly and `FROM_EMAIL` env var is set in production.
+**Fix:** Resolve INFRA-001 first. Then add explicit error logging to `src/app/api/auth/forgot-password/route.ts` so failures surface in Vercel logs.
+**Size:** ~1 hr. **Priority:** 🔴 Must fix — auth recovery is broken. **Blocked by:** INFRA-001.
 
 
 

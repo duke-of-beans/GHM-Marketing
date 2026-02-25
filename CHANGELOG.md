@@ -1,7 +1,29 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 22 + Sprint 21-C complete.
+**Last Updated:** February 24, 2026 — Bug batch audit complete. 5 backlog items confirmed pre-shipped, closed. ARCH-001 executed.
+
+---
+
+## Bug Batch Audit — February 24, 2026
+
+**UX-BUG-003 — Wave Widget Graceful Degradation**
+Confirmed pre-shipped. `FinancialOverviewSection.tsx` already handles `waveError` state with amber non-fatal notice. Raw GraphQL errors do not surface.
+
+**UX-BUG-004 — Left Nav Auto-Scroll on Group Expand**
+Confirmed pre-shipped. `nav.tsx` line 185 already calls `scrollIntoView({ behavior: "smooth", block: "nearest" })` on the last link of any expanded group.
+
+**UX-BUG-005 — "Team" Nav Group Rename**
+Confirmed pre-shipped. Nav group label is already `"Resources"` in `nav.tsx`. Service Catalog + Document Vault correctly grouped.
+
+**BUG-027 — Goals Widget Wrong Settings Hint**
+Confirmed pre-shipped. Manager dashboard hint link already reads `"Configure in Settings → Compensation"` pointing to `/settings?tab=compensation`.
+
+**UX-AUDIT-010 — Dashboard Role-Switch Layout Flash**
+Confirmed pre-shipped. `RefreshOnFocus` component implements 2-second debounce — skips refresh on back-navigation, only fires on genuine tab refocus. Flash resolved.
+
+**ARCH-001 — Orphaned File Audit**
+Executed. Moved `SPRINT7_HANDOFF.md`, `PROJECT_STATUS.md`, `OPERATIONAL_STATUS.md`, `BUILD_PLAN.md` from root to `docs/archive/`. Root is now clean.
 
 ---
 
