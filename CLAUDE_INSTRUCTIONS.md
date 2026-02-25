@@ -44,6 +44,29 @@ If any file fails to load, stop and tell the user which file is missing. Do not 
 
 ---
 
+## §AGENT_MODE — Cowork Autonomous Sessions
+
+If operating as a Cowork agent (not a Chat session):
+
+1. Load `D:\Work\SEO-Services\ghm-dashboard\AGENT_PROTOCOL.md` (GHM override)
+2. Load `D:\Work\AGENT_PROTOCOL.md` (business environment base)
+3. Load the sprint blueprint specified in the session brief
+4. **Skip the interactive verification checkpoint** — proceed directly to execution
+5. Follow the Agent Lifecycle defined in `D:\AGENT_ARCHITECTURE.md §4`
+6. End every session with MORNING_BRIEFING.md and git push
+
+**GHM-specific rules always active in agent mode:**
+- `SALARY_ONLY_USER_IDS = [4]` — never generate Gavin commissions or fees
+- `npx tsc --noEmit` must pass before any commit (zero new errors)
+- `prisma db push` only — never `prisma migrate dev`
+- Docs before git — always (BACKLOG → CHANGELOG → STATUS → then commit)
+- No raw `anthropic.messages.create()` outside `src/lib/ai/`
+- No raw role string comparisons — always `isElevated()`
+
+Templates: `D:\Dev\TEMPLATES\` — MORNING_BRIEFING_SCHEMA.md, BLOCKED_SCHEMA.md, AGENT_READY_BLUEPRINT.md
+
+---
+
 ## §3 SYNC PROTOCOL (non-negotiable)
 
 "Sync, commit, and push" means exactly this sequence — no shortcuts:

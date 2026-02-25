@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 21-D complete. BUG-029 and UX-AUDIT-026 shipped.
+**Last Updated:** February 24, 2026 — Agent infrastructure complete. Sprint 23-A blueprint written and queued for Cowork.
 
 **Owner:** David Kirsch
 
@@ -46,6 +46,7 @@ Foundation → out. Each sprint unblocks the next.
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ✅ SHIPPED | |
 | ~~21-D~~ | ~~TeamFeed Rework~~ | ~~BUG-029 (GIF render) + UX-AUDIT-026 (compose UX full rethink)~~ | ✅ SHIPPED | |
 | 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
+| 23-A | Color Token Audit | Sprint 23-A blueprint written — Cowork session queued (read-only audit → `docs/ui-constitution/COLOR_AUDIT.md`) | 🟡 QUEUED | First Cowork test run |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
 

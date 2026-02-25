@@ -1,7 +1,19 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 21-D complete. GIF rendering fixed, compose UX rebuilt to Slack-bar standard.
+**Last Updated:** February 24, 2026 — Agent infrastructure complete. Sprint 23-A queued.
+
+---
+
+## Agent Infrastructure — February 24, 2026
+
+**AGENT_PROTOCOL.md** — GHM project-specific agent protocol created. Immutable constraints (SALARY_ONLY_USER_IDS, prisma db push, no raw anthropic calls, isElevated() enforcement), bootstrap sequence, quality gates (TypeScript + SHIM + git), sync protocol, KERNL checkpointing spec, session end checklist.
+
+**SPRINT_23A_BLUEPRINT.md** — First agent-ready blueprint written for Sprint 23-A Color Token Audit. Read-only session: audits all color usage across `src/` and produces `docs/ui-constitution/COLOR_AUDIT.md`. 10 structured work items, full stopping conditions, ambiguity resolution, quality gates. First Cowork autonomous test run.
+
+**CLAUDE_INSTRUCTIONS.md** — §AGENT_MODE section added. Cowork agents skip interactive checkpoint, load AGENT_PROTOCOL + blueprint, proceed directly to execution. Quality gates and stopping conditions remain mandatory.
+
+**Files:** `AGENT_PROTOCOL.md` (new), `SPRINT_23A_BLUEPRINT.md` (new), `CLAUDE_INSTRUCTIONS.md` (§AGENT_MODE added)
 
 ---
 
