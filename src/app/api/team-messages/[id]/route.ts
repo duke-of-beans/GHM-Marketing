@@ -21,14 +21,48 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json({ ok: true });
 }
 
-// PATCH /api/team-messages/[id] — update pin/priority (manage_team permission)
+// PATCH /api/team-messages/[id]
+// Supports: isPinned, priority (manage_team only) + content edit (author or manage_team)
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const permissionError = await withPermission(req, "manage_team");
-  if (permissionError) return permissionError;
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const userId = parseInt(session.user.id);
   const messageId = parseInt(params.id);
   const body = await req.json();
-  const { isPinned, priority } = body;
+  const { isPinned, priority, content } = body;
+
+  const message = await prisma.teamMessage.findUnique({ where: { id: messageId } });
+  if (!message) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Content edit: author only (or manage_team)
+  if (content !== undefined) {
+    if (message.authorId !== userId) {
+      const fullUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { permissions: true, permissionPreset: true, role: true },
+      });
+      const permissions = getUserPermissions({
+        ...session.user,
+        permissions: fullUser?.permissions,
+        permissionPreset: fullUser?.permissionPreset,
+      });
+      if (!permissions.manage_team) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
+    const updated = await prisma.teamMessage.update({
+      where: { id: messageId },
+      data: { content: content.trim(), editedAt: new Date() },
+      include: { author: { select: { id: true, name: true, role: true } } },
+    });
+    return NextResponse.json({ message: updated });
+  }
+
+  // Pin / priority changes: manage_team only
+  const permissionError = await withPermission(req, "manage_team");
+  if (permissionError) return permissionError;
 
   const updated = await prisma.teamMessage.update({
     where: { id: messageId },
@@ -53,7 +87,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const message = await prisma.teamMessage.findUnique({ where: { id: messageId } });
   if (!message) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  // Author can always delete their own; otherwise check manage_team permission
   if (message.authorId !== userId) {
     const fullUser = await prisma.user.findUnique({
       where: { id: userId },

@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const feed = searchParams.get("feed") === "true";
   const limit = parseInt(searchParams.get("limit") ?? "50");
+  const q = searchParams.get("q")?.trim() ?? "";
 
   // Messages visible to this user:
   // 1. Sent by this user
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
   const messages = await prisma.teamMessage.findMany({
     where: {
       parentId: null,
+      ...(q ? { content: { contains: q, mode: "insensitive" } } : {}),
       OR: [
         { authorId: userId },
         { audienceType: "all" },
@@ -44,7 +46,10 @@ export async function GET(req: NextRequest) {
         },
         orderBy: { createdAt: "asc" },
       },
-      reads: { where: { userId }, select: { readAt: true } },
+      // Include reader names for "Seen by" display
+      reads: {
+        select: { readAt: true, userId: true, user: { select: { id: true, name: true } } },
+      },
       reactions: {
         select: { userId: true, emoji: true, user: { select: { name: true } } },
       },
@@ -79,7 +84,7 @@ export async function POST(req: NextRequest) {
 
   const userId = parseInt(session.user.id);
   const body = await req.json();
-  const { content, audienceType = "all", audienceValue, recipientId, parentId, priority = "normal", isPinned = false } = body;
+  const { content, audienceType = "all", audienceValue, recipientId, parentId, priority = "normal", isPinned = false, mentions } = body;
 
   if (!content?.trim()) {
     return NextResponse.json({ error: "Content required" }, { status: 400 });
@@ -99,6 +104,7 @@ export async function POST(req: NextRequest) {
       parentId: parentId ? parseInt(parentId) : null,
       priority,
       isPinned: canPin ? isPinned : false,
+      mentions: mentions ?? null,
     },
     include: {
       author: { select: { id: true, name: true, role: true } },
@@ -112,7 +118,7 @@ export async function POST(req: NextRequest) {
     data: { messageId: message.id, userId },
   });
 
-  // Fire push notifications if global setting is enabled
+  // Push notifications
   const settings = await prisma.globalSettings.findFirst({ select: { pushMessagesEnabled: true } });
   if (settings?.pushMessagesEnabled !== false) {
     const authorName = message.author.name;
@@ -124,19 +130,29 @@ export async function POST(req: NextRequest) {
       tag: "team-message",
     };
 
+    // @mention notifications (always fire, regardless of audience type)
+    if (mentions && Array.isArray(mentions) && mentions.length > 0) {
+      const mentionIds = (mentions as { userId: number }[])
+        .map((m) => m.userId)
+        .filter((id) => id !== userId);
+      if (mentionIds.length > 0) {
+        await sendPushToUsers(mentionIds, {
+          ...pushPayload,
+          title: `🔔 ${authorName} mentioned you`,
+        });
+      }
+    }
+
     if (audienceType === "user" && recipientId) {
-      // Direct message — only notify the recipient (not the author)
       const rid = parseInt(recipientId);
       if (rid !== userId) await sendPushToUsers([rid], pushPayload);
     } else if (audienceType === "role" && audienceValue) {
-      // Role-targeted — notify all users of that role except the author
       const roleUsers = await prisma.user.findMany({
         where: { role: audienceValue as any, isActive: true, id: { not: userId } },
         select: { id: true },
       });
       await sendPushToUsers(roleUsers.map((u) => u.id), pushPayload);
     } else {
-      // Broadcast — notify everyone except the author
       const allUsers = await prisma.user.findMany({
         where: { isActive: true, id: { not: userId } },
         select: { id: true },

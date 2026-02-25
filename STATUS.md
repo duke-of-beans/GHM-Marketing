@@ -1,11 +1,39 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 21-A complete. BUG-026 (forgot pw: dead link `/reset-password` → `/auth/reset-password` + error logging), BUG-027 (goals widget hint: Settings→General → Settings→Compensation), BUG-028 (emoji picker z-index `z-[200]` + GIF popover z-index + error logging on both). BUG-017/018/019 removed from BACKLOG (shipped Sprint 22). INFRA-001 (Resend domain verification) is a required manual ops action — email won't deliver until that's done.
+**Last Updated:** February 24, 2026 — Sprint 21-B in progress. TeamFeed full UX overhaul: SSE replaces 30s polling, auto-scroll to bottom on open, pinned message banner strip, always-visible compose, @mention autocomplete, edit message, "Seen by X" read receipts, search. Schema migration: `edited_at` + `mentions` columns on `team_messages`. Prisma regenerated. TypeScript clean (pre-existing 5 errors unaffected). INFRA-001 deferred — DNS ops action pending.
 
 ### BUG-025 — Middleware auth redirect loop (February 24, 2026)
 - [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.
 **Files modified:** `src/lib/auth/auth.config.ts`
+
+### SPRINT 21-B — TeamFeed UX Overhaul (February 24, 2026)
+
+**Audit findings addressed:**
+- `TeamFeedPanel` never called `load()` on mount — messages never appeared on first open. Fixed with `useEffect` + `useCallback` load on mount.
+- `ReactionRow` had dead `&& true` guard — cleaned.
+- `AttachmentBlock` was duplicated between `TeamFeed.tsx` and `TeamFeedSidebar.tsx` — extracted to `TeamFeedAttachment.tsx`.
+
+**Panel UX (Slack-grade open experience):**
+- Auto-scroll to bottom on mount + on new messages via `scrollRef` + `scrollIntoView`
+- Pinned messages extracted from scroll flow → collapsible banner strip above message list
+- Compose always rendered at bottom — no toggle button, audience/priority collapsed until "⋯ Options" clicked
+- Unread messages: scroll to first unread on open with floating "Jump to latest ↓" pill
+
+**New features:**
+- **SSE real-time** — `GET /api/team-messages/stream` replaces 30s polling. 5s DB poll, 25s heartbeat, 4.5min auto-close (under Vercel 5min cap, client reconnects). Instant updates.
+- **@mentions** — inline `@name` autocomplete while typing (fuzzy match against users list), stored as `mentions JSON` on `TeamMessage`. Mentioned users receive targeted in-app notification + push regardless of audience setting. Mentions render highlighted in message body.
+- **Edit message** — author can edit in-place via pencil icon. `PATCH /api/team-messages/[id]` with `content` body. `edited_at` timestamp stored, "edited" label shown in UI.
+- **"Seen by X" read receipts** — hover timestamp shows popover with reader names + relative timestamps. Reads query includes `user.name` in GET response.
+- **Search** — search input in panel header, `GET /api/team-messages?q=` against content + author name. Debounced 300ms. Clear button.
+
+**Schema migration:**
+- `prisma/migrations/20260224_teamfeed_sprint21b/migration.sql` — adds `edited_at TIMESTAMP(3)` + `mentions JSONB` to `team_messages`
+- Run `prisma db push` or apply migration before deploying
+
+**Files created:** `src/app/api/team-messages/stream/route.ts`, `src/components/team-feed/TeamFeedAttachment.tsx`, `prisma/migrations/20260224_teamfeed_sprint21b/migration.sql`
+**Files modified:** `src/components/team-feed/TeamFeedSidebar.tsx` (full overhaul), `src/components/team-feed/TeamFeed.tsx` (mount fix + attachment extraction), `src/components/team-feed/TeamFeedMultimedia.tsx` (dead code cleanup), `src/app/api/team-messages/route.ts` (search + reader names), `src/app/api/team-messages/[id]/route.ts` (edit support + PATCH content), `src/app/api/team-messages/stream/route.ts` (new SSE route)
+**TypeScript:** Zero new errors. Pre-existing 5 errors (scripts/basecamp/dotenv) unaffected.
 
 ### SPRINT 21-A — Bug Triage Batch (February 24, 2026)
 - [x] **BUG-026 COMPLETE** — Forgot password email dead link + silent failures fixed. Root cause 1: reset URL path was `/reset-password` — page lives at `/auth/reset-password`. All generated links were 404s even if email arrived. Fixed to correct path. Root cause 2: `sendNotificationEmail` result was not checked — silent failures swallowed. Added explicit `emailResult.success` check with `console.error` logging so Vercel runtime logs surface Resend failures. **Remaining ops gate:** INFRA-001 (Resend domain verification) must be completed for email to actually deliver — DNS action, no code.

@@ -213,7 +213,7 @@ export function ReactionRow({
   }
 
   const entries = Object.entries(grouped);
-  if (entries.length === 0 && true) return (
+  if (entries.length === 0) return (
     <div className="mt-1.5">
       <EmojiPickerButton onPick={(emoji) => toggle(emoji)} size="xs" />
     </div>

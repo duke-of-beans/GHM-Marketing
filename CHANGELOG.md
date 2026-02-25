@@ -1,7 +1,18 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 21-A complete: BUG-026/027/028 fixed. BUG-017/018/019 CHANGELOG sync (were shipped in Sprint 22 code but not logged here).
+**Last Updated:** February 24, 2026 — Sprint 21-B complete: UX-AUDIT-025 (TeamFeed full overhaul — SSE, @mentions, edit, read receipts, search, Slack-grade panel UX).
+
+---
+
+## Sprint 21-B — February 24, 2026
+
+**UX-AUDIT-025 — TeamFeed Full UX Overhaul**
+SSE real-time replaces 30s polling (`/api/team-messages/stream` — 5s DB poll, 25s heartbeat). Panel auto-scrolls to bottom on open. Pinned messages extracted to collapsible banner strip. Compose always visible with collapsible options. @mention autocomplete inline while typing, stored in `mentions JSON`, triggers targeted notification. Edit message in-place (author only), `edited_at` tracked. "Seen by X" read receipts on timestamp hover. Search in panel header against content + author. Dead `&&true` in ReactionRow cleaned. `AttachmentBlock` extracted to shared `TeamFeedAttachment.tsx`. `TeamFeedPanel` mount bug fixed (never called `load()`). Schema: `edited_at TIMESTAMP(3)` + `mentions JSONB` added to `team_messages`.
+
+---
+
+
 
 ---
 

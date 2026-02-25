@@ -38,9 +38,6 @@ import {
   Reply,
   Trash2,
   Zap,
-  Paperclip,
-  HardDriveDownload,
-  CheckCircle,
   CornerDownLeft,
 } from "lucide-react";
 import {
@@ -53,6 +50,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useModifierKey } from "@/hooks/use-modifier-key";
 import { EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia } from "./TeamFeedMultimedia";
+import { AttachmentBlock } from "./TeamFeedAttachment";
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type MessageAuthor = { id: number; name: string; role: string };
@@ -276,84 +274,6 @@ function ComposeMessage({
   );
 }
 
-// ─── Attachment Block ─────────────────────────────────────────────────────────
-
-function AttachmentBlock({ msg }: { msg: Pick<TeamMessageData, "id" | "attachmentUrl" | "attachmentName" | "attachmentSize" | "attachmentMimeType" | "attachmentVaultId"> }) {
-  const [saving, setSaving] = useState(false);
-  const [savedId, setSavedId] = useState<number | null>(msg.attachmentVaultId ?? null);
-
-  if (!msg.attachmentUrl) return null;
-
-  const name = msg.attachmentName ?? "attachment";
-  const size = msg.attachmentSize
-    ? msg.attachmentSize < 1024 * 1024
-      ? `${(msg.attachmentSize / 1024).toFixed(1)} KB`
-      : `${(msg.attachmentSize / (1024 * 1024)).toFixed(1)} MB`
-    : null;
-
-  async function saveToVault(e: React.MouseEvent) {
-    e.stopPropagation();
-    if (savedId) {
-      toast.info("Already saved to Vault");
-      return;
-    }
-    setSaving(true);
-    try {
-      const res = await fetch("/api/vault/transfer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messageId: msg.id, targetSpace: "private" }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        setSavedId(json.file.id);
-        toast.success("Saved to your Vault (My Files)");
-      } else {
-        toast.error(json.error ?? "Save failed");
-      }
-    } catch {
-      toast.error("Save failed");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div
-      className="mt-2 flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 max-w-sm"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <Paperclip className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-      <div className="flex-1 min-w-0">
-        <a
-          href={msg.attachmentUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-medium truncate hover:underline block"
-          title={name}
-        >
-          {name}
-        </a>
-        {size && <p className="text-[11px] text-muted-foreground">{size}</p>}
-      </div>
-      <button
-        onClick={saveToVault}
-        disabled={saving || !!savedId}
-        title={savedId ? "Saved to Vault" : "Save to Vault"}
-        className="flex-shrink-0 text-muted-foreground hover:text-primary disabled:opacity-50 transition-colors"
-      >
-        {savedId ? (
-          <CheckCircle className="h-4 w-4 text-green-500" />
-        ) : saving ? (
-          <span className="text-[10px]">…</span>
-        ) : (
-          <HardDriveDownload className="h-4 w-4" />
-        )}
-      </button>
-    </div>
-  );
-}
-
 // ─── Single Message Row ───────────────────────────────────────────────────────
 
 function MessageRow({
@@ -540,6 +460,7 @@ export function TeamFeedPanel({
   const [messages, setMessages] = useState<TeamMessageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [composing, setComposing] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -552,8 +473,13 @@ export function TeamFeedPanel({
     }
   }, []);
 
+  // Load when panel opens
+  useEffect(() => {
+    if (sheetOpen) load();
+  }, [sheetOpen, load]);
+
   return (
-    <Sheet>
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0">
         <SheetHeader className="p-4 border-b">

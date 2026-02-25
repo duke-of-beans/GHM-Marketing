@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 21-A complete. BUG-026 (forgot pw URL fix + error logging), BUG-027 (goals widget hint → Compensation tab), BUG-028 (emoji z-index fix, GIF error logging, orphaned /api/gifs route identified). BUG-017/018/019 removed (shipped Sprint 22). INFRA-001 remains required ops action before forgot-pw email delivers.
+**Last Updated:** February 24, 2026 — Sprint 21-B complete. TeamFeed full overhaul: SSE, @mentions, edit, read receipts, search, Slack-grade panel UX. Schema migration added (edited_at + mentions). UX-AUDIT-025 shipped. INFRA-001 deferred — DNS ops action pending when David has bandwidth (~30 min).
 
 **Owner:** David Kirsch
 
@@ -41,7 +41,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~19~~ | ~~Content Automation~~ | ~~FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit)~~ | ✅ SHIPPED | |
 | ~~20~~ | ~~COVOS Self-Service~~ | ~~FEAT-014 (PM Import) + BUG-025 (auth loop)~~ | ✅ SHIPPED | |
 | ~~21-A~~ | ~~Bug Triage Batch~~ | ~~BUG-026 (forgot pw email) + BUG-027 (goals hint) + BUG-028 (emoji/gif) + BUG-017/018/019~~ | ✅ SHIPPED | |
-| 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed UX pass) + BUG-028 carry | ~1 session | Sprint 19 deliverable needs finishing |
+| 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed full overhaul) | ✅ SHIPPED | |
 | 21-C | Import Hardening | FEAT-033 (edge cases + validation + rollback) | ~2 sessions | Trust/integrity layer for FEAT-014 |
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ~1 session | Investor/demo readiness |
 | 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
@@ -127,11 +127,6 @@ The platform is built for productization as COVOS. The branding should be presen
 **Direction:** Audit surfaces where COVOS identity belongs: (1) login/welcome screen footer or badge, (2) admin panel header, (3) email footers ("Powered by COVOS"), (4) report footers, (5) onboarding completion screen, (6) error pages. Avoid plastering it on every client-facing surface — keep it in admin/platform layers. Define COVOS visual language: mark/wordmark treatment, placement rules, minimum presence requirements.
 **Dependency:** UI-CONST-001 for full systematic treatment. This item is the scope definition + initial placement pass.
 **Size:** ~1–2 hrs initial placement pass. **Priority:** 🟠 SHOULD — prerequisite for external demo/investor readiness.
-
-### UX-AUDIT-025: TeamFeed Panel — General UX/UI Improvement Pass
-TeamFeed works but doesn't feel as polished as a first-class communication feature should. Review the overall panel UX against the bar of Slack/Linear comments/Notion discussions.
-**Direction:** Audit areas: (1) message density and spacing — too loose or too tight? (2) timestamp formatting and visibility, (3) reply threading clarity, (4) compose box affordance — is it obvious how to start typing?, (5) empty state when no messages, (6) panel open/close interaction, (7) notification badge behavior, (8) reaction display and interaction feel. Document findings, spec improvements, implement in a single pass.
-**Size:** ~1–2 hrs audit + implementation. **Priority:** 🟠 SHOULD.
 
 ### UX-AUDIT-001: Tooltip / Help Text / Hover State Audit (Global)
 The dashboard has no consistent tooltip or contextual help layer. Users — especially new admins — encounter unlabeled icons, ambiguous controls, and metric labels with no explanation.

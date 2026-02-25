@@ -1161,6 +1161,12 @@ model TeamMessage {
   attachmentSize     Int?     @map("attachment_size")
   attachmentMimeType String?  @map("attachment_mime_type")
   attachmentVaultId  Int?     @map("attachment_vault_id")   // set if promoted to vault
+
+  // Edit tracking
+  editedAt        DateTime? @map("edited_at")              // null = never edited
+
+  // @mentions — [{ userId: number, name: string }]
+  mentions        Json?                                     // null = no mentions
   
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
