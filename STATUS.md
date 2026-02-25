@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Agent infrastructure complete. AGENT_PROTOCOL.md + SPRINT_23A_BLUEPRINT.md created. Sprint 23-A (Color Token Audit) queued for first Cowork autonomous session. §AGENT_MODE added to CLAUDE_INSTRUCTIONS.md.
+**Last Updated:** February 25, 2026 — Sprint 23-A COLOR_AUDIT.md shipped via Cowork agent. Sprint 24 items (LEGAL-001, FEAT-028, UX-AUDIT-014) complete. Sprint 23-B Color Token Design next.
 
 ### BUG-025 — Middleware auth redirect loop (February 24, 2026)
 - [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.

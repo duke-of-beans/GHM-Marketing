@@ -105,7 +105,7 @@ export function AuditLogsViewer() {
   const exportLogs = async () => {
     try {
       // In a real implementation, this would call an export endpoint
-      toast.success("Export feature coming soon!");
+      toast.success("Export will be available soon.");
     } catch (error) {
       toast.error("Failed to export logs");
     }

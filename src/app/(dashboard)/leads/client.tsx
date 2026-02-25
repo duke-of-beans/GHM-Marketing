@@ -312,50 +312,9 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
     return result;
   }, [initialLeads, filters]);
 
-  const [batchEnriching, setBatchEnriching] = useState(false);
-  const [enrichCount, setEnrichCount] = useState<number | "all">(50);
   const [bulkCount, setBulkCount] = useState<number | "all">(200);
   const resolvedCount = (count: number | "all", total: number) =>
     count === "all" ? total : Math.min(count, total);
-
-  const handleBatchEnrich = async (force = false) => {
-    const leadIds = filteredLeads.map((l) => l.id);
-    if (leadIds.length === 0) return;
-    const limit = resolvedCount(enrichCount, leadIds.length);
-    const batch = leadIds.slice(0, limit);
-    setBatchEnriching(true);
-    try {
-      const res = await fetch("/api/leads/enrich-batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leadIds: batch, force }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        const { enriched, skipped } = data.data.summary;
-        if (skipped > 0 && enriched === 0) {
-          toast.warning(`All ${skipped} leads were enriched within the last 7 days — skipped to save API credits.`, {
-            action: {
-              label: "Force Re-enrich",
-              onClick: () => handleBatchEnrich(true),
-            },
-            duration: 10000,
-          });
-        } else if (skipped > 0) {
-          toast.success(`Enriched ${enriched} leads · ${skipped} skipped (fresh data)`);
-        } else {
-          toast.success(`Enriched ${enriched} of ${batch.length} leads`);
-        }
-        router.refresh();
-      } else {
-        toast.error(data.error || "Batch enrichment failed");
-      }
-    } catch {
-      toast.error("Batch enrichment failed");
-    } finally {
-      setBatchEnriching(false);
-    }
-  };
 
   const handleImportComplete = () => {
     router.refresh();
@@ -407,46 +366,6 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
           )}
           {(userRole === "manager" || userRole === "admin") && (
             <>
-              {/* Enrich button with count picker — split-button pattern using DropdownMenu */}
-              <div className="flex items-center border rounded overflow-hidden">
-                <button
-                  className="h-9 px-3 text-sm hover:bg-muted disabled:opacity-50"
-                  onClick={() => handleBatchEnrich()}
-                  disabled={batchEnriching || filteredLeads.length === 0}
-                >
-                  {batchEnriching
-                    ? "Enriching..."
-                    : `🔍 Enrich (${resolvedCount(enrichCount, filteredLeads.length)})`}
-                </button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="h-9 px-1.5 text-sm border-l hover:bg-muted disabled:opacity-50"
-                      disabled={batchEnriching || filteredLeads.length === 0}
-                      aria-label="Set enrich count"
-                    >
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuLabel className="text-xs text-muted-foreground">Enrich up to</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {([25, 50, 100, "all"] as const).map((n) => (
-                      <DropdownMenuItem
-                        key={n}
-                        className={enrichCount === n ? "font-medium text-primary" : ""}
-                        onClick={() => setEnrichCount(n)}
-                      >
-                        {n === "all" ? `All (${filteredLeads.length})` : n}
-                        {(n === "all" || (typeof n === "number" && n > 100)) && (
-                          <span className="ml-auto text-xs text-amber-500">⚠ cost</span>
-                        )}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
               {/* Bulk Actions with configurable count */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -470,7 +389,16 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                     <Archive className="h-3.5 w-3.5 mr-1.5" /> Archive All
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => bulkLeadOp("enrich", { force: false })}>
+                  <DropdownMenuItem onClick={() => {
+                    const availableCount = filteredLeads.filter(l => l.status === "available").length;
+                    const total = resolvedCount(bulkCount, filteredLeads.length);
+                    if (availableCount > total * 0.5) {
+                      if (!window.confirm(
+                        `${availableCount} of ${total} leads are still in "Available" status and haven't been contacted. Enriching untouched leads uses API credits that may not convert. Continue?`
+                      )) return;
+                    }
+                    bulkLeadOp("enrich", { force: false });
+                  }}>
                     🔍 Enrich All (skip fresh)
                   </DropdownMenuItem>
                   <DropdownMenuItem

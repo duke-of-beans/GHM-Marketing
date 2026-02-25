@@ -110,7 +110,7 @@ export function MyTasksWidget() {
         {/* Task list */}
         {tasks.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No active tasks — nice work! 🎉
+            No active tasks — all clear.
           </p>
         ) : (
           <div className="space-y-2">

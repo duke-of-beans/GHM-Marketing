@@ -210,7 +210,7 @@ export function ProductDialog({
               onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
             />
             <Label htmlFor="isActive" className="cursor-pointer">
-              Active (available for upsell recommendations)
+              Active (available for service recommendations)
             </Label>
           </div>
 

@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Agent infrastructure complete. Sprint 23-A blueprint written and queued for Cowork.
+**Last Updated:** February 25, 2026 — Sprint 23-A shipped (COLOR_AUDIT.md). Sprint 23-B Color Token Design queued.
 
 **Owner:** David Kirsch
 
@@ -46,9 +46,10 @@ Foundation → out. Each sprint unblocks the next.
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ✅ SHIPPED | |
 | ~~21-D~~ | ~~TeamFeed Rework~~ | ~~BUG-029 (GIF render) + UX-AUDIT-026 (compose UX full rethink)~~ | ✅ SHIPPED | |
 | 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
-| 23-A | Color Token Audit | Sprint 23-A blueprint written — Cowork session queued (read-only audit → `docs/ui-constitution/COLOR_AUDIT.md`) | 🟡 QUEUED | First Cowork test run |
+| ~~23-A~~ | ~~Color Token Audit~~ | ~~Sprint 23-A: COLOR_AUDIT.md generated (716 lines, 10 sections)~~ | ✅ SHIPPED | First Cowork test run |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
+| 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**
 - W7 Kill Gusto — run parallel Wave payroll cycle, then ops decision
@@ -56,25 +57,7 @@ Foundation → out. Each sprint unblocks the next.
 
 ---
 
-## 🐛 UX BUGS (Pre-existing, open)
-
-### UX-BUG-004: Left Nav — Auto-Scroll on Group Expand at Bottom of Panel
-Expanded items render below viewport. **Fix:** `scrollIntoView({ behavior: 'smooth' })` on last item of expanded group. **Size:** ~1 hr.
-
-### UX-BUG-005: "Team" Nav Group — Rename to Better Reflect Contents
-Contains Service Catalog + Document Vault. "Team" is misleading. **Fix:** Rename to "Resources" or "Workspace." **Size:** ~15 min.
-
 ---
-
-## 🔴 BUGS — Active Crashes & Broken Features
-
-
-### BUG-026: Forgot Password Email Not Arriving
-Forgot password flow exists but email is not arriving. Root cause: INFRA-001 (Resend domain not verified). Also confirm route calls Resend correctly and `FROM_EMAIL` env var is set in production.
-**Fix:** Resolve INFRA-001 first. Then add explicit error logging to `src/app/api/auth/forgot-password/route.ts` so failures surface in Vercel logs.
-**Size:** ~1 hr. **Priority:** 🔴 Must fix — auth recovery is broken. **Blocked by:** INFRA-001.
-
-
 
 ## 🔴 MUST — Active Blockers
 
@@ -96,13 +79,6 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 ---
 
 ## 🔴 UX AUDITS — Must Fix Before External Eyes
-
-### UX-AUDIT-010: Dashboard Role-Switch Layout Flash
-Navigating away from `/sales` and returning shows a different dashboard layout on return. Likely two different dashboard components mounting depending on navigation state or session hydration order.
-**Direction:** Audit which dashboard component mounts on `/` or `/sales` depending on role and navigation history. Confirm component is stable on return.
-**Size:** ~1–2 hrs. **Priority:** 🔴 Fix before external users — inconsistent first impression is a trust issue.
-
----
 
 ### UX-AUDIT-001: Tooltip / Help Text / Hover State Audit (Global)
 The dashboard has no consistent tooltip or contextual help layer. Users — especially new admins — encounter unlabeled icons, ambiguous controls, and metric labels with no explanation.
@@ -154,11 +130,6 @@ Current branding tab has a single brand color field. Need three roles: Primary (
 **Scope:** Extend `GlobalSettings` with `brandColorPrimary`, `brandColorSecondary`, `brandColorAccent` (nullable). `BrandingTab` UI with three pickers, role descriptions, "not set — using default" indicator, "Reset to defaults" button. CSS custom property injection at root level.
 **Size:** ~2 hrs. **Priority:** 🟠 SHOULD. **Depends on:** BUG-010 Blob provisioning first.
 
-### UX-AUDIT-014: Pipeline Enrich Button — Intent-Aware Enrichment
-"Enrich (50)" button enriches leads indiscriminately, wasting API credits on cold/unqualified leads.
-**Scope:** Remove flat header button. Replace with: (1) per-lead "Enrich" in lead detail sheet; (2) "Enrich selected" in Bulk Actions dropdown. Add warning when bulk enriching "available" status leads. Existing `handleBatchEnrich` logic unchanged.
-**Size:** ~1.5 hrs. **Priority:** 🟠 SHOULD.
-
 ### UX-AUDIT-015: Content Studio Empty States
 Content Studio shows generic "no content." Needs context-aware states: (a) no clients have Content Studio active, (b) active but no briefs yet — prompt to generate first.
 **Size:** ~30 min. **Priority:** 🟡 WOULD.
@@ -188,29 +159,6 @@ Marketing materials currently use generic GHM placeholders. Each tenant needs th
 **Scope:** `logoUrl` on TenantConfig. Admin-only upload UI in Settings → Branding. Toggle per material type (brochure, audit PDF, comp sheet, proposal, portal). Materials pull `logoUrl` + toggle state before generating. Fallback to text-only if no logo.
 **Relationship:** Depends on FEAT-016 (full style capture); this is a shippable subset.
 **Size:** ~1 session. **Priority:** 🟠 SHOULD. Pairs with FEAT-018.
-
-### ~~FEAT-022: TeamFeed — Multimedia, GIF, and Emoji Support~~ ✅ SHIPPED Sprint 19
-TeamFeed is currently text-only. For team communication to actually get used, it needs to feel like Slack.
-**Scope:** Emoji picker (emoji-mart) inline in compose box. Emoji reactions per message (store per-message-per-user, aggregate + display below messages). GIF search via Giphy or Tenor API — renders inline in thread. Image/file attachment via drag-drop or click-to-upload (Vercel Blob, depends on BUG-010). Paste-from-clipboard image support. Server limits: images max 8 MB, PNG/JPG/GIF/WebP.
-**UX bar:** Everything should feel native and instant. The bar is Slack. If it feels worse than Slack, it's not done.
-**Dependencies:** BUG-010 Blob provisioning (for image upload). Giphy/Tenor API key (free tier sufficient).
-**Size:** ~2 sessions (emoji + reactions first; GIF + attachment second). **Priority:** 🟠 SHOULD.
-
-### ~~FEAT-023: Stock Photo Library Integration~~ ✅ SHIPPED Sprint 19
-Content production requires images. Currently no way to source or attach images from within the platform.
-**Scope:** Integrate Unsplash, Pexels, and/or Pixabay (all free, permissive licenses). Search interface accessible from Content Studio and any rich text field — keyword search returns photo grid with photographer credit, one-click insert. Automation layer: when AI generates content, system auto-suggests relevant stock image based on topic (keyword extraction → API query → attach top result). Attribution metadata stored with image reference (required for Unsplash compliance).
-**Size:** ~1 session (search UI + Unsplash/Pexels); ~1 session (automation layer). **Priority:** 🟠 SHOULD.
-
-### ~~FEAT-024: Client Website Audit — Review & Optimization Analysis~~ ✅ SHIPPED Sprint 19
-Fast, structured way to audit a client's current site for technical, SEO, UX, and performance issues.
-**Scope:** "Audit Website" button on Client detail page (and optionally Lead detail sheet for prospect sites). Pre-populated with `websiteUrl`, editable. Analysis: Page speed / Core Web Vitals (PageSpeed Insights API), meta title/description, heading structure, mobile signal, SSL check, schema markup, broken links (surface-level), image alt tags, canonical tags, sitemap/robots.txt. Output: score per dimension, prioritized issue list (Critical / Recommended / Optional), plain-English summary. Export as branded PDF. Store per-client with timestamp for before/after tracking.
-**API dependency:** Google PageSpeed Insights API (free, requires API key in env).
-**Size:** ~2 sessions. **Priority:** 🟠 SHOULD.
-
-### FEAT-028: Bug Report Status Feedback Loop
-Bug and feature submissions currently go into a void from the submitter's perspective. Reports are visible to admin but submitters get no status updates.
-**Scope:** When admin updates ticket status (new → acknowledged → in-progress → resolved → won't-fix), the submitter receives an in-app notification (and optionally push if enabled). Lightweight "My Submissions" view for non-admin users to check ticket status without seeing everyone else's. Existing `BugReportsTab` (admin) already has status management — this is the submitter-facing layer only.
-**Size:** ~1 hr. **Priority:** 🟠 SHOULD.
 
 ---
 

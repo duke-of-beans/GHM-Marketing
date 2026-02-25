@@ -1,7 +1,42 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Agent infrastructure complete. Sprint 23-A queued.
+**Last Updated:** February 25, 2026 — Sprint 23-A shipped. Sprint 24 backlog hygiene.
+
+---
+
+## Sprint 23-A — UI Constitution Phase 1: Color Token Audit — February 25, 2026
+
+**COLOR_AUDIT.md COMPLETE — First Cowork autonomous agent session.** Read-only audit of all color usage across the GHM dashboard codebase. 716 lines, 10 sections, all quality gates passed (output exists, all sections present, zero code modified). Findings: 1,229 hardcoded color classes, 109 inline style color values, 44 SVG/chart hex values. 12 distinct status/state color patterns identified. Dark mode coverage at ~16%. Top concerns: status color fragmentation (12 independent systems), chart colors bypassing tokens entirely, custom navy #1e3a5f unformalised, welcome page as 10% color hotspot, inconsistent shade usage across same semantic concepts.
+**Files created:** `docs/ui-constitution/COLOR_AUDIT.md`, `MORNING_BRIEFING.md`, `docs/INFRA-001_RESEND_RUNBOOK.md`
+
+---
+
+## Sprint 24 — February 25, 2026
+
+**LEGAL-001 COMPLETE — Partner Agreement Dashboard Use Restriction.** Added §9.7 to `PARTNER_AGREEMENT.md`: dashboard and platform features licensed exclusively for GHM business. Use for personal clients, third-party clients, or non-GHM purposes is a material breach. GHM reserves right to monitor usage and suspend access.
+**Files modified:** `D:\Work\SEO-Services\PARTNER_AGREEMENT.md`
+
+**FEAT-028 — Confirmed pre-shipped (removed from backlog).** Bug report status feedback loop was already fully implemented: admin inline Status + Priority selects fire `createNotification()` to submitter on change. Non-admin "My Submissions" view at `/bugs` with `?mine=true` API support. All wired in Sprint 16.
+
+**UX-AUDIT-014 COMPLETE — Pipeline Enrich Button Intent-Aware Redesign.** Removed standalone "Enrich (50)" header button and its entire code path (`handleBatchEnrich`, `batchEnriching`, `enrichCount` state — all dead code removed). Enrichment now available through two intent-aware paths: (1) per-lead "Enrich Data" button in lead detail sheet (already existed), (2) "Enrich All (skip fresh)" in Bulk Actions dropdown (already existed). Added confirmation warning when >50% of targeted leads are in "Available" status — warns that enriching untouched leads wastes API credits.
+**Files modified:** `src/app/(dashboard)/leads/client.tsx`
+
+---
+
+## Backlog Hygiene — February 25, 2026
+
+**UX-BUG-004 — Removed from backlog (pre-shipped).** Nav auto-scroll on group expand confirmed shipped Feb 24 changelog audit. `nav.tsx` line 185 already calls `scrollIntoView({ behavior: "smooth", block: "nearest" })`.
+
+**UX-BUG-005 — Removed from backlog (pre-shipped).** "Team" nav group already renamed to "Resources" in `nav.tsx`. Confirmed Feb 24 changelog audit.
+
+**UX-AUDIT-010 — Removed from backlog (pre-shipped).** Dashboard role-switch layout flash resolved by `RefreshOnFocus` 2-second debounce. Confirmed Feb 24 changelog audit.
+
+**BUG-026 — Removed from backlog (code fix shipped Sprint 21-A).** Forgot password route fixed: correct `/auth/reset-password` path, explicit `emailResult.success` check with `console.error` logging. Email delivery blocked solely by INFRA-001 (Resend domain verification — ops action, no code).
+
+**FEAT-022/023/024 — Removed stale shipped entries from backlog.** All three shipped Sprint 19 but full description text was still lingering with strikethrough headers.
+
+**INFRA-001 — Ops runbook created.** Step-by-step Resend domain verification guide at `docs/INFRA-001_RESEND_RUNBOOK.md`. Verified forgot password route code is solid (Sprint 21-A fix confirmed). Once domain is verified, all email (forgot password, notifications, reports, work orders) will deliver.
 
 ---
 

@@ -42,7 +42,7 @@ export default async function VaultPage() {
       <div>
         <h1 className="text-2xl font-bold">Document Vault</h1>
         <p className="text-sm text-muted-foreground">
-          Contracts, resources, reports, and personal files — all in one place.
+          Contracts, resources, reports, and personal files
         </p>
       </div>
       <VaultClient

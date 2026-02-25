@@ -384,7 +384,7 @@ export default function BrochurePage() {
           ))}
         </div>
         <p style={{ marginTop: 10, fontSize: 12, color: "#9ca3af" }}>
-          Upsells available — never required
+          Additional services available — never required
         </p>
       </section>
 

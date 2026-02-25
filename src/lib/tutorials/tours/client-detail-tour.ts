@@ -35,7 +35,7 @@ export const CLIENT_DETAIL_TOUR: TourConfig = {
       element: '[data-tour="client-tab-scorecard"]',
       title: "Scorecard — Start Here",
       description:
-        "Upsell opportunities, competitive gaps, full scan history. If you're not sure what to work on, this tab will tell you.",
+        "Service recommendations, competitive gaps, full scan history. If you're not sure what to work on, this tab will tell you.",
       side: "bottom",
     },
     {

@@ -159,15 +159,15 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
-  content: "📝",
-  technical_seo: "⚙️",
-  local_seo: "📍",
-  backlinks: "🔗",
-  reviews: "⭐",
-  speed: "⚡",
-  competitor: "🎯",
-  website: "🌐",
-  general: "📋",
+  content: "CNT",
+  technical_seo: "SEO",
+  local_seo: "LOC",
+  backlinks: "BKL",
+  reviews: "REV",
+  speed: "SPD",
+  competitor: "CMP",
+  website: "WEB",
+  general: "GEN",
 };
 
 const VALID_CATEGORIES = [
@@ -236,7 +236,7 @@ function SortableTaskRow({
           {task.priority}
         </Badge>
         <span className="text-sm" title={task.category}>
-          {CATEGORY_ICONS[task.category] || "📋"}
+          {CATEGORY_ICONS[task.category] || "GEN"}
         </span>
       </div>
 
@@ -625,7 +625,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                     <Badge className={`text-[10px] px-1 py-0 ${PRIORITY_COLORS[task.priority] || ""}`}>
                       {task.priority}
                     </Badge>
-                    <span className="text-xs">{CATEGORY_ICONS[task.category] || "📋"}</span>
+                    <span className="text-xs">{CATEGORY_ICONS[task.category] || "GEN"}</span>
                     {task.isOverdue && <AlertTriangle className="h-3 w-3 text-red-500 ml-auto" />}
                   </div>
                   <p className="text-sm font-medium line-clamp-2 mb-1">{task.title}</p>
@@ -721,7 +721,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                 {t.sourceAlertId && (
                   <Link href={`/alerts?highlight=${t.sourceAlertId}`}>
                     <Badge variant="outline" className="text-[10px] border-orange-400 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/30 cursor-pointer">
-                      🔔 From alert #{t.sourceAlertId}
+                      From alert #{t.sourceAlertId}
                     </Badge>
                   </Link>
                 )}

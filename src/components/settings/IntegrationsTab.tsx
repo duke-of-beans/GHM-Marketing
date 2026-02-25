@@ -168,7 +168,7 @@ export function IntegrationsTab() {
     <Card className="mt-6">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          💰 Cost &amp; Cache Dashboard
+          Cost &amp; Cache Dashboard
         </CardTitle>
         <CardDescription>
           AI + enrichment spend and cache utilization — last 30 days

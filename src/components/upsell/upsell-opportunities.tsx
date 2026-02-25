@@ -111,7 +111,7 @@ export function UpsellOpportunities({
       });
 
       if (response.ok) {
-        toast.success("Upsell notification sent successfully!");
+        toast.success("Service recommendation sent");
         setDetectedOpps((prev) => prev.filter((o) => o.id !== oppId));
         router.refresh();
       } else {
@@ -142,7 +142,7 @@ export function UpsellOpportunities({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Upsell Opportunities</CardTitle>
+            <CardTitle className="text-lg">Service Recommendations</CardTitle>
             <Button
               variant="outline"
               size="sm"
@@ -156,7 +156,7 @@ export function UpsellOpportunities({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            No upsell opportunities detected. Run detection to identify potential product recommendations.
+            No service recommendations detected. Run detection to identify potential product recommendations.
           </p>
         </CardContent>
       </Card>
@@ -167,7 +167,7 @@ export function UpsellOpportunities({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold">Upsell Opportunities</h3>
+          <h3 className="font-semibold">Service Recommendations</h3>
           <p className="text-sm text-muted-foreground">
             {detectedOpps.length} potential product {detectedOpps.length === 1 ? "recommendation" : "recommendations"}
           </p>

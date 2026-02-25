@@ -211,7 +211,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
                   {audits.map((a) => (
                     <button key={a.id} onClick={() => setActive(a)} className={`w-full text-left flex items-center justify-between p-2 rounded-lg text-xs border transition-colors ${active.id === a.id ? "bg-primary/10 border-primary/30" : "hover:bg-muted/50"}`}>
                       <span className="text-muted-foreground">{format(new Date(a.runAt), "MMM d 'at' h:mm a")}</span>
-                      <div className="flex gap-2"><span>⚡ {a.scorePerformance ?? "—"}</span><span>🔍 {a.scoreSeo ?? "—"}</span></div>
+                      <div className="flex gap-2"><span>Perf {a.scorePerformance ?? "—"}</span><span>SEO {a.scoreSeo ?? "—"}</span></div>
                     </button>
                   ))}
                 </div>

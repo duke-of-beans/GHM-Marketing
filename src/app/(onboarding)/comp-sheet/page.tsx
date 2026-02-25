@@ -93,7 +93,7 @@ export default function CompSheetPage() {
           </table>
         </div>
         <p style={{ textAlign: "center", fontSize: 13, color: "#94a3b8", marginTop: 16 }}>
-          Residual rate assumes $250/client (4–6 closes/month tier). Upsell income not included — add ~$700/mo if 50% of closes include a basic website build.
+          Residual rate assumes $250/client (4–6 closes/month tier). Service commission income not included — add ~$700/mo if 50% of closes include a basic website build.
         </p>
 
         {/* STACKED BAR CHART */}
@@ -154,7 +154,7 @@ export default function CompSheetPage() {
               },
               {
                 icon: "🔗",
-                title: "10% Upsell Commission",
+                title: "10% Service Commission",
                 body: "Website builds ($350–$500 per) and consultation days ($100/day) stack on top. No ceiling, no splits.",
               },
               {

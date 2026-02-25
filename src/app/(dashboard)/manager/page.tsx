@@ -101,7 +101,7 @@ export default async function MasterDashboard() {
             {[
               contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
               contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
-            ].filter(Boolean).join(" · ") || `Good work, ${user.name.split(" ")[0]} — everything looks healthy`}
+            ].filter(Boolean).join(" · ") || "All systems nominal"}
           </p>
         </div>
       }

@@ -188,7 +188,7 @@ export default async function SalesDashboard() {
         <CardContent>
           {recentLeads.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No active leads — grab some from Available!
+              No active leads in pipeline. Claim leads from Available to get started.
             </p>
           ) : (
             <div className="space-y-1">

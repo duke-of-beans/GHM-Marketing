@@ -24,6 +24,17 @@ export async function GET() {
         brandColor: true,
         brandColorSecondary: true,
         brandColorAccent: true,
+        // FEAT-016: Voice + style fields
+        voiceTone: true,
+        voiceKeywords: true,
+        voiceAntiKeywords: true,
+        voiceSampleCopy: true,
+        voiceIndustry: true,
+        voiceAudience: true,
+        styleFontHeading: true,
+        styleFontBody: true,
+        styleCornerRadius: true,
+        styleDensity: true,
       },
     }),
   ]);
@@ -39,6 +50,20 @@ export async function GET() {
       brandColor: settings?.brandColor ?? null,
       brandColorSecondary: settings?.brandColorSecondary ?? null,
       brandColorAccent: settings?.brandColorAccent ?? null,
+    },
+    voice: {
+      voiceTone: settings?.voiceTone ?? null,
+      voiceKeywords: settings?.voiceKeywords ?? null,
+      voiceAntiKeywords: settings?.voiceAntiKeywords ?? null,
+      voiceSampleCopy: settings?.voiceSampleCopy ?? null,
+      voiceIndustry: settings?.voiceIndustry ?? null,
+      voiceAudience: settings?.voiceAudience ?? null,
+    },
+    style: {
+      styleFontHeading: settings?.styleFontHeading ?? null,
+      styleFontBody: settings?.styleFontBody ?? null,
+      styleCornerRadius: settings?.styleCornerRadius ?? null,
+      styleDensity: settings?.styleDensity ?? null,
     },
   });
 }
@@ -76,6 +101,20 @@ export async function PATCH(req: Request) {
     settingsUpdates.brandColorSecondary = body.brandColorSecondary;
   if (body.brandColorAccent !== undefined)
     settingsUpdates.brandColorAccent = body.brandColorAccent;
+
+  // FEAT-016: Voice profile fields
+  if (body.voiceTone !== undefined) settingsUpdates.voiceTone = body.voiceTone;
+  if (body.voiceKeywords !== undefined) settingsUpdates.voiceKeywords = body.voiceKeywords;
+  if (body.voiceAntiKeywords !== undefined) settingsUpdates.voiceAntiKeywords = body.voiceAntiKeywords;
+  if (body.voiceSampleCopy !== undefined) settingsUpdates.voiceSampleCopy = body.voiceSampleCopy;
+  if (body.voiceIndustry !== undefined) settingsUpdates.voiceIndustry = body.voiceIndustry;
+  if (body.voiceAudience !== undefined) settingsUpdates.voiceAudience = body.voiceAudience;
+
+  // FEAT-016: Visual style fields
+  if (body.styleFontHeading !== undefined) settingsUpdates.styleFontHeading = body.styleFontHeading;
+  if (body.styleFontBody !== undefined) settingsUpdates.styleFontBody = body.styleFontBody;
+  if (body.styleCornerRadius !== undefined) settingsUpdates.styleCornerRadius = body.styleCornerRadius;
+  if (body.styleDensity !== undefined) settingsUpdates.styleDensity = body.styleDensity;
 
   if (Object.keys(settingsUpdates).length > 0) {
     const existing = await prisma.globalSettings.findFirst({ select: { id: true } });

@@ -117,7 +117,7 @@ export function KanbanBoard({ initialLeads, onLeadClick }: KanbanBoardProps) {
 
       toast.success(
         newStatus === "won"
-          ? `🎉 ${businessName} won! Client profile created.`
+          ? `${businessName} won — client profile created.`
           : `${businessName} → ${LEAD_STATUS_CONFIG[newStatus].label}`
       );
     } catch {

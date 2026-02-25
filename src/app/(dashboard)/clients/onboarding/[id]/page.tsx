@@ -284,7 +284,7 @@ export default function OnboardingDetailPage() {
           <Link href="/clients/onboarding" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-1">
             <ArrowLeft className="h-3 w-3" /> Back to queue
           </Link>
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-2xl font-bold">
             {submission.lead?.businessName ?? "Onboarding Submission"}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">

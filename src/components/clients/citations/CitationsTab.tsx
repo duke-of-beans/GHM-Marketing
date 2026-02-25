@@ -157,7 +157,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
             : "No scan yet — run one below"}
           {data?.degradedDirectories.length ? (
             <span className="ml-2 text-amber-600">
-              ⚡ {data.degradedDirectories.length} directories temporarily excluded
+              {data.degradedDirectories.length} directories temporarily excluded
             </span>
           ) : null}
         </div>

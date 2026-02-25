@@ -24,7 +24,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search, Users, Building2, CheckSquare, Repeat, PenTool, Globe, TrendingUp, CreditCard, Package, Archive } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
@@ -42,7 +42,7 @@ type NavUser = {
 type NavLink = {
   href: string;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   permission?: keyof UserPermissions;
   elevatedOnly?: boolean;
 };
@@ -63,8 +63,8 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Prospects",
     defaultExpanded: true,
     links: [
-      { href: "/discovery", label: "Find Leads",       icon: "🔍", permission: "view_all_leads" },
-      { href: "/leads",     label: "Sales Pipeline",   icon: "👥", permission: "manage_leads" },
+      { href: "/discovery", label: "Find Leads",       icon: <Search className="h-4 w-4 shrink-0" />, permission: "view_all_leads" },
+      { href: "/leads",     label: "Sales Pipeline",   icon: <Users className="h-4 w-4 shrink-0" />, permission: "manage_leads" },
     ],
   },
   {
@@ -72,12 +72,12 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Clients",
     defaultExpanded: true,
     links: [
-      { href: "/clients",        label: "Client Portfolio", icon: "🏢", permission: "view_all_clients" },
-      { href: "/tasks",          label: "My Tasks",         icon: "✅" },
-      { href: "/recurring-tasks",label: "Recurring Tasks",  icon: "🔁", permission: "manage_clients" },
+      { href: "/clients",        label: "Client Portfolio", icon: <Building2 className="h-4 w-4 shrink-0" />, permission: "view_all_clients" },
+      { href: "/tasks",          label: "My Tasks",         icon: <CheckSquare className="h-4 w-4 shrink-0" /> },
+      { href: "/recurring-tasks",label: "Recurring Tasks",  icon: <Repeat className="h-4 w-4 shrink-0" />, permission: "manage_clients" },
       // UX-002 entries — routes created in UX-002 sprint
-      { href: "/content-studio", label: "Content Studio",   icon: "✍️", permission: "manage_clients" },
-      { href: "/website-studio", label: "Website Studio",   icon: "🌐", permission: "manage_clients" },
+      { href: "/content-studio", label: "Content Studio",   icon: <PenTool className="h-4 w-4 shrink-0" />, permission: "manage_clients" },
+      { href: "/website-studio", label: "Website Studio",   icon: <Globe className="h-4 w-4 shrink-0" />, permission: "manage_clients" },
     ],
   },
   {
@@ -85,7 +85,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Insights",
     defaultExpanded: false,
     links: [
-      { href: "/analytics", label: "Analytics", icon: "📈", permission: "view_analytics" },
+      { href: "/analytics", label: "Analytics", icon: <TrendingUp className="h-4 w-4 shrink-0" />, permission: "view_analytics" },
     ],
   },
   {
@@ -93,7 +93,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Finance",
     defaultExpanded: false,
     links: [
-      { href: "/payments", label: "Payments", icon: "💳", permission: "manage_payments" },
+      { href: "/payments", label: "Payments", icon: <CreditCard className="h-4 w-4 shrink-0" />, permission: "manage_payments" },
     ],
   },
   {
@@ -101,18 +101,18 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Resources",
     defaultExpanded: false,
     links: [
-      { href: "/products", label: "Service Catalog", icon: "📦", permission: "manage_products" },
-      { href: "/vault",    label: "Document Vault",  icon: "🗄️" },
+      { href: "/products", label: "Service Catalog", icon: <Package className="h-4 w-4 shrink-0" />, permission: "manage_products" },
+      { href: "/vault",    label: "Document Vault",  icon: <Archive className="h-4 w-4 shrink-0" /> },
     ],
   },
 ];
 
 // Bottom nav links (mobile) — flat, most important only
 const MOBILE_NAV_LINKS: NavLink[] = [
-  { href: "/tasks",    label: "Tasks",    icon: "✅" },
-  { href: "/clients",  label: "Clients",  icon: "🏢", permission: "view_all_clients" },
-  { href: "/leads",    label: "Pipeline", icon: "👥", permission: "manage_leads" },
-  { href: "/analytics",label: "Analytics",icon: "📈", permission: "view_analytics" },
+  { href: "/tasks",    label: "Tasks",    icon: <CheckSquare className="h-4 w-4 shrink-0" /> },
+  { href: "/clients",  label: "Clients",  icon: <Building2 className="h-4 w-4 shrink-0" />, permission: "view_all_clients" },
+  { href: "/leads",    label: "Pipeline", icon: <Users className="h-4 w-4 shrink-0" />, permission: "manage_leads" },
+  { href: "/analytics",label: "Analytics",icon: <TrendingUp className="h-4 w-4 shrink-0" />, permission: "view_analytics" },
 ];
 
 // ── localStorage helpers ────────────────────────────────────────────────────

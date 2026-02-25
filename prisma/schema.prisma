@@ -1036,7 +1036,21 @@ model GlobalSettings {
   brandColor            String?  @map("brand_color")       // hex e.g. "#1a56db" — primary (CTAs)
   brandColorSecondary   String?  @map("brand_color_secondary") // supporting UI elements
   brandColorAccent      String?  @map("brand_color_accent")    // highlights / badges
-  
+
+  // Voice Profile (FEAT-016)
+  voiceTone             String?  @map("voice_tone")             // e.g. "Confident, direct, professional"
+  voiceKeywords         String?  @map("voice_keywords")         // JSON string[] — preferred terms
+  voiceAntiKeywords     String?  @map("voice_anti_keywords")    // JSON string[] — terms to avoid
+  voiceSampleCopy       String?  @map("voice_sample_copy")      // Approved paragraph the tenant likes
+  voiceIndustry         String?  @map("voice_industry")         // e.g. "Digital marketing agency"
+  voiceAudience         String?  @map("voice_audience")         // e.g. "Local service businesses"
+
+  // Visual Style (FEAT-016)
+  styleFontHeading      String?  @map("style_font_heading")     // e.g. "Inter" — for generated docs
+  styleFontBody         String?  @map("style_font_body")        // e.g. "Inter" — for generated docs
+  styleCornerRadius     String?  @map("style_corner_radius")    // "sharp" | "rounded" | "pill"
+  styleDensity          String?  @map("style_density")          // "compact" | "comfortable" | "spacious"
+
   // Metadata
   updatedAt             DateTime @updatedAt @map("updated_at")
   updatedBy             Int?     @map("updated_by")

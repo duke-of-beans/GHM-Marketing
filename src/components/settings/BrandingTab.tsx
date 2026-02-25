@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Upload, Trash2, Palette, Building2, RotateCcw } from "lucide-react";
+import { Upload, Trash2, Palette, Building2, RotateCcw, MessageSquare, Paintbrush } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type BrandingState = {
   companyName: string;
@@ -17,6 +25,22 @@ type BrandingState = {
   brandColorAccent: string;
 };
 
+type VoiceState = {
+  voiceTone: string;
+  voiceKeywords: string;
+  voiceAntiKeywords: string;
+  voiceSampleCopy: string;
+  voiceIndustry: string;
+  voiceAudience: string;
+};
+
+type StyleState = {
+  styleFontHeading: string;
+  styleFontBody: string;
+  styleCornerRadius: string;
+  styleDensity: string;
+};
+
 const DEFAULTS: BrandingState = {
   companyName: "",
   companyTagline: "",
@@ -24,6 +48,22 @@ const DEFAULTS: BrandingState = {
   brandColor: "#2563eb",
   brandColorSecondary: "#64748b",
   brandColorAccent: "#f59e0b",
+};
+
+const VOICE_DEFAULTS: VoiceState = {
+  voiceTone: "",
+  voiceKeywords: "",
+  voiceAntiKeywords: "",
+  voiceSampleCopy: "",
+  voiceIndustry: "",
+  voiceAudience: "",
+};
+
+const STYLE_DEFAULTS: StyleState = {
+  styleFontHeading: "Inter",
+  styleFontBody: "Inter",
+  styleCornerRadius: "rounded",
+  styleDensity: "comfortable",
 };
 
 type ColorRole = {
@@ -56,7 +96,11 @@ const COLOR_ROLES: ColorRole[] = [
 
 export function BrandingTab() {
   const [branding, setBranding] = useState<BrandingState>(DEFAULTS);
+  const [voice, setVoice] = useState<VoiceState>(VOICE_DEFAULTS);
+  const [style, setStyle] = useState<StyleState>(STYLE_DEFAULTS);
   const [dirty, setDirty] = useState(false);
+  const [voiceDirty, setVoiceDirty] = useState(false);
+  const [styleDirty, setStyleDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -76,6 +120,24 @@ export function BrandingTab() {
             brandColorAccent: data.branding.brandColorAccent ?? DEFAULTS.brandColorAccent,
           });
         }
+        if (data.voice) {
+          setVoice({
+            voiceTone: data.voice.voiceTone ?? "",
+            voiceKeywords: data.voice.voiceKeywords ?? "",
+            voiceAntiKeywords: data.voice.voiceAntiKeywords ?? "",
+            voiceSampleCopy: data.voice.voiceSampleCopy ?? "",
+            voiceIndustry: data.voice.voiceIndustry ?? "",
+            voiceAudience: data.voice.voiceAudience ?? "",
+          });
+        }
+        if (data.style) {
+          setStyle({
+            styleFontHeading: data.style.styleFontHeading ?? STYLE_DEFAULTS.styleFontHeading,
+            styleFontBody: data.style.styleFontBody ?? STYLE_DEFAULTS.styleFontBody,
+            styleCornerRadius: data.style.styleCornerRadius ?? STYLE_DEFAULTS.styleCornerRadius,
+            styleDensity: data.style.styleDensity ?? STYLE_DEFAULTS.styleDensity,
+          });
+        }
       })
       .catch(() => {});
   }, []);
@@ -83,6 +145,64 @@ export function BrandingTab() {
   const update = (key: keyof BrandingState, value: string | null) => {
     setBranding((prev) => ({ ...prev, [key]: value }));
     setDirty(true);
+  };
+
+  const updateVoice = (key: keyof VoiceState, value: string) => {
+    setVoice((prev) => ({ ...prev, [key]: value }));
+    setVoiceDirty(true);
+  };
+
+  const updateStyle = (key: keyof StyleState, value: string) => {
+    setStyle((prev) => ({ ...prev, [key]: value }));
+    setStyleDirty(true);
+  };
+
+  const handleSaveVoice = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/onboarding", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voiceTone: voice.voiceTone || null,
+          voiceKeywords: voice.voiceKeywords || null,
+          voiceAntiKeywords: voice.voiceAntiKeywords || null,
+          voiceSampleCopy: voice.voiceSampleCopy || null,
+          voiceIndustry: voice.voiceIndustry || null,
+          voiceAudience: voice.voiceAudience || null,
+        }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      toast.success("Voice profile saved");
+      setVoiceDirty(false);
+    } catch {
+      toast.error("Failed to save voice profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveStyle = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/onboarding", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          styleFontHeading: style.styleFontHeading || null,
+          styleFontBody: style.styleFontBody || null,
+          styleCornerRadius: style.styleCornerRadius || null,
+          styleDensity: style.styleDensity || null,
+        }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      toast.success("Visual style saved");
+      setStyleDirty(false);
+    } catch {
+      toast.error("Failed to save visual style");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSave = async () => {
@@ -294,6 +414,160 @@ export function BrandingTab() {
           <div className="flex justify-end pt-2">
             <Button onClick={handleSave} disabled={!dirty || saving}>
               {saving ? "Saving…" : "Save Colors"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Voice Profile (FEAT-016) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />Voice Profile
+          </CardTitle>
+          <CardDescription>
+            Defines how generated content sounds — brochures, audit reports, competitive sheets, and AI-written copy all pull from this profile.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="voiceIndustry">Industry</Label>
+              <Input
+                id="voiceIndustry"
+                value={voice.voiceIndustry}
+                placeholder="Digital marketing agency"
+                onChange={(e) => updateVoice("voiceIndustry", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="voiceAudience">Target Audience</Label>
+              <Input
+                id="voiceAudience"
+                value={voice.voiceAudience}
+                placeholder="Local service businesses"
+                onChange={(e) => updateVoice("voiceAudience", e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="voiceTone">Tone</Label>
+            <Input
+              id="voiceTone"
+              value={voice.voiceTone}
+              placeholder="Confident, direct, professional — no fluff"
+              onChange={(e) => updateVoice("voiceTone", e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">How your brand speaks. Used as a directive for all generated copy.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="voiceKeywords">Preferred Terms</Label>
+              <Input
+                id="voiceKeywords"
+                value={voice.voiceKeywords}
+                placeholder="ROI, visibility, dominate, growth"
+                onChange={(e) => updateVoice("voiceKeywords", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Comma-separated. Words your brand uses.</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="voiceAntiKeywords">Terms to Avoid</Label>
+              <Input
+                id="voiceAntiKeywords"
+                value={voice.voiceAntiKeywords}
+                placeholder="cheap, guaranteed rankings, instant results"
+                onChange={(e) => updateVoice("voiceAntiKeywords", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Comma-separated. Words your brand never uses.</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="voiceSampleCopy">Sample Approved Copy</Label>
+            <Textarea
+              id="voiceSampleCopy"
+              value={voice.voiceSampleCopy}
+              placeholder="Paste a paragraph that represents your ideal brand voice. Generated content will match this style."
+              onChange={(e) => updateVoice("voiceSampleCopy", e.target.value)}
+              rows={4}
+            />
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button onClick={handleSaveVoice} disabled={!voiceDirty || saving}>
+              {saving ? "Saving…" : "Save Voice Profile"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Visual Style (FEAT-016) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Paintbrush className="h-5 w-5" />Document Style
+          </CardTitle>
+          <CardDescription>
+            Controls the look of generated documents — audit PDFs, brochures, demo pages, and comp sheets.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="styleFontHeading">Heading Font</Label>
+              <Select value={style.styleFontHeading} onValueChange={(v) => updateStyle("styleFontHeading", v)}>
+                <SelectTrigger id="styleFontHeading"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Inter">Inter</SelectItem>
+                  <SelectItem value="Plus Jakarta Sans">Plus Jakarta Sans</SelectItem>
+                  <SelectItem value="DM Sans">DM Sans</SelectItem>
+                  <SelectItem value="Outfit">Outfit</SelectItem>
+                  <SelectItem value="Space Grotesk">Space Grotesk</SelectItem>
+                  <SelectItem value="Sora">Sora</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="styleFontBody">Body Font</Label>
+              <Select value={style.styleFontBody} onValueChange={(v) => updateStyle("styleFontBody", v)}>
+                <SelectTrigger id="styleFontBody"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Inter">Inter</SelectItem>
+                  <SelectItem value="Plus Jakarta Sans">Plus Jakarta Sans</SelectItem>
+                  <SelectItem value="DM Sans">DM Sans</SelectItem>
+                  <SelectItem value="Source Sans 3">Source Sans 3</SelectItem>
+                  <SelectItem value="IBM Plex Sans">IBM Plex Sans</SelectItem>
+                  <SelectItem value="Nunito Sans">Nunito Sans</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="styleCornerRadius">Corner Style</Label>
+              <Select value={style.styleCornerRadius} onValueChange={(v) => updateStyle("styleCornerRadius", v)}>
+                <SelectTrigger id="styleCornerRadius"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sharp">Sharp — squared edges</SelectItem>
+                  <SelectItem value="rounded">Rounded — subtle radius</SelectItem>
+                  <SelectItem value="pill">Pill — fully rounded</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="styleDensity">Layout Density</Label>
+              <Select value={style.styleDensity} onValueChange={(v) => updateStyle("styleDensity", v)}>
+                <SelectTrigger id="styleDensity"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="compact">Compact — tight spacing</SelectItem>
+                  <SelectItem value="comfortable">Comfortable — balanced</SelectItem>
+                  <SelectItem value="spacious">Spacious — generous whitespace</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button onClick={handleSaveStyle} disabled={!styleDirty || saving}>
+              {saving ? "Saving…" : "Save Document Style"}
             </Button>
           </div>
         </CardContent>

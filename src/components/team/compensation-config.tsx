@@ -179,7 +179,7 @@ function GlobalTierPanel() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">Upsell Commission Rate</Label>
+              <Label className="text-xs">Service Commission Rate</Label>
               <div className="relative">
                 <Input
                   type="number"

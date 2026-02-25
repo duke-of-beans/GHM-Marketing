@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDistanceToNow, format } from "date-fns";
-import { Search, ExternalLink } from "lucide-react";
+import { Search, ExternalLink, CheckCircle2, Clock } from "lucide-react";
 
 interface Submission {
   id: number;
@@ -60,7 +60,7 @@ export default function OnboardingQueuePage() {
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Onboarding Queue</h1>
+          <h1 className="text-2xl font-bold">Onboarding Queue</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Client submissions awaiting ops processing
           </p>
@@ -163,11 +163,11 @@ export default function OnboardingQueuePage() {
                     </td>
                     <td className="p-3">
                       {s.onboardingComplete ? (
-                        <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50 dark:bg-green-950/30">
-                          ✅ Done
+                        <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50 dark:bg-green-950/30 gap-1">
+                          <CheckCircle2 className="h-3 w-3" /> Done
                         </Badge>
                       ) : (
-                        <Badge variant="secondary">⏳ In Progress</Badge>
+                        <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" /> In Progress</Badge>
                       )}
                     </td>
                     <td className="p-3">

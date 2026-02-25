@@ -120,7 +120,7 @@ export function MyEarningsWidget() {
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
                 <p className="text-sm">
-                  Total paid earnings from commissions, residuals, and upsell commissions.
+                  Total paid earnings from commissions, residuals, and service commissions.
                   Residual rates are locked at the retainer amount when the deal was closed.
                 </p>
               </TooltipContent>
@@ -145,7 +145,7 @@ export function MyEarningsWidget() {
                 <p className="font-medium">{formatCurrency(data.totalResidualEarned)}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Upsells</p>
+                <p className="text-muted-foreground">Service Commissions</p>
                 <p className="font-medium">{formatCurrency(data.totalUpsellEarned)}</p>
               </div>
             </div>
@@ -227,14 +227,14 @@ export function MyEarningsWidget() {
             </div>
           )}
 
-          {/* Upsell Commissions */}
+          {/* Service Commissions */}
           {(data.totalUpsellEarned > 0 || data.pendingUpsell > 0 || data.upsellLineItems.length > 0) && (
             <div className="pt-3 border-t">
               <button
                 onClick={() => setShowUpsell(!showUpsell)}
                 className="flex items-center justify-between w-full text-sm font-medium hover:text-foreground"
               >
-                <span>Upsell Commissions</span>
+                <span>Service Commissions</span>
                 <div className="flex items-center gap-1">
                   {data.pendingUpsell > 0 && (
                     <Badge variant="outline" className="text-xs text-orange-600 border-orange-300">
@@ -248,7 +248,7 @@ export function MyEarningsWidget() {
               {showUpsell && (
                 <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto">
                   {data.upsellLineItems.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No upsell commissions yet.</p>
+                    <p className="text-xs text-muted-foreground">No service commissions yet.</p>
                   ) : (
                     data.upsellLineItems.map((item) => (
                       <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b last:border-0">

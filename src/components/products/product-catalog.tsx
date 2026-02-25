@@ -89,7 +89,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
     } else {
       setProducts((prev) => [product, ...prev]);
       toast.success('Service added successfully', {
-        description: 'Service is now available for upsell recommendations'
+        description: 'Service is now available for recommendations'
       });
     }
     setDialogOpen(false);
@@ -226,7 +226,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
                   No services in your catalog yet
                 </p>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Add your SEO service packages here. The system will automatically suggest relevant upsells to clients based on competitive gaps detected in scans.
+                  Add your SEO service packages here. The system will automatically suggest relevant additions to clients based on competitive gaps detected in scans.
                 </p>
                 <Button onClick={handleAdd}>
                   <Plus className="h-4 w-4 mr-1" />

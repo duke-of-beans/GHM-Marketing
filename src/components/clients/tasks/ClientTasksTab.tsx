@@ -60,12 +60,12 @@ function priorityColor(p: string) {
 
 function categoryLabel(c: string) {
   const map: Record<string, string> = {
-    "site-build": "🏗️ Site Build",
-    content: "📝 Content",
-    "technical-seo": "⚙️ Technical SEO",
-    "link-building": "🔗 Link Building",
-    "review-mgmt": "⭐ Reviews",
-    "competitive-response": "🎯 Competitive",
+    "site-build": "Site Build",
+    content: "Content",
+    "technical-seo": "Technical SEO",
+    "link-building": "Link Building",
+    "review-mgmt": "Reviews",
+    "competitive-response": "Competitive",
   };
   return map[c] || c;
 }
@@ -128,12 +128,12 @@ function AddTaskDialog({
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="content">📝 Content</SelectItem>
-                <SelectItem value="site-build">🏗️ Site Build</SelectItem>
-                <SelectItem value="technical-seo">⚙️ Technical SEO</SelectItem>
-                <SelectItem value="link-building">🔗 Link Building</SelectItem>
-                <SelectItem value="review-mgmt">⭐ Reviews</SelectItem>
-                <SelectItem value="competitive-response">🎯 Competitive</SelectItem>
+                <SelectItem value="content">Content</SelectItem>
+                <SelectItem value="site-build">Site Build</SelectItem>
+                <SelectItem value="technical-seo">Technical SEO</SelectItem>
+                <SelectItem value="link-building">Link Building</SelectItem>
+                <SelectItem value="review-mgmt">Reviews</SelectItem>
+                <SelectItem value="competitive-response">Competitive</SelectItem>
               </SelectContent>
             </Select>
             <Select value={priority} onValueChange={setPriority}>

@@ -133,7 +133,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p className="text-sm">
-                    Estimated annual value per client (MRR × 12 ÷ active clients). Higher values indicate premium service positioning or successful upsells.
+                    Estimated annual value per client (MRR × 12 ÷ active clients). Higher values indicate premium service positioning or successful additional service adoption.
                   </p>
                 </TooltipContent>
               </InfoTooltip>
@@ -274,7 +274,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Upsell Pipeline
+              Additional Services Pipeline
             </CardTitle>
           </CardHeader>
           <CardContent>
