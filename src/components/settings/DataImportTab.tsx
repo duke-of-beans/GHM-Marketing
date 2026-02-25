@@ -447,7 +447,7 @@ export function DataImportTab() {
                         <TableBody>
                           {preview.tasks.map(t => (
                             <TableRow key={t.externalId} className="cursor-pointer"
-                              onClick={() => setSelected(prev => { const n=new Set(prev); n.has(t.externalId)?n.delete(t.externalId):n.add(t.externalId); return n })}>
+                              onClick={() => setSelected(prev => { const n=new Set(prev); if (n.has(t.externalId)) { n.delete(t.externalId); } else { n.add(t.externalId); } return n })}>
                               <TableCell><input type="checkbox" readOnly checked={selected.has(t.externalId)} className="cursor-pointer" /></TableCell>
                               <TableCell className="max-w-48 truncate font-medium">{t.title}</TableCell>
                               <TableCell className="text-xs text-muted-foreground">{t.projectName ?? "—"}</TableCell>
