@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 24, 2026 — Sprint 22 + Sprint 21-C complete. UX-AUDIT-023, UX-AUDIT-024, FEAT-033 shipped.
+**Last Updated:** February 24, 2026 — BUG-029 + UX-AUDIT-026 added (TeamFeed UX rework + GIF bug).
 
 **Owner:** David Kirsch
 
@@ -44,6 +44,7 @@ Foundation → out. Each sprint unblocks the next.
 | 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed full overhaul) | ✅ SHIPPED | |
 | 21-C | Import Hardening | FEAT-033 (edge cases + validation + rollback) | ✅ SHIPPED | |
 | 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ✅ SHIPPED | |
+| 21-D | TeamFeed Rework | BUG-029 (GIF render) + UX-AUDIT-026 (compose UX full rethink) | ~1 session | Feed is broken + unintuitive — fix before showing anyone |
 | 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
@@ -56,7 +57,17 @@ Foundation → out. Each sprint unblocks the next.
 
 ## 🐛 UX BUGS (Pre-existing, open)
 
-### UX-BUG-003: Payments Page — Wave Widget Fails Without Graceful Degradation
+### BUG-029: TeamFeed GIF — Search Results Don't Render After Selection
+GIF search via Tenor/Giphy returns results in the picker but selected GIFs do not appear in the message thread. Emoji picker works correctly. Multimedia upload UI (image/file attach) is not visible in the compose area — likely a conditional render issue or the upload button was never wired to the compose box.
+**Fix:** (1) Debug GIF insert path — confirm `onGifSelect` handler appends attachment to message state and POST body includes it. Check `TeamFeedAttachment` renders `type: "gif"` blocks correctly. (2) Audit compose box for file/image upload button — if missing, wire upload trigger to existing Blob upload logic. (3) Check `/api/team-messages` POST handler accepts and stores attachment payloads.
+**Size:** ~1–2 hrs. **Priority:** 🔴 Must fix — Sprint 19 deliverable still broken in production.
+
+### UX-AUDIT-026: TeamFeed Compose UX — Full Rethink Required
+The current compose pattern (options hidden behind "⋯ Options" pull-out) is unintuitive for a messaging context. Users expect Slack-style always-visible controls, not a collapsed drawer. Core complaints: audience/priority hidden by default is confusing, not discoverable, and slows down sending. The whole compose zone needs to feel native to messaging, not like a form.
+**Direction:** Redesign compose box. Always-visible: message textarea, send button, emoji, GIF, file attach. Audience selector as a compact inline badge/chip (defaulting to "All" or last-used, changeable with one click — not hidden). Priority as a small inline icon toggle (not in a drawer). Kill the "⋯ Options" pattern entirely. Reference: Slack compose bar, Linear comment box. The bar is: open the feed, type a message, hit send — zero friction, zero discovery required.
+**Also audit:** Overall TeamFeed panel feel — spacing, message density, timestamp placement, unread indicator, pinned banner behavior. The goal is a feed that a team actually wants to use daily.
+**Size:** ~1–2 hrs. **Priority:** 🔴 Must fix before external eyes — current UX actively discourages use.
+**Dependency:** Fix BUG-029 (GIF rendering) in same sprint.
 Raw GraphQL error surfaced in UI. **Fix:** Catch Wave auth errors, show clean amber notice. **Size:** ~1 hr.
 
 ### UX-BUG-004: Left Nav — Auto-Scroll on Group Expand at Bottom of Panel
