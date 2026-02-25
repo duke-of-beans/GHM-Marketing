@@ -16,8 +16,21 @@ type AuthUser = {
   territoryName: string | null;
 };
 
-// Paths that don't require authentication
-const PUBLIC_PATHS = ["/login", "/welcome", "/brochure", "/comp-sheet", "/territory-map"];
+// Paths that don't require authentication.
+// Use exact strings for short paths; prefix match is applied with startsWith below.
+const PUBLIC_PATHS = [
+  "/login",
+  "/welcome",
+  "/brochure",
+  "/comp-sheet",
+  "/territory-map",
+  "/auth",          // /auth/forgot-password, /auth/reset-password
+  "/public",        // /api/public/* already bypasses auth, but cover page routes too
+];
+
+// Paths that are truly public landing pages (never redirect logged-in users away from them)
+// e.g. your marketing site pages hosted on the same domain
+const MARKETING_PATHS = ["/", "/about", "/pricing", "/contact", "/privacy", "/terms"];
 
 // Paths that require manager/admin role
 const ELEVATED_PATHS = ["/manager", "/permissions", "/audit"];
@@ -64,7 +77,11 @@ export const authConfig = {
         return Response.redirect(new URL("/login", nextUrl));
       }
 
-      // Public paths: allow, redirect logged-in users to dashboard
+      // Marketing / truly-public pages: always allow, never redirect logged-in users away
+      const isMarketing = MARKETING_PATHS.some((p) => path === p);
+      if (isMarketing) return true;
+
+      // Auth/app public paths: allow unauthenticated; redirect logged-in users to their dashboard
       const isPublic = PUBLIC_PATHS.some((p) => path.startsWith(p));
       if (isPublic) {
         if (isLoggedIn) {

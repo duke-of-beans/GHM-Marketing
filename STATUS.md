@@ -1,7 +1,11 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 24, 2026 — Sprint 20 FEAT-014 complete. PM Data Migration Import: Basecamp/Asana/ClickUp/Monday/Trello/CSV adapters, Settings → Data Import wizard, 4 API routes, PmImportSession schema.
+**Last Updated:** February 24, 2026 — BUG-025 fix: middleware auth redirect loop causing all browser windows to navigate to dashboard. PM Data Migration Import: Basecamp/Asana/ClickUp/Monday/Trello/CSV adapters, Settings → Data Import wizard, 4 API routes, PmImportSession schema.
+
+### BUG-025 — Middleware auth redirect loop (February 24, 2026)
+- [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.
+**Files modified:** `src/lib/auth/auth.config.ts`
 
 ### SPRINT 20 — Data Migration & PM Import (February 24, 2026)
 - [x] **FEAT-014 COMPLETE** — PM Data Migration Import system. One-time connect → scrape → preview → commit flow for migrating tasks and contacts out of external PM platforms into GHM. No ongoing integration — credentials cleared after import completes.
