@@ -2,50 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   COVOS Signal — Platform Color Token System
+   Palette: Signal · Neutrals: Slate · Dark: Sidebar-stable
+   Spec: docs/ui-constitution/SIGNAL_TOKEN_SPEC.md
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
+
+  /* ─── LIGHT MODE ─────────────────────────────────────────── */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Structural surfaces */
+    --background: 210 40% 98.8%;       /* slate-50  #f8fafc */
+    --foreground: 222.2 47.4% 11.2%;   /* slate-900 #0f172a */
+    --card: 0 0% 100%;                 /* white     #ffffff */
+    --card-foreground: 222.2 47.4% 11.2%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    /* Interactive — COVOS indigo primary */
+    --primary: 243.4 75.4% 58.6%;     /* indigo-600 #4f46e5 */
+    --primary-foreground: 226.5 100% 93.9%; /* indigo-100 #e0e7ff */
+
+    /* Secondary surfaces */
+    --secondary: 214.3 31.8% 91.4%;   /* slate-200 #e2e8f0 */
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+
+    /* Muted */
+    --muted: 210 40% 96.1%;           /* slate-100 #f1f5f9 */
+    --muted-foreground: 215 16.3% 46.9%; /* slate-500 #64748b */
+
+    /* Accent — COVOS amber */
+    --accent: 37.7 92.1% 50.2%;       /* amber-600 #d97706 */
     --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;     /* red-500   #ef4444 */
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
+
+    /* Borders & inputs */
+    --border: 214.3 31.8% 91.4%;      /* slate-200 #e2e8f0 */
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 243.4 75.4% 58.6%;        /* matches primary */
+
+    /* Radius */
     --radius: 0.5rem;
+
+    /* ─── Sidebar (deep navy — same in both modes) ─── */
+    --sidebar: 220 38% 9%;            /* #0c1222 */
+    --sidebar-foreground: 213 17% 64.5%; /* #93a3b8 */
+    --sidebar-muted: 215 21% 37%;     /* #4b5c72 */
+    --sidebar-active: 229.7 93.8% 81.8%; /* indigo-300 #a5b4fc */
+    --sidebar-active-bg: 229 93% 81% / 0.10;
+    --sidebar-border: 220 30% 18%;    /* slate-800 #1e293b */
+
+    /* ─── Status tokens (universal, never tenant-overridden) ─── */
+    --status-success: 142.1 76.2% 36.3%;        /* green-600  #16a34a */
+    --status-success-bg: 138.5 76.5% 96.7%;     /* green-100  #dcfce7 */
+    --status-success-border: 141.7 76.6% 73.1%; /* green-200  #bbf7d0 */
+
+    --status-warning: 45.4 93.4% 47.5%;         /* yellow-500 #eab308 */
+    --status-warning-bg: 54.9 96.7% 88%;        /* yellow-100 #fef9c3 */
+    --status-warning-border: 47.9 95.8% 76.1%;  /* yellow-200 #fde68a */
+
+    --status-danger: 0 72.2% 50.6%;             /* red-600    #dc2626 */
+    --status-danger-bg: 0 93.3% 94.1%;          /* red-100    #fee2e2 */
+    --status-danger-border: 0 95.7% 89.8%;      /* red-200    #fecaca */
+
+    --status-info: 217.2 91.2% 59.8%;           /* blue-600   #2563eb */
+    --status-info-bg: 213.8 93.9% 87.8%;        /* blue-100   #dbeafe */
+    --status-info-border: 211.7 96.4% 78.4%;    /* blue-200   #bfdbfe */
+
+    --status-neutral: 215 16.3% 46.9%;          /* slate-500  #64748b */
+    --status-neutral-bg: 210 40% 96.1%;          /* slate-100  #f1f5f9 */
+    --status-neutral-border: 214.3 31.8% 91.4%; /* slate-200  #e2e8f0 */
+
+    /* ─── Chart tokens (8 — colorblind-safe, well-separated hues) ─── */
+    --chart-1: 243.4 75.4% 58.6%;   /* indigo  #4f46e5 */
+    --chart-2: 37.7 92.1% 50.2%;    /* amber   #d97706 */
+    --chart-3: 172.5 66% 50.4%;     /* teal    #2ba8a0 */
+    --chart-4: 346.8 77.2% 49.8%;   /* rose    #e11d48 */
+    --chart-5: 258.3 89.5% 66.3%;   /* violet  #8b5cf6 */
+    --chart-6: 188.7 94.5% 42.7%;   /* cyan    #0891b2 */
+    --chart-7: 84.8 85.2% 34.5%;    /* lime    #65a30d */
+    --chart-8: 24.6 95% 53.1%;      /* orange  #ea580c */
   }
 
+  /* ─── DARK MODE ──────────────────────────────────────────── */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    /* Structural surfaces */
+    --background: 222.2 47.4% 11.2%;   /* slate-900 #0f172a */
+    --foreground: 210 40% 98.8%;       /* slate-50  #f8fafc */
+    --card: 217.2 32.6% 17.5%;        /* slate-800 #1e293b */
+    --card-foreground: 210 40% 98.8%;
+    --popover: 217.2 32.6% 17.5%;
+    --popover-foreground: 210 40% 98.8%;
+
+    /* Interactive — indigo lightened for dark bg contrast */
+    --primary: 234.5 89.5% 73.9%;     /* indigo-400 #818cf8 */
+    --primary-foreground: 243.5 47.1% 20.4%; /* indigo-950 #1e1b4b */
+
+    /* Secondary surfaces */
+    --secondary: 217.2 32.6% 17.5%;   /* slate-800 #1e293b */
+    --secondary-foreground: 210 40% 98.8%;
+
+    /* Muted */
+    --muted: 217.2 32.6% 17.5%;       /* slate-800 */
+    --muted-foreground: 215 16.3% 46.9%; /* slate-500 */
+
+    /* Accent — amber brightened */
+    --accent: 50.4 97.8% 63.5%;       /* yellow-400 #fbbf24 */
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Destructive */
+    --destructive: 0 72.2% 50.6%;     /* red-600 */
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+
+    /* Borders & inputs */
+    --border: 217.2 32.6% 17.5%;      /* slate-800 #1e293b */
+    --input: 215 25% 27%;             /* slate-700 #334155 */
+    --ring: 234.5 89.5% 73.9%;        /* indigo-400 */
+
+    /* Sidebar — IDENTICAL to light mode */
+    --sidebar: 220 38% 9%;
+    --sidebar-foreground: 213 17% 64.5%;
+    --sidebar-muted: 215 21% 37%;
+    --sidebar-active: 229.7 93.8% 81.8%;
+    --sidebar-active-bg: 229 93% 81% / 0.10;
+    --sidebar-border: 220 30% 18%;
+
+    /* Status — brightened text, darkened backgrounds */
+    --status-success: 142.1 69.2% 58.2%;         /* green-400  #4ade80 */
+    --status-success-bg: 149.3 80.4% 10%;         /* green-950  #052e16 */
+    --status-success-border: 148.6 64.4% 16.9%;   /* green-900  #14532d */
+
+    --status-warning: 50.4 97.8% 63.5%;           /* yellow-400 #facc15 */
+    --status-warning-bg: 31 81.1% 9.4%;            /* dark amber #422006 */
+    --status-warning-border: 32.1 74.9% 25.5%;    /* yellow-900 #713f12 */
+
+    --status-danger: 0 90.6% 70.8%;               /* red-400    #f87171 */
+    --status-danger-bg: 0 74.7% 15.5%;             /* red-950    #450a0a */
+    --status-danger-border: 0 62.5% 30.6%;        /* red-900    #7f1d1d */
+
+    --status-info: 213.1 93.9% 67.8%;             /* blue-400   #60a5fa */
+    --status-info-bg: 224 64.3% 21.6%;             /* blue-950   #172554 */
+    --status-info-border: 216 44.4% 24.7%;         /* dark blue  #1e3a5f */
+
+    --status-neutral: 215 16.3% 46.9%;            /* slate-500  #64748b */
+    --status-neutral-bg: 217.2 32.6% 17.5%;        /* slate-800  #1e293b */
+    --status-neutral-border: 215 25% 27%;          /* slate-700  #334155 */
+
+    /* Chart — lightened for dark backgrounds */
+    --chart-1: 234.5 89.5% 73.9%;   /* indigo-400 #818cf8 */
+    --chart-2: 45.4 96.7% 64.5%;    /* amber-400  #fbbf24 */
+    --chart-3: 170.6 76.9% 64.3%;   /* teal-300   #5eead4 */
+    --chart-4: 343.4 81.5% 68.6%;   /* rose-400   #fb7185 */
+    --chart-5: 255.1 91.7% 76.3%;   /* violet-400 #a78bfa */
+    --chart-6: 187.9 85.7% 53.3%;   /* cyan-400   #22d3ee */
+    --chart-7: 82.7 78% 55.5%;      /* lime-400   #a3e635 */
+    --chart-8: 20.5 90.2% 48.2%;    /* orange-400 #fb923c */
   }
 }
 

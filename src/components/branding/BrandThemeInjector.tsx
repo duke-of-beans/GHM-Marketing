@@ -23,10 +23,11 @@ type Props = {
   colors: BrandColors;
 };
 
+// Signal palette defaults — what an unbranded tenant sees
 const DEFAULTS = {
-  primary: "#2563eb",
-  secondary: "#64748b",
-  accent: "#f59e0b",
+  primary: "#4f46e5",   // indigo-600 (Signal primary)
+  secondary: "#94a3b8", // slate-400 (Signal secondary)
+  accent: "#d97706",    // amber-600 (Signal accent)
 } as const;
 
 export function BrandThemeInjector({ colors }: Props) {

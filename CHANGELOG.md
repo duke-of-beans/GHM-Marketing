@@ -1,7 +1,32 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 23-A shipped. Sprint 24 backlog hygiene.
+**Last Updated:** February 25, 2026 — Sprint 23-C shipped (Signal Token Implementation).
+
+---
+
+## Sprint 23-C — UI Constitution Phase 1: Signal Token Implementation — February 25, 2026
+
+**COVOS Signal palette implemented across token infrastructure.** Three files modified, zero component changes needed (shadcn tokens already consumed by components). This sprint delivers the foundation — all subsequent color migration sprints consume these tokens.
+
+**globals.css — Full token replacement.** Replaced stock shadcn blue `:root` and `.dark` blocks with COVOS Signal palette (indigo-600 primary, amber-600 accent, slate neutrals). Added 6 sidebar tokens (deep navy, same in both modes). Added 15 status tokens × 2 modes (success/warning/danger/info/neutral — each with text, bg, border variants). Added 8 chart tokens × 2 modes (indigo, amber, teal, rose, violet, cyan, lime, orange — colorblind-safe, well-separated hues). Dark mode: sidebar stays identical, content area inverts, primary lightens to indigo-400, accent brightens to amber-400, status colors get darkened backgrounds with brightened text.
+
+**tailwind.config.ts — Token mappings extended.** Added chart tokens 6-8 (was 1-5). Added sidebar token group (DEFAULT, foreground, muted, active, active-bg, border). Added status token group (15 tokens: success/warning/danger/info/neutral × text/bg/border). Cleaned up mixed tab/space indentation to consistent 2-space. Components can now use `bg-status-success-bg text-status-success` instead of hardcoded `bg-green-100 text-green-600`.
+
+**BrandThemeInjector.tsx — Defaults updated to Signal.** Changed from stock shadcn blue (`#2563eb`) to Signal indigo (`#4f46e5`). Changed accent from `#f59e0b` to `#d97706`. Changed secondary from `#64748b` to `#94a3b8`. These defaults are what an unbranded COVOS tenant sees.
+
+**TypeScript check:** No new errors. Pre-existing errors in scripts/basecamp (unrelated) unchanged.
+**Files modified:** `src/app/globals.css`, `tailwind.config.ts`, `src/components/branding/BrandThemeInjector.tsx`
+**Spec:** `docs/ui-constitution/SIGNAL_TOKEN_SPEC.md` (locked reference — all token values, hex + HSL, light + dark, migration impact)
+
+---
+
+## Sprint 23-B — UI Constitution Phase 1: Color Token Design — February 25, 2026
+
+**COVOS platform palette designed and locked.** Multi-session design exploration (5 initial palettes → 4 refinements → Signal family → final selection). Produced `SIGNAL_TOKEN_SPEC.md` — complete token specification with light/dark values for structural, interactive, sidebar, status, and chart token families.
+
+**Decisions locked:** Palette: Signal. Neutrals: Slate. Dark mode: sidebar-stable (content inverts). Chart tokens: 8. Brand navy (#1e3a5f): deferred. Layer architecture: Layer 0 (COVOS platform, never overridden) + Layer 1 (tenant brand overlay) + Layer 2 (dark mode).
+**Files created:** `docs/ui-constitution/SIGNAL_TOKEN_SPEC.md`
 
 ---
 
