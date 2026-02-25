@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 25, 2026 — Sprint 18 shipped. UX-AUDIT-022, FEAT-019, FEAT-020 complete.
+**Last Updated:** February 24, 2026 — Sprint 20 FEAT-014 shipped. 7 new items added: BUG-026–031 + FEAT-033.
 
 **Owner:** David Kirsch
 
@@ -39,7 +39,12 @@ Foundation → out. Each sprint unblocks the next.
 | UI-CONST | UI/UX Constitution + Design System Saga | UI-CONST-001 — runs parallel to all sprints; audit → blueprint → build in groups | Multi-session initiative | Professional-grade UI indistinguishable from Xero/Slack/Monday. Prerequisite for White-Label/COVOS productization. |
 | ~~18~~ | ~~Analytics + Telemetry~~ | ~~FEAT-019 (dashboard usage metrics) + FEAT-020 (COVOS owner telemetry) + UX-AUDIT-022 (Settings IA consolidation)~~ | ✅ SHIPPED | |
 | ~~19~~ | ~~Content Automation~~ | ~~FEAT-022 (TeamFeed multimedia) + FEAT-023 (stock photo library) + FEAT-024 (client website audit)~~ | ✅ SHIPPED | |
-| 20 | COVOS Self-Service | FEAT-014 (PM Import) + multi-tenant self-serve | ~2 sessions | Full productization. |
+| ~~20~~ | ~~COVOS Self-Service~~ | ~~FEAT-014 (PM Import) + BUG-025 (auth loop)~~ | ✅ SHIPPED | |
+| 21-A | Bug Triage Batch | BUG-026 (forgot pw email) + BUG-027 (goals hint) + BUG-028 (emoji/gif) + BUG-017/018/019 | ~1 session | Broken in production right now |
+| 21-B | TeamFeed Polish | UX-AUDIT-025 (TeamFeed UX pass) + BUG-028 carry | ~1 session | Sprint 19 deliverable needs finishing |
+| 21-C | Import Hardening | FEAT-033 (edge cases + validation + rollback) | ~2 sessions | Trust/integrity layer for FEAT-014 |
+| 22 | COVOS Identity | UX-AUDIT-024 (branding pass) + UX-AUDIT-023 (tour tip sparkle) | ~1 session | Investor/demo readiness |
+| 23 | UI Constitution Phase 1 | UI-CONST-001 Foundations (color tokens, type scale, spacing) | Multi-session | Prerequisite for white-label |
 | ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
 | ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
 
@@ -66,6 +71,21 @@ Old sprint/phase/session markdown files cluttering root and docs/. **Fix:** Audi
 ---
 
 ## 🔴 BUGS — Active Crashes & Broken Features
+
+### BUG-026: Forgot Password — Email Not Delivered
+The forgot password flow exists (BUG-020 shipped) but the email is not arriving. Root cause is almost certainly INFRA-001 (Resend domain not verified) — but also need to confirm the route is actually calling Resend correctly and the `FROM_EMAIL` env var is set in production. Check: (1) Resend dashboard delivery logs for attempted sends, (2) `FROM_EMAIL` env var in Vercel, (3) `src/app/api/auth/forgot-password/route.ts` error handling for silent failures.
+**Fix:** Resolve INFRA-001 first (domain verification). Then add explicit error logging to the forgot-password route so failures surface in Vercel runtime logs rather than silently swallowing.
+**Size:** ~1 hr. **Priority:** 🔴 Must fix — auth recovery is broken.
+
+### BUG-027: Goals Widget — Wrong Settings Location in Hint Text
+The Goals widget tells users to go to "Settings → General" to configure goals data. That section has moved. Update the hint text to point to the correct location.
+**Fix:** Find the goals widget hint copy (likely in a Goals component or dashboard widget). Update the path reference to wherever goals config actually lives now.
+**Size:** ~15 min. **Priority:** 🔴 Must fix — actively misdirects users.
+
+### BUG-028: TeamFeed — Emoji Picker Broken, GIF Search Returns No Results
+Two distinct failures in the multimedia layer shipped in Sprint 19: (1) Emoji picker button does nothing when clicked — likely a dynamic import failure or the emoji-mart component isn't mounting correctly in production. (2) GIF search via Tenor API returns no results regardless of query — likely a missing `TENOR_API_KEY` env var in production, or the `/api/gif-search` route is silently failing.
+**Fix:** (1) Check emoji-mart dynamic import — confirm the `EmojiPicker` component is rendering client-side only and the import path is correct. Add error boundary. (2) Check Vercel env vars for `TENOR_API_KEY` (or `GIPHY_API_KEY`). Check `/api/gif-search` route for silent error swallowing.
+**Size:** ~1–2 hrs. **Priority:** 🔴 Must fix — these were Sprint 19 deliverables that are broken in production.
 
 ### BUG-017: Login Screen — Dark Mode Bleed on Logout
 Logging out while in dark mode leaves the login page rendering with a dark background and dark panel styling. Login should always display in forced light mode — it's a marketing/branding surface, not a UI preference surface, and dark mode on the login page looks broken/unintentional.
@@ -112,7 +132,21 @@ Navigating away from `/sales` and returning shows a different dashboard layout o
 
 ---
 
-## 🟠 SHOULD — UX Audits & Systemic Fixes
+### UX-AUDIT-023: Tour Tip Icons — Add Sparkle/Distinction to Distinguish from Regular Tooltips
+Tour tip trigger icons are currently blue circle `?` buttons — improved from the original but still indistinguishable at a glance from standard help tooltips. The guided tour is a distinct, more intentional UX mode and should feel that way.
+**Direction:** Add a small star/sparkle indicator to the top-right of tour tip icons (similar to the AI feature indicator pattern). Options: (a) a small `✦` or `✵` sparkle absolutely positioned on the icon, (b) a subtle animated ring pulse, (c) a Lucide `Sparkles` micro-badge. Should feel "this is special/interactive" without being distracting. Keep it tasteful — no aggressive animation.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD.
+
+### UX-AUDIT-024: COVOS Branding — Subtle, Tasteful Integration Throughout the ERP
+The platform is built for productization as COVOS. The branding should be present but not heavy-handed — the way Notion has subtle Notion-isms or Linear has its characteristic precision aesthetic. Goal: a user who learns the platform exists as "COVOS" would instantly recognize the connection.
+**Direction:** Audit surfaces where COVOS identity belongs: (1) login/welcome screen footer or badge, (2) admin panel header, (3) email footers ("Powered by COVOS"), (4) report footers, (5) onboarding completion screen, (6) error pages. Avoid plastering it on every client-facing surface — keep it in admin/platform layers. Define COVOS visual language: mark/wordmark treatment, placement rules, minimum presence requirements.
+**Dependency:** UI-CONST-001 for full systematic treatment. This item is the scope definition + initial placement pass.
+**Size:** ~1–2 hrs initial placement pass. **Priority:** 🟠 SHOULD — prerequisite for external demo/investor readiness.
+
+### UX-AUDIT-025: TeamFeed Panel — General UX/UI Improvement Pass
+TeamFeed works but doesn't feel as polished as a first-class communication feature should. Review the overall panel UX against the bar of Slack/Linear comments/Notion discussions.
+**Direction:** Audit areas: (1) message density and spacing — too loose or too tight? (2) timestamp formatting and visibility, (3) reply threading clarity, (4) compose box affordance — is it obvious how to start typing?, (5) empty state when no messages, (6) panel open/close interaction, (7) notification badge behavior, (8) reaction display and interaction feel. Document findings, spec improvements, implement in a single pass.
+**Size:** ~1–2 hrs audit + implementation. **Priority:** 🟠 SHOULD.
 
 ### UX-AUDIT-001: Tooltip / Help Text / Hover State Audit (Global)
 The dashboard has no consistent tooltip or contextual help layer. Users — especially new admins — encounter unlabeled icons, ambiguous controls, and metric labels with no explanation.
@@ -177,7 +211,18 @@ Content Studio shows generic "no content." Needs context-aware states: (a) no cl
 
 ## 🟠 SHOULD — Features & Productization
 
-### FEAT-014: Project Management Platform Import
+### FEAT-033: Import/Migration — Edge Case Hardening & Recovery Layer
+The PM import system (FEAT-014) assumes a clean migration. Real-world data is messy. Need defensive handling across the full import surface.
+**Scope:**
+- **Field validation before commit:** Before writing any records, run a validation pass on the full `previewJson`. Surface issues per-record: missing required fields (title/clientId), invalid dates, unknown status values, truncated strings. Show a validation report in the UI before the user clicks "Import."
+- **Partial failure handling:** If some tasks fail to write (DB constraint, bad data), continue the rest and report per-record errors in `commitStats.errors`. Currently errors are collected but not surfaced clearly in the UI completion screen — expand the done screen to show a collapsible error log.
+- **Field length enforcement:** Truncate or warn on fields that exceed DB column limits (title >255, description >5000, etc.) rather than letting Prisma throw.
+- **Duplicate detection:** Check for existing `ClientTask` records with matching `source` + `externalId` pattern before inserting. Offer "skip duplicates" vs "overwrite" choice in the commit config step.
+- **Rollback option:** After a commit, offer a "Undo this import" action for 24 hours that soft-deletes all tasks created in that `PmImportSession` (requires adding `pmImportSessionId` foreign key to `ClientTask`).
+- **Assignee mismatch report:** Currently unmatched assignees are silently set to null. Surface a "X tasks have unrecognized assignees" warning in the preview step with the names listed so the admin can manually resolve before committing.
+- **CSV column mapping UI:** Rather than assuming column order, let the user map their CSV columns to the expected fields in a visual mapper step before preview.
+**Size:** ~2 sessions. **Priority:** 🟠 SHOULD — data integrity is a trust issue; broken imports destroy confidence in the platform.
+
 Onboarding adapters for Basecamp (existing crawler), Asana, Monday.com, ClickUp, Trello. Generic `TaskImportAdapter` interface + import wizard in Settings. Preview/mapping step before commit. Admin-only.
 **Strategic note (Feb 24):** This is a customer acquisition lever — absorbing PM platform users entirely by migrating their existing tasks. Prioritize the most popular platforms first (Asana, ClickUp). The import wizard should feel effortless: connect → preview → confirm → done.
 **Size:** ~1 session per adapter; ~1 session for wizard UI. **Priority:** 🟠 Sprint 20 target.
