@@ -65,6 +65,10 @@ export default function Error({
             Report This Error
           </BugReportButton>
         </div>
+
+        <p className="text-[10px] tracking-widest text-muted-foreground/30 uppercase select-none pt-4">
+          Powered by COVOS
+        </p>
       </div>
     </div>
   );

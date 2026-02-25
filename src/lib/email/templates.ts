@@ -179,6 +179,9 @@ function generateReportEmailHTML(params: {
         <p style="font-size: 12px; color: #666; text-align: center;">
           © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </p>
+        <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
+          Powered by COVOS
+        </p>
       </div>
     </body>
     </html>
@@ -261,6 +264,9 @@ function generateUpsellEmailHTML(params: {
         <p style="font-size: 12px; color: #666; text-align: center;">
           © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </p>
+        <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
+          Powered by COVOS
+        </p>
       </div>
     </body>
     </html>
@@ -321,6 +327,9 @@ function generatePortalInviteHTML(params: {
         
         <p style="font-size: 12px; color: #666; text-align: center;">
           © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
+        </p>
+        <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
+          Powered by COVOS
         </p>
       </div>
     </body>

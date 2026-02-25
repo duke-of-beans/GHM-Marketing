@@ -1,7 +1,24 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 24, 2026 — Sprint 21-B complete: UX-AUDIT-025 (TeamFeed full overhaul — SSE, @mentions, edit, read receipts, search, Slack-grade panel UX).
+**Last Updated:** February 24, 2026 — Sprint 22 + Sprint 21-C complete.
+
+---
+
+## Sprint 22 — February 24, 2026
+
+**UX-AUDIT-023 — Tour Tip Sparkle Badge**
+Confirmed pre-shipped. `TourButton.tsx` already has amber Sparkles badge absolutely positioned top-right of HelpCircle icon. No code changes needed.
+
+**UX-AUDIT-024 — COVOS Branding Pass**
+"Powered by COVOS" mark added to all remaining surfaces: `src/lib/email/templates.ts` (report, upsell, portal invite footers), `src/lib/email/index.ts` (status notification, contractor Wave invite, partner onboarding notification, report email). Login page, error page, onboarding wizard done screen, and report PDF template confirmed pre-existing. Full platform-layer coverage complete.
+
+---
+
+## Sprint 21-C — February 24, 2026
+
+**FEAT-033 — Import/Migration Edge Case Hardening & Recovery Layer**
+Schema: `pm_import_session_id INT` + `pm_external_id TEXT` added to `client_tasks` with dedup index. New API routes: `POST /api/import/pm/validate` (pre-commit validation — missing titles, field length warnings, duplicate detection, assignee mismatch report, canProceed flag), `POST /api/import/pm/rollback` (24-hour undo window, deletes all tasks by session ID). Commit route hardened: field truncation at 255/5000 chars, duplicate detection with skip/overwrite strategy, `pmImportSessionId` + `pmExternalId` stored on every created task. `DataImportTab` UI overhauled to 6-step flow: platform → connect → preview (with CSV column mapper) → validate (with assignee mismatch panel, per-record issues, duplicate count) → commit (with dup strategy selector) → done (with collapsible error log, rollback button). TypeScript clean (5 pre-existing errors unaffected).
 
 ---
 

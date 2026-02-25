@@ -113,7 +113,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2 pb-4">
           {tenantLogoUrl ? (
@@ -239,6 +239,10 @@ export default function LoginPage() {
           )}
         </CardContent>
       </Card>
+      {/* COVOS platform mark — admin layer only, tasteful */}
+      <p className="mt-6 text-[10px] tracking-widest text-gray-300 uppercase select-none">
+        Powered by COVOS
+      </p>
     </div>
   );
 }

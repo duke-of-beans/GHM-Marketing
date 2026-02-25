@@ -567,6 +567,10 @@ model ClientTask {
   blockedReason     String?     @map("blocked_reason")       // Why task is blocked
   checklistComplete Boolean     @default(false) @map("checklist_complete") // Quick filter for completed checklists
 
+  // ── Import tracking ──────────────────────────────────────────────────────
+  pmImportSessionId Int?        @map("pm_import_session_id")  // FK to PmImportSession (for rollback)
+  pmExternalId      String?     @map("pm_external_id")        // Original externalId from source platform
+
   // Relations
   notes             ClientNote[]
   transitions       TaskTransition[]
@@ -576,6 +580,7 @@ model ClientTask {
   recurringRule     RecurringTaskRule? @relation(fields: [recurringRuleId], references: [id])
   checklistItems    TaskChecklistItem[]
   alertLinks        TaskAlertLink[]
+  pmImportSession   PmImportSession?   @relation(fields: [pmImportSessionId], references: [id])
 
   @@index([clientId, status])
   @@index([clientId, category])
@@ -2181,6 +2186,7 @@ model PmImportSession {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  importedTasks ClientTask[]  // Tasks created from this import session (for rollback)
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([platform, status])

@@ -1,7 +1,7 @@
 // POST /api/import/pm/commit
 // Writes previewed tasks and contacts to the GHM database.
 // Matches assignees to existing Users by email/name (best-effort).
-// Optionally filters to selected task IDs only (from UI selection).
+// Enforces field length limits, detects duplicates, stores session ID for rollback.
 
 import { NextRequest, NextResponse } from "next/server"
 import { withPermission } from "@/lib/auth/api-permissions"
@@ -9,6 +9,9 @@ import { prisma } from "@/lib/db"
 import { Prisma } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import type { ImportedTask, ImportedContact } from "@/lib/pm-import"
+
+const MAX_TITLE_LEN       = 255
+const MAX_DESCRIPTION_LEN = 5000
 
 export async function POST(request: NextRequest) {
   const permErr = await withPermission(request, "manage_clients")
@@ -19,14 +22,17 @@ export async function POST(request: NextRequest) {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await request.json() as {
-    sessionId:         number
-    selectedTaskIds?:  string[]   // externalIds to import; if omitted, import all
-    clientId:          number     // required — all imported tasks are linked to this client
-    categoryOverride?: string     // override all task categories
+    sessionId:          number
+    selectedTaskIds?:   string[]
+    clientId:           number
+    categoryOverride?:  string
+    duplicateStrategy?: "skip" | "overwrite"  // default: "skip"
   }
 
   if (!body.clientId)
     return NextResponse.json({ error: "clientId is required — tasks must be linked to a client" }, { status: 400 })
+
+  const duplicateStrategy = body.duplicateStrategy ?? "skip"
 
   const importSession = await prisma.pmImportSession.findUnique({ where: { id: body.sessionId } })
   if (!importSession || importSession.userId !== userId)
@@ -46,7 +52,7 @@ export async function POST(request: NextRequest) {
     where: { id: body.sessionId }, data: { status: "importing" },
   })
 
-  // ── Build user lookup map (email → id, name → id) ────────────────────────
+  // ── Build user lookup map ────────────────────────────────────────────────
   const allUsers = await prisma.user.findMany({
     where: { isActive: true },
     select: { id: true, name: true, email: true },
@@ -75,42 +81,82 @@ export async function POST(request: NextRequest) {
     ? preview.tasks.filter(t => selectedSet.has(t.externalId))
     : preview.tasks
 
+  // ── Load existing duplicates for this client ─────────────────────────────
+  const externalIds = tasksToImport.map(t => t.externalId)
+  const existingByExternalId = new Map<string, number>()
+
+  if (externalIds.length > 0) {
+    const existing = await prisma.clientTask.findMany({
+      where: { clientId: body.clientId, pmExternalId: { in: externalIds } },
+      select: { pmExternalId: true, id: true },
+    })
+    existing.forEach(e => { if (e.pmExternalId) existingByExternalId.set(e.pmExternalId, e.id) })
+  }
+
   // ── Import tasks ─────────────────────────────────────────────────────────
-  let tasksCreated = 0
-  let tasksSkipped = 0
-  const taskErrors: { externalId: string; error: string }[] = []
+  let tasksCreated  = 0
+  let tasksUpdated  = 0
+  let tasksSkipped  = 0
+  const taskErrors: { externalId: string; title: string; error: string }[] = []
 
   for (const task of tasksToImport) {
+    // Skip tasks with no title (hard error — DB requires it)
+    if (!task.title?.trim()) {
+      tasksSkipped++
+      taskErrors.push({ externalId: task.externalId, title: "(no title)", error: "Missing title — skipped" })
+      continue
+    }
+
+    // Enforce field length limits (truncate rather than throw)
+    const title = task.title.slice(0, MAX_TITLE_LEN)
+    const rawDescription = [
+      task.description,
+      `[Imported from ${importSession.platform}]`,
+      task.projectName ? `Project: ${task.projectName}` : null,
+    ].filter(Boolean).join("\n") || ""
+    const description = rawDescription.slice(0, MAX_DESCRIPTION_LEN)
+
+    const taskData = {
+      clientId:           body.clientId,
+      title,
+      description,
+      category:           body.categoryOverride ?? task.category ?? "general",
+      source:             `import:${importSession.platform}`,
+      status:             task.status === "in_progress" ? "in_progress" : task.status === "completed" ? "completed" : "queued",
+      priority:           task.priority,
+      dueDate:            task.dueDate instanceof Date ? task.dueDate : null,
+      completedAt:        task.completedAt instanceof Date ? task.completedAt : null,      assignedToUserId:   resolveUser(task),
+      pmImportSessionId:  body.sessionId,
+      pmExternalId:       task.externalId,
+    }
+
     try {
-      await prisma.clientTask.create({
-        data: {
-          clientId:         body.clientId,
-          title:            task.title,
-          description:      [
-            task.description,
-            `[Imported from ${importSession.platform}]`,
-            task.projectName ? `Project: ${task.projectName}` : null,
-          ].filter(Boolean).join("\n") || "",
-          category:         body.categoryOverride ?? task.category ?? "general",
-          source:           `import:${importSession.platform}`,
-          status:           task.status === "in_progress" ? "in_progress" : task.status === "completed" ? "completed" : "queued",
-          priority:         task.priority,
-          dueDate:          task.dueDate ? new Date(task.dueDate) : null,
-          completedAt:      task.completedAt ? new Date(task.completedAt) : null,
-          assignedToUserId: resolveUser(task),
-        },
-      })
-      tasksCreated++
+      const existingId = existingByExternalId.get(task.externalId)
+
+      if (existingId) {
+        if (duplicateStrategy === "overwrite") {
+          await prisma.clientTask.update({ where: { id: existingId }, data: taskData })
+          tasksUpdated++
+        } else {
+          tasksSkipped++
+        }
+      } else {
+        await prisma.clientTask.create({ data: taskData })
+        tasksCreated++
+      }
     } catch (e) {
       tasksSkipped++
-      taskErrors.push({ externalId: task.externalId, error: String(e) })
+      taskErrors.push({ externalId: task.externalId, title, error: String(e) })
     }
   }
 
   // ── Commit stats and mark complete ───────────────────────────────────────
   const commitStats = {
-    tasksCreated, tasksSkipped,
-    errors: taskErrors.slice(0, 20),
+    tasksCreated,
+    tasksUpdated,
+    tasksSkipped,
+    duplicateStrategy,
+    errors: taskErrors.slice(0, 50),
     platform: importSession.platform,
     committedAt: new Date().toISOString(),
   }
@@ -120,7 +166,6 @@ export async function POST(request: NextRequest) {
     data: {
       status:          "complete",
       commitStats:     commitStats as object,
-      // Clear credentials now that migration is done
       credentialsJson: Prisma.DbNull,
       errorMessage:    null,
     },

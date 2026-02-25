@@ -82,6 +82,9 @@ export async function sendWorkOrderEmail(params: {
             <p style="color: #999; font-size: 12px; margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
               This work order is valid for 30 days from the date of issue.
             </p>
+            <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;">
+              Powered by COVOS
+            </p>
           </div>
         </div>
       `,
@@ -156,6 +159,9 @@ export async function sendStatusNotification(params: {
           </p>
           <p style="color: #999; font-size: 12px; margin-top: 24px;">
             GHM Marketing · Digital Marketing Solutions
+          </p>
+          <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;">
+            Powered by COVOS
           </p>
         </div>
       `,
@@ -305,6 +311,9 @@ export async function sendContractorWaveInvite(params: {
             <p style="color: #9ca3af; font-size: 12px; margin: 0;">
               GHM Digital Marketing Inc · Questions? Reply to this email.
             </p>
+            <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;margin-bottom:0;">
+              Powered by COVOS
+            </p>
           </div>
         </div>
       `,
@@ -366,6 +375,9 @@ export async function sendPartnerOnboardingNotification(params: {
             <p style="color: #6b7280; font-size: 13px; margin-bottom: 0;">
               Questions? Reply to this email or reach out to the ops team directly.
             </p>
+            <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;margin-bottom:0;">
+              Powered by COVOS
+            </p>
           </div>
         </div>
       `,
@@ -415,6 +427,9 @@ export async function sendNotificationEmail(params: {
             ${actionButton}
             <p style="color:#9ca3af;font-size:12px;margin-top:24px;margin-bottom:0;">
               GHM Marketing Dashboard — automated notification
+            </p>
+            <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;margin-bottom:0;">
+              Powered by COVOS
             </p>
           </div>
         </div>
@@ -474,6 +489,9 @@ export async function sendReportEmail(params: {
           <p style="color: #999; font-size: 12px; margin-top: 32px;">
             Questions? Reply to this email or contact your account manager directly.
             <br>Report ID: ${reportId}
+          </p>
+          <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;margin-bottom:0;">
+            Powered by COVOS
           </p>
         </div>
       </div>
