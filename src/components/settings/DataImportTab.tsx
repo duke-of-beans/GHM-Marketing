@@ -438,7 +438,7 @@ export function DataImportTab() {
                               className="cursor-pointer"
                               onClick={() => setSelected(prev => {
                                 const next = new Set(prev)
-                                next.has(t.externalId) ? next.delete(t.externalId) : next.add(t.externalId)
+                                if (next.has(t.externalId)) { next.delete(t.externalId) } else { next.add(t.externalId) }
                                 return next
                               })}>
                               <TableCell>
