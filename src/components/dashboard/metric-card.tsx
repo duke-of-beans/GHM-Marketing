@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { HelpCircle } from "lucide-react";
 import {
@@ -20,41 +19,40 @@ type MetricCardProps = {
 export function MetricCard({ title, value, subtitle, trend, className, tooltip }: MetricCardProps) {
   return (
     <TooltipProvider>
-      <Card className={cn("", className)}>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {title}
-            </CardTitle>
-            {tooltip && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="text-sm">{tooltip}</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-2xl md:text-3xl font-bold">{value}</p>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
-          )}
+      <div className={cn("relative rounded-lg bg-card p-4", className)}>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+          {title}
+        </p>
+        <div className="flex items-baseline gap-2">
+          <p className="text-3xl font-bold tabular-nums">{value}</p>
           {trend && (
-            <p
+            <span
               className={cn(
-                "text-xs mt-1 font-medium",
-                trend.value >= 0 ? "text-status-success" : "text-status-danger"
+                "text-xs font-semibold px-1.5 py-0.5 rounded",
+                trend.value >= 0
+                  ? "text-status-success bg-status-success-bg"
+                  : "text-status-danger bg-status-danger-bg"
               )}
             >
-              {trend.value >= 0 ? "↑" : "↓"} {Math.abs(trend.value)}% {trend.label}
-            </p>
+              {trend.value >= 0 ? "+" : ""}
+              {trend.value}%
+            </span>
           )}
-        </CardContent>
-      </Card>
+        </div>
+        {subtitle && (
+          <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+        )}
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="absolute top-3 right-3 h-3.5 w-3.5 text-muted-foreground/50 cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p className="text-sm">{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
     </TooltipProvider>
   );
 }

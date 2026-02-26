@@ -13,7 +13,7 @@ type Props = {
 
 export function MetricsRow({ totalLeads, activeLeads, conversionRate, wonDeals, totalMRR, totalARR }: Props) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 h-full content-start">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 h-full content-start">
       <MetricCard
         title="Total Leads"
         value={totalLeads}

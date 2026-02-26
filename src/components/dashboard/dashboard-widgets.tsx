@@ -1,20 +1,19 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { 
-  Plus, 
-  FileText, 
-  TrendingUp, 
+import { cn } from "@/lib/utils";
+import {
+  Plus,
+  FileText,
+  TrendingUp,
   Users,
   DollarSign,
   Target,
-  Zap
 } from "lucide-react";
 
 /**
  * Quick Actions Widget for Master Dashboard
+ * Signal redesign: neutral rows, icon-only color, no rainbow backgrounds.
  */
 export function QuickActions() {
   const actions = [
@@ -23,120 +22,106 @@ export function QuickActions() {
       icon: Plus,
       href: "/discovery",
       description: "Find new prospects",
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/70",
-      iconBg: "bg-blue-100 dark:bg-blue-900/60",
+      iconColor: "text-primary",
     },
     {
       label: "Review Content",
       icon: FileText,
       href: "/review",
       description: "Approve pending work",
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/70",
-      iconBg: "bg-purple-100 dark:bg-purple-900/60",
+      iconColor: "text-primary",
     },
     {
       label: "View Pipeline",
       icon: TrendingUp,
       href: "/leads",
       description: "Check sales progress",
-      color: "text-status-success",
-      bgColor: "bg-status-success-bg hover:bg-status-success-bg dark:hover:bg-status-success-bg/70",
-      iconBg: "bg-status-success-bg",
+      iconColor: "text-status-success",
     },
     {
       label: "Manage Team",
       icon: Users,
       href: "/settings?tab=team",
       description: "Update team members",
-      color: "text-status-warning",
-      bgColor: "bg-status-warning-bg hover:bg-status-warning-bg",
-      iconBg: "bg-status-warning-bg",
+      iconColor: "text-muted-foreground",
     },
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-status-warning" />
-          Quick Actions
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-1.5">
-          {actions.map((action) => (
-            <Link key={action.href} href={action.href}>
-              <Button
-                variant="ghost"
-                className={`w-full h-auto justify-start gap-3 px-3 py-2.5 ${action.bgColor} rounded-lg`}
-              >
-                <div className={`flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-md ${action.iconBg}`}>
-                  <action.icon className={`h-4 w-4 ${action.color}`} />
-                </div>
-                <div className="flex flex-col items-start min-w-0">
-                  <span className="font-semibold text-sm leading-tight text-foreground">{action.label}</span>
-                  <span className="text-xs text-muted-foreground leading-tight">{action.description}</span>
-                </div>
-              </Button>
-            </Link>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-lg bg-card p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3">Quick Actions</h3>
+      <div className="flex flex-col gap-0.5">
+        {actions.map((action) => (
+          <Link key={action.href} href={action.href}>
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-muted transition-colors group">
+              <action.icon className={cn("h-4 w-4 shrink-0", action.iconColor)} />
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {action.label}
+                </span>
+                <span className="text-xs text-muted-foreground">{action.description}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 
 /**
- * Revenue Metrics Widget with trend indicators
+ * Revenue Metrics Widget with trend indicators.
+ * Signal redesign: neutral card, green accent text only (no green gradient background).
  */
-export function RevenueMetricsWidget({ 
-  mrr, 
-  arr, 
-  growth 
-}: { 
-  mrr: number; 
-  arr: number; 
+export function RevenueMetricsWidget({
+  mrr,
+  arr,
+  growth,
+}: {
+  mrr: number;
+  arr: number;
   growth: number;
 }) {
   const isPositiveGrowth = growth > 0;
-  
+
   return (
-    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-status-success-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-status-success">
-          <DollarSign className="h-5 w-5" />
-          Revenue Performance
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="rounded-lg bg-card p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+        <DollarSign className="h-4 w-4 text-status-success" />
+        Revenue
+      </h3>
+      <div className="space-y-3">
         <div>
-          <div className="text-sm text-muted-foreground mb-1">Monthly Recurring Revenue</div>
-          <div className="text-3xl font-bold text-status-success">
+          <p className="text-xs text-muted-foreground">Monthly Recurring</p>
+          <p className="text-2xl font-bold text-status-success tabular-nums">
             ${mrr.toLocaleString()}
-          </div>
-          <div className="text-xs text-muted-foreground mt-1">
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
             ARR: ${arr.toLocaleString()}
-          </div>
+          </p>
         </div>
-        
-        <div className="pt-3 border-t border-status-success-border">
+        <div className="pt-2 border-t">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Growth Rate</span>
-            <div className={`flex items-center gap-1 ${isPositiveGrowth ? 'text-status-success' : 'text-muted-foreground'}`}>
-              <TrendingUp className={`h-4 w-4 ${isPositiveGrowth ? '' : 'opacity-50'}`} />
-              <span className="font-semibold">{growth.toFixed(1)}%</span>
-            </div>
+            <span className="text-xs text-muted-foreground">Growth</span>
+            <span
+              className={cn(
+                "text-sm font-semibold tabular-nums",
+                isPositiveGrowth ? "text-status-success" : "text-muted-foreground"
+              )}
+            >
+              {isPositiveGrowth ? "+" : ""}
+              {growth.toFixed(1)}%
+            </span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
 /**
- * Active Goals/Targets Widget
+ * Active Goals/Targets Widget.
+ * Signal redesign: thin progress bars (h-1.5), primary + success colors, no Card wrapper.
  */
 export function GoalsWidget({
   wonDeals,
@@ -153,22 +138,20 @@ export function GoalsWidget({
   const revenueProgress = (revenue / targetRevenue) * 100;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5 text-blue-500" />
-          Monthly Goals
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="rounded-lg bg-card p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+        <Target className="h-4 w-4 text-muted-foreground" />
+        Monthly Goals
+      </h3>
+      <div className="space-y-4">
         <div>
-          <div className="flex justify-between text-sm mb-2">
+          <div className="flex justify-between text-sm mb-1.5">
             <span className="text-foreground">Deals Closed</span>
             <span className="font-semibold">{wonDeals} / {targetDeals}</span>
           </div>
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div 
-              className="bg-blue-500 h-2 rounded-full transition-all" 
+          <div className="w-full bg-muted rounded-full h-1.5">
+            <div
+              className="bg-primary h-1.5 rounded-full transition-all"
               style={{ width: `${Math.min(dealsProgress, 100)}%` }}
             />
           </div>
@@ -178,15 +161,15 @@ export function GoalsWidget({
         </div>
 
         <div>
-          <div className="flex justify-between text-sm mb-2">
+          <div className="flex justify-between text-sm mb-1.5">
             <span className="text-foreground">Revenue</span>
             <span className="font-semibold">
               ${(revenue / 1000).toFixed(0)}K / ${(targetRevenue / 1000).toFixed(0)}K
             </span>
           </div>
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div 
-              className="bg-status-success-bg h-2 rounded-full transition-all" 
+          <div className="w-full bg-muted rounded-full h-1.5">
+            <div
+              className="bg-status-success h-1.5 rounded-full transition-all"
               style={{ width: `${Math.min(revenueProgress, 100)}%` }}
             />
           </div>
@@ -194,7 +177,7 @@ export function GoalsWidget({
             {revenueProgress.toFixed(0)}% of target
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

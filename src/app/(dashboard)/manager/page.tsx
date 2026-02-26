@@ -1,4 +1,7 @@
-﻿import { requirePermission } from "@/lib/auth/permissions";
+﻿import Link from "next/link";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/db";
 import { getDashboardMetrics, getFunnelStats } from "@/lib/db/leads";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
@@ -95,14 +98,22 @@ export default async function MasterDashboard() {
   return (
     <MasterPageClient
       heading={
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            {[
-              contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
-              contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
-            ].filter(Boolean).join(" · ") || "All systems nominal"}
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">
+              {[
+                contextStats.needsAttention > 0 && `${contextStats.needsAttention} client${contextStats.needsAttention !== 1 ? "s" : ""} need attention`,
+                contextStats.availableLeads > 0 && `${contextStats.availableLeads} unclaimed lead${contextStats.availableLeads !== 1 ? "s" : ""} available`,
+              ].filter(Boolean).join(" · ") || "All systems nominal"}
+            </p>
+          </div>
+          <Link href="/discovery">
+            <Button className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+              <Plus className="h-4 w-4" />
+              New Lead
+            </Button>
+          </Link>
         </div>
       }
     >
