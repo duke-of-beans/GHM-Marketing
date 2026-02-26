@@ -53,7 +53,7 @@ export function TerritoryHealthBanner({
   const Icon = cfg.icon;
 
   return (
-    <div className={cn("rounded-xl border px-4 py-3", cfg.bg)}>
+    <div className={cn("rounded-lg border px-4 py-3", cfg.bg)}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <MapPin className={cn("h-4 w-4 flex-shrink-0", cfg.text)} />

@@ -272,7 +272,7 @@ export function RankingsTab({ clientId }: { clientId: number }) {
 
       {/* No keywords state */}
       {activeKeywords.length === 0 && (
-        <div className="border rounded-lg p-8 text-center text-muted-foreground">
+        <div className="border rounded-lg p-6 text-center text-muted-foreground">
           <p className="text-sm mb-2">No keywords being tracked yet.</p>
           <p className="text-xs">Add keywords above to start tracking local rankings.</p>
         </div>

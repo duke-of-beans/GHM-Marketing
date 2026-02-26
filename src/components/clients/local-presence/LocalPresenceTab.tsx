@@ -330,7 +330,7 @@ function AIDraftModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-card rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
+      <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-lg space-y-4">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-violet-500" />
           <h3 className="font-semibold text-lg">AI Post Draft</h3>
@@ -427,7 +427,7 @@ function CreatePostModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-card rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
+      <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-lg space-y-4">
         <h3 className="font-semibold text-lg">New GBP Post</h3>
         <Textarea
           value={summary}

@@ -106,7 +106,7 @@ export function SalesToolsPanel() {
                     >
                       <Button
                         variant="ghost"
-                        className={`w-full h-auto flex-col items-center gap-1.5 p-3 ${tool.bg} hover:opacity-80 border-none rounded-xl`}
+                        className={`w-full h-auto flex-col items-center gap-1.5 p-3 ${tool.bg} hover:opacity-80 border-none rounded-lg`}
                       >
                         <Icon className={`h-5 w-5 ${tool.color}`} />
                         <span className="text-[11px] font-medium leading-tight text-center">

@@ -143,7 +143,7 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
           {/* Drop zone */}
           <div
             className={cn(
-              "relative border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
+              "relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer",
               dragging
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50",

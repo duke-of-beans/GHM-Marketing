@@ -102,7 +102,7 @@ export function BulkImportDialog({ open, onClose, onSuccess, endpoint, title, de
 
             {/* Drop zone */}
             <div
-              className="relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-8 text-center cursor-pointer hover:bg-accent/50 transition-colors"
+              className="relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 text-center cursor-pointer hover:bg-accent/50 transition-colors"
               onClick={() => fileRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}

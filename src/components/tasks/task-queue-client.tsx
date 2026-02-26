@@ -1095,7 +1095,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
 
       {/* Task list or board */}
       {tasks.length === 0 ? (
-        <Card className="p-12 text-center">
+        <Card className="p-6 text-center">
           <CheckCircle2 className="h-12 w-12 text-status-success mx-auto mb-3" />
           <p className="text-lg font-medium">Queue clear</p>
           <p className="text-sm text-muted-foreground mt-1">No tasks match your filters.</p>

@@ -145,7 +145,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
               <a href={active.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><ArrowUpRight className="h-4 w-4" /></a>
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center py-3 border rounded-xl bg-muted/30">
+            <div className="flex flex-wrap gap-6 justify-center py-3 border rounded-lg bg-muted/30">
               <ScoreRing score={active.scorePerformance} label="Performance" />
               <ScoreRing score={active.scoreSeo} label="SEO" />
               <ScoreRing score={active.scoreAccessibility} label="Accessibility" />

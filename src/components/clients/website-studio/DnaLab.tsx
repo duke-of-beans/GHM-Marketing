@@ -142,7 +142,7 @@ export function DnaLab({ clientId, propertyId, propertySlug, onBack }: Props) {
           />
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
+        <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
           <Dna className="h-8 w-8 text-muted-foreground mx-auto" />
           <p className="font-medium">No DNA captured yet</p>
           <p className="text-sm text-muted-foreground">Enter the source website URL above to extract design tokens.</p>

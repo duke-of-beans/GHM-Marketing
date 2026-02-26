@@ -203,7 +203,7 @@ export function AISearchBar({ scopedClientId, onAction }: Props) {
       {mounted && open && createPortal(
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)}>
           <div
-            className="w-full max-w-xl mx-4 rounded-xl border border-border bg-background shadow-2xl overflow-hidden"
+            className="w-full max-w-xl mx-4 rounded-lg border border-border bg-background shadow-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
         {/* Input row */}

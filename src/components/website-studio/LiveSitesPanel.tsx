@@ -62,7 +62,7 @@ export function LiveSitesPanel() {
 
   if (sites.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
+      <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
         <Globe className="h-8 w-8 text-muted-foreground mx-auto" />
         <p className="font-medium">No live sites yet</p>
         <p className="text-sm text-muted-foreground">

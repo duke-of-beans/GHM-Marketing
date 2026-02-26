@@ -101,7 +101,7 @@ export function RecurringTasksClient() {
       </div>
 
       {rules.length === 0 ? (
-        <Card className="p-12 text-center">
+        <Card className="p-6 text-center">
           <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
           <p className="text-muted-foreground text-sm">No recurring rules yet.</p>
           <p className="text-xs text-muted-foreground/70 mt-1">Create a rule to automate task creation on a schedule.</p>

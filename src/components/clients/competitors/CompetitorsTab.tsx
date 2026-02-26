@@ -148,7 +148,7 @@ export function CompetitorsTab({ clientId }: CompetitorsTabProps) {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : competitors.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-8 text-center">
+        <div className="rounded-lg border border-dashed p-6 text-center">
           <Building2 className="mx-auto h-8 w-8 text-muted-foreground/40 mb-3" />
           <p className="text-sm text-muted-foreground">No competitors tracked yet.</p>
           <p className="text-xs text-muted-foreground mt-1">Add up to 5 to include in weekly scans.</p>

@@ -58,7 +58,7 @@ export function BulkActionBar({ selectedIds, onClear, actions, entityLabel = "it
   }
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-xl border border-border bg-background shadow-2xl ring-1 ring-black/5">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 rounded-lg border border-border bg-background shadow-lg ring-1 ring-black/5">
       {/* Count badge */}
       <span className="text-sm font-medium text-foreground mr-2 min-w-[80px]">{label} selected</span>
 

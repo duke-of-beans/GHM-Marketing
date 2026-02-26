@@ -77,7 +77,7 @@ export function GifPicker({
 
       {open && (
         <div
-          className="absolute z-50 bottom-full mb-1 left-0 bg-popover border rounded-xl shadow-lg w-72 flex flex-col overflow-hidden"
+          className="absolute z-50 bottom-full mb-1 left-0 bg-popover border rounded-lg shadow-lg w-72 flex flex-col overflow-hidden"
           style={{ maxHeight: 320 }}
           onClick={(e) => e.stopPropagation()}
         >

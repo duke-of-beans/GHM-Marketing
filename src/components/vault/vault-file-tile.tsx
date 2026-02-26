@@ -143,7 +143,7 @@ export function VaultFileTile({
         onClick={handleTileClick}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleTileClick(e as any); }}
         className={cn(
-          "group relative flex flex-col gap-2 rounded-xl border bg-card p-3 cursor-pointer",
+          "group relative flex flex-col gap-2 rounded-lg border bg-card p-3 cursor-pointer",
           "hover:border-primary/40 hover:bg-muted/30 transition-colors",
           loading && "opacity-50 pointer-events-none"
         )}

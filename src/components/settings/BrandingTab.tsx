@@ -292,7 +292,7 @@ export function BrandingTab() {
             </div>
           ) : (
             <div
-              className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-10 cursor-pointer hover:bg-accent/50 transition-colors"
+              className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 cursor-pointer hover:bg-accent/50 transition-colors"
               onClick={() => fileRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {

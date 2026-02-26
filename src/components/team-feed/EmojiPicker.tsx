@@ -47,7 +47,7 @@ export function EmojiPicker({
       </button>
       {open && (
         <div
-          className="absolute z-50 bottom-full mb-1 left-0 bg-popover border rounded-xl shadow-lg p-2 grid grid-cols-6 gap-0.5 w-52"
+          className="absolute z-50 bottom-full mb-1 left-0 bg-popover border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-0.5 w-52"
           onClick={(e) => e.stopPropagation()}
         >
           {REACTION_EMOJI.map((emoji) => (

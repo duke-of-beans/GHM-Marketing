@@ -72,7 +72,7 @@ export function EmojiPickerButton({
           <SmilePlus className={size === "xs" ? "h-3.5 w-3.5" : "h-4 w-4"} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 border-0 shadow-xl w-auto z-[200]" align="start" side="top" sideOffset={8}>
+      <PopoverContent className="p-0 border-0 shadow-lg w-auto z-[200]" align="start" side="top" sideOffset={8}>
         <EmojiPicker
           data={emojiData}
           onEmojiSelect={(em: { native: string }) => {

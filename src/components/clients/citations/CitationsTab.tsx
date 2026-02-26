@@ -169,7 +169,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
 
       {/* No scan state */}
       {!scan && (
-        <div className="border rounded-lg p-8 text-center text-muted-foreground">
+        <div className="border rounded-lg p-6 text-center text-muted-foreground">
           <Building2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm mb-1">No citation scan on record.</p>
           <p className="text-xs">Run a scan to check NAP consistency across {results.length || "all"} directories.</p>

@@ -753,7 +753,7 @@ export function TeamFeedSidebar({
 
   return (
     <div className={`flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${open ? "w-80" : "w-0"}`}>
-      <div className="w-80 h-[calc(100vh-6rem)] sticky top-0 flex flex-col border rounded-xl bg-card shadow-sm ml-4">
+      <div className="w-80 h-[calc(100vh-6rem)] sticky top-0 flex flex-col border rounded-lg bg-card shadow-sm ml-4">
 
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b flex-shrink-0">

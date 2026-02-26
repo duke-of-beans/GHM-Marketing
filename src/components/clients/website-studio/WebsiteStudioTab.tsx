@@ -176,7 +176,7 @@ export function WebsiteStudioTab({ clientId, businessName }: Props) {
 
 function EmptyState({ onNew, businessName }: { onNew: () => void; businessName: string }) {
   return (
-    <div className="rounded-lg border border-dashed p-10 text-center space-y-3">
+    <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
       <Globe className="h-8 w-8 text-muted-foreground mx-auto" />
       <div>
         <p className="font-medium">No web properties yet</p>
