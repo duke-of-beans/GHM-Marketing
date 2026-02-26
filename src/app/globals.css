@@ -178,4 +178,12 @@
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
   }
+
+  /* Sidebar token utilities — consume --sidebar-* tokens, do NOT modify token values */
+  .sidebar-bg          { background-color: hsl(var(--sidebar)); }
+  .sidebar-text        { color: hsl(var(--sidebar-foreground)); }
+  .sidebar-text-muted  { color: hsl(var(--sidebar-muted)); }
+  .sidebar-text-active { color: hsl(var(--sidebar-active)); }
+  .sidebar-active-bg   { background-color: hsl(var(--sidebar-active-bg)); }
+  .sidebar-border-color { border-color: hsl(var(--sidebar-border)); }
 }

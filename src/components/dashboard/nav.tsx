@@ -195,7 +195,7 @@ function NavGroupSection({
         onClick={toggle}
         className={cn(
           "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors",
-          "text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted dark:hover:bg-card"
+          "text-[hsl(var(--sidebar-muted))] hover:text-[hsl(var(--sidebar-foreground))] hover:bg-[hsl(220_38%_13%)]"
         )}
         aria-expanded={open}
       >
@@ -215,8 +215,8 @@ function NavGroupSection({
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 isActivePath(link.href)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
+                  ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active))] font-medium"
+                  : "text-[hsl(var(--sidebar-foreground))] hover:bg-[hsl(220_38%_13%)] hover:text-[hsl(var(--sidebar-active))]"
               )}
             >
               <span>{link.icon}</span>
@@ -265,7 +265,7 @@ export function DashboardNav({
   return (
     <>
       {/* ── Desktop sidebar ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-muted/50 p-4 overflow-hidden">
+      <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen sidebar-bg p-4 overflow-hidden">
         {/* Logo + user */}
         <div className="mb-4 flex-shrink-0">
           <Link href={dashboardHref}>
@@ -274,7 +274,7 @@ export function DashboardNav({
               <img
                 src={logoUrl}
                 alt={companyName ?? "Company logo"}
-                className="mb-1 max-h-12 max-w-[180px] object-contain hover:opacity-80 transition-opacity"
+                className="mb-1 max-h-12 max-w-[180px] object-contain brightness-0 invert hover:opacity-80 transition-opacity"
               />
             ) : (
               <Image
@@ -282,12 +282,12 @@ export function DashboardNav({
                 alt="GHM Digital Marketing"
                 width={180}
                 height={59}
-                className="mb-1 dark:brightness-0 dark:invert hover:opacity-80 transition-opacity"
+                className="mb-1 brightness-0 invert hover:opacity-80 transition-opacity"
                 priority
               />
             )}
           </Link>
-          <p className="text-xs text-muted-foreground">{user.name}</p>
+          <p className="text-xs sidebar-text-muted">{user.name}</p>
         </div>
 
         {/* Dashboard pinned link (role-specific, outside groups) */}
@@ -297,8 +297,8 @@ export function DashboardNav({
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               isActivePath(dashboardHref)
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
+                ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active))] font-medium"
+                : "sidebar-text hover:bg-[hsl(220_38%_13%)] hover:text-[hsl(var(--sidebar-active))]"
             )}
           >
             <LayoutDashboard className="h-4 w-4 shrink-0" />
@@ -321,14 +321,14 @@ export function DashboardNav({
         </nav>
 
         {/* Bottom actions */}
-        <div className="flex-shrink-0 space-y-1 border-t pt-3 mt-3">
+        <div className="flex-shrink-0 space-y-1 border-t border-[hsl(var(--sidebar-border))] pt-3 mt-3">
           <Link
             href="/profile"
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
               isActivePath("/profile")
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
+                ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active))] font-medium"
+                : "sidebar-text hover:bg-[hsl(220_38%_13%)] hover:text-[hsl(var(--sidebar-active))]"
             )}
           >
             <User className="h-4 w-4 shrink-0" />
@@ -340,8 +340,8 @@ export function DashboardNav({
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 isActivePath("/settings")
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
+                  ? "bg-[hsl(var(--sidebar-active-bg))] text-[hsl(var(--sidebar-active))] font-medium"
+                  : "sidebar-text hover:bg-[hsl(220_38%_13%)] hover:text-[hsl(var(--sidebar-active))]"
               )}
             >
               <Settings className="h-4 w-4 shrink-0" />
@@ -351,11 +351,18 @@ export function DashboardNav({
           <HelpMenu />
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground transition-colors w-full"
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm sidebar-text hover:bg-[hsl(220_38%_13%)] hover:text-[hsl(var(--sidebar-active))] transition-colors w-full"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             Sign Out
           </button>
+        </div>
+
+        {/* Platform attribution */}
+        <div className="flex-shrink-0 pt-2">
+          <p className="text-[10px] text-[hsl(var(--sidebar-muted))] text-center tracking-wide">
+            Powered by COVOS
+          </p>
         </div>
       </aside>
 
