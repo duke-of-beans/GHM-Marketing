@@ -173,7 +173,7 @@ export function TaskChecklist({ taskId, category }: Props) {
           {progress.total > 0 && (
             <div className="w-full bg-muted rounded-full h-1">
               <div
-                className={`h-1 rounded-full transition-all ${pct === 100 ? "bg-status-success-bg" : "bg-blue-500"}`}
+                className={`h-1 rounded-full transition-all ${pct === 100 ? "bg-status-success" : "bg-primary"}`}
                 style={{ width: `${pct}%` }}
               />
             </div>

@@ -140,7 +140,7 @@ export default async function SalesDashboard() {
           title="Available"
           value={availableInTerritory}
           subtitle="In my territory"
-          className="[&_p.text-2xl]:text-blue-600 [&_p.text-3xl]:text-blue-600"
+          className="[&_p.text-2xl]:text-primary [&_p.text-3xl]:text-primary"
           tooltip="Unassigned leads in your territory ready to claim."
         />
         <MetricCard

@@ -131,18 +131,18 @@ type Props = {
 const PRIORITY_COLORS: Record<string, string> = {
   P1: "bg-status-danger-bg text-status-danger",
   P2: "bg-status-warning-bg text-status-warning",
-  P3: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200",
+  P3: "bg-status-info-bg text-status-info",
   P4: "bg-muted text-muted-foreground dark:bg-card",
 };
 
 const STATUS_COLORS: Record<string, string> = {
   queued: "bg-muted text-foreground dark:bg-card",
-  in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200",
+  in_progress: "bg-status-info-bg text-status-info",
   review: "bg-status-warning-bg text-status-warning",
   approved: "bg-status-success-bg text-status-success",
   deployed: "bg-status-success-bg text-status-success",
   measuring: "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-200",
-  complete: "bg-teal-100 text-teal-700 dark:bg-teal-900/60 dark:text-teal-200",
+  complete: "bg-status-success-bg text-status-success",
   rejected: "bg-status-danger-bg text-status-danger",
   cancelled: "bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground",
 };
@@ -567,7 +567,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
         </Card>
         <Card className="p-3">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-blue-500" />
+            <Clock className="h-4 w-4 text-status-info" />
             <span className="text-sm text-muted-foreground">In Progress</span>
           </div>
           <p className="text-2xl font-bold mt-1">{s.in_progress || 0}</p>
@@ -594,7 +594,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
 
   const BOARD_COLUMNS: { status: string; label: string; color: string }[] = [
     { status: "queued", label: "Queued", color: "border-border dark:border-border" },
-    { status: "in_progress", label: "In Progress", color: "border-blue-400 dark:border-blue-500" },
+    { status: "in_progress", label: "In Progress", color: "border-status-info-border" },
     { status: "review", label: "In Review", color: "border-status-warning-border" },
     { status: "approved", label: "Approved", color: "border-status-success-border" },
   ];
@@ -676,7 +676,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-muted-foreground text-xs">Client</p>
-                <Link href={`/clients/${t.clientId}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+                <Link href={`/clients/${t.clientId}`} className="text-primary hover:underline">
                   {t.clientName}
                 </Link>
               </div>

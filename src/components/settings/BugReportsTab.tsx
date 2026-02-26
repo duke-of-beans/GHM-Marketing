@@ -71,7 +71,7 @@ interface BugReport {
 
 const STATUS_OPTIONS = [
   { value: "new", label: "New", icon: AlertTriangle, color: "bg-status-warning-bg text-status-warning" },
-  { value: "acknowledged", label: "Acknowledged", icon: Eye, color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
+  { value: "acknowledged", label: "Acknowledged", icon: Eye, color: "bg-status-info-bg text-status-info" },
   { value: "in-progress", label: "In Progress", icon: Clock, color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
   { value: "resolved", label: "Resolved", icon: CheckCircle2, color: "bg-status-success-bg text-status-success" },
   { value: "wont-fix", label: "Won't Fix", icon: XCircle, color: "bg-muted text-foreground dark:bg-card" },
@@ -142,7 +142,7 @@ function ReportRow({ report, onUpdate }: { report: BugReport; onUpdate: () => vo
             {report.type === "bug" ? (
               <Bug className="h-4 w-4 flex-shrink-0 text-status-warning" />
             ) : (
-              <Lightbulb className="h-4 w-4 flex-shrink-0 text-blue-600" />
+              <Lightbulb className="h-4 w-4 flex-shrink-0 text-status-info" />
             )}
             <span className="font-medium text-sm flex-1 min-w-0 truncate">{report.title}</span>
             <Badge className={`${SEVERITY_COLORS[report.severity] ?? ""} text-[10px] py-0`}>
@@ -163,7 +163,7 @@ function ReportRow({ report, onUpdate }: { report: BugReport; onUpdate: () => vo
               <span>Category: <strong className="text-foreground">{CATEGORY_LABELS[report.category] ?? report.category}</strong></span>
               <span>Filed: {format(new Date(report.createdAt), "MMM d, yyyy h:mm a")}</span>
               {report.pageUrl && (
-                <a href={report.pageUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-600 hover:underline">
+                <a href={report.pageUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
                   <ExternalLink className="h-3 w-3" /> Page URL
                 </a>
               )}
@@ -338,7 +338,7 @@ export function BugReportsTab() {
         {/* Summary badges */}
         <div className="flex gap-3 text-xs pt-1">
           <span className="flex items-center gap-1"><Bug className="h-3.5 w-3.5 text-status-warning" /> {bugs.length} bugs</span>
-          <span className="flex items-center gap-1"><Lightbulb className="h-3.5 w-3.5 text-blue-600" /> {features.length} features</span>
+          <span className="flex items-center gap-1"><Lightbulb className="h-3.5 w-3.5 text-status-info" /> {features.length} features</span>
         </div>
 
         {/* Filters */}

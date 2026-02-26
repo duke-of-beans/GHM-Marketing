@@ -100,7 +100,7 @@ export default async function ClientDetailPage({
         <pre className="bg-muted p-4 rounded text-xs overflow-auto">
           {error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}
         </pre>
-        <Link href="/clients" className="text-blue-600 hover:underline mt-4 block">
+        <Link href="/clients" className="text-primary hover:underline mt-4 block">
           ← Back to Clients
         </Link>
       </div>

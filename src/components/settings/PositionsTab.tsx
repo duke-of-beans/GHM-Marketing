@@ -53,7 +53,7 @@ const ACCESS_LABELS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  sales: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  sales: "bg-status-info-bg text-status-info",
   management: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   operations: "bg-status-success-bg text-status-success",
   contractor: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",

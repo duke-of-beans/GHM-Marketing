@@ -98,7 +98,7 @@ export function LiveSitesPanel() {
 function SiteRow({ site }: { site: LiveSite }) {
   const tierLabel = site.tier?.replace("tier", "T") ?? "";
   const tierColors: Record<string, string> = {
-    tier1: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+    tier1: "bg-status-info-bg text-status-info",
     tier2: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
     tier3: "bg-status-warning-bg text-status-warning",
   };

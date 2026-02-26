@@ -54,7 +54,7 @@ export type ClientTask = {
 function priorityColor(p: string) {
   if (p === "Critical" || p === "P1") return "bg-status-danger-bg text-status-danger";
   if (p === "High" || p === "P2") return "bg-status-warning-bg text-status-warning";
-  if (p === "Standard" || p === "P3") return "bg-blue-100 text-blue-800";
+  if (p === "Standard" || p === "P3") return "bg-status-info-bg text-status-info";
   return "bg-muted text-foreground";
 }
 
@@ -239,7 +239,7 @@ export function ClientTasksTab({ clientId, initialTasks }: Props) {
                                 {categoryLabel(task.category)}
                               </Badge>
                               {task.source !== "manual" && (
-                                <Badge variant="outline" className="text-[10px] bg-blue-50 text-blue-700">
+                                <Badge variant="outline" className="text-[10px] bg-status-info-bg text-status-info">
                                   {task.source}
                                 </Badge>
                               )}

@@ -25,8 +25,8 @@ const tools = [
     label: "Pipeline",
     icon: TrendingUp,
     href: "/leads",
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-50 dark:bg-blue-950/40",
+    color: "text-status-info",
+    bg: "bg-status-info-bg",
     tooltip: "Your active leads and pipeline.",
   },
   {

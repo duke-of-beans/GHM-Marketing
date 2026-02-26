@@ -198,16 +198,16 @@ function StepTerritory({ territory }: { territory: { id: number; name: string } 
   return (
     <StepCard>
       <div className="flex items-center gap-2">
-        <MapPin className="h-5 w-5 text-blue-500" />
+        <MapPin className="h-5 w-5 text-status-info" />
         <h2 className="text-xl font-bold">Your Territory</h2>
       </div>
       {territory ? (
         <div className="space-y-3">
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 p-4">
-            <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
+          <div className="rounded-lg bg-status-info-bg/20 border border-status-info-border p-4">
+            <p className="text-lg font-semibold text-status-info">
               {territory.name}
             </p>
-            <p className="text-sm text-blue-600 dark:text-blue-400 mt-0.5">
+            <p className="text-sm text-status-info mt-0.5">
               Assigned and active
             </p>
           </div>
@@ -303,9 +303,9 @@ function StepFirstLead() {
       <div className="grid grid-cols-2 gap-3">
         <a
           href="/leads?filter=available"
-          className="flex flex-col gap-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+          className="flex flex-col gap-2 p-4 rounded-lg bg-status-info-bg/20 hover:bg-status-info-bg/40 border border-status-info-border/40 transition-colors"
         >
-          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <Target className="h-6 w-6 text-status-info" />
           <div>
             <p className="text-sm font-semibold">Claim Available Leads</p>
             <p className="text-xs text-muted-foreground mt-0.5">

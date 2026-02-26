@@ -122,7 +122,7 @@ export function UserPermissionCard({
   const roleColors: Record<AppRole, string> = {
     admin: "bg-status-danger-bg text-status-danger",
     manager: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    sales: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    sales: "bg-status-info-bg text-status-info",
   };
 
   // Roles the current viewer is allowed to assign
@@ -210,7 +210,7 @@ export function UserPermissionCard({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-blue-600"
+                  className="text-muted-foreground hover:text-primary"
                   onClick={onResetOnboarding}
                   title="Reset onboarding — user will go through setup wizard again on next login"
                 >
