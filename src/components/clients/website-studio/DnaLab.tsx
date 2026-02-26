@@ -97,7 +97,7 @@ export function DnaLab({ clientId, propertyId, propertySlug, onBack }: Props) {
               className="flex-1 h-8 text-sm"
             />
             <Button size="sm" onClick={handleCapture} disabled={capturing} className="h-8 text-xs">
-              {capturing ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Capturing...</> : <><RefreshCw className="h-3 w-3 mr-1" /> Capture DNA</>}
+              {capturing ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Capturing...</> : <><RefreshCw className="h-4 w-4 mr-1" /> Capture DNA</>}
             </Button>
           </div>
           {capture && (
@@ -250,10 +250,10 @@ function TokenRow({
           <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className="h-6 text-xs flex-1" />
           <Input value={editNote} onChange={(e) => setEditNote(e.target.value)} placeholder="Note (required)" className="h-6 text-xs w-32" />
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={handleSave} disabled={saving}>
-            <Check className="h-3 w-3 text-status-success" />
+            <Check className="h-4 w-4 text-status-success" />
           </Button>
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => setEditing(false)}>
-            <X className="h-3 w-3" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (

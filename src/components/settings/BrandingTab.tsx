@@ -385,7 +385,7 @@ export function BrandingTab() {
                       onClick={() => update(role.key, role.defaultHex)}
                       title="Reset to default"
                     >
-                      <RotateCcw className="h-3 w-3" /> Reset
+                      <RotateCcw className="h-4 w-4" /> Reset
                     </button>
                   )}
                 </div>

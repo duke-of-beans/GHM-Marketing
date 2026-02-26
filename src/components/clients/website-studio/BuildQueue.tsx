@@ -152,9 +152,9 @@ function DeployButton({
       disabled={deploying}
     >
       {deploying ? (
-        <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Deploying...</>
+        <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Deploying...</>
       ) : (
-        <><Rocket className="h-3 w-3 mr-1" /> Deploy</>
+        <><Rocket className="h-4 w-4 mr-1" /> Deploy</>
       )}
     </Button>
   );

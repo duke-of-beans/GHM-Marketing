@@ -176,20 +176,20 @@ export function StockPhotoPicker({ onSelect, trigger, initialQuery = "", inline 
                       <button
                         onClick={() => copyUrl(photo)}
                         title="Copy URL"
-                        className="h-7 w-7 rounded-md bg-background/90 flex items-center justify-center hover:bg-background transition-colors"
+                        className="h-8 w-8 rounded-md bg-background/90 flex items-center justify-center hover:bg-background transition-colors"
                       >
                         {copiedId === photo.id
-                          ? <Check className="h-3.5 w-3.5 text-status-success" />
-                          : <Copy className="h-3.5 w-3.5" />}
+                          ? <Check className="h-4 w-4 text-status-success" />
+                          : <Copy className="h-4 w-4" />}
                       </button>
                       <a
                         href={photo.photoPageUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         title="View original"
-                        className="h-7 w-7 rounded-md bg-background/90 flex items-center justify-center hover:bg-background transition-colors"
+                        className="h-8 w-8 rounded-md bg-background/90 flex items-center justify-center hover:bg-background transition-colors"
                       >
-                        <ExternalLink className="h-3.5 w-3.5" />
+                        <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
                     <div>

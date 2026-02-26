@@ -392,7 +392,7 @@ export function DataImportTab() {
                       onChange={e => setCreds(c => ({ ...c, [f.key === "extra" ? "Token" : f.key]: e.target.value }))} />
                   </div>
                 ))}
-                {meta.docsUrl && <a href={meta.docsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">API token docs <ExternalLink className="h-3 w-3" /></a>}
+                {meta.docsUrl && <a href={meta.docsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary flex items-center gap-1 hover:underline">API token docs <ExternalLink className="h-4 w-4" /></a>}
                 <div className="flex gap-2 pt-2">
                   <Button variant="outline" onClick={() => setStep("platform")}><ArrowLeft className="h-4 w-4 mr-1" />Back</Button>
                   <Button onClick={handleConnect} disabled={loading}>
@@ -615,7 +615,7 @@ export function DataImportTab() {
               <div className="w-full text-left">
                 <button onClick={() => setErrorsOpen(o => !o)}
                   className="flex items-center gap-1 text-xs text-status-warning hover:underline">
-                  {errorsOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                  {errorsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                   {commitResult.errors.length} task{commitResult.errors.length > 1 ? "s" : ""} had errors
                 </button>
                 {errorsOpen && (

@@ -374,7 +374,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
                         {val !== role.default && (
                           <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                             onClick={() => update(role.key, role.default)}>
-                            <RotateCcw className="h-3 w-3" /> Reset
+                            <RotateCcw className="h-4 w-4" /> Reset
                           </button>
                         )}
                       </div>
@@ -564,7 +564,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
                   ))}
                   <button onClick={loadIntegrations}
                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-2">
-                    <RotateCcw className="h-3 w-3" /> Refresh
+                    <RotateCcw className="h-4 w-4" /> Refresh
                   </button>
                 </div>
               ) : (

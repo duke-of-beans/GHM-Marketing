@@ -140,16 +140,16 @@ export function RecurringTasksClient() {
                   />
                   <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Edit rule" onClick={() => { setEditRule(rule); setFormOpen(true); }}>
-                      <Pencil className="h-3.5 w-3.5" />
+                    <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Edit rule" onClick={() => { setEditRule(rule); setFormOpen(true); }}>
+                      <Pencil className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Edit rule</TooltipContent>
                 </Tooltip>
                   <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 hover:text-destructive" aria-label="Delete rule" onClick={() => deleteRule(rule.id)}>
-                      <Trash2 className="h-3.5 w-3.5" />
+                    <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-destructive" aria-label="Delete rule" onClick={() => deleteRule(rule.id)}>
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Delete rule permanently</TooltipContent>

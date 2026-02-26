@@ -222,12 +222,12 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="shrink-0 h-7 w-7"
+                  className="shrink-0 h-8 w-8"
                   onClick={() => copyToClipboard(kw.keyword)}
                   aria-label="Copy keyword"
                   title="Copy keyword"
                 >
-                  <Copy className="h-3.5 w-3.5" />
+                  <Copy className="h-4 w-4" />
                 </Button>
               </div>
             ))}

@@ -134,9 +134,9 @@ export function IntegrationsTab() {
                       asChild
                     >
                       <a href={CONFIGURE_LINKS[integration.id]} target="_blank" rel="noopener noreferrer">
-                        <Settings2 className="h-3 w-3" />
+                        <Settings2 className="h-4 w-4" />
                         Configure
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
                   )}
@@ -144,13 +144,13 @@ export function IntegrationsTab() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
+                      className="h-8 w-8"
                       onClick={load}
                       disabled={checking}
                       aria-label="Re-check connection"
                       title="Re-check connection"
                     >
-                      <RefreshCw className={`h-3.5 w-3.5 ${checking ? "animate-spin" : ""}`} />
+                      <RefreshCw className={`h-4 w-4 ${checking ? "animate-spin" : ""}`} />
                     </Button>
                   )}
                 </div>

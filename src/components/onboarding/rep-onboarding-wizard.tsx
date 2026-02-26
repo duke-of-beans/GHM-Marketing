@@ -75,7 +75,7 @@ export function RepOnboardingWizard({ userName, currentStep, territory }: Props)
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <LogOut className="h-3 w-3" />
+              <LogOut className="h-4 w-4" />
               Sign out
             </button>
           </div>

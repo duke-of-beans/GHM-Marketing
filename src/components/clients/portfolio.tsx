@@ -358,7 +358,7 @@ export function ClientPortfolio({
             <Button variant="outline">
               <Download className="h-4 w-4 mr-1" />
               Export
-              <ChevronDown className="h-3 w-3 ml-1" />
+              <ChevronDown className="h-4 w-4 ml-1" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

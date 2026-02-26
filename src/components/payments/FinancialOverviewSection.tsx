@@ -248,8 +248,8 @@ export function FinancialOverviewSection() {
               <CardTitle className="text-sm font-medium">Recent Transactions</CardTitle>
               <Tooltip>
               <TooltipTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Refresh transactions" onClick={load}>
-                  <RefreshCw className="w-3.5 h-3.5" />
+                <Button size="icon" variant="ghost" className="h-8 w-8" aria-label="Refresh transactions" onClick={load}>
+                  <RefreshCw className="w-4 h-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Refresh transactions</TooltipContent>

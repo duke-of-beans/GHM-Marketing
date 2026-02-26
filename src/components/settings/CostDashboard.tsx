@@ -169,7 +169,7 @@ export function CostDashboard() {
               disabled={flushing || data.cache.expiredEntries === 0}
               className="gap-1.5 h-7 text-xs"
             >
-              <Trash2 className={`h-3 w-3 ${flushing ? "animate-spin" : ""}`} />
+              <Trash2 className={`h-4 w-4 ${flushing ? "animate-spin" : ""}`} />
               Flush Expired ({data.cache.expiredEntries})
             </Button>
           </div>
@@ -194,7 +194,7 @@ export function CostDashboard() {
 
       <div className="flex justify-end">
         <Button variant="ghost" size="sm" onClick={load} className="gap-1.5 text-xs">
-          <RefreshCw className="h-3 w-3" />
+          <RefreshCw className="h-4 w-4" />
           Refresh
         </Button>
       </div>

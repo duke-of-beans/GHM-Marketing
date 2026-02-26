@@ -66,7 +66,7 @@ export function EmojiPickerButton({
           type="button"
           variant="ghost"
           size="icon"
-          className={size === "xs" ? "h-6 w-6" : "h-7 w-7"}
+          className={size === "xs" ? "h-6 w-6" : "h-8 w-8"}
           title="Add emoji"
         >
           <SmilePlus className={size === "xs" ? "h-3.5 w-3.5" : "h-4 w-4"} />
@@ -131,7 +131,7 @@ export function GifPickerButton({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" className="h-7 w-7" title="Add GIF">
+        <Button type="button" variant="ghost" size="icon" className="h-8 w-8" title="Add GIF">
           <span className="text-[10px] font-bold tracking-tight">GIF</span>
         </Button>
       </PopoverTrigger>

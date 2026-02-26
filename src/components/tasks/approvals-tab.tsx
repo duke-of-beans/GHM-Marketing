@@ -363,7 +363,7 @@ export function ApprovalsTab() {
                     disabled={actioning === `task-changes-${task.id}`}
                     onClick={() => requestChangesTask(task.id)}
                   >
-                    <AlertCircle className="h-3 w-3 mr-1" />
+                    <AlertCircle className="h-4 w-4 mr-1" />
                     {actioning === `task-changes-${task.id}` ? "Sending…" : "Request Changes"}
                   </Button>
                   <Button
@@ -372,7 +372,7 @@ export function ApprovalsTab() {
                     disabled={actioning === `task-approve-${task.id}`}
                     onClick={() => approveTask(task.id)}
                   >
-                    <CheckCircle className="h-3 w-3 mr-1" />
+                    <CheckCircle className="h-4 w-4 mr-1" />
                     {actioning === `task-approve-${task.id}` ? "Approving…" : "Approve"}
                   </Button>
                 </div>
@@ -430,7 +430,7 @@ export function ApprovalsTab() {
                       disabled={actioning === `content-reject-${item.id}`}
                       onClick={() => actionContent(item.id, "reject")}
                     >
-                      <XCircle className="h-3 w-3 mr-1" />
+                      <XCircle className="h-4 w-4 mr-1" />
                       {actioning === `content-reject-${item.id}` ? "Sending…" : "Send Back"}
                     </Button>
                     <Button
@@ -439,7 +439,7 @@ export function ApprovalsTab() {
                       disabled={actioning === `content-approve-${item.id}`}
                       onClick={() => actionContent(item.id, "approve")}
                     >
-                      <CheckCircle className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-4 w-4 mr-1" />
                       {actioning === `content-approve-${item.id}` ? "Approving…" : "Approve"}
                     </Button>
                   </div>
@@ -500,7 +500,7 @@ export function ApprovalsTab() {
                   {/* Vendor ID warning */}
                   {!group.hasVendorId && (
                     <div className="flex items-center gap-1.5 text-xs text-status-warning mb-3 bg-status-warning-bg rounded px-2 py-1.5">
-                      <AlertTriangle className="h-3 w-3 shrink-0" />
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
                       No Wave vendor ID — approval will succeed but Wave bill won&apos;t be created. Set contractor info in Team settings first.
                     </div>
                   )}
@@ -511,7 +511,7 @@ export function ApprovalsTab() {
                       disabled={isActioning}
                       onClick={() => approvePaymentGroup(group)}
                     >
-                      <CheckCircle className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-4 w-4 mr-1" />
                       {isActioning ? "Approving…" : `Approve $${group.totalAmount.toFixed(2)}`}
                     </Button>
                   </div>

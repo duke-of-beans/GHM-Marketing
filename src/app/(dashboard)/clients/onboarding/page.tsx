@@ -173,7 +173,7 @@ export default function OnboardingQueuePage() {
                     <td className="p-3">
                       <Link href={`/clients/onboarding/${s.id}`}>
                         <Button size="sm" variant="ghost" className="gap-1">
-                          View <ExternalLink className="h-3 w-3" />
+                          View <ExternalLink className="h-4 w-4" />
                         </Button>
                       </Link>
                     </td>

@@ -166,12 +166,12 @@ export function VersionHistoryDialog({
                         >
                           {restoring === version.id ? (
                             <>
-                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                               Restoring...
                             </>
                           ) : (
                             <>
-                              <RotateCcw className="h-3 w-3 mr-1" />
+                              <RotateCcw className="h-4 w-4 mr-1" />
                               Restore
                             </>
                           )}

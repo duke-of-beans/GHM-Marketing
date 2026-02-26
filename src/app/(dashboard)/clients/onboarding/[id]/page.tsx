@@ -282,7 +282,7 @@ export default function OnboardingDetailPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <Link href="/clients/onboarding" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-1">
-            <ArrowLeft className="h-3 w-3" /> Back to queue
+            <ArrowLeft className="h-4 w-4" /> Back to queue
           </Link>
           <h1 className="text-2xl font-bold">
             {submission.lead?.businessName ?? "Onboarding Submission"}

@@ -167,7 +167,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
                   {link.replace(/^https?:\/\//, "").substring(0, 42)}…
                 </span>
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0 shrink-0" onClick={handleCopy}>
-                  {copied ? <Check className="h-3 w-3 text-status-success" /> : <Copy className="h-3 w-3" />}
+                  {copied ? <Check className="h-4 w-4 text-status-success" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
 
@@ -188,12 +188,12 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
 
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={handleCopy} className="flex-1">
-                  {copied ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                  {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                   {copied ? "Copied!" : "Copy Link"}
                 </Button>
                 {status === "expired" && (
                   <Button size="sm" variant="outline" onClick={handleGenerate} disabled={generating}>
-                    <RefreshCw className="h-3 w-3 mr-1" />
+                    <RefreshCw className="h-4 w-4 mr-1" />
                     Refresh
                   </Button>
                 )}

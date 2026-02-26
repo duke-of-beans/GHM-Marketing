@@ -151,7 +151,7 @@ export function TaskChecklist({ taskId, category }: Props) {
               {progress.done}/{progress.total}
             </Badge>
           )}
-          {collapsed ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+          {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
         </button>
 
         {items.length === 0 && templates.length > 0 && !collapsed && (

@@ -95,11 +95,11 @@ export function MyTasksWidget() {
           <div className="flex gap-3 text-xs">
             {stats.overdue > 0 && (
               <span className="flex items-center gap-1 text-status-danger font-medium">
-                <AlertTriangle className="h-3 w-3" /> {stats.overdue} overdue
+                <AlertTriangle className="h-4 w-4" /> {stats.overdue} overdue
               </span>
             )}
             <span className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="h-3 w-3" /> {stats.queued} queued
+              <Clock className="h-4 w-4" /> {stats.queued} queued
             </span>
             {stats.in_progress > 0 && (
               <span className="text-muted-foreground">{stats.in_progress} in progress</span>

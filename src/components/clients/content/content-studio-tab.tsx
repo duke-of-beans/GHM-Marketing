@@ -276,7 +276,7 @@ function ContentCard({ item, onUpdate }: { item: ContentItem; onUpdate: () => vo
                 className="text-xs h-7"
                 onClick={() => setExpanded(!expanded)}
               >
-                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </div>
           </div>

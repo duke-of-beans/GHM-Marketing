@@ -175,8 +175,8 @@ export function CompetitorsTab({ clientId }: CompetitorsTabProps) {
                   Added {new Date(c.addedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                 </Badge>
                 <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(c)}
-                  className="text-muted-foreground hover:text-status-danger h-7 w-7 p-0">
-                  <Trash2 className="h-3.5 w-3.5" />
+                  className="text-muted-foreground hover:text-status-danger h-8 w-8 p-0">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>

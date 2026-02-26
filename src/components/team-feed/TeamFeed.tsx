@@ -247,7 +247,7 @@ function ComposeMessage({
                     className="h-7 text-xs px-2"
                     onClick={() => setIsPinned(!isPinned)}
                   >
-                    <Pin className="h-3 w-3 mr-1" />
+                    <Pin className="h-4 w-4 mr-1" />
                     {isPinned ? "Pinned" : "Pin"}
                   </Button>
                 </TooltipTrigger>
@@ -266,7 +266,7 @@ function ComposeMessage({
           <p className="flex items-center gap-0.5 text-[10px] text-muted-foreground ml-1">{modSymbol}<CornerDownLeft className="h-3.5 w-3.5" /> to send</p>
         </div>
         <Button size="sm" onClick={send} disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs">
-          <Send className="h-3 w-3 mr-1" />
+          <Send className="h-4 w-4 mr-1" />
           {sending ? "Sending…" : "Send"}
         </Button>
       </div>
@@ -339,7 +339,7 @@ function MessageRow({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Pin className="h-3 w-3 text-status-warning cursor-default" />
+                    <Pin className="h-4 w-4 text-status-warning cursor-default" />
                   </TooltipTrigger>
                   <TooltipContent side="top">
                     <p className="text-xs">Pinned — always visible at the top of the feed</p>
@@ -368,7 +368,7 @@ function MessageRow({
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                 onClick={(e) => { e.stopPropagation(); setReplying(!replying); }}
               >
-                <Reply className="h-3 w-3" /> Reply
+                <Reply className="h-4 w-4" /> Reply
               </button>
             )}
             {hasReplies && showReplies && (
@@ -376,7 +376,7 @@ function MessageRow({
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                 onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
               >
-                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {msg.replies.length} {msg.replies.length === 1 ? "reply" : "replies"}
               </button>
             )}

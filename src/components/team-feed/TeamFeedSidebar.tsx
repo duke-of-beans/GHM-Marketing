@@ -369,7 +369,7 @@ function ComposeBox({
 
         <Button size="sm" onClick={send}
           disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs px-3 ml-1">
-          {sending ? "…" : <><Send className="h-3 w-3 mr-1" />Send</>}
+          {sending ? "…" : <><Send className="h-4 w-4 mr-1" />Send</>}
         </Button>
       </div>
     </div>
@@ -492,7 +492,7 @@ function MessageRow({
               />
               <div className="flex gap-1.5">
                 <Button size="sm" className="h-6 text-xs" onClick={saveEdit} disabled={saving}>
-                  <Check className="h-3 w-3 mr-1" />{saving ? "Saving…" : "Save"}
+                  <Check className="h-4 w-4 mr-1" />{saving ? "Saving…" : "Save"}
                 </Button>
                 <Button size="sm" variant="ghost" className="h-6 text-xs"
                   onClick={() => { setEditing(false); setEditContent(msg.content); }}>
@@ -538,12 +538,12 @@ function MessageRow({
 
             <button className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
               onClick={(e) => { e.stopPropagation(); setReplying(!replying); }}>
-              <Reply className="h-3 w-3" /> Reply
+              <Reply className="h-4 w-4" /> Reply
             </button>
             {hasReplies && (
               <button className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
                 onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}>
-                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {msg.replies.length} {msg.replies.length === 1 ? "reply" : "replies"}
               </button>
             )}
@@ -646,11 +646,11 @@ function PinnedBanner({
         className="w-full flex items-center gap-2 px-4 py-2 text-xs hover:bg-status-warning-bg/50 dark:hover:bg-status-warning-bg/20 transition-colors"
         onClick={() => setOpen(!open)}
       >
-        <Pin className="h-3 w-3 text-status-warning flex-shrink-0" />
+        <Pin className="h-4 w-4 text-status-warning flex-shrink-0" />
         <span className="font-medium text-status-warning flex-1 text-left">
           {messages.length} pinned {messages.length === 1 ? "message" : "messages"}
         </span>
-        {open ? <ChevronUp className="h-3 w-3 text-status-warning" /> : <ChevronRight className="h-3 w-3 text-status-warning" />}
+        {open ? <ChevronUp className="h-4 w-4 text-status-warning" /> : <ChevronRight className="h-4 w-4 text-status-warning" />}
       </button>
       {open && (
         <div className="px-3 pb-3 space-y-2">
@@ -780,7 +780,7 @@ export function TeamFeedSidebar({
                 className="text-muted-foreground hover:text-foreground transition-colors">
                 <Search className="h-4 w-4" />
               </button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
                 <X className="h-4 w-4" />
               </Button>
             </>

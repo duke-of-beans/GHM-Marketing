@@ -178,8 +178,8 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
               disabled={bulkBusy}
             >
               {bulkBusy
-                ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" />Approving...</>
-                : <><CheckCheck className="h-3 w-3 mr-1" />Approve All Cleared ({clearableCount})</>
+                ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" />Approving...</>
+                : <><CheckCheck className="h-4 w-4 mr-1" />Approve All Cleared ({clearableCount})</>
               }
             </Button>
           )}
@@ -261,7 +261,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                         className="h-7 text-xs border-status-warning-border text-status-warning hover:bg-status-warning-bg"
                         onClick={() => setExpanded(e => ({ ...e, [page.id]: true }))}
                       >
-                        <ShieldAlert className="h-3 w-3 mr-1" />Override
+                        <ShieldAlert className="h-4 w-4 mr-1" />Override
                       </Button>
                     )}
                     {(page.scrvnrStatus === "cleared" || page.scrvnrStatus === "override") && (
@@ -272,7 +272,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                         onClick={() => reviewPage(page.id, "approved")}
                         disabled={isBusy}
                       >
-                        {isBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3 mr-1" />}
+                        {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-1" />}
                         Approve
                       </Button>
                     )}
@@ -283,7 +283,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                       onClick={() => reviewPage(page.id, "changes_requested")}
                       disabled={isBusy}
                     >
-                      <XCircle className="h-3 w-3 mr-1" />Reject
+                      <XCircle className="h-4 w-4 mr-1" />Reject
                     </Button>
                   </div>
                 )}
@@ -301,7 +301,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                   {result?.failedSections && result.failedSections.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-status-danger flex items-center gap-1 mb-1">
-                        <AlertTriangle className="h-3 w-3" />Failed sections
+                        <AlertTriangle className="h-4 w-4" />Failed sections
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {result.failedSections.map(s => (
@@ -339,7 +339,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                           reviewPage(page.id, "approved", { overrideNote: overrideNote[page.id] })
                         }
                       >
-                        {isBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShieldAlert className="h-3 w-3 mr-1" />}
+                        {isBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldAlert className="h-4 w-4 mr-1" />}
                         Override & Approve
                       </Button>
                     </div>
