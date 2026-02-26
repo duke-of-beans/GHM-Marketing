@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sheet,
@@ -85,8 +86,8 @@ function initials(name: string) {
 }
 
 function priorityBadge(priority: string) {
-  if (priority === "urgent") return <Badge className="bg-status-danger-bg text-status-danger text-[10px] py-0">Urgent</Badge>;
-  if (priority === "important") return <Badge className="bg-status-warning-bg text-status-warning text-[10px] py-0">Important</Badge>;
+  if (priority === "urgent") return <StatusBadge variant="danger">Urgent</StatusBadge>;
+  if (priority === "important") return <StatusBadge variant="warning">Important</StatusBadge>;
   return null;
 }
 

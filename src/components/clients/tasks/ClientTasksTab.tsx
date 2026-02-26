@@ -114,7 +114,7 @@ function AddTaskDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="text-xs">+ Add Task</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>New Task</DialogTitle>
         </DialogHeader>

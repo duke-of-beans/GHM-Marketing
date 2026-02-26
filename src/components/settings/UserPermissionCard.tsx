@@ -343,7 +343,7 @@ export function UserPermissionCard({
 
       {/* Deactivate Confirmation */}
       <Dialog open={deactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Deactivate {user.name}?</DialogTitle>
             <DialogDescription>
@@ -370,7 +370,7 @@ export function UserPermissionCard({
 
       {/* Hard Delete Confirmation */}
       <Dialog open={hardDeleteDialogOpen} onOpenChange={setHardDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-destructive">Permanently Delete {user.name}?</DialogTitle>
             <DialogDescription>

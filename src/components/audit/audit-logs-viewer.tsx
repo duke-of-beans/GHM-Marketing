@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { 
   Shield, 
   AlertCircle, 
@@ -114,9 +115,9 @@ export function AuditLogsViewer() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "success":
-        return <Badge className="bg-status-success-bg text-status-success"><CheckCircle className="h-3 w-3 mr-1" />Success</Badge>;
+        return <StatusBadge variant="success"><CheckCircle className="h-3 w-3 mr-1" />Success</StatusBadge>;
       case "denied":
-        return <Badge className="bg-status-danger-bg text-status-danger"><XCircle className="h-3 w-3 mr-1" />Denied</Badge>;
+        return <StatusBadge variant="danger"><XCircle className="h-3 w-3 mr-1" />Denied</StatusBadge>;
       case "error":
         return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Error</Badge>;
       default:

@@ -8,6 +8,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -60,11 +61,11 @@ const fmt = {
   int: (n: number) => n.toLocaleString("en-US"),
 };
 
-function StatusBadge({ status }: { status: string }) {
+function CampaignStatusBadge({ status }: { status: string }) {
   if (status === "ENABLED")
-    return <Badge className="bg-status-success-bg text-status-success border-status-success-border text-[10px]">Active</Badge>;
+    return <StatusBadge variant="success">Active</StatusBadge>;
   if (status === "PAUSED")
-    return <Badge className="bg-status-warning-bg text-status-warning border-status-warning-border text-[10px]">Paused</Badge>;
+    return <StatusBadge variant="warning">Paused</StatusBadge>;
   return <Badge variant="outline" className="text-[10px]">{status}</Badge>;
 }
 
@@ -106,7 +107,7 @@ function CampaignsTable({ campaigns }: { campaigns: CampaignData[] }) {
               {campaigns.map((c) => (
                 <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-2.5 font-medium max-w-[200px] truncate">{c.name}</td>
-                  <td className="px-3 py-2.5 text-center"><StatusBadge status={c.status} /></td>
+                  <td className="px-3 py-2.5 text-center"><CampaignStatusBadge status={c.status} /></td>
                   <td className="px-3 py-2.5 text-right">{fmt.usd(c.spend)}</td>
                   <td className="px-3 py-2.5 text-right text-muted-foreground">{fmt.int(c.impressions)}</td>
                   <td className="px-3 py-2.5 text-right">{fmt.int(c.clicks)}</td>

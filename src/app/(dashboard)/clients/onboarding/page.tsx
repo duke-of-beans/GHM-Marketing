@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDistanceToNow, format } from "date-fns";
@@ -111,7 +112,7 @@ export default function OnboardingQueuePage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
+        <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
           <p className="text-sm">No submissions found</p>
         </div>
       ) : (
@@ -163,9 +164,9 @@ export default function OnboardingQueuePage() {
                     </td>
                     <td className="p-3">
                       {s.onboardingComplete ? (
-                        <Badge variant="outline" className="text-status-success border-status-success-border bg-status-success-bg gap-1">
+                        <StatusBadge variant="success" className="gap-1">
                           <CheckCircle2 className="h-3 w-3" /> Done
-                        </Badge>
+                        </StatusBadge>
                       ) : (
                         <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" /> In Progress</Badge>
                       )}

@@ -119,7 +119,7 @@ function AddKeywordsDialog({ clientId, onAdded }: { clientId: number; onAdded: (
           <Plus className="h-4 w-4 mr-1" /> Add Keywords
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add Keywords</DialogTitle>
         </DialogHeader>

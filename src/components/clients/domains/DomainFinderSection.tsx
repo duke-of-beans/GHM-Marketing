@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,7 +45,7 @@ function SuggestionRow({ s }: { s: DomainSuggestion }) {
       </div>
       <div className="flex items-center gap-3">
         {s.available ? (
-          <Badge className="bg-status-success-bg text-status-success border-status-success-border text-[10px]">Available</Badge>
+          <StatusBadge variant="success">Available</StatusBadge>
         ) : (
           <Badge variant="outline" className="text-[10px] text-status-danger">Taken</Badge>
         )}
@@ -74,7 +75,7 @@ function ParkedRow({ d }: { d: OwnedDomain }) {
         <p className="text-xs text-muted-foreground">{expiresLabel(d.expires)}</p>
       </div>
       <div className="flex items-center gap-2">
-        <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[10px]">GHM Parked</Badge>
+        <StatusBadge variant="info">GHM Parked</StatusBadge>
         {d.renewable && (
           <Badge variant="outline" className="text-[10px]">Renewable</Badge>
         )}

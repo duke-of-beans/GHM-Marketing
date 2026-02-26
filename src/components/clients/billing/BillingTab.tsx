@@ -238,12 +238,12 @@ export function BillingTab({ clientId, businessName }: { clientId: number; busin
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Issued</TableHead>
-                  <TableHead>Due</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Paid</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Invoice</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Issued</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Due</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Amount</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Status</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Paid</TableHead>
                   <TableHead className="w-8"></TableHead>
                 </TableRow>
               </TableHeader>

@@ -18,6 +18,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -77,9 +78,9 @@ function initials(name: string) {
 
 function priorityBadge(priority: string) {
   if (priority === "urgent")
-    return <Badge className="bg-status-danger-bg text-status-danger text-[10px] py-0">Urgent</Badge>;
+    return <StatusBadge variant="danger">Urgent</StatusBadge>;
   if (priority === "important")
-    return <Badge className="bg-status-warning-bg text-status-warning text-[10px] py-0">Important</Badge>;
+    return <StatusBadge variant="warning">Important</StatusBadge>;
   return null;
 }
 
@@ -803,8 +804,8 @@ export function TeamFeedSidebar({
               {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}
             </div>
           ) : feedMessages.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-30" />
+            <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+              <MessageSquare className="h-8 w-8 mb-2 opacity-30" />
               <p className="text-sm">{search ? "No messages found." : voice.empty.teamFeed.body}</p>
             </div>
           ) : (

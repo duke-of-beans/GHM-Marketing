@@ -118,7 +118,7 @@ export function CompetitorsTab({ clientId }: CompetitorsTabProps) {
                 <Plus className="h-3.5 w-3.5" />Add Competitor
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader><DialogTitle>Add Competitor</DialogTitle></DialogHeader>
               <div className="space-y-4 pt-2">
                 <div className="space-y-1.5">

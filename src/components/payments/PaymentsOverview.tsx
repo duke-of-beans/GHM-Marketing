@@ -252,13 +252,13 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Client</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Retainer</TableHead>
-                <TableHead>Latest Invoice</TableHead>
-                <TableHead>Due</TableHead>
-                <TableHead>Inv Status</TableHead>
-                <TableHead>Last Payment</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Client</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Status</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Retainer</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Latest Invoice</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Due</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Inv Status</TableHead>
+                <TableHead className="text-xs font-medium uppercase tracking-wider">Last Payment</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -350,10 +350,10 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Partner</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Transactions</TableHead>
-                  <TableHead>Total Due</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Partner</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Role</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Transactions</TableHead>
+                  <TableHead className="text-xs font-medium uppercase tracking-wider">Total Due</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

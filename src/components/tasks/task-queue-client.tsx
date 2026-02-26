@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TaskChecklist } from "@/components/tasks/task-checklist";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -665,7 +666,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
             <div className="flex items-center gap-2">
               <Badge className={PRIORITY_COLORS[t.priority] || ""}>{t.priority}</Badge>
               <Badge className={STATUS_COLORS[t.status] || ""}>{STATUS_LABELS[t.status]}</Badge>
-              {t.isOverdue && <Badge className="bg-status-danger-bg text-white text-[10px]">OVERDUE</Badge>}
+              {t.isOverdue && <StatusBadge variant="danger">OVERDUE</StatusBadge>}
             </div>
             <SheetTitle className="text-left text-lg mt-2">{t.title}</SheetTitle>
           </SheetHeader>

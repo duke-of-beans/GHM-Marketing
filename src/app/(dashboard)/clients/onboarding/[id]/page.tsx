@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -294,9 +295,9 @@ export default function OnboardingDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           {submission.onboardingComplete ? (
-            <Badge variant="outline" className="text-status-success border-status-success-border bg-status-success-bg">
+            <StatusBadge variant="success">
               Onboarding Complete
-            </Badge>
+            </StatusBadge>
           ) : (
             <Button
               onClick={handleMarkComplete}

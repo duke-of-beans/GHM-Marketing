@@ -443,7 +443,7 @@ export function DataImportTab() {
                   <CardContent>
                     <div className="max-h-72 overflow-y-auto rounded border">
                       <Table>
-                        <TableHeader><TableRow><TableHead className="w-8"/><TableHead>Title</TableHead><TableHead>Project</TableHead><TableHead>Status</TableHead><TableHead>Assignee</TableHead></TableRow></TableHeader>
+                        <TableHeader><TableRow><TableHead className="w-8"/><TableHead className="text-xs font-medium uppercase tracking-wider">Title</TableHead><TableHead className="text-xs font-medium uppercase tracking-wider">Project</TableHead><TableHead className="text-xs font-medium uppercase tracking-wider">Status</TableHead><TableHead className="text-xs font-medium uppercase tracking-wider">Assignee</TableHead></TableRow></TableHeader>
                         <TableBody>
                           {preview.tasks.map(t => (
                             <TableRow key={t.externalId} className="cursor-pointer"

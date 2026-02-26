@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { ROLE_LABELS } from "@/lib/auth/roles";
 import type { UserRole } from "@prisma/client";
 
@@ -36,7 +37,7 @@ function activityBadge(count: number) {
   if (count === 0) return <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>;
   if (count < 20) return <Badge variant="outline" className="text-xs">{count} events</Badge>;
   if (count < 100) return <Badge variant="secondary" className="text-xs">{count} events</Badge>;
-  return <Badge className="text-xs bg-status-success-bg text-white">{count} events</Badge>;
+  return <StatusBadge variant="success">{count} events</StatusBadge>;
 }
 
 export function UserActivityTab() {

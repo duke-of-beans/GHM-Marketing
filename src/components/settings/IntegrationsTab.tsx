@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Circle, RefreshCw, Zap, ExternalLink, Settings2 } from "lucide-react";
 import { toast } from "sonner";
@@ -58,9 +59,9 @@ export function IntegrationsTab() {
     return <Circle className="h-4 w-4 text-muted-foreground" />;
   }
 
-  function StatusBadge({ status }: { status: IntegrationStatus }) {
+  function IntegrationStatusBadge({ status }: { status: IntegrationStatus }) {
     if (!status.configured) return <Badge variant="outline">Not Configured</Badge>;
-    if (status.healthy === true)  return <Badge className="bg-status-success-bg/10 text-status-success border-status-success-border">Healthy</Badge>;
+    if (status.healthy === true)  return <StatusBadge variant="success">Healthy</StatusBadge>;
     if (status.healthy === false) return <Badge variant="destructive">Error</Badge>;
     return <Badge variant="secondary">Unknown</Badge>;
   }
@@ -123,7 +124,7 @@ export function IntegrationsTab() {
                   {integration.latencyMs !== null && (
                     <span className="text-xs text-muted-foreground">{integration.latencyMs}ms</span>
                   )}
-                  <StatusBadge status={integration} />
+                  <IntegrationStatusBadge status={integration} />
 
                   {/* CTA: configure if not set, refresh if healthy/error */}
                   {!integration.configured && CONFIGURE_LINKS[integration.id] && (

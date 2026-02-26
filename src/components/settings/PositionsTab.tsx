@@ -360,7 +360,7 @@ export function PositionsTab() {
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Delete "{deleteTarget?.name}"?</DialogTitle>
             <DialogDescription>This cannot be undone. Users assigned this position will have their position cleared.</DialogDescription>

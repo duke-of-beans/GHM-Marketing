@@ -141,8 +141,8 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
   )
 
   if (content.length === 0) return (
-    <div className="text-center py-12">
-      <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <FileText className="h-12 w-12 text-muted-foreground/50" />
       <h3 className="mt-4 text-lg font-medium">No content yet</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         Generate content using the tools above to get started.
