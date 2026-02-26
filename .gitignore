@@ -45,3 +45,8 @@ next-env.d.ts
 
 .vercel
 .env*.local
+_commit.bat 
+_tmp.txt 
+_tmp2.txt 
+_git_out.txt 
+_git_err.txt 
