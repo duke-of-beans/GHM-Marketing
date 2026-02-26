@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — 8 more items added (UX-AUDIT-028, UX-FEAT-004/005/006, FEAT-034/035, ARCH-002/003). Infrastructure fracture identified as critical architectural fork. Sprint matrix extended through Sprint 33.
+**Last Updated:** February 26, 2026 — COVOS Extraction Audit complete. Sprint 28 Blueprints (Tracks A/B/C) + Sprint 29 Go-Live Blueprint written and ready for Cowork execution. 4 open decisions need David's input (see COVOS_EXTRACTION_AUDIT.md §7, and 5 infra questions in SPRINT29 blueprint). Sprint matrix through 33.
 
 **Owner:** David Kirsch
 
@@ -51,14 +51,15 @@ Foundation → out. Each sprint unblocks the next.
 | ~~25~~ | ~~UI Constitution Mega-Sprint~~ | ~~5-Pass: Responsiveness + Icons + Typography + Spacing + Components. UX-AUDIT-006 closed.~~ | ✅ SHIPPED | |
 | ~~26~~ | ~~COVOS Signal Visual Identity~~ | ~~4-Pass sidebar/widget/component/page redesign. UI-CONST-001 Group 4 (Navigation) complete.~~ | ✅ SHIPPED | |
 | ~~SEC~~ | ~~Security Fix — Permission Gaps~~ | ~~18 unprotected API handlers secured with withPermission. createdBy hardcode fixed.~~ | ✅ SHIPPED | |
-| 27 | Bug Triage + Dark Mode Polish | BUG-030 (TeamFeed send overflow) + BUG-031 (dark accent yellow→amber) + BUG-032 (pipeline column dark mode) | ~30 min | Quick wins, visual cleanup |
-| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) + FEAT-035 (single lead entry) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
-| 29 | Entity Migration Readiness | Tenant registry for new entity, contract template entity swap, brochure/collateral rebrand hooks, Wave reconnect docs | ~1 session | New entity day-one operational |
-| **ARCH** | **Infrastructure Fracture** | **ARCH-002 (repo/service/credential audit + separation plan) + ARCH-003 (COVOS module roadmap)** | **~1 session planning** | **⚠️ FORK — must decide before second tenant. Blocks true productization.** |
-| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed Slack-grade overhaul) + UX-AUDIT-027 (contrast/accessibility) + UX-FEAT-004 (vault preview) | ~1.5 sessions | Platform feels alive + accessible |
+| 27 | Bug Triage + Dark Mode Polish | BUG-030/031/032 + FEAT-037 (single lead entry) | ~1 hr | Quick wins, visual cleanup, obvious UX gap |
+| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
+| 29 | Entity Migration Readiness | Tenant registry, contract templates, brochure hooks, Wave reconnect | ~1 session | New entity day-one operational |
+| **ARCH** | **Project Fracture + COVOS Roadmap** | **ARCH-002 (repo/service/DB separation plan) + ARCH-003 (82-category module mapping)** | **~1 session (docs)** | **⚠️ FORK — gates true productization** |
+| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed overhaul) + UX-AUDIT-027 (contrast) + FEAT-035 (vault preview) | ~1.5 sessions | Alive + accessible |
 | 31 | UI-CONST-001 Group 5 | Data Display — tables, metric tiles, charts | ~1 session | Design system continuation |
-| 32 | Signing + Tours | FEAT-034 (DocuSign integration) + UX-FEAT-005 (expanded tour tips) | ~2 sessions | Sales workflow completion + onboarding depth |
-| 33 | Customization + Guide | UX-AUDIT-028 (customization audit) + UX-FEAT-006 (guide character Phase 1) | ~2 sessions | Retention + personality layer |
+| 32 | Signing + Tours | FEAT-036 (DocuSign) + FEAT-038 (expanded tour tips) | ~2 sessions | Sales workflow + onboarding |
+| 33 | Customization + Guide | FEAT-034 (customization audit) + FEAT-039 (guide character Phase 1) | ~2 sessions | Retention + personality |
+| 34+ | COVOS Phase 1 Modules | Per ARCH-003 roadmap — email marketing, booking, proposals, etc. | Multi-session | Vertical ERP expansion |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**

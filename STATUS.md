@@ -1,7 +1,18 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 26, 2026 — Sprint 26 + Security Fix shipped. 14 new backlog items total. ARCH-002 (infrastructure fracture) identified as critical fork for productization. Entity restructuring accelerates timeline — new entity in ~2 weeks, COVOS must be tenant-ready. Sprint matrix through 33.
+**Last Updated:** February 26, 2026 — Sprint 26 + Security Fix shipped. COVOS Extraction Audit complete (all phases). Sprint 28 blueprints (Tracks A/B/C) + Sprint 29 Go-Live blueprint written. 14 backlog items. ARCH-002 (infrastructure fracture) identified as critical fork. Entity restructuring in ~2 weeks — Sprints 27→28→29 are the critical path. All four blueprint docs in `docs/blueprints/`.
+
+### COVOS EXTRACTION AUDIT — Phase 1 Complete (February 26, 2026)
+- [x] **AUDIT COMPLETE** — Full tenant coupling analysis. Documents at `docs/blueprints/COVOS_EXTRACTION_AUDIT.md`.
+  - **Category B (needs extraction):** ~50 runtime GHM references across 12 files. Fully catalogued with exact line numbers and replacement targets.
+  - **TenantConfig gap analysis:** 6 new fields required (`companyName`, `fromEmail`, `fromName`, `supportEmail`, `dashboardUrl`, `aiContext`). Interface extension + updated ghm entry specified exactly.
+  - **DB isolation:** Recommend separate Neon DB per tenant (Path A). `TenantConfig.databaseUrl` already designed for this. Single `getTenantPrismaClient()` helper = done.
+  - **Infrastructure map:** Vercel project, Resend account, GCP project all need transfer/creation for COVOS entity. Wave/GBP/DataForSEO per-tenant (already correct).
+  - **File collision map:** 4 non-overlapping tracks for parallel Cowork. Track A must complete first (defines interface), then B + C run simultaneously.
+- [x] **SPRINT 28 BLUEPRINTS WRITTEN** — `docs/blueprints/SPRINT28_TRACK_A_BLUEPRINT.md`, `SPRINT28_TRACK_B_BLUEPRINT.md`, `SPRINT28_TRACK_C_BLUEPRINT.md`. Exact files, search-and-replace instructions, verification commands, commit messages. Ready for Cowork execution.
+- [x] **SPRINT 29 BLUEPRINT WRITTEN** — `docs/blueprints/SPRINT29_GO_LIVE_BLUEPRINT.md`. Full infrastructure transfer runbook (Vercel, GitHub, Resend, GCP/GBP OAuth, Blob). DB isolation helper (`getTenantPrismaClient`). Second tenant dry-run checklist. `TENANT_PROVISIONING.md` spec. Open infra questions (I1–I5) documented.
+- **4 open decisions** need David's answer before Sprint 28 starts (see Section 7 of audit doc).
 
 ### BUG-025 — Middleware auth redirect loop (February 24, 2026)
 - [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.
