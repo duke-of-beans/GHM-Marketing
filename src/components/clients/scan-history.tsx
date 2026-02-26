@@ -101,7 +101,12 @@ export function ScanHistory({ clientId }: { clientId: number }) {
         </CardHeader>
         <CardContent>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold">{latestScan.healthScore}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-3xl font-bold cursor-help">{latestScan.healthScore}</span>
+              </TooltipTrigger>
+              <TooltipContent>Composite score: GBP engagement, citation accuracy, and ranking trends (30 days)</TooltipContent>
+            </Tooltip>
             {scoreDelta !== 0 && (
               <Badge variant={scoreDelta > 0 ? 'default' : 'destructive'} className="gap-1">
                 {scoreDelta > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}

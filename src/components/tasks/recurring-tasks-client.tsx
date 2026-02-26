@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { RecurringTaskForm } from "./recurring-task-form";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface RecurringRule {
   id: number;
@@ -137,12 +138,22 @@ export function RecurringTasksClient() {
                     onCheckedChange={() => toggleActive(rule)}
                     title={rule.isActive ? "Pause rule" : "Activate rule"}
                   />
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setEditRule(rule); setFormOpen(true); }}>
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-7 w-7 hover:text-destructive" onClick={() => deleteRule(rule.id)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                  <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Edit rule" onClick={() => { setEditRule(rule); setFormOpen(true); }}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Edit rule</TooltipContent>
+                </Tooltip>
+                  <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 hover:text-destructive" aria-label="Delete rule" onClick={() => deleteRule(rule.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Delete rule permanently</TooltipContent>
+                </Tooltip>
                 </div>
               </div>
             </Card>

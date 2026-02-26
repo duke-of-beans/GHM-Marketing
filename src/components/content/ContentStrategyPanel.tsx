@@ -224,6 +224,7 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
                   size="icon"
                   className="shrink-0 h-7 w-7"
                   onClick={() => copyToClipboard(kw.keyword)}
+                  aria-label="Copy keyword"
                   title="Copy keyword"
                 >
                   <Copy className="h-3.5 w-3.5" />

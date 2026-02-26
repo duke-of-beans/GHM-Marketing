@@ -16,6 +16,7 @@ import {
   ArrowDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface BankAccount {
   id: string;
@@ -245,9 +246,14 @@ export function FinancialOverviewSection() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium">Recent Transactions</CardTitle>
-              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={load}>
-                <RefreshCw className="w-3.5 h-3.5" />
-              </Button>
+              <Tooltip>
+              <TooltipTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Refresh transactions" onClick={load}>
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Refresh transactions</TooltipContent>
+            </Tooltip>
             </div>
           </CardHeader>
           <CardContent>

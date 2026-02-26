@@ -15,6 +15,7 @@ import {
 import { Plus, Edit, Trash2, Search, SlidersHorizontal, LayoutList, LayoutGrid } from "lucide-react";
 import { ProductDialog } from "./product-dialog";
 import { toast } from "sonner";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 type Product = {
   id: number;
@@ -196,6 +197,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
               size="icon"
               className="h-8 w-8 rounded-r-none border-r"
               onClick={() => toggleView("list")}
+              aria-label="List view"
               title="List view"
             >
               <LayoutList className="h-4 w-4" />
@@ -205,6 +207,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
               size="icon"
               className="h-8 w-8 rounded-l-none"
               onClick={() => toggleView("grid")}
+              aria-label="Grid view"
               title="Grid view"
             >
               <LayoutGrid className="h-4 w-4" />
@@ -266,12 +269,22 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-medium text-sm leading-snug">{product.name}</p>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEdit(product)}>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={() => handleDelete(product.id)}>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Edit service" onClick={() => handleEdit(product)}>
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit service</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" aria-label="Delete service" onClick={() => handleDelete(product.id)}>
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete service</TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -294,12 +307,22 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-medium text-sm leading-snug">{product.name}</p>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEdit(product)}>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={() => handleDelete(product.id)}>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Edit service" onClick={() => handleEdit(product)}>
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit service</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" aria-label="Delete service" onClick={() => handleDelete(product.id)}>
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete service</TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
