@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — Sprint 24 shipped (3-Pass UX Quality). Closed: UX-AUDIT-001, UX-AUDIT-002, UX-AUDIT-005.
+**Last Updated:** February 26, 2026 — Sprint 25 shipped (5-Pass UI Constitution). Closed: UX-AUDIT-006. UI-CONST-001 Groups 1b/1c/2/3 complete.
 
 **Owner:** David Kirsch
 
@@ -85,11 +85,6 @@ The brochure represents a marketing company selling marketing services. It curre
 **Direction:** Modern layout — strong typographic hierarchy, bold section breaks, purposeful whitespace, brand-consistent color. Not a template — an actual designed piece.
 **Dependency:** FEAT-016 (tenant voice/style capture) should ship first so the brochure renders each tenant's brand rather than being GHM-generic.
 **Size:** ~1 session structural redesign; additional pass once FEAT-016 is live. **Priority:** 🟠 SHOULD.
-
-### UX-AUDIT-006: Responsiveness Audit (Global — Split Screen + Mobile)
-No formal responsiveness audit has been run.
-**Scope:** Test at 1920px, 1440px, 1280px, 1024px (split screen), 768px (tablet), 375px (mobile). Fix critical breakage at 1024px and 768px. Document 375px issues as future mobile sprint items.
-**Size:** ~1 session. **Priority:** 🟠 SHOULD.
 
 ### UX-AUDIT-007: Admin Logo Swap (Productization)
 Navbar and login screen logos are hardcoded. New tenants need to replace with their own logo.
@@ -213,9 +208,9 @@ The platform needs to be indistinguishable in quality from Xero, Slack, Monday, 
 - What is explicitly forbidden? (emoji in UI, decorative animation, inconsistent spacing)
 
 **Groups (audit + blueprint + build in sequence):**
-1. Foundations — color tokens, type scale, spacing grid, elevation/shadow
-2. Icon System — select or commission set, swap all stock/emoji
-3. Component Core — buttons, inputs, selects, badges, tags, modals
+1. Foundations — ✅ 1a: Color tokens (Sprint 23-D/E) · ✅ 1b: Typography (Sprint 25 Pass 3) · ✅ 1c: Spacing/Elevation (Sprint 25 Pass 4) · ✅ Responsiveness (Sprint 25 Pass 1)
+2. Icon System — ✅ COMPLETE (Sprint 25 Pass 2) — sizes normalized, aria-hidden added, semantic replacements applied
+3. Component Core — ✅ COMPLETE (Sprint 25 Pass 5) — Card anatomy, Badge→StatusBadge, Dialog widths, TableHead, empty states
 4. Navigation — sidebar, topbar, breadcrumbs, tabs
 5. Data Display — tables, cards, metric tiles, charts
 6. Communication — email templates, in-app notifications, toasts, alerts, empty states

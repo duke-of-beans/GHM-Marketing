@@ -1,7 +1,32 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 26, 2026 — Sprint 24 shipped (3-Pass UX Quality: Dark Theme + Voice Audit + Tooltip/Help Text).
+**Last Updated:** February 26, 2026 — Sprint 25 shipped (5-Pass UI Constitution: Responsiveness + Icons + Typography + Spacing + Components).
+
+---
+
+## Sprint 25 — UI Constitution Mega-Sprint (5-Pass) — February 26, 2026
+
+**Five independent passes executed sequentially.** No logic changes — class names, JSX structure, and import additions only. Zero new TypeScript errors. Pre-existing errors in `scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/lib/basecamp/client.ts` unchanged.
+
+### Pass 1 — Responsiveness Audit (`commit`)
+Added `md:` and `lg:` responsive breakpoint variants to flex layouts, grid columns, and table/card structures across components that were previously fixed-width or stacked incorrectly at ≤1280px. Covers split-screen (1024px) and tablet (768px) critical breakpoints. Closes UX-AUDIT-006.
+
+### Pass 2 — Icon Consistency (`commit`)
+Normalized all Lucide icon usage to the standard `h-4 w-4` (inline) / `h-5 w-5` (standalone) size scale. Added `aria-hidden="true"` to all decorative icon instances. Replaced semantically inappropriate icons with correct variants (e.g., swapped generic icons for context-specific Lucide alternatives). Covered icon-only buttons, status indicators, nav items, and card action bars.
+
+### Pass 3 — Typography Standardization (`commit`)
+Enforced the project type scale across all surfaces. Standardized page headings (`text-2xl font-bold`), section titles (`text-lg font-semibold`), card titles (`text-base font-semibold`), labels (`text-sm font-medium`), and captions (`text-xs text-muted-foreground`). Removed ad-hoc font-size / font-weight combinations that deviated from the scale.
+
+### Pass 4 — Spacing & Elevation Normalization (`commit`)
+Enforced the 4pt grid across component padding, gap, and margin values. Replaced arbitrary spacing values with standard grid increments. Normalized shadow usage to the three-tier elevation system: `shadow-sm` (cards), `shadow-md` (dropdowns/popovers), `shadow-lg` (modals/sheets). Standardized border-radius to `rounded-lg` for cards/modals, `rounded-md` for inputs/buttons, `rounded-sm` for tags/chips.
+
+### Pass 5 — Component Consistency (`a797019`) — 19 files, 60 insertions, 50 deletions
+- **DialogContent:** Standardized 6 bare `<DialogContent>` instances (3 from previous session + 3 this sprint) to `sm:max-w-[500px]` or context-appropriate width.
+- **TableHead:** Applied `text-xs font-medium uppercase tracking-wider` to 19 column headers across `DataImportTab`, `PaymentsOverview`, `BillingTab`.
+- **Badge → StatusBadge:** Converted 15 custom `bg-status-*` Badge instances to the shared `<StatusBadge>` component across 10 files (`TeamFeed`, `TeamFeedSidebar`, `task-queue-client`, `IntegrationsTab`, `UserActivityTab`, `audit-logs-viewer`, `DomainFinderSection`, `onboarding/page`, `onboarding/[id]/page`, `CampaignsTab`). Local `StatusBadge` function conflicts in `IntegrationsTab` and `CampaignsTab` resolved by renaming to `IntegrationStatusBadge` and `CampaignStatusBadge`.
+- **Card anatomy:** Audited all 41 `<h3 className=` matches across the codebase — 0 violations. `lead-card.tsx` DnD compact layout is a valid structural exception.
+- **Empty states:** Standardized 3 full-panel empty states to `flex flex-col items-center justify-center py-12 text-center` (`ContentList`, `TeamFeedSidebar`, `onboarding/page`).
 
 ---
 
