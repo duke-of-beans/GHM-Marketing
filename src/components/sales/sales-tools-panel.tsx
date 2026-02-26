@@ -86,7 +86,7 @@ export function SalesToolsPanel() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-sm">
           <Zap className="h-4 w-4 text-status-warning" />
           Sales Tools
         </CardTitle>

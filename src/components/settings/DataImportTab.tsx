@@ -431,7 +431,7 @@ export function DataImportTab() {
               {preview && preview.tasks.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Task Preview <span className="text-sm font-normal text-muted-foreground ml-2">(first {preview.tasks.length} of {stats.taskCount})</span></CardTitle>
+                    <CardTitle className="text-sm">Task Preview <span className="text-sm font-normal text-muted-foreground ml-2">(first {preview.tasks.length} of {stats.taskCount})</span></CardTitle>
                     <div className="flex gap-2 text-xs text-muted-foreground">
                       <button className="hover:text-foreground" onClick={() => setSelected(new Set(preview.tasks.map(t => t.externalId)))}>Select all</button>
                       <span>·</span>

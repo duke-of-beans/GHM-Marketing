@@ -83,7 +83,7 @@ export function ClientIntegrationsTab({ clientId }: Props) {
               {connection.connected
                 ? <CheckCircle2 className="h-4 w-4 text-status-success" />
                 : <Circle className="h-4 w-4 text-muted-foreground" />}
-              <CardTitle className="text-base">{title}</CardTitle>
+              <CardTitle className="text-sm">{title}</CardTitle>
             </div>
             <Badge variant={connection.connected ? "default" : "outline"} className={connection.connected ? "bg-status-success-bg/10 text-status-success border-status-success-border" : ""}>
               {connection.connected ? "Connected" : "Not Connected"}

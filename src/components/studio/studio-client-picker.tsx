@@ -148,7 +148,7 @@ export function StudioClientPicker({ studioName, studioIcon, renderStudio }: Pro
             {search ? (
               <>
                 <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-1" />
-                <p className="text-base font-medium">No clients match &ldquo;{search}&rdquo;</p>
+                <p className="text-sm font-medium">No clients match &ldquo;{search}&rdquo;</p>
                 <p className="text-sm text-muted-foreground">Try a different name, city, or industry.</p>
                 <button
                   className="text-sm underline text-muted-foreground hover:text-foreground"
@@ -160,7 +160,7 @@ export function StudioClientPicker({ studioName, studioIcon, renderStudio }: Pro
             ) : (
               <>
                 <Users className="h-10 w-10 mx-auto text-muted-foreground/30 mb-1" />
-                <p className="text-base font-medium">No active clients yet</p>
+                <p className="text-sm font-medium">No active clients yet</p>
                 <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                   Clients are added when a lead is marked as <strong>Won</strong> in the Sales Pipeline.
                 </p>

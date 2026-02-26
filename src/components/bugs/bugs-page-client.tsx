@@ -177,7 +177,7 @@ export function BugsPageClient({ isAdmin = false }: { isAdmin?: boolean }) {
                   <div className="flex items-start gap-3 flex-1">
                     {statusIcon(bug.status)}
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base">{bug.title}</CardTitle>
+                      <CardTitle className="text-sm">{bug.title}</CardTitle>
                       <CardDescription className="mt-1">
                         {bug.description.substring(0, 200)}
                         {bug.description.length > 200 && "..."}

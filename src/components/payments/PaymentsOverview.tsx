@@ -222,7 +222,7 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Client AR</CardTitle>
+            <CardTitle className="text-sm">Client AR</CardTitle>
             <div className="flex gap-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -319,7 +319,7 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
+              <CardTitle className="text-sm flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 Pending Partner Commissions
               </CardTitle>

@@ -120,7 +120,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
     <div className="space-y-5">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4" />Website Audit</CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Globe className="h-4 w-4" />Website Audit</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">

@@ -51,7 +51,7 @@ export function CompanyProfitabilityWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Company Profitability
           </CardTitle>
@@ -70,7 +70,7 @@ export function CompanyProfitabilityWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Company Profitability
           </CardTitle>
@@ -87,7 +87,7 @@ export function CompanyProfitabilityWidget() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Company Profitability
             </CardTitle>

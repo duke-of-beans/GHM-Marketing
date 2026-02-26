@@ -10,7 +10,7 @@ export default function ClientDetailError({
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
       <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold">Something went wrong</h2>
+        <h2 className="text-lg font-semibold">Something went wrong</h2>
         <p className="text-sm text-muted-foreground max-w-md">
           {error.message || "Failed to load client profile. This may be a data issue."}
         </p>

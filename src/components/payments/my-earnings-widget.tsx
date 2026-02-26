@@ -71,7 +71,7 @@ export function MyEarningsWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
             My Earnings
           </CardTitle>
@@ -90,7 +90,7 @@ export function MyEarningsWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
             My Earnings
           </CardTitle>
@@ -110,7 +110,7 @@ export function MyEarningsWidget() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
               My Earnings
             </CardTitle>

@@ -574,7 +574,7 @@ export function TeamFeedWidget({
     <Card className="flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <MessageSquare className="h-5 w-5" />
             Team Feed
             {unreadCount > 0 && (

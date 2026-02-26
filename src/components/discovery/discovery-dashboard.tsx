@@ -225,7 +225,7 @@ export function DiscoveryDashboard() {
       {!hasSearched && (
         <div className="flex flex-col items-center justify-center py-14 text-center space-y-3 border rounded-lg bg-muted/20">
           <MapPin className="h-10 w-10 text-muted-foreground" />
-          <p className="font-semibold text-base">Ready to find leads</p>
+          <p className="text-sm font-semibold">Ready to find leads</p>
           <p className="text-sm text-muted-foreground max-w-sm">
             Enter a business type and location above to search Google Maps for prospects that match your criteria. Each result gets an instant quality score.
           </p>

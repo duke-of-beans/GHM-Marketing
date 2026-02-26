@@ -318,12 +318,12 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
 
             <div className="mt-2 space-y-1">
               {client.lead?.city && client.lead?.state && (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Location:</span> {client.lead.city}, {client.lead.state}
                 </p>
               )}
               {client.lead?.website && (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Website:</span>{" "}
                   <a
                     href={client.lead.website.startsWith("http") ? client.lead.website : `https://${client.lead.website}`}
@@ -336,17 +336,17 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
                 </p>
               )}
               {client.lead?.phone && (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Phone:</span> {client.lead.phone}
                 </p>
               )}
               {client.lead?.assignedUser && (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Sales Rep:</span> {client.lead.assignedUser.name}
                 </p>
               )}
               {client.masterManager && (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Account Manager:</span> {client.masterManager.name}
                 </p>
               )}

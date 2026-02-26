@@ -19,7 +19,7 @@ export function RepLeaderboard({ reps }: RepLeaderboardProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Rep Performance</CardTitle>
+        <CardTitle className="text-sm">Rep Performance</CardTitle>
       </CardHeader>
       <CardContent>
         {reps.length === 0 ? (

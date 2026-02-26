@@ -168,7 +168,7 @@ export function IntegrationsTab() {
     {/* Cost + Cache Dashboard */}
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-sm">
           Cost &amp; Cache Dashboard
         </CardTitle>
         <CardDescription>

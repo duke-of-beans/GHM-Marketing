@@ -258,7 +258,7 @@ export function SiteHealthTab({ clientId }: Props) {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-base font-semibold">Site Health</h3>
+          <h3 className="text-sm font-semibold">Site Health</h3>
           {latest.length > 1 && (
             <Select
               value={selectedDomainId?.toString() ?? ""}

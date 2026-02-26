@@ -37,7 +37,7 @@ export function IntelligenceTrends({ trend }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Business Intelligence</h2>
+        <h2 className="text-2xl font-semibold">Business Intelligence</h2>
         <p className="text-muted-foreground text-sm mt-1">
           Month-over-month revenue, client count, and health score trends
         </p>
@@ -46,7 +46,7 @@ export function IntelligenceTrends({ trend }: Props) {
       {/* MRR Trend */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Revenue Trend — MRR</CardTitle>
+          <CardTitle className="text-sm">Revenue Trend — MRR</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
@@ -72,7 +72,7 @@ export function IntelligenceTrends({ trend }: Props) {
         {/* Client Count Trend */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Active Clients</CardTitle>
+            <CardTitle className="text-sm">Active Clients</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
@@ -97,7 +97,7 @@ export function IntelligenceTrends({ trend }: Props) {
         {/* New Closes + Churn */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">New Clients vs. Churn</CardTitle>
+            <CardTitle className="text-sm">New Clients vs. Churn</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
@@ -118,7 +118,7 @@ export function IntelligenceTrends({ trend }: Props) {
       {/* Avg Health Score Trend */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Average Health Score Trend</CardTitle>
+          <CardTitle className="text-sm">Average Health Score Trend</CardTitle>
         </CardHeader>
         <CardContent>
           {display.every((p) => p.avgHealthScore === null) ? (

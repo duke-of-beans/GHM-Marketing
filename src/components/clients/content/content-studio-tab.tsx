@@ -59,7 +59,7 @@ export function ContentStudioTab({ clientId, businessName, industry }: ContentSt
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Content Studio</h2>
+          <h2 className="text-lg font-semibold">Content Studio</h2>
           <p className="text-sm text-muted-foreground">
             AI-powered content generation for {businessName}
           </p>

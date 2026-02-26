@@ -180,7 +180,7 @@ export function PositionsTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
+          <h2 className="text-2xl font-semibold flex items-center gap-2">
             <Briefcase className="h-6 w-6" />
             Positions
           </h2>
@@ -208,7 +208,7 @@ export function PositionsTab() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <CardTitle className="text-base">{p.name}</CardTitle>
+                      <CardTitle className="text-sm">{p.name}</CardTitle>
                       <Badge className={TYPE_COLORS[p.type] ?? ""}>{TYPE_LABELS[p.type] ?? p.type}</Badge>
                       {!p.isActive && (
                         <Badge variant="outline" className="text-xs text-muted-foreground border-dashed">Inactive</Badge>

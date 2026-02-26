@@ -84,7 +84,7 @@ export function DashboardUsagePanel() {
       {/* DAU chart */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <Users className="h-4 w-4" />
             Daily Active Users — Last 30 Days
           </CardTitle>
@@ -116,7 +116,7 @@ export function DashboardUsagePanel() {
         {/* Feature heatmap */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <Flame className="h-4 w-4" />
               Feature Usage Heatmap
             </CardTitle>
@@ -146,7 +146,7 @@ export function DashboardUsagePanel() {
         {/* Top pages */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm">
               <Eye className="h-4 w-4" />
               Top Pages
             </CardTitle>
@@ -171,7 +171,7 @@ export function DashboardUsagePanel() {
       {/* Per-user activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <Activity className="h-4 w-4" />
             User Activity (30d)
           </CardTitle>

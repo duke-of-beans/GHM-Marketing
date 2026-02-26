@@ -189,7 +189,7 @@ export function UpsellOpportunities({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <CardTitle className="text-base">{opp.productName}</CardTitle>
+                  <CardTitle className="text-sm">{opp.productName}</CardTitle>
                   <Badge variant={getScoreBadgeVariant(opp.opportunityScore)}>
                     <TooltipProvider>
                       <Tooltip>

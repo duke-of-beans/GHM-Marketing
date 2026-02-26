@@ -36,7 +36,7 @@ export function PipelineFunnel({ stats }: PipelineFunnelProps) {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Pipeline</CardTitle>
+          <CardTitle className="text-sm">Pipeline</CardTitle>
           {wonStat && wonStat.count > 0 && (
             <span className="text-sm font-semibold text-status-success">
               {wonStat.count} Won · ${wonStat.totalValue.toLocaleString()}

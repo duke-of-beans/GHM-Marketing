@@ -227,7 +227,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
                   )}
                   <Icon className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base truncate">
+                    <CardTitle className="text-sm truncate">
                       {item.title || getTypeLabel(item.contentType)}
                     </CardTitle>
                     <CardDescription>

@@ -134,7 +134,7 @@ export function WaveSettingsTab() {
       {/* Connection status */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center justify-between">
             Wave Connection
             <Button variant="ghost" size="sm" onClick={loadStatus} disabled={loadingStatus}>
               <RefreshCw className={`w-3.5 h-3.5 ${loadingStatus ? "animate-spin" : ""}`} />
@@ -211,7 +211,7 @@ export function WaveSettingsTab() {
       {/* SEO Product selector */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">SEO Retainer Product</CardTitle>
+          <CardTitle className="text-sm">SEO Retainer Product</CardTitle>
           <CardDescription>
             Select the Wave product used for monthly retainer invoices. You must create the product
             in Wave first, then select it here.
@@ -265,7 +265,7 @@ export function WaveSettingsTab() {
       {/* Webhook setup */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Webhook Configuration</CardTitle>
+          <CardTitle className="text-sm">Webhook Configuration</CardTitle>
           <CardDescription>
             Configure this URL in Wave to receive real-time payment events. Set the webhook secret in your
             environment as <code className="text-xs bg-muted px-1 rounded">WAVE_WEBHOOK_SECRET</code>.
@@ -304,7 +304,7 @@ export function WaveSettingsTab() {
       {/* Manual sync actions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Manual Sync</CardTitle>
+          <CardTitle className="text-sm">Manual Sync</CardTitle>
           <CardDescription>
             Run these once after initial setup to link existing clients and team members to Wave.
             Crons handle this automatically going forward.
@@ -330,7 +330,7 @@ export function WaveSettingsTab() {
       {/* Cron schedule info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Automation Schedule</CardTitle>
+          <CardTitle className="text-sm">Automation Schedule</CardTitle>
           <CardDescription>Automated jobs running via Vercel Crons</CardDescription>
         </CardHeader>
         <CardContent>

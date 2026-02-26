@@ -84,7 +84,7 @@ export function ReportsList({ reports }: { reports: Report[] }) {
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-base">
+                  <CardTitle className="text-sm">
                     {report.type.charAt(0).toUpperCase() + report.type.slice(1)} Report
                   </CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">

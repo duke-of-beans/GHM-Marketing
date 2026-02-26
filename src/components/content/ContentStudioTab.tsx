@@ -47,7 +47,7 @@ export function ContentStudioTab({ clientId, isMaster = false }: ContentStudioTa
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Content Studio</h2>
+        <h2 className="text-2xl font-semibold">Content Studio</h2>
         <p className="text-muted-foreground mt-1">
           AI-powered content generation that goes beyond generic templates. Our system researches your client&apos;s industry, analyzes local market trends, studies competitor strategies, and creates tailored content that resonates with their specific audience.
         </p>
@@ -148,7 +148,7 @@ export function ContentStudioTab({ clientId, isMaster = false }: ContentStudioTa
         <TabsContent value="photos">
           <div className="space-y-4">
             <div>
-              <h3 className="text-base font-semibold">Stock Photo Library</h3>
+              <h3 className="text-sm font-semibold">Stock Photo Library</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Search millions of free, high-quality photos from Unsplash and Pexels. Click to copy the URL or use it directly in your content.
               </p>

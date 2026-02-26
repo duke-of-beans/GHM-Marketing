@@ -179,7 +179,7 @@ export default async function SalesDashboard() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Needs Attention</CardTitle>
+            <CardTitle className="text-sm">Needs Attention</CardTitle>
             <Link href="/leads">
               <Button variant="ghost" size="sm" className="text-xs">View all →</Button>
             </Link>

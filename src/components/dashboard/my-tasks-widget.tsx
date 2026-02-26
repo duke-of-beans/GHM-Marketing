@@ -62,7 +62,7 @@ export function MyTasksWidget() {
     return (
       <Card className="h-full">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <CheckSquare className="h-4 w-4" /> My Tasks
           </CardTitle>
         </CardHeader>
@@ -79,7 +79,7 @@ export function MyTasksWidget() {
     <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <CheckSquare className="h-4 w-4" /> My Tasks
           </CardTitle>
           <Link href="/tasks">

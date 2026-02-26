@@ -44,7 +44,7 @@ export function ManagementFeesWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <Users className="h-4 w-4" />
             Management Fees
           </CardTitle>
@@ -63,7 +63,7 @@ export function ManagementFeesWidget() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
+          <CardTitle className="text-sm flex items-center gap-2">
             <Users className="h-4 w-4" />
             Management Fees
           </CardTitle>
@@ -80,7 +80,7 @@ export function ManagementFeesWidget() {
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2">
               <Users className="h-4 w-4" />
               Management Fees
             </CardTitle>

@@ -55,7 +55,7 @@ export function MyBookWidget({ activeClients }: MyBookWidgetProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="flex items-center gap-2 text-sm">
           <BookOpen className="h-4 w-4 text-status-success" />
           My Book
         </CardTitle>

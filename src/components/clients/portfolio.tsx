@@ -442,7 +442,7 @@ export function ClientPortfolio({
             {clients.length === 0 ? (
               <>
                 <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-base font-semibold">No clients yet</p>
+                <p className="text-sm font-semibold">No clients yet</p>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
                   Clients are created automatically when a lead is marked as <strong>Won</strong> in the sales pipeline.
                 </p>
@@ -458,7 +458,7 @@ export function ClientPortfolio({
             ) : (
               <>
                 <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-4" />
-                <p className="text-base font-semibold">No clients match these filters</p>
+                <p className="text-sm font-semibold">No clients match these filters</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   {clients.length} client{clients.length !== 1 ? "s" : ""} in your portfolio — try broadening your search.
                 </p>
@@ -586,7 +586,7 @@ export function ClientPortfolio({
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <CardTitle className="text-base truncate">
+                      <CardTitle className="text-sm truncate">
                         {client.businessName}
                       </CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5">

@@ -83,7 +83,7 @@ export default async function ReportsPage() {
       {/* Territory breakdown */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Territory Performance</CardTitle>
+          <CardTitle className="text-sm">Territory Performance</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -124,7 +124,7 @@ export default async function ReportsPage() {
       {/* Source performance */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Lead Source Performance</CardTitle>
+          <CardTitle className="text-sm">Lead Source Performance</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
