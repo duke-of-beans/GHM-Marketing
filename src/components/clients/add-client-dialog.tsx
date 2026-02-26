@@ -126,7 +126,7 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
           <div className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold text-sm">Business Information</h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
                 <Label htmlFor="businessName">Business Name *</Label>
                 <Input
@@ -179,7 +179,7 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
           <div className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold text-sm">Location</h3>
             
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="city">City *</Label>
                 <Input
@@ -220,7 +220,7 @@ export function AddClientDialog({ open, onOpenChange, onSuccess }: ClientDialogP
           <div className="space-y-4 p-4 border rounded-lg">
             <h3 className="font-semibold text-sm">Service Details</h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="retainerAmount">Monthly Retainer *</Label>
                 <Input

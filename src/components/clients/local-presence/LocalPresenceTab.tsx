@@ -188,7 +188,7 @@ function InsightKPIs({ daily }: { daily: DailyInsight[] }) {
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {kpis.map(k => (
         <div key={k.label} className="border rounded-lg p-3 bg-card text-center">
           <div className="text-xl font-bold">{k.value.toLocaleString()}</div>
@@ -336,7 +336,7 @@ function AIDraftModal({
           <h3 className="font-semibold text-lg">AI Post Draft</h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-medium text-muted-foreground block mb-1">Post type</label>
             <Select value={postType} onValueChange={v => setPostType(v as typeof postType)}>
@@ -538,7 +538,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
       </div>
 
       {/* KPIs row */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="border rounded-lg p-3 bg-card text-center">
           <div className="text-xl font-bold">{avgRating}</div>
           <div className="text-xs text-muted-foreground">Avg. Rating</div>

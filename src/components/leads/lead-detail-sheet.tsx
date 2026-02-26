@@ -729,7 +729,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
             </SheetHeader>
 
             {/* Contact info - editable */}
-            <div className="grid grid-cols-2 gap-3 text-sm pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm pb-4">
               <EditableField
                 label="Phone"
                 value={lead.phone}
@@ -771,7 +771,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
             </div>
 
             {/* Value metrics */}
-            <div className="grid grid-cols-4 gap-2 text-center pb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center pb-4">
               {[
                 { label: "Deal", value: formatCurrency(lead.dealValueTotal) },
                 { label: "MRR", value: formatCurrency(lead.mrr) },
@@ -788,7 +788,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
             {/* SEO metrics */}
             {(lead.domainRating !== null || lead.reviewCount !== null) && (
               <TooltipProvider>
-                <div className="grid grid-cols-4 gap-2 text-center pb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center pb-4">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="bg-muted/50 rounded px-2 py-1.5 cursor-help">

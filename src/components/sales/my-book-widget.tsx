@@ -80,7 +80,7 @@ export function MyBookWidget({ activeClients }: MyBookWidgetProps) {
             </div>
 
             {/* Projections */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="rounded-lg bg-muted/50 px-3 py-2.5">
                 <p className="text-xs text-muted-foreground mb-0.5">6 months</p>
                 <p className="text-base font-semibold">

@@ -218,7 +218,7 @@ export function VoiceProfileDialog({
               {/* Characteristics */}
               <div className="space-y-3">
                 <h4 className="text-sm font-medium">Writing Characteristics</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
                     <span className="text-xs text-muted-foreground">Formality</span>
                     <Badge variant="secondary" className="text-xs">

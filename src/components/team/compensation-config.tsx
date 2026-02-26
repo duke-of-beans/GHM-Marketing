@@ -135,7 +135,7 @@ function GlobalTierPanel() {
             Existing locked rates are not affected.
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs">Tier 1 Residual (base)</Label>
               <div className="relative">
@@ -200,7 +200,7 @@ function GlobalTierPanel() {
 
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Tier Thresholds (monthly retainer)</Label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs">Tier 2 starts at</Label>
                 <div className="relative">
@@ -333,7 +333,7 @@ function UserCompRow({ user }: { user: { id: number; name: string; email: string
             <p className="text-xs text-muted-foreground">Loading…</p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Commission */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">

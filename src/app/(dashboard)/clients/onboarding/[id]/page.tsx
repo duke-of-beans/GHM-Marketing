@@ -309,7 +309,7 @@ export default function OnboardingDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ── Left: Ops checklist ─────────────────────────────────────────── */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">

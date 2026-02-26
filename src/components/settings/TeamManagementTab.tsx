@@ -490,7 +490,7 @@ export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false
               <Label>Email</Label>
               <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="jane@example.com" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Dashboard Role</Label>
                 <Select value={newRole} onValueChange={(v: AppRole) => setNewRole(v)}>

@@ -210,7 +210,7 @@ export function MyEarningsWidget() {
           {(data.thisMonthResidualsPaid > 0 || data.thisMonthResidualsPending > 0) && (
             <div className="pt-3 border-t">
               <p className="text-xs font-medium text-muted-foreground mb-1.5">This Month</p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                 {data.thisMonthResidualsPaid > 0 && (
                   <div>
                     <p className="text-muted-foreground">Residuals Paid</p>

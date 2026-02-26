@@ -183,7 +183,7 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground mb-1">Monthly MRR</p>

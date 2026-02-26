@@ -176,7 +176,7 @@ export function WaveSettingsTab() {
                 </div>
               )}
               {status.connected && (
-                <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                   <div>
                     <p className="text-xs text-muted-foreground">Business ID</p>
                     <p className="font-mono text-xs truncate">{status.businessId ?? "—"}</p>

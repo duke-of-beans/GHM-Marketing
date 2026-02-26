@@ -64,7 +64,7 @@ export function CostDashboard() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="h-32 rounded-lg bg-muted animate-pulse" />
         ))}
@@ -83,7 +83,7 @@ export function CostDashboard() {
     <div className="space-y-6">
 
       {/* Summary row */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Total (30d)" value={`$${totalLast30}`} sub="AI + enrichment" />
         <StatCard label="AI This Month" value={`$${data.ai.thisMonth.totalUSD}`} sub={`${data.ai.last30Days.callCount} calls`} />
         <StatCard label="Enrichment (30d)" value={`$${data.enrichment.last30Days.totalUSD}`} sub={`${data.enrichment.last30Days.callCount} calls`} />

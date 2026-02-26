@@ -351,7 +351,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
 
   return (
     <div className="space-y-4 pb-20 md:pb-0">
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
         <div data-tour="leads-heading">
           <h1 className="text-2xl font-bold">Sales Pipeline</h1>
           <p className="text-sm text-muted-foreground">

@@ -231,7 +231,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
             </div>
 
             {/* Contact Information */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="phone">
                   Phone <span className="text-status-danger">*</span>
@@ -286,7 +286,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="grid gap-2 col-span-2">
                 <Label htmlFor="city">
                   City <span className="text-status-danger">*</span>
@@ -336,7 +336,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
             <div className="border-t pt-4 mt-2">
               <h3 className="font-medium mb-4">Service Configuration</h3>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="retainerAmount">
                     Monthly Retainer <span className="text-status-danger">*</span>

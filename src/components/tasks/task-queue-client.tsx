@@ -672,7 +672,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
 
           <div className="space-y-5">
             {/* Meta info */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-muted-foreground text-xs">Client</p>
                 <Link href={`/clients/${t.clientId}`} className="text-blue-600 dark:text-blue-400 hover:underline">
@@ -992,7 +992,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
           <Skeleton className="h-8 w-32" />
           <Skeleton className="h-8 w-64" />
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20" />)}
         </div>
         <Card>

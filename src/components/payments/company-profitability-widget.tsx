@@ -171,7 +171,7 @@ export function CompanyProfitabilityWidget() {
 
         {/* Payment Status */}
         <div className="pt-3 border-t">
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
             <div>
               <p className="text-muted-foreground">Paid Out</p>
               <p className="font-medium text-status-success">{formatCurrency(data.totalPaid)}</p>

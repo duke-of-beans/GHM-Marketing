@@ -171,7 +171,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-muted-foreground">
                 <div>
                   <span className="block text-[10px] uppercase tracking-wide font-medium">Last accessed</span>
                   <span>

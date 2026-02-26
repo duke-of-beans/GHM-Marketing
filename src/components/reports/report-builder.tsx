@@ -113,7 +113,7 @@ export function ReportBuilder() {
         {/* Columns Selection */}
         <div className="space-y-2">
           <Label>Columns to Include</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {availableColumns[reportType as keyof typeof availableColumns].map(
               (col) => (
                 <div key={col.id} className="flex items-center space-x-2">

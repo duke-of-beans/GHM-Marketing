@@ -134,7 +134,7 @@ export function RecurringTaskForm({ rule, onClose, onSaved }: Props) {
             <p className="text-[11px] text-muted-foreground">Use {"{clientName}"} to insert the client&apos;s name.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Category</Label>
               <Select value={category} onValueChange={setCategory}>

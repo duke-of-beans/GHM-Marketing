@@ -373,7 +373,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     {override.commissionAmount !== null && (
                       <div>
                         <span className="text-muted-foreground">Commission: </span>
@@ -427,7 +427,7 @@ export function ClientCompensationSection({ clientId, users }: Props) {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="override-commission">Commission Override</Label>
                     <div className="flex items-center gap-2">

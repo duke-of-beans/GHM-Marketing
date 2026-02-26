@@ -120,7 +120,7 @@ export function GenerateReportButton({ clientId }: { clientId: number }) {
                   {sections.size === ALL_SECTIONS.length ? "Deselect all" : "Select all"}
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {ALL_SECTIONS.map(s => (
                   <div key={s.id} className="flex items-center gap-2">
                     <Checkbox

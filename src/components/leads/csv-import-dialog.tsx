@@ -148,7 +148,7 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
           {/* Results */}
           {result && (
             <div className="space-y-2 text-sm">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="bg-muted rounded p-2">
                   <p className="text-muted-foreground">Total rows</p>
                   <p className="font-semibold">{result.total}</p>
