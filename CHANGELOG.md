@@ -1,7 +1,25 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 26, 2026 — Sprint 25 shipped (5-Pass UI Constitution: Responsiveness + Icons + Typography + Spacing + Components).
+**Last Updated:** February 26, 2026 — Sprint 26 shipped (4-Pass COVOS Signal Visual Identity). UI-CONST-001 Group 4 (Navigation) complete.
+
+---
+
+## Sprint 26 — COVOS Signal Visual Identity (4-Pass) — February 26, 2026
+
+**Four independent passes executed sequentially.** No logic changes — class names, JSX structure, and import additions only. Zero new TypeScript errors introduced. Pre-existing errors in `scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/lib/basecamp/client.ts` unchanged. Closes UI-CONST-001 Group 4 (Navigation).
+
+### Pass 1 — Sidebar Signal Identity (`3ccb343`)
+Transformed the application sidebar from stock `bg-muted/50` to the COVOS Signal navy identity using the existing `--sidebar-*` CSS token system. Added 6 sidebar utility classes to `globals.css` (`@layer utilities`): `.sidebar-bg`, `.sidebar-text`, `.sidebar-text-muted`, `.sidebar-text-active`, `.sidebar-active-bg`, `.sidebar-border-color`. Applied to `nav.tsx`: sidebar `bg-muted/50` → `sidebar-bg` (deep navy `hsl(220 38% 9%)`), always-inverted logo, token-driven active/hover states on all nav links and group headers, token-colored bottom section border, "Powered by COVOS" footer attribution. Critical constraint honored: `--sidebar-*` token values in globals.css were not modified — only utility classes added and consumed.
+
+### Pass 2 — Dashboard Widget Redesign (`eee8dd9`)
+Removed rainbow color aesthetics and Card component wrappers from high-frequency dashboard surfaces. `metric-card.tsx`: full rewrite — Card wrapper removed, dense `div` layout with inline trend badges using `bg-status-success-bg/text-status-success` or `bg-status-danger-bg/text-status-danger`. `MetricsRow.tsx`: `gap-3` → `gap-2`. `dashboard-widgets.tsx`: QuickActions neutral row layout (removed per-action `bgColor`/`iconBg`), RevenueMetricsWidget green gradient removed (neutral `bg-card`), GoalsWidget progress bars `h-2 bg-blue-500` → `h-1.5 bg-primary/bg-status-success`. `manager/page.tsx`: added amber "New Lead" CTA button (`bg-accent`) with `Link` + `Plus` imports.
+
+### Pass 3 — Core Component Polish (`3b7c738`)
+Reduced visual noise across the shared component layer. `card.tsx`: `shadow` → `shadow-sm` (flatter cards, less elevation competition). `button.tsx`: `outline`/`ghost` hover `bg-accent` → `bg-muted` (no amber flash); added `accent` variant for intentional CTA use. `select.tsx`: `SelectItem` focus `bg-accent` → `bg-muted` (no amber flash in Settings theme selector). `globals.css`: added 6px thin scrollbar styling in `@layer base` with token-colored thumb (`hsl(var(--border))`), dark mode sidebar-border variant.
+
+### Pass 4 — Page-Level Signal Token Sweep (`6360064`) — 14 files, 30 insertions, 30 deletions
+Replaced remaining hardcoded blue/teal Tailwind color classes with Signal design tokens across dashboard components. P3 priority badges → `bg-status-info-bg text-status-info` (5 files: task-queue-client, approvals-tab, recurring-tasks-client, my-tasks-widget, ClientTasksTab). Task `in_progress` status → `bg-status-info-bg text-status-info`; `complete` → `bg-status-success-bg text-status-success` (task-queue-client). Progress bar `bg-blue-500` → `bg-primary` (task-checklist). Bug `acknowledged` status → `bg-status-info-bg text-status-info` (BugReportsTab). Feature/Lightbulb icons `text-blue-600` → `text-status-info` (BugReportsTab). External links `text-blue-600` → `text-primary` (BugReportsTab, clients/[id]/page). Sales role badge → `bg-status-info-bg text-status-info` (PositionsTab, UserPermissionCard). LiveSites tier1 → `bg-status-info-bg text-status-info` (LiveSitesPanel). Pipeline tool card → `bg-status-info-bg/text-status-info` (sales-tools-panel). Territory highlight → `bg-status-info-bg/20 border-status-info-border text-status-info` (rep-onboarding-wizard). Available leads accent `text-blue-600` → `text-primary` (sales/page).
 
 ---
 

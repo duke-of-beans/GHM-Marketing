@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 26, 2026 — Sprint 25 complete (5-Pass UI Constitution: Responsiveness + Icons + Typography + Spacing + Components). UI-CONST-001 Groups 1b/1c/2/3 done. UX-AUDIT-006 closed.
+**Last Updated:** February 26, 2026 — Sprint 26 complete (4-Pass COVOS Signal Visual Identity: sidebar navy, widget redesign, component polish, Signal token sweep). UI-CONST-001 Groups 1–4 done.
 
 ### BUG-025 — Middleware auth redirect loop (February 24, 2026)
 - [x] **BUG-025 COMPLETE** — All browser windows auto-navigating to `/manager` or `/sales` regardless of website. Root cause: `authorized()` callback in `auth.config.ts` treated any path not in `PUBLIC_PATHS` as protected, so the root path `/` and any marketing pages returned `false` for unauthenticated visitors (NextAuth redirect to `/login`) OR redirected logged-in users away from non-app pages to their dashboard. Fix: added `MARKETING_PATHS` array (`/`, `/about`, `/pricing`, `/contact`, `/privacy`, `/terms`) that always returns `true` without any redirect, checked before the `PUBLIC_PATHS` redirect logic. Also added `/auth` and `/public` to `PUBLIC_PATHS` to cover forgot-password and reset-password routes.
