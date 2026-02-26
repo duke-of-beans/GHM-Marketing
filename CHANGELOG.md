@@ -1,7 +1,19 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 26, 2026 — Sprint 26 shipped (4-Pass COVOS Signal Visual Identity). UI-CONST-001 Group 4 (Navigation) complete.
+**Last Updated:** February 26, 2026 — Security fix shipped (permission gaps, 18 handlers across content/* and clients/[id]/gbp, clients/[id]/voice-profile).
+
+---
+
+## Security Fix — Permission Gaps (Content & Client Routes) — February 26, 2026
+
+Added `withPermission("manage_clients")` auth check to all unprotected API handlers across the content namespace and client sub-routes. Closes PG-01 through PG-18 from `docs/ROUTE_AUDIT.md`. Zero new TypeScript errors.
+
+- **5 AI generation endpoints secured** (`generate-blog`, `generate-meta`, `generate-ppc`, `generate-social`, `generate-strategy`) — previously callable without auth, burning OpenAI credits and writing to DB unauthenticated
+- **7 content CRUD endpoints secured** (`list` GET+PATCH, `[id]` DELETE+PATCH, `batch` DELETE, `schedule` POST, `publish/[id]` POST, `[id]/restore` POST, `[id]/versions` GET)
+- **2 client sub-route files secured** (`clients/[id]/gbp` GET+DELETE, `clients/[id]/voice-profile` GET+DELETE); `_req` parameter renamed to `request` in gbp handlers
+- **Fixed `createdBy: 1` hardcode** in `content/[id]/route.ts` PATCH — now uses session user ID via dynamic auth import
+- Already secured (unchanged): `content/bulk` (auth+isElevated), `content/review` (withPermission), `clients/[id]/capture-voice` (withPermission)
 
 ---
 

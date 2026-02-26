@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const clientId = parseInt(params.id);
     if (isNaN(clientId)) {
       return NextResponse.json(
@@ -58,6 +62,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const clientId = parseInt(params.id);
     if (isNaN(clientId)) {
       return NextResponse.json(

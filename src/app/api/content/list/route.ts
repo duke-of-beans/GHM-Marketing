@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function GET(request: NextRequest) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('clientId');
     const contentType = searchParams.get('contentType');
@@ -59,6 +63,9 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const body = await request.json();
     const { contentId, status, scheduledFor } = body;
 

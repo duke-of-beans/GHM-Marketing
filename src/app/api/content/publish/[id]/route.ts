@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const contentId = parseInt(params.id);
 
     if (isNaN(contentId)) {

@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — Sprint 26 shipped (4-Pass COVOS Signal Visual Identity). UI-CONST-001 Group 4 (Navigation) complete. Groups 1–4 done.
+**Last Updated:** February 26, 2026 — Security fix shipped (permission gaps — 18 handlers across content/* and client sub-routes secured). Groups 1–4 done.
 
 **Owner:** David Kirsch
 
@@ -152,6 +152,21 @@ See full scope above (in SHOULD section — moved here pending pitch/demo timeli
 Should Tasks live under "Clients" in the left nav rather than as a standalone top-level section? Most task work is client-contextual.
 **Direction:** Evaluate (A) keep top-level for cross-client queue management vs. (B) move under Clients with master queue accessible elsewhere. Audit actual usage pattern before committing.
 **Size:** ~2 hrs (decision + nav restructure). **Priority:** 🟡 WOULD — low disruption if changed early, high disruption later. Decide before Sprint 20.
+
+### BUG-030: TeamFeed Send Button Clipped Off-Screen
+The Send button in the TeamFeed compose area is partially cut off on the right edge. The compose bar's flex layout doesn't constrain properly — the icon row (Everyone, emoji, pin, GIF, Ctrl↵, Send) overflows the panel width.
+**Fix:** Audit the compose bar flex layout in TeamFeedSidebar (and/or TeamFeed). Likely needs `overflow-hidden` on the toolbar row, or the button row needs `flex-shrink` / `min-w-0` treatment so it stays within bounds.
+**Size:** ~30 min. **Priority:** 🔴 MUST — broken UI, visible to all users.
+
+### BUG-031: Dark Mode Accent Color — Yellow Instead of Amber/Orange
+The `--accent` token in dark mode renders as a cool yellow rather than the warm amber/orange from light mode. The "New Lead" CTA and other accent-colored elements look mismatched between modes. User preference: dark mode accent should be the same warm amber-orange as light mode, not a desaturated yellow.
+**Fix:** Audit `globals.css` dark mode `--accent` and `--accent-foreground` HSL values. Adjust to match the warm amber tone (closer to `d97706` / amber-500) rather than the current yellowish value. May also affect chart tokens or status tokens if they reference `--accent`.
+**Size:** ~30 min. **Priority:** 🟠 SHOULD — visual inconsistency, affects brand feel.
+
+### BUG-032: Sales Pipeline Column Headers — Poor Dark Mode Contrast
+The Kanban column status headers (e.g. "Contacted", "Follow Up") use light pastel backgrounds that look washed out and out-of-place in dark mode. These were addressed once in BUG-016 (text brightness) but the background colors themselves (`bg-purple-50`, `bg-orange-50`, etc.) don't adapt to dark mode.
+**Fix:** Add `dark:` variants to the pipeline column header backgrounds — either darker tinted versions of each status color, or transparent backgrounds with colored left-border accents. Should feel native to the dark navy context.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD — visual polish, affects primary sales workflow page.
 
 ### FEAT-011: Full Button / Route / Path / Dependency & Logic Audit
 No formal audit of the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers accumulate silently.

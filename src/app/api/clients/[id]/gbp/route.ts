@@ -4,13 +4,17 @@ import { getGBPClient } from '@/lib/enrichment/providers/google-business/client'
 import { listReviews } from '@/lib/enrichment/providers/google-business/reviews'
 import { fetchInsights } from '@/lib/enrichment/providers/google-business/insights'
 import { listPosts } from '@/lib/enrichment/providers/google-business/posts'
+import { withPermission } from "@/lib/auth/api-permissions"
 
 // GET /api/clients/[id]/gbp
 // Returns connection status + reviews + insights + posts
 export async function GET(
-  _req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
+
   const clientId = parseInt(params.id)
   if (isNaN(clientId)) return NextResponse.json({ error: 'Invalid id' }, { status: 400 })
 
@@ -51,9 +55,12 @@ export async function GET(
 
 // DELETE /api/clients/[id]/gbp — disconnect
 export async function DELETE(
-  _req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(request, "manage_clients");
+  if (permissionError) return permissionError;
+
   const clientId = parseInt(params.id)
   await prisma.gBPConnection.updateMany({
     where: { clientId },

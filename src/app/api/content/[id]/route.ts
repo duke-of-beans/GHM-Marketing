@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withPermission } from "@/lib/auth/api-permissions";
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
     const contentId = parseInt(params.id);
 
     if (isNaN(contentId)) {
@@ -38,6 +42,13 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    const permissionError = await withPermission(request, "manage_clients");
+    if (permissionError) return permissionError;
+
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+    const userId = parseInt(session!.user.id);
+
     const contentId = parseInt(params.id);
     const body = await request.json();
     const { title, content, changeNote } = body;
@@ -71,7 +82,7 @@ export async function PATCH(
         keywords: currentContent.keywords,
         metadata: currentContent.metadata as any,
         changeNote: changeNote || 'Content updated',
-        createdBy: 1, // TODO: Use session user ID
+        createdBy: userId,
       },
     });
 
