@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — Sprint 26 + Security Fix both shipped. 6 new items added (BUG-030/031/032, UX-FEAT-002/003, UX-AUDIT-027). Sprint matrix restructured for entity migration critical path.
+**Last Updated:** February 26, 2026 — 8 more items added (UX-AUDIT-028, UX-FEAT-004/005/006, FEAT-034/035, ARCH-002/003). Infrastructure fracture identified as critical architectural fork. Sprint matrix extended through Sprint 33.
 
 **Owner:** David Kirsch
 
@@ -52,10 +52,13 @@ Foundation → out. Each sprint unblocks the next.
 | ~~26~~ | ~~COVOS Signal Visual Identity~~ | ~~4-Pass sidebar/widget/component/page redesign. UI-CONST-001 Group 4 (Navigation) complete.~~ | ✅ SHIPPED | |
 | ~~SEC~~ | ~~Security Fix — Permission Gaps~~ | ~~18 unprotected API handlers secured with withPermission. createdBy hardcode fixed.~~ | ✅ SHIPPED | |
 | 27 | Bug Triage + Dark Mode Polish | BUG-030 (TeamFeed send overflow) + BUG-031 (dark accent yellow→amber) + BUG-032 (pipeline column dark mode) | ~30 min | Quick wins, visual cleanup |
-| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
+| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) + FEAT-035 (single lead entry) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
 | 29 | Entity Migration Readiness | Tenant registry for new entity, contract template entity swap, brochure/collateral rebrand hooks, Wave reconnect docs | ~1 session | New entity day-one operational |
-| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed Slack-grade overhaul) + UX-AUDIT-027 (contrast/accessibility pass) | ~1.5 sessions | Platform feels alive + accessible |
+| **ARCH** | **Infrastructure Fracture** | **ARCH-002 (repo/service/credential audit + separation plan) + ARCH-003 (COVOS module roadmap)** | **~1 session planning** | **⚠️ FORK — must decide before second tenant. Blocks true productization.** |
+| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed Slack-grade overhaul) + UX-AUDIT-027 (contrast/accessibility) + UX-FEAT-004 (vault preview) | ~1.5 sessions | Platform feels alive + accessible |
 | 31 | UI-CONST-001 Group 5 | Data Display — tables, metric tiles, charts | ~1 session | Design system continuation |
+| 32 | Signing + Tours | FEAT-034 (DocuSign integration) + UX-FEAT-005 (expanded tour tips) | ~2 sessions | Sales workflow completion + onboarding depth |
+| 33 | Customization + Guide | UX-AUDIT-028 (customization audit) + UX-FEAT-006 (guide character Phase 1) | ~2 sessions | Retention + personality layer |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**
@@ -190,6 +193,53 @@ The Kanban column status headers (e.g. "Contacted", "Follow Up") use light paste
 **Fix:** Add `dark:` variants to the pipeline column header backgrounds — either darker tinted versions of each status color, or transparent backgrounds with colored left-border accents. Should feel native to the dark navy context.
 **Size:** ~1 hr. **Priority:** 🟠 SHOULD — visual polish, affects primary sales workflow page.
 
+### UX-AUDIT-028: Customization Audit — Global User Personalization Surface
+Every user interaction with the platform should feel like *their* platform. This is a comprehensive audit of every surface that could be customizable but isn't yet. Not just widget layout — everything: which columns appear in tables, which metrics show on dashboard cards, sidebar group order, default filters on each page, notification preferences per event type, theme beyond light/dark (accent color per user?), default landing page per role, compact vs. comfortable density toggle, which quick actions appear and in what order, pipeline column visibility/ordering, report section toggles, email digest frequency. The audit produces a ranked list of customization opportunities with effort estimates and a phased implementation plan. The philosophy: reasonable defaults that work for 90% of users, with progressive disclosure of customization for power users who want control.
+**Output:** `docs/CUSTOMIZATION_AUDIT.md` — every customizable surface, current state, proposed UX, effort.
+**Size:** ~1 session audit, multi-session implementation. **Priority:** 🟡 WOULD — high-value for retention and stickiness, not blocking entity launch.
+
+### UX-FEAT-004: Document Vault — Preview Before Download
+Currently clicking a vault file triggers an immediate download. Best practice: preview first, download second. Images render inline in a lightbox/dialog. PDFs render in an iframe viewer. Documents (.docx, .xlsx) show a preview card with metadata (size, type, upload date, uploader) and prominent Download button. Unknown types show metadata + download only. The preview dialog should also surface version info if the file is from Shared space.
+**Size:** ~2 hrs. **Priority:** 🟠 SHOULD — UX quality, prevents accidental downloads, builds trust.
+
+### FEAT-034: DocuSign Integration — In-Dashboard Document Signing
+Sales reps need to send contracts, agreements, and onboarding docs for signature without leaving the platform. Leverage the existing DocuSign MCP connector (already connected in Claude). Build: (1) "Send for Signature" action on vault files and generated documents (contracts, agreements), (2) envelope status tracking per document (sent/viewed/signed/declined), (3) signed document auto-return to vault, (4) signature request history on client detail and in a dedicated "Signatures" section. This is a COVOS-level module — should work for any tenant's document signing needs, not GHM-specific.
+**Dependency:** DocuSign API credentials per tenant (add to TenantConfig or IntegrationsTab).
+**Size:** ~1.5 sessions. **Priority:** 🟠 SHOULD — high-value for sales workflow, differentiator vs. competitors.
+**Cross-reference:** COVOS SaaS module backlog (from previous chat — needs to be surfaced and merged).
+
+### FEAT-035: Manual Single-Lead Entry Form
+The "Import Leads" button on Sales Pipeline currently only supports CSV bulk import. Users need the ability to manually enter a single lead via a form — same fields as the won-client form (business name, contact, phone, email, address, territory, notes). Quick-add from Pipeline page header or from Import dialog as a "Add One Lead" tab alongside CSV upload.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD — basic workflow gap, especially for reps getting walk-in referrals.
+
+### UX-FEAT-005: Expanded Tour Tips — Process-Intensive Page Coverage
+Tour tips (Driver.js) currently cover basic page orientation. The more complex workflows need deeper guided tours: Content Studio (brief creation → AI generation → review → publish flow), Website Studio (site setup → page builder → SCRVNR review → approval → deployment), Approval Queue (review criteria, override flow), Analytics (what each metric means, how to act on it), Discovery (search → enrich → claim flow). Each tour should be triggerable from the `?` help icon and auto-offered on first visit to that page.
+**Size:** ~1 session (5-6 page tours). **Priority:** 🟡 WOULD — important for onboarding, not blocking.
+
+### UX-FEAT-006: COVOS Guide Character — Reactive AI Assistant Persona
+A persistent but non-intrusive guide character that speaks in the platform's sardonic, deadpan, 4th-wall-breaking voice. NOT Clippy — doesn't pop up on a timer or frequency. Reactive: appears when it detects user idle on a page for >30 seconds, when a user visits the same page 3x without taking action, when a workflow stalls (e.g., lead sitting in "New" for 5+ days). Proactive only when patterns suggest confusion (rapid page switching, incomplete form abandonment, repeated filter resets). The character has David's sketches as design reference. Voice matches the sardonic micro-copy already in empty states. Could evolve into an AI-powered contextual assistant that actually understands what the user is trying to do.
+**Phase 1:** Static character with pre-written contextual tips (reactive triggers only).
+**Phase 2:** AI-powered contextual awareness (reads page state, suggests next action).
+**Size:** Phase 1 ~1 session, Phase 2 ~2 sessions. **Priority:** 🟡 WOULD — differentiator, personality layer, but requires design assets (David's sketches).
+
+### ARCH-002: Project Architecture Fracture — COVOS Productization Separation
+**⚠️ ARCHITECTURAL FORK — Requires dedicated planning session.**
+The current project lives as a single Next.js app in one repo (`duke-of-beans/GHM-Marketing`) deployed to one Vercel project, using scattered 3rd-party services some of which are tied to GHM accounts. For true productization, COVOS needs to be its own entity with its own infrastructure:
+- **Repository:** COVOS platform repo separate from any tenant-specific config. GHM becomes just a tenant, not the codebase owner.
+- **Vercel:** COVOS project with its own team/org. Tenant subdomains route to the same deployment.
+- **3rd-party services:** Each service (Resend, Wave, GBP, DataForSEO, Tenor, Unsplash, etc.) needs clear ownership — which are COVOS platform services vs. which are per-tenant credentials? Document every service, its current owner, and its target state.
+- **Google accounts:** Audit which Google services are tied to personal vs. GHM vs. future-entity accounts.
+- **Git ownership:** `duke-of-beans` org → COVOS org? Or keep and rebrand?
+- **Environment variables:** Classify every env var as platform-level (COVOS owns) vs. tenant-level (each agency provides their own).
+- **Database:** Single Neon DB with tenant isolation via `tenantId` column, or separate DBs per tenant? Current schema has no `tenantId` on most tables.
+**Output:** `docs/ARCH_002_INFRASTRUCTURE_FRACTURE.md` — full audit of every service, credential, account, and dependency with migration plan.
+**Size:** ~1 session audit + doc, multi-session implementation. **Priority:** 🔴 MUST before second tenant goes live. **This is the biggest architectural decision remaining.**
+
+### ARCH-003: COVOS SaaS Module Backlog — "Mr. Potato Head" ERP Strategy
+**Cross-reference needed:** A previous chat session produced a backlog of SaaS tools/modules that COVOS could build to expand from SEO agency dashboard into middle-market ERP territory. That backlog needs to be surfaced, validated, and merged into this file as a FUTURE roadmap section. Modules discussed included: invoicing/billing (beyond Wave), HR/contractor management, project management, CRM capabilities, reporting/BI, and potentially DocuSign-like document management. The strategy: modular "Mr. Potato Head" approach where each capability is a toggleable module, building toward a comprehensive business operations platform.
+**Action:** Find and import the COVOS SaaS module backlog from the previous chat. Validate against current architecture. Create `docs/COVOS_MODULE_ROADMAP.md`.
+**Size:** ~2 hrs research + doc. **Priority:** 🟠 SHOULD — strategic planning, informs all architectural decisions.
+
 ### FEAT-011: Full Button / Route / Path / Dependency & Logic Audit
 No formal audit of the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers accumulate silently.
 **Scope:** Enumerate every `<Button>`, `<Link>`, `router.push()`, form `onSubmit`. Map to handler and route. Flag: dead routes, broken routes, duplicate logic, permission gaps, dependency tangles.
@@ -276,3 +326,62 @@ Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant ad
 ### ARCH-NOTE-001: Bug Reports + Feature Requests — Enterprise Support Routing
 **Architecture note (no code yet):** Bug reports and feature request submissions from tenant users must NOT route to the client-side admin (i.e., whoever is running the COVOS instance). These are platform-level communications and belong in an enterprise support channel owned by COVOS/David. Before building FEAT-028 (submitter feedback loop) or any multi-tenant support tooling, define a support email address and route all bug/feature submissions there instead of — or in addition to — surfacing them in the tenant's admin Settings. The tenant admin should see a filtered, curated view of what's relevant to their instance; platform-level reports go upstream to COVOS support.
 **Action needed:** Pick support email (e.g., support@covos.app). Update FEAT-028 spec to reflect routing. Consider whether tenant admins get a read-only filtered view or nothing at all.
+
+
+---
+
+## 🏗️ ARCHITECTURAL FORKS — Decisions Required Before Building
+
+### ARCH-002: Project Fracture — COVOS Platform vs. Tenant Instances
+**Status:** Decision needed. **Priority:** 🔴 CRITICAL — blocks productization.
+The current codebase is a single Next.js app that serves GHM operations AND is becoming the COVOS product. For true productization, this needs to fracture into: (1) COVOS core platform (the product, its own repo, its own Vercel project, its own GitHub org), and (2) Tenant instances that deploy from COVOS core with per-tenant config. Right now everything lives in `duke-of-beans/GHM-Marketing` on a shared Vercel, using GHM's Google accounts, GHM's Resend, GHM's Wave credentials — none of which belong to the new entity or to COVOS as a product company.
+**What needs compartmentalization:**
+- **Git/GitHub:** COVOS core gets its own org (e.g., `covos-platform`). GHM-specific config becomes tenant data, not codebase.
+- **Vercel:** COVOS gets its own Vercel team. Tenant deployments are separate projects deploying the same codebase with different env vars.
+- **3rd party services:** Resend, Wave, Google APIs, Tenor, Unsplash, DataForSEO, OpenAI/Anthropic — each needs to be either (a) COVOS-owned with tenant isolation, or (b) tenant-provided credentials stored in TenantConfig. Decision per service.
+- **DNS:** covos.app is the product domain. Tenants get `{slug}.covos.app` or custom domains. GHM's domain is just one tenant.
+- **Database:** Single Neon DB with tenant_id column on all tables? Or separate databases per tenant? Cost/complexity tradeoff.
+- **Billing:** COVOS needs its own Stripe (or similar) for tenant subscription billing. Separate from tenant's own payment processing.
+**This is not a sprint — it's an architecture decision document that gates everything.** Recommend: produce `COVOS_ARCHITECTURE_DECISION.md` before any fracture work begins.
+**Reference:** `D:\Work\Covos_Business_Opportunity_Assessment.docx` — full market analysis, pricing architecture, 82 killable SaaS categories, build sequence.
+
+### ARCH-003: COVOS SaaS Module Backlog — The 82-Category Replacement Map
+**Status:** Strategy document exists (`Covos_Business_Opportunity_Assessment.docx`). Needs translation into actionable product backlog.
+The assessment identifies 82 SaaS categories COVOS can absorb, organized into 8 groups: Sales & CRM (6), Marketing (11), Operations & PM (8), Field Operations (7), Supply Chain (4), HR (16), Finance (17), Customer Service (13). Phase 1 (10 core modules) kills $975–$5,545/mo per client across all 20 target verticals.
+**Current GHM dashboard already covers significant Phase 1 ground:** CRM/pipeline (done), project/task management (done), invoicing (via Wave), reporting/dashboards (done), client portal (done), document management (Vault), internal comms (TeamFeed), approval workflows (done).
+**Phase 1 gaps:** Appointment booking, proposal/estimate generation (partial), email marketing (not started), basic marketing automation (not started), time tracking with billable hours (partial).
+**Action needed:** Map existing features against the 82-category list. Identify gaps. Prioritize Phase 1 completion. This becomes the COVOS product roadmap.
+**Size:** ~1 session to produce the mapping doc. No code. **Priority:** 🟠 SHOULD — strategic planning that informs all future sprints.
+
+---
+
+## 🟡 WOULD — Additional Features & Polish
+
+### FEAT-034: Customization Audit — Global Personalization Framework
+Every surface that could be personalized should be. Systematic audit of every configurable element across the entire platform.
+**Scope (non-exhaustive):** Widget visibility (add/remove/show/hide, not just rearrange). Table column chooser per data table. Sidebar nav pin/unpin/reorder. Notification preferences per-channel per-event. Display density toggle (compact/comfortable/spacious). Default tab memory per page. Quick action visibility/order. Pipeline stage customization (tenant-level). Keyboard shortcut reference.
+**Output:** `docs/CUSTOMIZATION_AUDIT.md` — every configurable surface mapped, current state, recommendation (user-level vs. tenant-level vs. not worth it).
+**Size:** ~1 session audit + doc, multi-sprint implementation. **Priority:** 🟡 WOULD.
+
+### FEAT-035: Document Vault — Preview Before Download
+Click → preview modal instead of immediate download. PDF via iframe, images full-size with zoom, DOCX via server-side conversion, CSV/XLSX as table preview. Download as secondary action in modal footer.
+**Size:** ~2 hrs. **Priority:** 🟠 SHOULD.
+
+### FEAT-036: DocuSign Integration — In-Dashboard Document Signing
+Send documents for signature from within the dashboard (Vault, contracts, onboarding). Track status. Receive signed docs back into Vault. Uses DocuSign API via tenant-provided credentials in TenantConfig.
+**Use cases:** Sales rep sends service agreement. Admin sends partner agreement. Client signs onboarding.
+**Dependency:** ARCH-002 (whose DocuSign account). Listed as "sleeper feature" in COVOS assessment.
+**Size:** ~1.5 sessions. **Priority:** 🟡 WOULD.
+
+### FEAT-037: Single Lead Manual Entry
+"Import Leads" becomes split button: "Import CSV" + "Add Single Lead." Form: business name, contact, phone, email, website, territory, notes. Creates Lead in first pipeline stage.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD — obvious gap.
+
+### FEAT-038: Expanded Tour Tips — Studio & Complex Workflow Coverage
+Extend Driver.js tutorials to Content Studio, Website Studio, Analytics, Settings (especially for new admins), Pipeline advanced filters.
+**Size:** ~1 session (content, not infra). **Priority:** 🟡 WOULD.
+
+### FEAT-039: Reactive Guide Character — "The Voice"
+Personality-driven contextual assistant. NOT Clippy — reactive only. Triggers: idle 60s+ on actionable page, same page 3x without completing primary action, empty states, first-visit pages. Character: deadpan sardonic, fourth-wall-breaking, matches brand voice. David has character sketches.
+**Technical:** Global React component, receives page context + DashboardEvent signals. Small avatar bottom-right with speech bubble. Dismissable. Toggleable in Settings. Learns what user already knows.
+**Size:** ~2 sessions (system + content for all pages). **Priority:** 🟡 WOULD — high differentiation, needs character design finalized.
