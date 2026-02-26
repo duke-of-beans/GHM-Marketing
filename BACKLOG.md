@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — Security fix shipped (permission gaps — 18 handlers across content/* and client sub-routes secured). Groups 1–4 done.
+**Last Updated:** February 26, 2026 — Sprint 26 + Security Fix both shipped. 6 new items added (BUG-030/031/032, UX-FEAT-002/003, UX-AUDIT-027). Sprint matrix restructured for entity migration critical path.
 
 **Owner:** David Kirsch
 
@@ -50,8 +50,12 @@ Foundation → out. Each sprint unblocks the next.
 | ~~24~~ | ~~UX Quality Sprint~~ | ~~Dark theme token migration + Voice audit + Tooltip audit~~ | ✅ SHIPPED | |
 | ~~25~~ | ~~UI Constitution Mega-Sprint~~ | ~~5-Pass: Responsiveness + Icons + Typography + Spacing + Components. UX-AUDIT-006 closed.~~ | ✅ SHIPPED | |
 | ~~26~~ | ~~COVOS Signal Visual Identity~~ | ~~4-Pass sidebar/widget/component/page redesign. UI-CONST-001 Group 4 (Navigation) complete.~~ | ✅ SHIPPED | |
-| ~~21~~ | ~~Settings & Tasks Polish~~ | ~~BUG-012–016 + UX-AUDIT-018/019 + FEAT-030–032~~ | ✅ SHIPPED | |
-| ~~22~~ | ~~UX Polish + Settings IA~~ | ~~BUG-017/018/019 + UX-AUDIT-020/021~~ | ✅ SHIPPED | |
+| ~~SEC~~ | ~~Security Fix — Permission Gaps~~ | ~~18 unprotected API handlers secured with withPermission. createdBy hardcode fixed.~~ | ✅ SHIPPED | |
+| 27 | Bug Triage + Dark Mode Polish | BUG-030 (TeamFeed send overflow) + BUG-031 (dark accent yellow→amber) + BUG-032 (pipeline column dark mode) | ~30 min | Quick wins, visual cleanup |
+| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
+| 29 | Entity Migration Readiness | Tenant registry for new entity, contract template entity swap, brochure/collateral rebrand hooks, Wave reconnect docs | ~1 session | New entity day-one operational |
+| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed Slack-grade overhaul) + UX-AUDIT-027 (contrast/accessibility pass) | ~1.5 sessions | Platform feels alive + accessible |
+| 31 | UI-CONST-001 Group 5 | Data Display — tables, metric tiles, charts | ~1 session | Design system continuation |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**
@@ -152,6 +156,24 @@ See full scope above (in SHOULD section — moved here pending pitch/demo timeli
 Should Tasks live under "Clients" in the left nav rather than as a standalone top-level section? Most task work is client-contextual.
 **Direction:** Evaluate (A) keep top-level for cross-client queue management vs. (B) move under Clients with master queue accessible elsewhere. Audit actual usage pattern before committing.
 **Size:** ~2 hrs (decision + nav restructure). **Priority:** 🟡 WOULD — low disruption if changed early, high disruption later. Decide before Sprint 20.
+
+### UX-FEAT-002: TeamFeed Major Overhaul — Slack-Grade Panel
+TeamFeed needs to evolve from a sidebar chat panel into a proper communication hub. Three major upgrades:
+1. **Resizable panel** — drag handle on left edge, width persisted to localStorage, min/max constraints.
+2. **Two-pane layout** — people/channels list on left, message thread on right (Slack model). Online/offline status indicators (green dot = active in last 5 min via `DashboardEvent` heartbeat or session recency). User avatars or initials with presence dots.
+3. **Polish** — subtle accent color on the TeamFeed toggle icon in the nav (e.g., indigo dot or badge when unread). Typing indicators, "X is typing..." at bottom of message pane.
+**Size:** ~1.5 sessions (resize + layout restructure + presence system). **Priority:** 🟠 SHOULD — high-impact UX, makes the platform feel alive.
+
+### UX-AUDIT-027: Accessibility Contrast Pass — Signal Palette Review
+The Signal palette looks great but some token combinations may not meet WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large text). Particularly concerned about: muted text on dark backgrounds, status badge text on colored backgrounds, secondary text in metric cards, sidebar nav items in non-active state. Run a systematic contrast audit of all foreground/background token pairs in both light and dark mode. Adjust any failing pairs while preserving the Signal aesthetic — typically means bumping foreground lightness up 10-15% rather than changing hues.
+**Size:** ~1 hr audit + ~1 hr fixes. **Priority:** 🟠 SHOULD — accessibility + readability, especially for older users or bright environments.
+
+### UX-FEAT-003: Dashboard Widget Default Layout per Role
+Dashboard widgets currently initialize in an undefined/random order on first login. Each role should get a thoughtful default layout reflecting what they'll use most:
+- **Admin/Manager:** Revenue metrics top-left, Client Health top-right, Team Activity mid-left, Goals mid-right, Quick Actions bottom.
+- **Sales Rep:** My Pipeline top-left, My Book top-right, Needs Attention mid-left, Sales Tools mid-right, Earnings bottom.
+Layout stored on first render if no saved layout exists. Users can still customize and their arrangement persists. Only affects the very first session.
+**Size:** ~1 hr. **Priority:** 🟠 SHOULD — first impression matters, especially for new reps.
 
 ### BUG-030: TeamFeed Send Button Clipped Off-Screen
 The Send button in the TeamFeed compose area is partially cut off on the right edge. The compose bar's flex layout doesn't constrain properly — the icon row (Everyone, emoji, pin, GIF, Ctrl↵, Send) overflows the panel width.
