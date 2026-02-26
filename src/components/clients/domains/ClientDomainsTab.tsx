@@ -78,7 +78,7 @@ export function ClientDomainsTab({
                     className={`text-[10px] ${
                       domain.ownershipType === "ghm"
                         ? "bg-blue-50 text-blue-700"
-                        : "bg-gray-50"
+                        : "bg-muted"
                     }`}
                   >
                     {domain.ownershipType === "ghm" ? "GHM Owned" : "Client Owned"}

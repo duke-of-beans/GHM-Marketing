@@ -195,7 +195,7 @@ function NavGroupSection({
         onClick={toggle}
         className={cn(
           "w-full flex items-center justify-between px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors",
-          "text-muted-foreground/70 hover:text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+          "text-muted-foreground/70 hover:text-muted-foreground hover:bg-muted dark:hover:bg-card"
         )}
         aria-expanded={open}
       >
@@ -216,7 +216,7 @@ function NavGroupSection({
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 isActivePath(link.href)
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
               )}
             >
               <span>{link.icon}</span>
@@ -265,7 +265,7 @@ export function DashboardNav({
   return (
     <>
       {/* ── Desktop sidebar ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-gray-50/50 dark:bg-gray-950 p-4 overflow-hidden">
+      <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen border-r bg-muted/50 p-4 overflow-hidden">
         {/* Logo + user */}
         <div className="mb-4 flex-shrink-0">
           <Link href={dashboardHref}>
@@ -298,7 +298,7 @@ export function DashboardNav({
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               isActivePath(dashboardHref)
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+                : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
             )}
           >
             <span>📊</span>
@@ -328,7 +328,7 @@ export function DashboardNav({
               "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
               isActivePath("/profile")
                 ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+                : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
             )}
           >
             <span>👤</span>
@@ -341,7 +341,7 @@ export function DashboardNav({
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
                 isActivePath("/settings")
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
               )}
             >
               <span>⚙️</span>
@@ -351,7 +351,7 @@ export function DashboardNav({
           <HelpMenu />
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-foreground transition-colors w-full"
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground transition-colors w-full"
           >
             <span>🚪</span>
             Sign Out

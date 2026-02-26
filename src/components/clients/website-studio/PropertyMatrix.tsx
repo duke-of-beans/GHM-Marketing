@@ -173,8 +173,8 @@ function StatusDot({ status, isStale }: { status: string; isStale: boolean }) {
     approved:   "bg-status-success-bg",
     review:     "bg-status-warning-bg",
     composing:  "bg-blue-400",
-    scaffolded: "bg-gray-400",
+    scaffolded: "bg-muted-foreground",
     error:      "bg-status-danger-bg",
   };
-  return <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${colors[status] ?? "bg-gray-400"}`} />;
+  return <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${colors[status] ?? "bg-muted-foreground"}`} />;
 }

@@ -50,7 +50,7 @@ export function ReportPreviewModal({
           <DialogTitle>Report Preview</DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto border rounded-lg bg-white">
+        <div className="flex-1 overflow-y-auto border rounded-lg bg-card">
           <iframe
             srcDoc={reportHtml}
             className="w-full h-full min-h-[600px]"

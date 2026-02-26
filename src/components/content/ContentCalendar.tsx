@@ -60,7 +60,7 @@ export function ContentCalendar({ clientId }: ContentCalendarProps) {
       case 'meta':
         return 'bg-status-success-bg text-status-success'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-muted text-foreground'
     }
   }
 

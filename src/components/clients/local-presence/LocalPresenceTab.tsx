@@ -85,7 +85,7 @@ function StarRating({ rating }: { rating: number }) {
         <Star
           key={i}
           size={12}
-          className={i <= rating ? "fill-yellow-400 text-status-warning" : "text-gray-200"}
+          className={i <= rating ? "fill-yellow-400 text-status-warning" : "text-muted-foreground"}
         />
       ))}
     </span>
@@ -122,15 +122,15 @@ function ReviewCard({
   }
 
   return (
-    <div className="border rounded-lg p-4 space-y-2 bg-white">
+    <div className="border rounded-lg p-4 space-y-2 bg-card">
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-medium text-sm">{review.reviewer}</span>
             <StarRating rating={review.rating} />
           </div>
-          <p className="text-sm text-gray-700">{review.comment || <span className="italic text-gray-400">No comment</span>}</p>
-          <span className="text-xs text-gray-400">{new Date(review.createTime).toLocaleDateString()}</span>
+          <p className="text-sm text-foreground">{review.comment || <span className="italic text-muted-foreground">No comment</span>}</p>
+          <span className="text-xs text-muted-foreground">{new Date(review.createTime).toLocaleDateString()}</span>
         </div>
         {review.replyText
           ? <Badge variant="secondary" className="shrink-0 text-xs">Replied</Badge>
@@ -190,10 +190,10 @@ function InsightKPIs({ daily }: { daily: DailyInsight[] }) {
   return (
     <div className="grid grid-cols-4 gap-3">
       {kpis.map(k => (
-        <div key={k.label} className="border rounded-lg p-3 bg-white text-center">
+        <div key={k.label} className="border rounded-lg p-3 bg-card text-center">
           <div className="text-xl font-bold">{k.value.toLocaleString()}</div>
-          <div className="text-xs text-gray-500">{k.label}</div>
-          <div className="text-xs text-gray-400">Last 90 days</div>
+          <div className="text-xs text-muted-foreground">{k.label}</div>
+          <div className="text-xs text-muted-foreground">Last 90 days</div>
         </div>
       ))}
     </div>
@@ -203,10 +203,10 @@ function InsightKPIs({ daily }: { daily: DailyInsight[] }) {
 // ─── Snapshot trend charts ───────────────────────────────────────────────────
 
 function TrendArrow({ delta }: { delta: number | null }) {
-  if (delta === null) return <MinusIcon size={12} className="text-gray-400 inline" />
+  if (delta === null) return <MinusIcon size={12} className="text-muted-foreground inline" />
   if (delta > 0) return <TrendingUp size={12} className="text-status-success inline mr-0.5" />
   if (delta < 0) return <TrendingDown size={12} className="text-status-danger inline mr-0.5" />
-  return <MinusIcon size={12} className="text-gray-400 inline" />
+  return <MinusIcon size={12} className="text-muted-foreground inline" />
 }
 
 function SnapshotTrends({ clientId }: { clientId: number }) {
@@ -220,10 +220,10 @@ function SnapshotTrends({ clientId }: { clientId: number }) {
       .finally(() => setLoading(false))
   }, [clientId])
 
-  if (loading) return <div className="text-xs text-gray-400 py-4">Loading history…</div>
+  if (loading) return <div className="text-xs text-muted-foreground py-4">Loading history…</div>
   if (snapshots.length === 0) {
     return (
-      <div className="border rounded-lg p-4 text-center text-sm text-gray-400">
+      <div className="border rounded-lg p-4 text-center text-sm text-muted-foreground">
         No snapshot history yet — data will appear after the first weekly cron run.
       </div>
     )
@@ -253,17 +253,17 @@ function SnapshotTrends({ clientId }: { clientId: number }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-muted-foreground">
         Last snapshot: {new Date(latest.scanDate).toLocaleDateString()} · 30-day rolling window
       </p>
 
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
         {kpis.map(k => (
-          <div key={k.label} className="border rounded-lg p-2 bg-white text-center">
+          <div key={k.label} className="border rounded-lg p-2 bg-card text-center">
             <div className="text-lg font-bold leading-tight">{k.value}</div>
-            <div className="text-xs text-gray-500">{k.label}</div>
+            <div className="text-xs text-muted-foreground">{k.label}</div>
             {k.delta !== null && (
-              <div className={`text-xs mt-0.5 flex items-center justify-center gap-0.5 ${k.delta > 0 ? "text-status-success" : k.delta < 0 ? "text-status-danger" : "text-gray-400"}`}>
+              <div className={`text-xs mt-0.5 flex items-center justify-center gap-0.5 ${k.delta > 0 ? "text-status-success" : k.delta < 0 ? "text-status-danger" : "text-muted-foreground"}`}>
                 <TrendArrow delta={k.delta} />
                 {k.delta > 0 ? `+${k.delta}` : k.delta}
               </div>
@@ -273,8 +273,8 @@ function SnapshotTrends({ clientId }: { clientId: number }) {
       </div>
 
       {chartData.length > 1 && (
-        <div className="border rounded-lg p-4 bg-white">
-          <p className="text-xs font-medium text-gray-600 mb-3">Views + Clicks over time</p>
+        <div className="border rounded-lg p-4 bg-card">
+          <p className="text-xs font-medium text-muted-foreground mb-3">Views + Clicks over time</p>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -330,7 +330,7 @@ function AIDraftModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
+      <div className="bg-card rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-violet-500" />
           <h3 className="font-semibold text-lg">AI Post Draft</h3>
@@ -338,7 +338,7 @@ function AIDraftModal({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-medium text-gray-600 block mb-1">Post type</label>
+            <label className="text-xs font-medium text-muted-foreground block mb-1">Post type</label>
             <Select value={postType} onValueChange={v => setPostType(v as typeof postType)}>
               <SelectTrigger className="text-sm">
                 <SelectValue />
@@ -351,7 +351,7 @@ function AIDraftModal({
             </Select>
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-600 block mb-1">Topic (optional)</label>
+            <label className="text-xs font-medium text-muted-foreground block mb-1">Topic (optional)</label>
             <input
               className="w-full border rounded px-3 py-1.5 text-sm"
               placeholder="e.g. spring tune-ups"
@@ -372,14 +372,14 @@ function AIDraftModal({
 
         {draft && (
           <div className="space-y-2">
-            <label className="text-xs font-medium text-gray-600 block">Draft — edit before using</label>
+            <label className="text-xs font-medium text-muted-foreground block">Draft — edit before using</label>
             <Textarea
               value={draft}
               onChange={e => setDraft(e.target.value)}
               rows={4}
               className="text-sm"
             />
-            <p className="text-xs text-gray-400">{draft.length} characters</p>
+            <p className="text-xs text-muted-foreground">{draft.length} characters</p>
             <div className="flex gap-2">
               <Button size="sm" onClick={() => onUse(draft)} className="flex-1">Use this draft</Button>
               <Button size="sm" variant="outline" onClick={handleGenerate} disabled={loading}>Regenerate</Button>
@@ -427,7 +427,7 @@ function CreatePostModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
+      <div className="bg-card rounded-xl shadow-lg p-6 w-full max-w-lg space-y-4">
         <h3 className="font-semibold text-lg">New GBP Post</h3>
         <Textarea
           value={summary}
@@ -478,7 +478,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-gray-400 gap-2">
+      <div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
         <Loader2 className="animate-spin" size={18} />
         Loading Google Business Profile…
       </div>
@@ -489,10 +489,10 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
   if (!data?.connected) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-        <MapPin size={40} className="text-gray-300" />
+        <MapPin size={40} className="text-muted-foreground" />
         <div>
-          <p className="font-medium text-gray-700 mb-1">Connect Google Business Profile</p>
-          <p className="text-sm text-gray-500 max-w-sm">
+          <p className="font-medium text-foreground mb-1">Connect Google Business Profile</p>
+          <p className="text-sm text-muted-foreground max-w-sm">
             Connect this client's GBP account to manage reviews, track local search performance, and publish posts.
           </p>
         </div>
@@ -514,10 +514,10 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-semibold">{data.locationName}</p>
-          <p className="text-xs text-gray-400">{data.googleEmail}</p>
+          <p className="text-xs text-muted-foreground">{data.googleEmail}</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-muted-foreground">
             {data.lastSyncAt ? `Synced ${new Date(data.lastSyncAt).toLocaleString()}` : "Never synced"}
           </span>
           <Button size="sm" variant="outline" onClick={load}>
@@ -539,19 +539,19 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
 
       {/* KPIs row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="border rounded-lg p-3 bg-white text-center">
+        <div className="border rounded-lg p-3 bg-card text-center">
           <div className="text-xl font-bold">{avgRating}</div>
-          <div className="text-xs text-gray-500">Avg. Rating</div>
+          <div className="text-xs text-muted-foreground">Avg. Rating</div>
         </div>
-        <div className="border rounded-lg p-3 bg-white text-center">
+        <div className="border rounded-lg p-3 bg-card text-center">
           <div className="text-xl font-bold">{reviews.length}</div>
-          <div className="text-xs text-gray-500">Total Reviews</div>
+          <div className="text-xs text-muted-foreground">Total Reviews</div>
         </div>
-        <div className="border rounded-lg p-3 bg-white text-center">
+        <div className="border rounded-lg p-3 bg-card text-center">
           <div className={`text-xl font-bold ${needsReply.length > 0 ? "text-status-warning" : "text-status-success"}`}>
             {needsReply.length}
           </div>
-          <div className="text-xs text-gray-500">Unanswered</div>
+          <div className="text-xs text-muted-foreground">Unanswered</div>
         </div>
       </div>
 
@@ -564,7 +564,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2 -mb-px ${
               activeTab === t
                 ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {t === "history" ? "Trends" : t}
@@ -581,7 +581,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
       {activeTab === "reviews" && (
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
           {reviews.length === 0
-            ? <p className="text-sm text-gray-400 text-center py-8">No reviews found.</p>
+            ? <p className="text-sm text-muted-foreground text-center py-8">No reviews found.</p>
             : reviews.map(r => (
                 <ReviewCard
                   key={r.reviewId}
@@ -599,14 +599,14 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
         <div className="space-y-4">
           {data.insights?.daily?.length
             ? <InsightKPIs daily={data.insights.daily} />
-            : <p className="text-sm text-gray-400">No insights data available.</p>
+            : <p className="text-sm text-muted-foreground">No insights data available.</p>
           }
           {data.insights?.keywords?.length ? (
             <div>
               <p className="text-sm font-medium mb-2">Top Search Keywords</p>
               <div className="border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-xs text-gray-500">
+                  <thead className="bg-muted text-xs text-muted-foreground">
                     <tr>
                       <th className="text-left px-4 py-2">Keyword</th>
                       <th className="text-right px-4 py-2">Monthly Impressions</th>
@@ -614,7 +614,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
                   </thead>
                   <tbody className="divide-y">
                     {data.insights.keywords.slice(0, 15).map((k, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
+                      <tr key={i} className="hover:bg-muted">
                         <td className="px-4 py-2 font-mono text-xs">{k.keyword}</td>
                         <td className="px-4 py-2 text-right">{k.monthlyImpressions.toLocaleString()}</td>
                       </tr>
@@ -639,12 +639,12 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
             </Button>
           </div>
           {(data.posts ?? []).length === 0
-            ? <p className="text-sm text-gray-400 text-center py-8">No posts yet.</p>
+            ? <p className="text-sm text-muted-foreground text-center py-8">No posts yet.</p>
             : (data.posts ?? []).map(p => (
-                <div key={p.name} className="border rounded-lg p-4 bg-white space-y-1">
+                <div key={p.name} className="border rounded-lg p-4 bg-card space-y-1">
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary" className="text-xs capitalize">{p.topicType.toLowerCase()}</Badge>
-                    <span className="text-xs text-gray-400">{new Date(p.createTime).toLocaleDateString()}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(p.createTime).toLocaleDateString()}</span>
                   </div>
                   <p className="text-sm">{p.summary}</p>
                 </div>

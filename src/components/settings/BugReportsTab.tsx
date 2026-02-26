@@ -74,14 +74,14 @@ const STATUS_OPTIONS = [
   { value: "acknowledged", label: "Acknowledged", icon: Eye, color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
   { value: "in-progress", label: "In Progress", icon: Clock, color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
   { value: "resolved", label: "Resolved", icon: CheckCircle2, color: "bg-status-success-bg text-status-success" },
-  { value: "wont-fix", label: "Won't Fix", icon: XCircle, color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" },
+  { value: "wont-fix", label: "Won't Fix", icon: XCircle, color: "bg-muted text-foreground dark:bg-card" },
 ];
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: "bg-status-danger-bg text-status-danger",
   high: "bg-status-warning-bg text-status-warning",
   medium: "bg-status-warning-bg text-status-warning",
-  low: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  low: "bg-muted text-muted-foreground dark:bg-card",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {

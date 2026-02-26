@@ -33,7 +33,7 @@ interface Props {
 // ─── Status config ──────────────────────────────────────────────────────────
 
 const SCRVNR_BADGE: Record<string, { label: string; className: string }> = {
-  unprocessed: { label: "Unprocessed", className: "bg-gray-100 text-gray-600" },
+  unprocessed: { label: "Unprocessed", className: "bg-muted text-muted-foreground" },
   processing:  { label: "Processing",  className: "bg-blue-100 text-blue-600" },
   cleared:     { label: "Cleared ✓",   className: "bg-status-success-bg text-status-success" },
   failed:      { label: "Failed",      className: "bg-status-danger-bg text-status-danger" },
@@ -41,7 +41,7 @@ const SCRVNR_BADGE: Record<string, { label: string; className: string }> = {
 };
 
 const REVIEW_BADGE: Record<string, { label: string; className: string }> = {
-  pending:            { label: "Pending",            className: "bg-gray-100 text-gray-500" },
+  pending:            { label: "Pending",            className: "bg-muted text-muted-foreground" },
   approved:           { label: "Approved",           className: "bg-status-success-bg text-status-success" },
   changes_requested:  { label: "Changes Requested",  className: "bg-status-danger-bg text-status-danger" },
 };

@@ -131,11 +131,11 @@ const PRIORITY_COLORS: Record<string, string> = {
   P1: "bg-status-danger-bg text-status-danger",
   P2: "bg-status-warning-bg text-status-warning",
   P3: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200",
-  P4: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  P4: "bg-muted text-muted-foreground dark:bg-card",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  queued: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+  queued: "bg-muted text-foreground dark:bg-card",
   in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200",
   review: "bg-status-warning-bg text-status-warning",
   approved: "bg-status-success-bg text-status-success",
@@ -143,7 +143,7 @@ const STATUS_COLORS: Record<string, string> = {
   measuring: "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-200",
   complete: "bg-teal-100 text-teal-700 dark:bg-teal-900/60 dark:text-teal-200",
   rejected: "bg-status-danger-bg text-status-danger",
-  cancelled: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
+  cancelled: "bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -559,7 +559,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Card className="p-3">
           <div className="flex items-center gap-2">
-            <ListTodo className="h-4 w-4 text-gray-500" />
+            <ListTodo className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Queued</span>
           </div>
           <p className="text-2xl font-bold mt-1">{s.queued || 0}</p>
@@ -592,7 +592,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
   // ── Board view ────────────────────────────────────────────────────────────
 
   const BOARD_COLUMNS: { status: string; label: string; color: string }[] = [
-    { status: "queued", label: "Queued", color: "border-gray-300 dark:border-gray-600" },
+    { status: "queued", label: "Queued", color: "border-border dark:border-border" },
     { status: "in_progress", label: "In Progress", color: "border-blue-400 dark:border-blue-500" },
     { status: "review", label: "In Review", color: "border-status-warning-border" },
     { status: "approved", label: "Approved", color: "border-status-success-border" },

@@ -360,7 +360,7 @@ export function ApprovalModal({
 
 function ScrvnrBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string }> = {
-    unprocessed: { label: "Not run",    className: "bg-gray-100 text-gray-600" },
+    unprocessed: { label: "Not run",    className: "bg-muted text-muted-foreground" },
     processing:  { label: "Running",    className: "bg-blue-100 text-blue-700" },
     cleared:     { label: "SCRVNR ✓",  className: "bg-status-success-bg text-status-success" },
     failed:      { label: "SCRVNR ✗",  className: "bg-status-danger-bg text-status-danger" },
@@ -376,7 +376,7 @@ function ScrvnrBadge({ status }: { status: string }) {
 
 function ReviewBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string }> = {
-    pending:            { label: "Pending",          className: "bg-gray-100 text-gray-500" },
+    pending:            { label: "Pending",          className: "bg-muted text-muted-foreground" },
     approved:           { label: "Approved",         className: "bg-status-success-bg text-status-success" },
     changes_requested:  { label: "Changes needed",   className: "bg-status-danger-bg text-status-danger" },
   };

@@ -74,7 +74,7 @@ const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = 
   overdue:     { label: "Overdue",     color: "text-status-warning" },
   paused:      { label: "Paused",      color: "text-status-danger" },
   collections: { label: "Collections", color: "text-status-danger font-bold" },
-  terminated:  { label: "Terminated",  color: "text-gray-500" },
+  terminated:  { label: "Terminated",  color: "text-muted-foreground" },
 };
 
 export function BillingTab({ clientId, businessName }: { clientId: number; businessName: string }) {

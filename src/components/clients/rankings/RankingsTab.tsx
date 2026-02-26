@@ -57,10 +57,10 @@ interface RankingSummary {
 // ============================================================================
 
 function PositionDelta({ current, previous }: { current: number | null; previous: number | null }) {
-  if (current === null) return <span className="text-gray-400 text-xs">—</span>;
+  if (current === null) return <span className="text-muted-foreground text-xs">—</span>;
   if (previous === null) return <span className="text-xs text-blue-500">New</span>;
   const delta = previous - current; // positive = improved (moved up)
-  if (delta === 0) return <Minus className="h-3 w-3 text-gray-400 inline" />;
+  if (delta === 0) return <Minus className="h-3 w-3 text-muted-foreground inline" />;
   if (delta > 0) return (
     <span className="text-status-success text-xs flex items-center gap-0.5">
       <ArrowUp className="h-3 w-3" />{delta}
@@ -74,8 +74,8 @@ function PositionDelta({ current, previous }: { current: number | null; previous
 }
 
 function PositionBadge({ pos, type }: { pos: number | null; type: "organic" | "pack" }) {
-  if (pos === null) return <span className="text-gray-400 text-sm">—</span>;
-  const color = pos <= 3 ? "bg-status-success-bg text-status-success" : pos <= 10 ? "bg-status-warning-bg text-status-warning" : "bg-gray-100 text-gray-600";
+  if (pos === null) return <span className="text-muted-foreground text-sm">—</span>;
+  const color = pos <= 3 ? "bg-status-success-bg text-status-success" : pos <= 10 ? "bg-status-warning-bg text-status-warning" : "bg-muted text-muted-foreground";
   return (
     <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${color}`}>
       #{pos}
@@ -211,7 +211,7 @@ export function RankingsTab({ clientId }: { clientId: number }) {
   const uncategorized = filtered.filter((k) => !k.category);
   if (uncategorized.length > 0) grouped["Uncategorized"] = uncategorized;
 
-  if (loading) return <div className="p-6 text-sm text-gray-500">Loading rankings...</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading rankings...</div>;
 
   return (
     <div className="space-y-6 p-4">
@@ -224,9 +224,9 @@ export function RankingsTab({ clientId }: { clientId: number }) {
             { label: "In Local Pack", value: summary.inLocalPack },
             { label: "Avg. Position", value: summary.avgPosition ?? "—" },
           ].map((stat) => (
-            <div key={stat.label} className="border rounded-lg p-3 bg-white">
+            <div key={stat.label} className="border rounded-lg p-3 bg-card">
               <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -235,7 +235,7 @@ export function RankingsTab({ clientId }: { clientId: number }) {
       {/* Controls */}
       <div className="flex flex-wrap gap-2 items-center">
         <div className="relative flex-1 min-w-[160px]">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-8 text-sm"
             placeholder="Search keywords..."
@@ -265,14 +265,14 @@ export function RankingsTab({ clientId }: { clientId: number }) {
 
       {/* Last scan info */}
       {summary?.lastScanDate && (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground">
           Last scan: {new Date(summary.lastScanDate).toLocaleString()} · Biweekly schedule active
         </p>
       )}
 
       {/* No keywords state */}
       {activeKeywords.length === 0 && (
-        <div className="border rounded-lg p-8 text-center text-gray-500">
+        <div className="border rounded-lg p-8 text-center text-muted-foreground">
           <p className="text-sm mb-2">No keywords being tracked yet.</p>
           <p className="text-xs">Add keywords above to start tracking local rankings.</p>
         </div>
@@ -281,13 +281,13 @@ export function RankingsTab({ clientId }: { clientId: number }) {
       {/* Keyword table grouped by category */}
       {Object.entries(grouped).map(([cat, kws]) => (
         <div key={cat} className="border rounded-lg overflow-hidden">
-          <div className="bg-gray-50 px-4 py-2 flex items-center justify-between border-b">
+          <div className="bg-muted px-4 py-2 flex items-center justify-between border-b">
             <span className="text-sm font-medium">{cat}</span>
-            <span className="text-xs text-gray-400">{kws.length} keywords</span>
+            <span className="text-xs text-muted-foreground">{kws.length} keywords</span>
           </div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-xs text-gray-500 bg-gray-50/50">
+              <tr className="border-b text-xs text-muted-foreground bg-muted/50">
                 <th className="text-left py-2 px-4 font-medium">Keyword</th>
                 <th className="text-center py-2 px-3 font-medium">Organic</th>
                 <th className="text-center py-2 px-3 font-medium">Δ</th>
@@ -301,7 +301,7 @@ export function RankingsTab({ clientId }: { clientId: number }) {
               {kws.map((kw) => {
                 const snap = kw.snapshots[0] ?? null;
                 return (
-                  <tr key={kw.id} className="border-b last:border-0 hover:bg-gray-50/50">
+                  <tr key={kw.id} className="border-b last:border-0 hover:bg-muted/50">
                     <td className="py-2 px-4 font-mono text-xs">{kw.keyword}</td>
                     <td className="py-2 px-3 text-center">
                       <PositionBadge pos={snap?.organicPosition ?? null} type="organic" />
@@ -321,13 +321,13 @@ export function RankingsTab({ clientId }: { clientId: number }) {
                         previous={snap?.previousLocalPack ?? null}
                       />
                     </td>
-                    <td className="py-2 px-4 text-right text-xs text-gray-500">
+                    <td className="py-2 px-4 text-right text-xs text-muted-foreground">
                       {kw.searchVolume ? kw.searchVolume.toLocaleString() : "—"}
                     </td>
                     <td className="py-2 px-4 text-right">
                       <button
                         onClick={() => handleDeactivate(kw.id)}
-                        className="text-xs text-gray-400 hover:text-status-danger"
+                        className="text-xs text-muted-foreground hover:text-status-danger"
                         title="Remove keyword"
                       >
                         ×

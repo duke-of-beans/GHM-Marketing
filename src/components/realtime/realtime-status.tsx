@@ -22,7 +22,7 @@ export function RealtimeStatus() {
         <TooltipTrigger asChild>
           <Badge
             variant={connected ? "default" : "secondary"}
-            className={`gap-1 ${connected ? "bg-status-success-bg" : "bg-gray-400"}`}
+            className={`gap-1 ${connected ? "bg-status-success-bg" : "bg-muted-foreground"}`}
           >
             {connected ? (
               <Wifi className="h-3 w-3" />

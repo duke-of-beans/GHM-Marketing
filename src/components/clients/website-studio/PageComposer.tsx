@@ -318,7 +318,7 @@ function SectionEditor({
 
 function ScrvnrGateBadge({ status }: { status: ScrvnrGateStatus }) {
   const configs: Record<ScrvnrGateStatus, { label: string; className: string; icon: React.ReactNode }> = {
-    unprocessed: { label: "Not checked",  className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400", icon: null },
+    unprocessed: { label: "Not checked",  className: "bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground", icon: null },
     processing:  { label: "Running...",   className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: <Loader2 className="h-3 w-3 animate-spin" /> },
     cleared:     { label: "Gate: OPEN",   className: "bg-status-success-bg text-status-success", icon: <ShieldCheck className="h-3 w-3" /> },
     failed:      { label: "Gate: CLOSED", className: "bg-status-danger-bg text-status-danger", icon: <ShieldX className="h-3 w-3" /> },

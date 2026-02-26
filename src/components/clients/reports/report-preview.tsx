@@ -73,7 +73,7 @@ export function ReportPreview({
             </div>
 
             <div
-              className="border rounded-lg p-4 bg-white"
+              className="border rounded-lg p-4 bg-card"
               dangerouslySetInnerHTML={{ __html: html }}
             />
           </>

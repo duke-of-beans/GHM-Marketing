@@ -38,12 +38,12 @@ interface ContentItem {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  draft:     'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  draft:     'bg-muted text-foreground dark:bg-card',
   review:    'bg-status-warning-bg text-status-warning',
   approved:  'bg-status-success-bg text-status-success',
   published: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
   scheduled: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
-  archived:  'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+  archived:  'bg-muted text-muted-foreground dark:bg-card dark:text-muted-foreground',
 }
 
 export function ContentList({ clientId, refreshTrigger, isMaster = false }: ContentListProps) {

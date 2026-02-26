@@ -215,7 +215,7 @@ export default function OnboardingPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Loading your onboarding...</p>
+          <p className="text-muted-foreground text-sm">Loading your onboarding...</p>
         </div>
       </div>
     );
@@ -230,17 +230,17 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4 sm:py-10">
+    <div className="min-h-screen bg-background py-6 px-4 sm:py-10">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-3">
             <span className="text-white font-bold text-sm">GHM</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">
+          <h1 className="text-xl font-bold text-foreground">
             Welcome, {data?.lead.businessName}
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Let&apos;s get your SEO campaign started. This takes about 10 minutes.
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function OnboardingPage() {
         {/* Save indicator */}
         <div className="text-right mb-2 h-4">
           {saveIndicator === "saving" && (
-            <span className="text-xs text-gray-400">Saving...</span>
+            <span className="text-xs text-muted-foreground">Saving...</span>
           )}
           {saveIndicator === "saved" && (
             <span className="text-xs text-status-success">Saved ✓</span>
@@ -259,7 +259,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
           {currentStep === 1 && (
             <Step1
               data={form.step1}
@@ -305,7 +305,7 @@ export default function OnboardingPage() {
           )}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs text-muted-foreground mt-4">
           Your progress is saved automatically. You can close this and come back anytime.
         </p>
       </div>
@@ -327,22 +327,22 @@ function StepProgress({ current, labels }: { current: number; labels: string[] }
             <div key={step} className="flex flex-col items-center flex-1">
               <div className="flex items-center w-full">
                 {i > 0 && (
-                  <div className={`h-0.5 flex-1 ${done ? "bg-blue-600" : "bg-gray-200"}`} />
+                  <div className={`h-0.5 flex-1 ${done ? "bg-blue-600" : "bg-secondary"}`} />
                 )}
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0
-                    ${done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white ring-2 ring-blue-200" : "bg-gray-200 text-gray-500"}`}
+                    ${done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white ring-2 ring-blue-200" : "bg-secondary text-muted-foreground"}`}
                 >
                   {done ? "✓" : step}
                 </div>
                 {i < labels.length - 1 && (
-                  <div className={`h-0.5 flex-1 ${step < current ? "bg-blue-600" : "bg-gray-200"}`} />
+                  <div className={`h-0.5 flex-1 ${step < current ? "bg-blue-600" : "bg-secondary"}`} />
                 )}
               </div>
-      <span className={`text-xs mt-1 text-center hidden sm:block ${active ? "text-blue-600 font-medium" : "text-gray-400"}`}>
+      <span className={`text-xs mt-1 text-center hidden sm:block ${active ? "text-blue-600 font-medium" : "text-muted-foreground"}`}>
                 {label}
               </span>
-              <span className={`text-[10px] mt-1 text-center sm:hidden ${active ? "text-blue-600 font-medium" : "text-gray-400"}`}>
+              <span className={`text-[10px] mt-1 text-center sm:hidden ${active ? "text-blue-600 font-medium" : "text-muted-foreground"}`}>
                 {label.split(" ")[0]}
               </span>
             </div>
@@ -358,7 +358,7 @@ function StepProgress({ current, labels }: { current: number; labels: string[] }
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-foreground mb-1">
         {label} {required && <span className="text-status-danger">*</span>}
       </label>
       {children}
@@ -375,7 +375,7 @@ function Input({ value, onChange, placeholder, type = "text" }: {
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[44px]"
+      className="w-full rounded-lg border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[44px]"
     />
   );
 }
@@ -389,7 +389,7 @@ function Textarea({ value, onChange, placeholder, rows = 3 }: {
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       rows={rows}
-      className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+      className="w-full rounded-lg border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
     />
   );
 }
@@ -412,11 +412,11 @@ function RadioGroup<T extends string>({ options, value, onChange }: {
               className="sr-only"
             />
             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center
-              ${value === opt.value ? "border-blue-600 bg-blue-600" : "border-gray-300 group-hover:border-blue-400"}`}>
-              {value === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+              ${value === opt.value ? "border-blue-600 bg-blue-600" : "border-border group-hover:border-blue-400"}`}>
+              {value === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-card" />}
             </div>
           </div>
-          <span className="text-sm text-gray-700">{opt.label}</span>
+          <span className="text-sm text-foreground">{opt.label}</span>
         </label>
       ))}
     </div>
@@ -429,9 +429,9 @@ function NavButtons({
   onNext?: () => void; onBack?: () => void; saving?: boolean; nextLabel?: string;
 }) {
   return (
-    <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-6 pt-4 border-t border-gray-100">
+    <div className="flex flex-col-reverse sm:flex-row sm:justify-between gap-3 mt-6 pt-4 border-t border-border">
       {onBack ? (
-        <button onClick={onBack} className="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg sm:border-0">
+        <button onClick={onBack} className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground border border-border rounded-lg sm:border-0">
           ← Back
         </button>
       ) : <div />}
@@ -452,7 +452,7 @@ function SectionBadge({ level }: { level: "REQUIRED" | "RECOMMENDED" | "OPTIONAL
   const colors = {
     REQUIRED: "bg-status-danger-bg text-status-danger border-status-danger-border",
     RECOMMENDED: "bg-status-warning-bg text-status-warning border-status-warning-border",
-    OPTIONAL: "bg-gray-50 text-gray-600 border-gray-200",
+    OPTIONAL: "bg-muted text-muted-foreground border-border",
   };
   return (
     <span className={`text-xs px-2 py-0.5 rounded border font-medium ${colors[level]}`}>
@@ -485,8 +485,8 @@ function Step1({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">Step 1: Your Business</h2>
-      <p className="text-sm text-gray-500 mb-5">We&apos;ve pre-filled what we know. Please confirm or correct.</p>
+      <h2 className="text-lg font-semibold text-foreground mb-1">Step 1: Your Business</h2>
+      <p className="text-sm text-muted-foreground mb-5">We&apos;ve pre-filled what we know. Please confirm or correct.</p>
 
       <Field label="Business Name" required>
         <Input value={data.businessName} onChange={(v) => onChange({ businessName: v })} />
@@ -498,15 +498,15 @@ function Step1({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-status-danger">*</span></label>
+          <label className="block text-sm font-medium text-foreground mb-1">City <span className="text-status-danger">*</span></label>
           <Input value={data.city} onChange={(v) => onChange({ city: v })} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">State <span className="text-status-danger">*</span></label>
+          <label className="block text-sm font-medium text-foreground mb-1">State <span className="text-status-danger">*</span></label>
           <Input value={data.state} onChange={(v) => onChange({ state: v })} placeholder="CA" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">ZIP <span className="text-status-danger">*</span></label>
+          <label className="block text-sm font-medium text-foreground mb-1">ZIP <span className="text-status-danger">*</span></label>
           <Input value={data.zipCode} onChange={(v) => onChange({ zipCode: v })} />
         </div>
       </div>
@@ -579,13 +579,13 @@ function Step1({
           </label>
           {data.multiLocation && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">How many?</span>
+              <span className="text-sm text-muted-foreground">How many?</span>
               <input
                 type="number"
                 min={2}
                 value={data.locationCount ?? ""}
                 onChange={(e) => onChange({ locationCount: parseInt(e.target.value) })}
-                className="w-16 rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-16 rounded border border-border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
@@ -610,12 +610,12 @@ function Step2({
 }) {
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">Step 2: Your Contacts</h2>
-      <p className="text-sm text-gray-500 mb-5">Who should we talk to about your campaign?</p>
+      <h2 className="text-lg font-semibold text-foreground mb-1">Step 2: Your Contacts</h2>
+      <p className="text-sm text-muted-foreground mb-5">Who should we talk to about your campaign?</p>
 
       <div className="mb-5">
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-3">
-          Primary Contact <span className="text-gray-400 normal-case font-normal">(day-to-day communication)</span>
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">
+          Primary Contact <span className="text-muted-foreground normal-case font-normal">(day-to-day communication)</span>
         </h3>
         <Field label="Full Name" required>
           <Input value={data.primaryContactName} onChange={(v) => onChange({ primaryContactName: v })} />
@@ -646,16 +646,16 @@ function Step2({
         </Field>
       </div>
 
-      <div className="border-t border-gray-100 pt-5 mb-5">
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-3">Billing Contact</h3>
+      <div className="border-t border-border pt-5 mb-5">
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Billing Contact</h3>
         <label className="flex items-center gap-2 cursor-pointer mb-4">
           <input
             type="checkbox"
             checked={!!data.billingSameAsPrimary}
             onChange={(e) => onChange({ billingSameAsPrimary: e.target.checked })}
-            className="rounded border-gray-300 text-blue-600"
+            className="rounded border-border text-blue-600"
           />
-          <span className="text-sm text-gray-700">Same as primary contact</span>
+          <span className="text-sm text-foreground">Same as primary contact</span>
         </label>
         {!data.billingSameAsPrimary && (
           <>
@@ -724,18 +724,18 @@ function Step3({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">Step 3: Technical Access</h2>
-      <p className="text-sm text-gray-500 mb-5">
+      <h2 className="text-lg font-semibold text-foreground mb-1">Step 3: Technical Access</h2>
+      <p className="text-sm text-muted-foreground mb-5">
         We need a few things to start working on your campaign. Pick whichever option is easiest.
         Not sure about something? Just pick &ldquo;I need help.&rdquo;
       </p>
 
       {/* DNS */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="border border-border rounded-lg p-4 mb-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-gray-800">DNS Access</h3>
-            <p className="text-xs text-gray-500 mt-0.5">How we connect your website to the infrastructure we build.</p>
+            <h3 className="text-sm font-semibold text-foreground">DNS Access</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">How we connect your website to the infrastructure we build.</p>
           </div>
           <SectionBadge level="REQUIRED" />
         </div>
@@ -743,13 +743,13 @@ function Step3({
           <select
             value={ta.dns?.provider ?? ""}
             onChange={(e) => updateTA({ dns: { ...ta.dns, provider: e.target.value, method: ta.dns?.method ?? "help", status: ta.dns?.status ?? "pending" } })}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select...</option>
             {DNS_PROVIDERS.map((p) => <option key={p} value={p}>{p}</option>)}
           </select>
         </Field>
-        <p className="text-sm font-medium text-gray-700 mb-2">How would you like to give us access?</p>
+        <p className="text-sm font-medium text-foreground mb-2">How would you like to give us access?</p>
         <RadioGroup
           options={[
             { value: "invite", label: "I'll add GHM as an authorized user — we'll send simple instructions" },
@@ -762,15 +762,15 @@ function Step3({
       </div>
 
       {/* GBP */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="border border-border rounded-lg p-4 mb-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-gray-800">Google Business Profile</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Your listing on Google Maps and local search.</p>
+            <h3 className="text-sm font-semibold text-foreground">Google Business Profile</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Your listing on Google Maps and local search.</p>
           </div>
           <SectionBadge level="REQUIRED" />
         </div>
-        <p className="text-sm font-medium text-gray-700 mb-2">Do you have a Google Business Profile?</p>
+        <p className="text-sm font-medium text-foreground mb-2">Do you have a Google Business Profile?</p>
         <div className="flex gap-4 mb-3">
           {([{ v: true, l: "Yes" }, { v: false, l: "No" }, { v: null, l: "Not sure" }] as const).map(({ v, l }) => (
             <label key={l} className="flex items-center gap-2 cursor-pointer">
@@ -795,16 +795,16 @@ function Step3({
             onChange={(v) => updateTA({ gbp: { ...ta.gbp, hasProfile: true, method: v, status: v === "help" ? "help_needed" : "pending" } })}
           />
         ) : ta.gbp?.hasProfile === false || ta.gbp?.hasProfile === null ? (
-          <p className="text-sm text-gray-500 bg-gray-50 rounded p-3">
+          <p className="text-sm text-muted-foreground bg-muted rounded p-3">
             No worries — we can set one up or help you find your existing profile.
           </p>
         ) : null}
       </div>
 
       {/* Analytics */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="border border-border rounded-lg p-4 mb-4">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-sm font-semibold text-gray-800">Google Analytics (GA4)</h3>
+          <h3 className="text-sm font-semibold text-foreground">Google Analytics (GA4)</h3>
           <SectionBadge level="RECOMMENDED" />
         </div>
         <div className="flex gap-4 mb-3">
@@ -831,21 +831,21 @@ function Step3({
             onChange={(v) => updateTA({ analytics: { ...ta.analytics, hasGA4: true, method: v, status: v === "help" ? "help_needed" : "pending" } })}
           />
         ) : (ta.analytics?.hasGA4 === false || ta.analytics?.hasGA4 === null) ? (
-          <p className="text-sm text-gray-500 bg-gray-50 rounded p-3">No problem — we&apos;ll set it up for you.</p>
+          <p className="text-sm text-muted-foreground bg-muted rounded p-3">No problem — we&apos;ll set it up for you.</p>
         ) : null}
       </div>
 
       {/* CMS */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="border border-border rounded-lg p-4 mb-4">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-sm font-semibold text-gray-800">Website CMS</h3>
+          <h3 className="text-sm font-semibold text-foreground">Website CMS</h3>
           <SectionBadge level="OPTIONAL" />
         </div>
         <Field label="What platform is your website on?">
           <select
             value={ta.cms?.platform ?? ""}
             onChange={(e) => updateTA({ cms: { ...ta.cms, platform: e.target.value, status: "pending" } })}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select...</option>
             {CMS_PLATFORMS.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -864,9 +864,9 @@ function Step3({
       </div>
 
       {/* Ad Accounts */}
-      <div className="border border-gray-200 rounded-lg p-4 mb-4">
+      <div className="border border-border rounded-lg p-4 mb-4">
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-sm font-semibold text-gray-800">Ad Accounts</h3>
+          <h3 className="text-sm font-semibold text-foreground">Ad Accounts</h3>
           <SectionBadge level="OPTIONAL" />
         </div>
         <div className="flex gap-4 mb-3">
@@ -875,7 +875,7 @@ function Step3({
               type="checkbox"
               checked={!!ta.adAccounts?.googleAds}
               onChange={(e) => updateTA({ adAccounts: { ...ta.adAccounts, googleAds: e.target.checked, meta: ta.adAccounts?.meta ?? false, status: "pending" } })}
-              className="rounded border-gray-300 text-blue-600"
+              className="rounded border-border text-blue-600"
             />
             <span className="text-sm">Google Ads</span>
           </label>
@@ -884,7 +884,7 @@ function Step3({
               type="checkbox"
               checked={!!ta.adAccounts?.meta}
               onChange={(e) => updateTA({ adAccounts: { ...ta.adAccounts, meta: e.target.checked, googleAds: ta.adAccounts?.googleAds ?? false, status: "pending" } })}
-              className="rounded border-gray-300 text-blue-600"
+              className="rounded border-border text-blue-600"
             />
             <span className="text-sm">Meta / Facebook</span>
           </label>
@@ -935,12 +935,12 @@ function Step4({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">Step 4: Your Market & Content</h2>
-      <p className="text-sm text-gray-500 mb-5">Help us understand your competitive landscape and content preferences.</p>
+      <h2 className="text-lg font-semibold text-foreground mb-1">Step 4: Your Market & Content</h2>
+      <p className="text-sm text-muted-foreground mb-5">Help us understand your competitive landscape and content preferences.</p>
 
       <div className="mb-6">
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-1">Competitors</h3>
-        <p className="text-xs text-gray-500 mb-3">Who are your top competitors online? We&apos;ll run our own research too — this just tells us who you&apos;re watching.</p>
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-1">Competitors</h3>
+        <p className="text-xs text-muted-foreground mb-3">Who are your top competitors online? We&apos;ll run our own research too — this just tells us who you&apos;re watching.</p>
         <div className="space-y-2 mb-2">
           {competitors.map((c, i) => (
             <Input
@@ -959,7 +959,7 @@ function Step4({
       </div>
 
       <div className="mb-6">
-        <p className="text-sm font-medium text-gray-700 mb-2">Where are they beating you? (Check all that apply)</p>
+        <p className="text-sm font-medium text-foreground mb-2">Where are they beating you? (Check all that apply)</p>
         <div className="space-y-2">
           {COMPETITOR_PAINS.map((pain) => (
             <label key={pain} className="flex items-start gap-3 cursor-pointer">
@@ -967,9 +967,9 @@ function Step4({
                 type="checkbox"
                 checked={pains.includes(pain)}
                 onChange={() => togglePain(pain)}
-                className="mt-0.5 rounded border-gray-300 text-blue-600"
+                className="mt-0.5 rounded border-border text-blue-600"
               />
-              <span className="text-sm text-gray-700">{pain}</span>
+              <span className="text-sm text-foreground">{pain}</span>
             </label>
           ))}
         </div>
@@ -983,8 +983,8 @@ function Step4({
         />
       </Field>
 
-      <div className="border-t border-gray-100 pt-5 mb-5">
-        <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-3">Content Preferences</h3>
+      <div className="border-t border-border pt-5 mb-5">
+        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide mb-3">Content Preferences</h3>
         <Field label="Topics we should focus on">
           <Textarea
             value={data.contentFocusTopics}
@@ -1023,8 +1023,8 @@ function Step4({
                 className="mt-0.5 text-blue-600"
               />
               <div>
-                <p className="text-sm font-medium text-gray-800">GHM publishes based on strategy, then notifies me</p>
-                <p className="text-xs text-gray-500">Recommended — fastest results</p>
+                <p className="text-sm font-medium text-foreground">GHM publishes based on strategy, then notifies me</p>
+                <p className="text-xs text-muted-foreground">Recommended — fastest results</p>
               </div>
             </label>
             <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:border-blue-200 hover:bg-blue-50">
@@ -1035,8 +1035,8 @@ function Step4({
                 className="mt-0.5 text-blue-600"
               />
               <div>
-                <p className="text-sm font-medium text-gray-800">Send content to me for review before publishing</p>
-                <p className="text-xs text-gray-500">Slower timeline</p>
+                <p className="text-sm font-medium text-foreground">Send content to me for review before publishing</p>
+                <p className="text-xs text-muted-foreground">Slower timeline</p>
               </div>
             </label>
           </div>
@@ -1062,34 +1062,34 @@ function Step5Review({
   const ta = step3.technicalAccess;
 
   const ReviewSection = ({ title, step, children }: { title: string; step: number; children: React.ReactNode }) => (
-    <div className="border border-gray-200 rounded-lg p-4 mb-3">
+    <div className="border border-border rounded-lg p-4 mb-3">
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
           <span className="text-status-success text-sm">✅</span>
-          <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         </div>
         <button onClick={() => onEdit(step)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
           Edit
         </button>
       </div>
-      <div className="text-sm text-gray-600 space-y-0.5">{children}</div>
+      <div className="text-sm text-muted-foreground space-y-0.5">{children}</div>
     </div>
   );
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-1">Step 5: Review & Submit</h2>
-      <p className="text-sm text-gray-500 mb-5">Here&apos;s everything you&apos;ve provided. Click any section to make changes.</p>
+      <h2 className="text-lg font-semibold text-foreground mb-1">Step 5: Review & Submit</h2>
+      <p className="text-sm text-muted-foreground mb-5">Here&apos;s everything you&apos;ve provided. Click any section to make changes.</p>
 
       <ReviewSection title="Your Business" step={1}>
-        <p className="font-medium text-gray-800">{step1.businessName}</p>
+        <p className="font-medium text-foreground">{step1.businessName}</p>
         <p>{[step1.address, step1.city, step1.state, step1.zipCode].filter(Boolean).join(", ")}</p>
         {step1.phone && <p>{step1.phone}</p>}
         {step1.website && <p className="text-blue-600">{step1.website}</p>}
       </ReviewSection>
 
       <ReviewSection title="Primary Contact" step={2}>
-        <p className="font-medium text-gray-800">{step2.primaryContactName}{step2.primaryContactTitle ? `, ${step2.primaryContactTitle}` : ""}</p>
+        <p className="font-medium text-foreground">{step2.primaryContactName}{step2.primaryContactTitle ? `, ${step2.primaryContactTitle}` : ""}</p>
         {step2.primaryContactEmail && <p>{step2.primaryContactEmail}</p>}
         {step2.preferredContactMethod && <p>Prefers {step2.preferredContactMethod}</p>}
       </ReviewSection>
@@ -1109,7 +1109,7 @@ function Step5Review({
       </ReviewSection>
 
       <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 mt-4">
-        <p className="text-xs text-gray-600 mb-3">
+        <p className="text-xs text-muted-foreground mb-3">
           By submitting, you confirm the information above is accurate and authorize GHM Digital to begin work on your SEO campaign.
         </p>
         <button
@@ -1128,14 +1128,14 @@ function Step5Review({
 
 function ConfirmationScreen({ businessName, partnerName }: { businessName: string; partnerName: string }) {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-6">
           <span className="text-white font-bold text-sm">GHM</span>
         </div>
         <div className="text-4xl mb-4">✅</div>
-        <h1 className="text-xl font-bold text-gray-900 mb-2">You&apos;re all set, {businessName}.</h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <h1 className="text-xl font-bold text-foreground mb-2">You&apos;re all set, {businessName}.</h1>
+        <p className="text-muted-foreground text-sm mb-6">
           Our operations team has everything they need to get started. Here&apos;s what happens next:
         </p>
         <div className="text-left space-y-3 mb-6">
@@ -1148,16 +1148,16 @@ function ConfirmationScreen({ businessName, partnerName }: { businessName: strin
               <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
                 {i + 1}
               </div>
-              <p className="text-sm text-gray-700">{item}</p>
+              <p className="text-sm text-foreground">{item}</p>
             </div>
           ))}
         </div>
         {partnerName && (
-          <p className="text-sm text-gray-500">
-            Questions? Contact your GHM rep: <span className="font-medium text-gray-800">{partnerName}</span>
+          <p className="text-sm text-muted-foreground">
+            Questions? Contact your GHM rep: <span className="font-medium text-foreground">{partnerName}</span>
           </p>
         )}
-        <p className="text-xs text-gray-400 mt-2">Or reach us at support@ghmdigital.com</p>
+        <p className="text-xs text-muted-foreground mt-2">Or reach us at support@ghmdigital.com</p>
       </div>
     </div>
   );
@@ -1199,17 +1199,17 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
   // Already submitted — show a friendly done screen, not an error
   if (errorCode === 409) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <div className="max-w-sm w-full text-center">
           <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-4">
             <span className="text-white font-bold text-sm">GHM</span>
           </div>
           <div className="text-4xl mb-4">✅</div>
-          <h1 className="text-lg font-semibold text-gray-900 mb-2">Already submitted!</h1>
-          <p className="text-gray-500 text-sm">
+          <h1 className="text-lg font-semibold text-foreground mb-2">Already submitted!</h1>
+          <p className="text-muted-foreground text-sm">
             Your onboarding form has already been received. Our operations team is getting everything set up for you.
           </p>
-          <p className="text-gray-400 text-xs mt-4">
+          <p className="text-muted-foreground text-xs mt-4">
             Questions? Reach us at support@ghmdigital.com
           </p>
         </div>
@@ -1218,16 +1218,16 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-sm w-full text-center">
         <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-4">
           <span className="text-white font-bold text-sm">GHM</span>
         </div>
         <div className="text-4xl mb-4">{errorCode === 410 ? "⏰" : "❌"}</div>
-        <h1 className="text-lg font-semibold text-gray-900 mb-2">
+        <h1 className="text-lg font-semibold text-foreground mb-2">
           {errorCode === 410 ? "This link has expired" : "Invalid link"}
         </h1>
-        <p className="text-gray-500 text-sm mb-5">
+        <p className="text-muted-foreground text-sm mb-5">
           {errorCode === 410
             ? "Onboarding links are valid for 30 days. This one has passed that window."
             : "This onboarding link isn't valid. Please use the link your GHM representative sent you."}
@@ -1254,7 +1254,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
           </>
         )}
 
-        <p className="text-gray-400 text-xs">
+        <p className="text-muted-foreground text-xs">
           Need help? Contact us at support@ghmdigital.com
         </p>
       </div>

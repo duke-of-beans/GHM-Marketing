@@ -201,7 +201,7 @@ function ContentCard({ item, onUpdate }: { item: ContentItem; onUpdate: () => vo
     if (status === "published") return "bg-status-success-bg text-status-success";
     if (status === "approved") return "bg-blue-100 text-blue-800";
     if (status === "review") return "bg-status-warning-bg text-status-warning";
-    return "bg-gray-100 text-gray-800";
+    return "bg-muted text-foreground";
   };
 
   return (

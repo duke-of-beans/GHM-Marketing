@@ -52,7 +52,7 @@ function StatusIcon({ status }: { status: DirectoryResult["status"] }) {
   if (status === "match") return <CheckCircle2 className="h-4 w-4 text-status-success" />;
   if (status === "mismatch") return <XCircle className="h-4 w-4 text-status-danger" />;
   if (status === "partial") return <AlertTriangle className="h-4 w-4 text-status-warning" />;
-  return <XCircle className="h-4 w-4 text-gray-400" />;
+  return <XCircle className="h-4 w-4 text-muted-foreground" />;
 }
 
 function StatusLabel({ status }: { status: DirectoryResult["status"] }) {
@@ -60,7 +60,7 @@ function StatusLabel({ status }: { status: DirectoryResult["status"] }) {
     match: { label: "Match", class: "bg-status-success-bg text-status-success" },
     mismatch: { label: "Mismatch", class: "bg-status-danger-bg text-status-danger" },
     partial: { label: "Partial", class: "bg-status-warning-bg text-status-warning" },
-    missing: { label: "Not Listed", class: "bg-gray-100 text-gray-500" },
+    missing: { label: "Not Listed", class: "bg-muted text-muted-foreground" },
   };
   const s = map[status];
   return (
@@ -111,7 +111,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
     }
   }
 
-  if (loading) return <div className="p-6 text-sm text-gray-500">Loading citations...</div>;
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading citations...</div>;
 
   const scan = data?.scan ?? null;
   const results: DirectoryResult[] = (scan?.results as DirectoryResult[]) ?? [];
@@ -124,7 +124,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
     <div className="space-y-5 p-4">
       {/* KPI cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="border rounded-lg p-3 bg-card">
           <div className="text-2xl font-bold flex items-end gap-1">
             {scan?.healthScore ?? "—"}
             {healthDelta !== null && (
@@ -133,25 +133,25 @@ export function CitationsTab({ clientId }: { clientId: number }) {
               </span>
             )}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">Citation Score</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Citation Score</div>
         </div>
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="border rounded-lg p-3 bg-card">
           <div className="text-2xl font-bold text-status-success">{scan?.matches ?? "—"}</div>
-          <div className="text-xs text-gray-500 mt-0.5">Directories matched</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Directories matched</div>
         </div>
-        <div className="border rounded-lg p-3 bg-white">
+        <div className="border rounded-lg p-3 bg-card">
           <div className="text-2xl font-bold text-status-warning">{scan ? scan.mismatches : "—"}</div>
-          <div className="text-xs text-gray-500 mt-0.5">Need fixes</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Need fixes</div>
         </div>
-        <div className="border rounded-lg p-3 bg-white">
-          <div className="text-2xl font-bold text-gray-500">{scan?.missing ?? "—"}</div>
-          <div className="text-xs text-gray-500 mt-0.5">Not listed</div>
+        <div className="border rounded-lg p-3 bg-card">
+          <div className="text-2xl font-bold text-muted-foreground">{scan?.missing ?? "—"}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Not listed</div>
         </div>
       </div>
 
       {/* Controls */}
       <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-muted-foreground">
           {scan
             ? `Last scan: ${new Date(scan.scanDate).toLocaleDateString()} · Quarterly schedule active`
             : "No scan yet — run one below"}
@@ -169,8 +169,8 @@ export function CitationsTab({ clientId }: { clientId: number }) {
 
       {/* No scan state */}
       {!scan && (
-        <div className="border rounded-lg p-8 text-center text-gray-500">
-          <Building2 className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+        <div className="border rounded-lg p-8 text-center text-muted-foreground">
+          <Building2 className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm mb-1">No citation scan on record.</p>
           <p className="text-xs">Run a scan to check NAP consistency across {results.length || "all"} directories.</p>
         </div>
@@ -179,13 +179,13 @@ export function CitationsTab({ clientId }: { clientId: number }) {
       {/* Directory table */}
       {results.length > 0 && (
         <div className="border rounded-lg overflow-hidden">
-          <div className="bg-gray-50 px-4 py-2 border-b flex items-center justify-between">
+          <div className="bg-muted px-4 py-2 border-b flex items-center justify-between">
             <span className="text-sm font-medium">Directory Status</span>
-            <span className="text-xs text-gray-400">{results.length} checked</span>
+            <span className="text-xs text-muted-foreground">{results.length} checked</span>
           </div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-xs text-gray-500 bg-gray-50/50">
+              <tr className="border-b text-xs text-muted-foreground bg-muted/50">
                 <th className="text-left py-2 px-4 font-medium">Directory</th>
                 <th className="text-left py-2 px-3 font-medium">Status</th>
                 <th className="text-left py-2 px-3 font-medium hidden sm:table-cell">Fields</th>
@@ -197,14 +197,14 @@ export function CitationsTab({ clientId }: { clientId: number }) {
                 <>
                   <tr
                     key={r.key}
-                    className="border-b last:border-0 hover:bg-gray-50/50 cursor-pointer"
+                    className="border-b last:border-0 hover:bg-muted/50 cursor-pointer"
                     onClick={() => setExpanded(expanded === r.key ? null : r.key)}
                   >
                     <td className="py-2 px-4">
                       <div className="flex items-center gap-1.5">
                         <StatusIcon status={r.status} />
                         <span className="text-sm">{r.displayName}</span>
-                        <span className="text-xs text-gray-400 capitalize hidden sm:inline">
+                        <span className="text-xs text-muted-foreground capitalize hidden sm:inline">
                           · {r.importance}
                         </span>
                       </div>
@@ -219,22 +219,22 @@ export function CitationsTab({ clientId }: { clientId: number }) {
                         <FieldCheck ok={r.phoneMatch} label="Phone" />
                       </div>
                     </td>
-                    <td className="py-2 px-4 text-right text-xs text-gray-500">
+                    <td className="py-2 px-4 text-right text-xs text-muted-foreground">
                       {r.confidence}%
                     </td>
                   </tr>
                   {expanded === r.key && (
-                    <tr key={`${r.key}-detail`} className="bg-gray-50 border-b">
+                    <tr key={`${r.key}-detail`} className="bg-muted border-b">
                       <td colSpan={4} className="px-4 py-3">
                         <div className="text-xs space-y-1">
-                          {r.foundName && <p><span className="text-gray-500">Found name:</span> {r.foundName}</p>}
-                          {r.foundAddress && <p><span className="text-gray-500">Found address:</span> {r.foundAddress}</p>}
-                          {r.foundPhone && <p><span className="text-gray-500">Found phone:</span> {r.foundPhone}</p>}
+                          {r.foundName && <p><span className="text-muted-foreground">Found name:</span> {r.foundName}</p>}
+                          {r.foundAddress && <p><span className="text-muted-foreground">Found address:</span> {r.foundAddress}</p>}
+                          {r.foundPhone && <p><span className="text-muted-foreground">Found phone:</span> {r.foundPhone}</p>}
                           {r.details.map((d, i) => (
                             <p key={i} className="text-status-warning">⚠ {d}</p>
                           ))}
                           {r.status === "missing" && (
-                            <p className="text-gray-500 italic">Business not found in this directory.</p>
+                            <p className="text-muted-foreground italic">Business not found in this directory.</p>
                           )}
                           {r.listingUrl && (
                             <a

@@ -93,7 +93,7 @@ const PRIORITY_COLORS: Record<string, string> = {
   P1: "bg-status-danger-bg text-status-danger",
   P2: "bg-status-warning-bg text-status-warning",
   P3: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200",
-  P4: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  P4: "bg-muted text-muted-foreground dark:bg-card",
 };
 
 // ── Exported count fetcher (used by parent for badge) ─────────────────────

@@ -97,7 +97,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
   {
     title: "Your Profile",
     description: "Name, email, password — all yours to update. Your manager doesn't need to be involved.",
-    icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    icon: <UserCog className="h-12 w-12 text-muted-foreground" />,
     route: "/profile",
     tips: [
       "'My Profile' is in the left sidebar — it's not hidden, just not loud about it",
@@ -148,7 +148,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "You Can Rearrange All of This",
     description: "The layout is yours. Every widget is moveable and resizable. The default is fine. Custom is better.",
-    icon: <LayoutDashboard className="h-12 w-12 text-slate-600" />,
+    icon: <LayoutDashboard className="h-12 w-12 text-muted-foreground" />,
     route: "/manager",
     tips: [
       "'Arrange widgets' lives in the top right — click it to enter edit mode",
@@ -247,7 +247,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "Your Profile",
     description: "Name, email, password — update them yourself from My Profile. Role and permission changes go through Settings → Team.",
-    icon: <UserCog className="h-12 w-12 text-slate-600" />,
+    icon: <UserCog className="h-12 w-12 text-muted-foreground" />,
     route: "/profile",
     tips: [
       "'My Profile' is in the left sidebar — not buried, just quiet",
@@ -423,7 +423,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
                   ? "w-4 bg-blue-600"
                   : idx < currentStep
                   ? "w-1.5 bg-status-success-bg"
-                  : "w-1.5 bg-gray-300"
+                  : "w-1.5 bg-muted"
               }`}
             />
           ))}

@@ -10,7 +10,7 @@ export default async function ClientPortalPage({
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Access Required</h1>
           <p className="text-muted-foreground">
@@ -53,7 +53,7 @@ export default async function ClientPortalPage({
 
   if (!client) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Invalid Access Token</h1>
           <p className="text-muted-foreground">

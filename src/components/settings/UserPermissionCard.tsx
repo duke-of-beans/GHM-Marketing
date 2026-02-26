@@ -140,7 +140,7 @@ export function UserPermissionCard({
                 className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold shrink-0 ${
                   user.isActive
                     ? "bg-gradient-to-br from-blue-500 to-purple-600"
-                    : "bg-gray-400"
+                    : "bg-muted-foreground"
                 }`}
               >
                 {user.name.charAt(0).toUpperCase()}

@@ -31,13 +31,13 @@ const intentColors: Record<string, string> = {
   comparison: "bg-purple-100 text-purple-800 border-purple-200",
   local: "bg-status-warning-bg text-status-warning border-status-warning-border",
   transactional: "bg-status-danger-bg text-status-danger border-status-danger-border",
-  navigational: "bg-gray-100 text-gray-800 border-gray-200",
+  navigational: "bg-muted text-foreground border-border",
 };
 
 const volumeColors: Record<string, string> = {
   high: "bg-status-success-bg text-status-success border-status-success-border",
   medium: "bg-status-warning-bg text-status-warning border-status-warning-border",
-  low: "bg-gray-100 text-gray-700 border-gray-200",
+  low: "bg-muted text-foreground border-border",
 };
 
 export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
@@ -149,7 +149,7 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
                   <p className="text-xs text-muted-foreground">{topic.why}</p>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] ${intentColors[topic.intent] || "bg-gray-100 text-gray-700 border-gray-200"}`}
+                    className={`text-[10px] ${intentColors[topic.intent] || "bg-muted text-foreground border-border"}`}
                   >
                     {topic.intent}
                   </Badge>
@@ -209,7 +209,7 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
                   </Badge>
                   <Badge
                     variant="outline"
-                    className={`text-[10px] ${intentColors[kw.intent] || "bg-gray-100 text-gray-700 border-gray-200"}`}
+                    className={`text-[10px] ${intentColors[kw.intent] || "bg-muted text-foreground border-border"}`}
                   >
                     {kw.intent}
                   </Badge>

@@ -279,7 +279,7 @@ export function BrandingTab() {
               <img
                 src={branding.logoUrl}
                 alt="Company logo"
-                className="h-16 max-w-48 object-contain border rounded p-2 bg-white"
+                className="h-16 max-w-48 object-contain border rounded p-2 bg-card"
               />
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>

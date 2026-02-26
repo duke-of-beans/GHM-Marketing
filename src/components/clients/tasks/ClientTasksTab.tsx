@@ -55,7 +55,7 @@ function priorityColor(p: string) {
   if (p === "Critical" || p === "P1") return "bg-status-danger-bg text-status-danger";
   if (p === "High" || p === "P2") return "bg-status-warning-bg text-status-warning";
   if (p === "Standard" || p === "P3") return "bg-blue-100 text-blue-800";
-  return "bg-gray-100 text-gray-800";
+  return "bg-muted text-foreground";
 }
 
 function categoryLabel(c: string) {

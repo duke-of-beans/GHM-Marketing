@@ -75,7 +75,7 @@ export function TerritoryHealthBanner({
 
       {/* Progress bar */}
       <div className="mt-2.5">
-        <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+        <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-card/10 overflow-hidden">
           <div
             className={cn("h-full rounded-full transition-all duration-500", cfg.bar)}
             style={{ width: `${thresholdProgress}%` }}

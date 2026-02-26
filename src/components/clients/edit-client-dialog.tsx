@@ -342,7 +342,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                     Monthly Retainer <span className="text-status-danger">*</span>
                   </Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                    <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
                     <Input
                       id="retainerAmount"
                       type="number"

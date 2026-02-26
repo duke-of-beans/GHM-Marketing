@@ -8,7 +8,7 @@ import { toast } from "sonner";
 // ApprovalModal is mounted in WebsiteStudioTab and driven via onOpenApproval callback
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  scaffolded: { label: "Scaffolded",  color: "text-gray-500",   icon: <Clock className="h-3 w-3" /> },
+  scaffolded: { label: "Scaffolded",  color: "text-muted-foreground",   icon: <Clock className="h-3 w-3" /> },
   composing:  { label: "Composing",   color: "text-blue-600",   icon: <Edit3 className="h-3 w-3" /> },
   review:     { label: "In Review",   color: "text-status-warning", icon: <Clock className="h-3 w-3" /> },
   approved:   { label: "Approved",    color: "text-status-success",icon: <CheckCircle2 className="h-3 w-3" /> },

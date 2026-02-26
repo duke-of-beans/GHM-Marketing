@@ -27,9 +27,9 @@ export function ClientPortalDashboard({ client }: { client: Client }) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-background border-b">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <h1 className="text-2xl font-bold">{client.businessName}</h1>
           <p className="text-sm text-muted-foreground">Client Dashboard</p>
@@ -193,7 +193,7 @@ export function ClientPortalDashboard({ client }: { client: Client }) {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-12">
+      <footer className="bg-card border-t mt-12">
         <div className="max-w-6xl mx-auto px-6 py-4 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
         </div>

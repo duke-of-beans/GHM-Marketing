@@ -166,7 +166,7 @@ export function GoalsWidget({
             <span className="text-foreground">Deals Closed</span>
             <span className="font-semibold">{wonDeals} / {targetDeals}</span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-secondary rounded-full h-2">
             <div 
               className="bg-blue-500 h-2 rounded-full transition-all" 
               style={{ width: `${Math.min(dealsProgress, 100)}%` }}
@@ -184,7 +184,7 @@ export function GoalsWidget({
               ${(revenue / 1000).toFixed(0)}K / ${(targetRevenue / 1000).toFixed(0)}K
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-secondary rounded-full h-2">
             <div 
               className="bg-status-success-bg h-2 rounded-full transition-all" 
               style={{ width: `${Math.min(revenueProgress, 100)}%` }}
