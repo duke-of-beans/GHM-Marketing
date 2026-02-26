@@ -19,7 +19,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Users, Archive, Trash2, Download } from "lucide-react";
+import { ChevronDown, Users, Archive, Trash2, Download, AlertTriangle, Filter, ClipboardList } from "lucide-react";
 
 type KanbanLead = {
   id: number;
@@ -399,7 +399,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                     }
                     bulkLeadOp("enrich", { force: false });
                   }}>
-                    🔍 Enrich All (skip fresh)
+                    Enrich All (skip fresh)
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-destructive"
@@ -449,7 +449,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
       {/* Cap warning — shown when lead count exceeds the 500-lead kanban limit */}
       {totalLeadCount > 500 && (
         <div className="flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-status-warning-border bg-status-warning-bg text-status-warning">
-          <span>⚠️</span>
+          <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>
             Showing 500 of {totalLeadCount.toLocaleString()} leads — use filters above to narrow results and see specific leads.
           </span>
@@ -465,7 +465,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
             // Brand new pipeline — no leads exist anywhere
             return (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                <div className="text-4xl">📋</div>
+                <ClipboardList className="h-10 w-10 text-muted-foreground mx-auto" />
                 <p className="font-semibold text-lg">Your pipeline is empty</p>
                 <p className="text-sm text-muted-foreground max-w-sm">
                   Add your first lead manually, import a CSV, or use the Discovery engine to find local businesses that match your criteria.
@@ -484,7 +484,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
             // Leads exist but filters are hiding them all
             return (
               <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
-                <div className="text-3xl">🔍</div>
+                <Filter className="h-8 w-8 text-muted-foreground mx-auto" />
                 <p className="font-semibold">No leads match these filters</p>
                 <p className="text-sm text-muted-foreground max-w-sm">
                   {initialLeads.length} lead{initialLeads.length !== 1 ? "s" : ""} exist in your pipeline — try broadening your criteria or clearing the filters.
@@ -502,7 +502,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
           // Leads exist, no filters active — territory or assignment context returning nothing
           return (
             <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
-              <div className="text-3xl">📭</div>
+              <Users className="h-8 w-8 text-muted-foreground mx-auto" />
               <p className="font-semibold">No leads visible here</p>
               <p className="text-sm text-muted-foreground max-w-sm">
                 There are no leads in this view. They may be assigned to a different territory, or not yet imported.

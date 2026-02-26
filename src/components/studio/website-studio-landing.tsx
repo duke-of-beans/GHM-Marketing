@@ -10,7 +10,7 @@ export function WebsiteStudioLanding() {
     <Suspense fallback={<Skeleton className="h-64 w-full" />}>
       <StudioClientPicker
         studioName="Website Studio"
-        studioIcon="🌐"
+        studioIcon=""
         renderStudio={(client) => (
           <WebsiteStudioTab
             clientId={client.id}

@@ -728,7 +728,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                 {t.recurringRuleId && (
                   <Link href={`/recurring-tasks?highlight=${t.recurringRuleId}`}>
                     <Badge variant="outline" className="text-[10px] border-purple-400 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/30 cursor-pointer">
-                      🔁 Recurring task
+                      Recurring task
                     </Badge>
                   </Link>
                 )}
@@ -955,10 +955,10 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                 className="w-full mt-1 text-sm border rounded-md px-3 py-2 bg-background"
                 defaultValue="P3"
               >
-                <option value="P1">🔴 P1 — Critical</option>
-                <option value="P2">🟠 P2 — High</option>
-                <option value="P3">🔵 P3 — Medium</option>
-                <option value="P4">⚪ P4 — Low</option>
+                <option value="P1">P1 — Critical</option>
+                <option value="P2">P2 — High</option>
+                <option value="P3">P3 — Medium</option>
+                <option value="P4">P4 — Low</option>
               </select>
             </div>
           </div>

@@ -124,10 +124,10 @@ export function RecurringTasksClient() {
                     {rule.clientName ? ` — ${rule.clientName}` : " — All active clients"}
                   </p>
                   <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-                    <span>🕐 {formatCron(rule.cronExpression)}</span>
+                    <span>{formatCron(rule.cronExpression)}</span>
                     <span>Last run: {formatDate(rule.lastRunAt)}</span>
                     <span>Next run: {formatDate(rule.nextRunAt)}</span>
-                    {rule.checklistTemplateName && <span>📋 {rule.checklistTemplateName}</span>}
+                    {rule.checklistTemplateName && <span>{rule.checklistTemplateName}</span>}
                   </div>
                 </div>
 

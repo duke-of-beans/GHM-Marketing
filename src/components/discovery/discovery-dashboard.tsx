@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Plus, HelpCircle } from "lucide-react";
+import { Search, Plus, HelpCircle, MapPin } from "lucide-react";
 import { CSVImportDialog } from "@/components/leads/csv-import-dialog";
 import { toast } from "sonner";
 
@@ -224,7 +224,7 @@ export function DiscoveryDashboard() {
       {/* Results */}
       {!hasSearched && (
         <div className="flex flex-col items-center justify-center py-14 text-center space-y-3 border rounded-lg bg-muted/20">
-          <div className="text-4xl">🗺️</div>
+          <MapPin className="h-10 w-10 text-muted-foreground" />
           <p className="font-semibold text-base">Ready to find leads</p>
           <p className="text-sm text-muted-foreground max-w-sm">
             Enter a business type and location above to search Google Maps for prospects that match your criteria. Each result gets an instant quality score.
@@ -238,7 +238,7 @@ export function DiscoveryDashboard() {
       {hasSearched && results.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <div className="text-3xl mb-3">🔎</div>
+            <Search className="h-8 w-8 mb-3 text-muted-foreground" />
             <p className="font-semibold mb-1">No businesses found</p>
             <p className="text-sm text-muted-foreground max-w-sm mx-auto">
               Try a broader location (e.g. &quot;Dallas&quot; instead of &quot;Downtown Dallas&quot;), different keywords (e.g. &quot;lawyer&quot; instead of &quot;attorney&quot;), or a lower minimum review count.
@@ -303,8 +303,8 @@ export function DiscoveryDashboard() {
                       </Tooltip>
                     </div>
                     <div className="flex gap-4 text-sm text-muted-foreground mb-2">
-                      <span>⭐ {result.rating} ({result.reviewCount} reviews)</span>
-                      {result.phone && <span>📞 {result.phone}</span>}
+                      <span>{result.rating}★ ({result.reviewCount} reviews)</span>
+                      {result.phone && <span>{result.phone}</span>}
                       {result.website && (
                         <a
                           href={result.website}
@@ -312,7 +312,7 @@ export function DiscoveryDashboard() {
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
                         >
-                          🌐 Website
+                          Website
                         </a>
                       )}
                       <span className="text-xs bg-muted dark:bg-card px-2 py-0.5 rounded">

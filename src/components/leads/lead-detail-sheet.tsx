@@ -816,7 +816,7 @@ export function LeadDetailSheet({ leadId, open, onClose }: LeadDetailSheetProps)
                     <p className="text-sm font-semibold">{lead.reviewCount ?? "—"}</p>
                   </div>
                   <div className="bg-muted/50 rounded px-2 py-1.5">
-                    <p className="text-xs text-muted-foreground">Avg ⭐</p>
+                    <p className="text-xs text-muted-foreground">Avg Rating</p>
                     <p className="text-sm font-semibold">
                       {lead.reviewAvg != null ? Number(lead.reviewAvg).toFixed(1) : "—"}
                     </p>

@@ -137,7 +137,7 @@ export function ClientNotesTab({ clientId, initialNotes }: Props) {
 
       {pinnedNotes.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium mb-0.5">📌 Client Standards</h3>
+          <h3 className="text-sm font-medium mb-0.5">Client Standards</h3>
           <p className="text-xs text-muted-foreground mb-2">
             Pinned instructions that always apply to this account
           </p>

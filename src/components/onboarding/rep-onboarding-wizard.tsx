@@ -138,7 +138,6 @@ function StepWelcome({ firstName }: { firstName: string }) {
   return (
     <StepCard>
       <div className="text-center space-y-3">
-        <div className="text-5xl">👋</div>
         <h1 className="text-2xl font-bold">Hey {firstName}, welcome to GHM.</h1>
         <p className="text-muted-foreground">
           You're about to become part of the team. This'll take about 3 minutes
@@ -155,7 +154,6 @@ function StepWelcome({ firstName }: { firstName: string }) {
             key={item.label}
             className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-muted/50 text-center"
           >
-            <span className="text-2xl">{item.icon}</span>
             <span className="text-xs font-medium">{item.label}</span>
           </div>
         ))}
@@ -175,15 +173,15 @@ function StepRole() {
       </p>
       <div className="space-y-2">
         {[
-          { icon: "✅", text: "Find prospects in your territory" },
-          { icon: "✅", text: "Generate a free audit to break the ice" },
-          { icon: "✅", text: "Show them the live demo on the call" },
-          { icon: "✅", text: "Close the retainer, collect your bonus" },
-          { icon: "✅", text: "Light monthly check-ins keep them happy" },
-        ].map((item) => (
-          <div key={item.text} className="flex items-start gap-2 text-sm">
-            <span>{item.icon}</span>
-            <span>{item.text}</span>
+          "Find prospects in your territory",
+          "Generate a free audit to break the ice",
+          "Show them the live demo on the call",
+          "Close the retainer, collect your bonus",
+          "Light monthly check-ins keep them happy",
+        ].map((text) => (
+          <div key={text} className="flex items-start gap-2 text-sm">
+            <span className="text-status-success mt-0.5 shrink-0">✓</span>
+            <span>{text}</span>
           </div>
         ))}
       </div>

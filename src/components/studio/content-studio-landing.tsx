@@ -10,7 +10,7 @@ export function ContentStudioLanding() {
     <Suspense fallback={<Skeleton className="h-64 w-full" />}>
       <StudioClientPicker
         studioName="Content Studio"
-        studioIcon="✍️"
+        studioIcon=""
         renderStudio={(client) => (
           <ContentStudioTab clientId={client.id} />
         )}

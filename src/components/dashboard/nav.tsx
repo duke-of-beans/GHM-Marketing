@@ -24,7 +24,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ChevronDown, Search, Users, Building2, CheckSquare, Repeat, PenTool, Globe, TrendingUp, CreditCard, Package, Archive } from "lucide-react";
+import { ChevronDown, Search, Users, Building2, CheckSquare, Repeat, PenTool, Globe, TrendingUp, CreditCard, Package, Archive, LayoutDashboard, User, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
@@ -301,7 +301,7 @@ export function DashboardNav({
                 : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
             )}
           >
-            <span>📊</span>
+            <LayoutDashboard className="h-4 w-4 shrink-0" />
             Dashboard
           </Link>
         </div>
@@ -331,7 +331,7 @@ export function DashboardNav({
                 : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
             )}
           >
-            <span>👤</span>
+            <User className="h-4 w-4 shrink-0" />
             My Profile
           </Link>
           {permissions.manage_settings && (
@@ -344,7 +344,7 @@ export function DashboardNav({
                   : "text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground"
               )}
             >
-              <span>⚙️</span>
+              <Settings className="h-4 w-4 shrink-0" />
               Settings
             </Link>
           )}
@@ -353,7 +353,7 @@ export function DashboardNav({
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted dark:hover:bg-card hover:text-foreground transition-colors w-full"
           >
-            <span>🚪</span>
+            <LogOut className="h-4 w-4 shrink-0" />
             Sign Out
           </button>
         </div>
@@ -380,7 +380,7 @@ export function DashboardNav({
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-muted-foreground touch-target justify-center"
         >
-          <span className="text-lg">🚪</span>
+          <LogOut className="h-5 w-5 shrink-0" />
           Exit
         </button>
       </nav>

@@ -86,8 +86,8 @@ export function ClientDomainsTab({
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {domain.contentCount} pages ·{" "}
-                  {domain.dnsVerified ? "✅ DNS" : "⏳ DNS pending"} ·{" "}
-                  {domain.sslActive ? "✅ SSL" : "⏳ SSL pending"} ·{" "}
+                  {domain.dnsVerified ? "DNS verified" : "DNS pending"} ·{" "}
+                  {domain.sslActive ? "SSL active" : "SSL pending"} ·{" "}
                   Last deployed: {timeAgo(domain.lastDeployedAt)}
                 </p>
               </div>

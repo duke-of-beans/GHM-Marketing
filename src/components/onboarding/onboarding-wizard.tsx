@@ -193,7 +193,6 @@ function StepWelcome({ firstName, positionName, positionType }: { firstName: str
   return (
     <StepCard>
       <div className="text-center space-y-3">
-        <div className="text-5xl">👋</div>
         <h1 className="text-2xl font-bold">Hey {firstName}, welcome to GHM.</h1>
         <p className="text-muted-foreground">
           You&apos;re joining as{positionName ? ` a ${positionName}` : " part of the team"}. This takes about 3 minutes — setup, tools, and you&apos;re live.
@@ -202,7 +201,6 @@ function StepWelcome({ firstName, positionName, positionType }: { firstName: str
       <div className="grid grid-cols-3 gap-3 pt-2">
         {highlights.map((item) => (
           <div key={item.label} className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-muted/50 text-center">
-            <span className="text-2xl">{item.icon}</span>
             <span className="text-xs font-medium">{item.label}</span>
           </div>
         ))}

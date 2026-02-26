@@ -115,7 +115,7 @@ export function LeadCard({ lead, onClick, onStatusChange }: LeadCardProps) {
             {lead.assignedUser?.name ?? "Unassigned"}
           </span>
           {lead._count.notes > 0 && (
-            <span>💬 {lead._count.notes}</span>
+            <span>{lead._count.notes} notes</span>
           )}
         </div>
       </div>

@@ -144,7 +144,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
           {status === "completed" || tokenData.submission ? (
             <div className="space-y-1">
               <p className="text-sm font-medium text-status-success">
-                ✅ Client completed onboarding
+                Client onboarding complete
               </p>
               {tokenData.submission?.submittedAt && (
                 <p className="text-xs text-muted-foreground">

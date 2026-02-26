@@ -139,10 +139,10 @@ function AddTaskDialog({
             <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="Critical">🔴 Critical</SelectItem>
-                <SelectItem value="High">🟠 High</SelectItem>
-                <SelectItem value="Standard">🔵 Standard</SelectItem>
-                <SelectItem value="Low">⚪ Low</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
+                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="Standard">Standard</SelectItem>
+                <SelectItem value="Low">Low</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -264,7 +264,6 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
           {/* ── Step 0: Welcome ── */}
           {step === 0 && (
             <div className="space-y-4 text-center">
-              <div className="text-5xl">👋</div>
               <h1 className="text-2xl font-bold">Welcome to your dashboard</h1>
               <p className="text-muted-foreground">
                 Let&apos;s take a few minutes to set up your company profile, brand colors,
@@ -593,8 +592,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
           {/* ── Step 6: Done ── */}
           {step === LAST_STEP && (
             <div className="space-y-4 text-center">
-              <div className="text-5xl">🎉</div>
-              <h2 className="text-2xl font-bold">You&apos;re all set!</h2>
+              <h2 className="text-2xl font-bold">Setup complete.</h2>
               <p className="text-muted-foreground">
                 Your platform is configured and ready to use.
               </p>

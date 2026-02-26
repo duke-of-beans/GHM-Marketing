@@ -2,7 +2,7 @@
 // BulkImportDialog — reusable CSV/XLSX upload dialog for clients and users
 // Handles file selection, column preview, upload, and results display.
 import { useState, useRef } from "react";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Download } from "lucide-react";
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2, X, Download, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -128,7 +128,7 @@ export function BulkImportDialog({ open, onClose, onSuccess, endpoint, title, de
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={onClose}>Cancel</Button>
               <Button onClick={handleUpload} disabled={!file || loading} className="gap-1.5">
-                {loading ? <span className="animate-spin">⏳</span> : <Upload className="h-4 w-4" />}
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {loading ? "Importing…" : "Import"}
               </Button>
             </div>

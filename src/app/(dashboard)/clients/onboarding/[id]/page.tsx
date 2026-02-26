@@ -144,7 +144,7 @@ function ChecklistRow({
           className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
           onClick={() => setShowNote(!showNote)}
         >
-          {showNote ? "hide note" : state.note ? "note ✎" : "+ note"}
+          {showNote ? "hide note" : state.note ? "edit note" : "+ note"}
         </button>
       </div>
       {showNote && (
@@ -295,7 +295,7 @@ export default function OnboardingDetailPage() {
         <div className="flex items-center gap-3">
           {submission.onboardingComplete ? (
             <Badge variant="outline" className="text-status-success border-status-success-border bg-status-success-bg">
-              ✅ Onboarding Complete
+              Onboarding Complete
             </Badge>
           ) : (
             <Button

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import type {
   OnboardingTokenResponse,
@@ -1065,7 +1066,7 @@ function Step5Review({
     <div className="border border-border rounded-lg p-4 mb-3">
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-status-success text-sm">✅</span>
+          <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
           <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         </div>
         <button onClick={() => onEdit(step)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
@@ -1133,7 +1134,7 @@ function ConfirmationScreen({ businessName, partnerName }: { businessName: strin
         <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-6">
           <span className="text-white font-bold text-sm">GHM</span>
         </div>
-        <div className="text-4xl mb-4">✅</div>
+        <CheckCircle2 className="h-16 w-16 text-status-success mx-auto mb-4" />
         <h1 className="text-xl font-bold text-foreground mb-2">You&apos;re all set, {businessName}.</h1>
         <p className="text-muted-foreground text-sm mb-6">
           Our operations team has everything they need to get started. Here&apos;s what happens next:
@@ -1204,7 +1205,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
           <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-4">
             <span className="text-white font-bold text-sm">GHM</span>
           </div>
-          <div className="text-4xl mb-4">✅</div>
+          <CheckCircle2 className="h-16 w-16 text-status-success mx-auto mb-4" />
           <h1 className="text-lg font-semibold text-foreground mb-2">Already submitted!</h1>
           <p className="text-muted-foreground text-sm">
             Your onboarding form has already been received. Our operations team is getting everything set up for you.
@@ -1223,7 +1224,9 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
         <div className="inline-flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg mb-4">
           <span className="text-white font-bold text-sm">GHM</span>
         </div>
-        <div className="text-4xl mb-4">{errorCode === 410 ? "⏰" : "❌"}</div>
+        {errorCode === 410
+              ? <Clock className="h-16 w-16 text-status-warning mx-auto mb-4" />
+              : <XCircle className="h-16 w-16 text-status-error mx-auto mb-4" />}
         <h1 className="text-lg font-semibold text-foreground mb-2">
           {errorCode === 410 ? "This link has expired" : "Invalid link"}
         </h1>
@@ -1237,7 +1240,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
           <>
             {refreshed ? (
               <div className="bg-status-success-bg border border-status-success-border rounded-lg p-3 mb-4">
-                <p className="text-sm text-status-success font-medium">✅ Fresh link generated — redirecting...</p>
+                <p className="text-sm text-status-success font-medium">Link generated — redirecting...</p>
               </div>
             ) : (
               <button
