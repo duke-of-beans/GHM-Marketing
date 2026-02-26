@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — Sprint 23-E shipped (Status Color Token Migration — 779 replacements across 125 file-changes).
+**Last Updated:** February 26, 2026 — Sprint 24 shipped (3-Pass UX Quality). Closed: UX-AUDIT-001, UX-AUDIT-002, UX-AUDIT-005.
 
 **Owner:** David Kirsch
 
@@ -80,28 +80,11 @@ GBP integration built. App in Testing mode. Gate: Google API Console approval fo
 
 ## 🔴 UX AUDITS — Must Fix Before External Eyes
 
-### UX-AUDIT-001: Tooltip / Help Text / Hover State Audit (Global)
-The dashboard has no consistent tooltip or contextual help layer. Users — especially new admins — encounter unlabeled icons, ambiguous controls, and metric labels with no explanation.
-**Scope:** Full global pass. Every icon button, metric card, non-obvious control gets a tooltip or `title` attribute. Focus areas: nav icons, action buttons without labels, score/metric displays (health score, churn risk, impact score, close likelihood), filter controls, audit sections, commission fields. Build shared `<Tooltip>` component if one doesn't exist. Also audit all static help text (empty states, onboarding prompts, section intros) for accuracy and consistency.
-**Voice rule:** Tooltip voice = reserved, informational, brief. "Health score reflects GBP engagement, citation accuracy, and ranking position over the last 30 days." Not "Check out your health score!"
-**Size:** ~1 session. **Priority:** 🟠 SHOULD.
-
-### UX-AUDIT-002: Voice Audit — Dashboard UI Copy (Global, SCRVNR Pass)
-Dashboard UI contains consumer-facing language that doesn't match the voice of a professional marketing platform. "Upsells available" should be "Additional products available."
-**Scope:** All UI copy — page titles, section headers, button labels, column headers, badge labels, empty states, filter labels, card labels, dialog titles, form labels, placeholder text, nav labels, status indicators. Also: demos and promotional materials (brochures, audit reports, comp sheets, territory map page). Excludes: notifications/alerts, tutorials/guides, contracts.
-**Method:** SCRVNR pass. Voice target = reserved, professional, B2B.
-**Size:** ~1 session. **Priority:** 🟠 SHOULD.
-
 ### UX-AUDIT-003: Brochure — Visual Design Overhaul (Marketing-Grade)
 The brochure represents a marketing company selling marketing services. It currently doesn't look like something a sharp agency would send a prospect.
 **Direction:** Modern layout — strong typographic hierarchy, bold section breaks, purposeful whitespace, brand-consistent color. Not a template — an actual designed piece.
 **Dependency:** FEAT-016 (tenant voice/style capture) should ship first so the brochure renders each tenant's brand rather than being GHM-generic.
 **Size:** ~1 session structural redesign; additional pass once FEAT-016 is live. **Priority:** 🟠 SHOULD.
-
-### UX-AUDIT-005: Dark Theme Audit (Global)
-Dark mode exists but hasn't been comprehensively audited. Likely issues: hardcoded light colors, insufficient contrast, invisible borders, shadows that don't adapt.
-**Scope:** Full global pass in dark mode. Every page and major component. Fix all inconsistencies. Codify dark mode colors in shared token/variable system if not already done.
-**Size:** ~1 session. **Priority:** 🟠 SHOULD.
 
 ### UX-AUDIT-006: Responsiveness Audit (Global — Split Screen + Mobile)
 No formal responsiveness audit has been run.

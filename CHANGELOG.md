@@ -1,7 +1,24 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 26, 2026 — Sprint 23-E shipped (Status Color Token Migration — 779 replacements across 125 file-changes).
+**Last Updated:** February 26, 2026 — Sprint 24 shipped (3-Pass UX Quality: Dark Theme + Voice Audit + Tooltip/Help Text).
+
+---
+
+## Sprint 24 — UX Quality Sprint (3-Pass) — February 26, 2026
+
+**Three independent passes executed sequentially.** No logic changes — class names, string literals, and JSX structure only.
+
+### Pass 1 — Dark Theme Token Migration (`9864235`)
+Replaced hardcoded Tailwind gray/white/black/slate classes with semantic CSS variable tokens across 41 files. Tokens (`bg-card`, `bg-background`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `border-border`, etc.) auto-adapt to dark mode via `globals.css`. Removed all paired `dark:` gray-family override classes. Context-aware `bg-white` resolution: page-level → `bg-background`, popovers/dropdowns → `bg-popover`, cards/modals → `bg-card`. 9 `bg-black/N` semi-transparent overlays intentionally retained. Excluded: email templates, PDF generators, `status-badge.tsx`, `globals.css`, `tailwind.config`.
+
+### Pass 2 — Voice Audit (`7de02d3`)
+Removed all colorful pictographic emoji from functional UI across 21 files. Replaced emoji spans with Lucide icon components: LayoutDashboard, User, Settings, LogOut, HelpCircle, Loader2, MapPin, Search, CheckCircle2, Clock, XCircle, AlertTriangle, Filter, ClipboardList. Fixed casual B2B copy: "You're all set!" → "Setup complete.", "note ✎" → "edit note", DNS/SSL status labels clarified. Removed priority-selector and recurring-task emoji. Intentionally retained: U+26A0 ⚠ warning glyph (typography), U+2605 ★ star rating unit. Excluded: TeamFeed (user content), EmojiPicker, email/PDF templates.
+
+### Pass 3 — Tooltip & Help Text Audit (`5d75e8f`)
+Added `<TooltipProvider>` to root `layout.tsx`. Added Tooltip wrappers + `aria-label` to icon-only buttons in 5 components: product-catalog (Edit/Delete service ×4, view toggles), recurring-tasks (Edit/Delete rule), FinancialOverviewSection (Refresh transactions), ContentStrategyPanel (Copy keyword), IntegrationsTab (Re-check connection), vault-file-tile (File options). Added Health Score metric tooltip to scan-history.tsx. Confirmed existing comprehensive tooltips on profile.tsx (Health Score) and churn-risk-badge.tsx (Churn Risk). 8 files modified, 0 new TypeScript errors.
+
+**TypeScript check:** No new errors. Pre-existing errors in `scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/lib/basecamp/client.ts` unchanged.
 
 ---
 
