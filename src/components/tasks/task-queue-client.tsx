@@ -128,8 +128,8 @@ type Props = {
 // ── Constants ───────────────────────────────────────────────────────────────
 
 const PRIORITY_COLORS: Record<string, string> = {
-  P1: "bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200",
-  P2: "bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-200",
+  P1: "bg-status-danger-bg text-status-danger",
+  P2: "bg-status-warning-bg text-status-warning",
   P3: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200",
   P4: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
 };
@@ -137,12 +137,12 @@ const PRIORITY_COLORS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   queued: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
   in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-200",
-  review: "bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200",
-  approved: "bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-200",
-  deployed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-200",
+  review: "bg-status-warning-bg text-status-warning",
+  approved: "bg-status-success-bg text-status-success",
+  deployed: "bg-status-success-bg text-status-success",
   measuring: "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-200",
   complete: "bg-teal-100 text-teal-700 dark:bg-teal-900/60 dark:text-teal-200",
-  rejected: "bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-200",
+  rejected: "bg-status-danger-bg text-status-danger",
   cancelled: "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
@@ -216,7 +216,7 @@ function SortableTaskRow({
       ref={setNodeRef}
       style={style}
       className={`group flex items-center gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-muted/40 transition-colors cursor-pointer ${
-        task.isOverdue ? "bg-red-50/50 dark:bg-red-950/20" : ""
+        task.isOverdue ? "bg-status-danger-bg/50" : ""
       } ${isActive ? "opacity-50 pointer-events-none" : ""}`}
       onClick={() => onSelect(task)}
     >
@@ -262,7 +262,7 @@ function SortableTaskRow({
       {/* Due date */}
       <div className="w-16 text-right flex-shrink-0 hidden sm:block">
         {dueStr && (
-          <span className={`text-xs ${task.isOverdue ? "text-red-600 dark:text-red-400 font-medium" : "text-muted-foreground"}`}>
+          <span className={`text-xs ${task.isOverdue ? "text-status-danger font-medium" : "text-muted-foreground"}`}>
             {dueStr}
           </span>
         )}
@@ -573,17 +573,17 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
         </Card>
         <Card className="p-3">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-amber-500" />
+            <CheckCircle2 className="h-4 w-4 text-status-warning" />
             <span className="text-sm text-muted-foreground">In Review</span>
           </div>
           <p className="text-2xl font-bold mt-1">{s.review || 0}</p>
         </Card>
         <Card className="p-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <AlertTriangle className="h-4 w-4 text-status-danger" />
             <span className="text-sm text-muted-foreground">Overdue</span>
           </div>
-          <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">{stats.overdue}</p>
+          <p className="text-2xl font-bold text-status-danger mt-1">{stats.overdue}</p>
         </Card>
       </div>
     );
@@ -594,8 +594,8 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
   const BOARD_COLUMNS: { status: string; label: string; color: string }[] = [
     { status: "queued", label: "Queued", color: "border-gray-300 dark:border-gray-600" },
     { status: "in_progress", label: "In Progress", color: "border-blue-400 dark:border-blue-500" },
-    { status: "review", label: "In Review", color: "border-amber-400 dark:border-amber-500" },
-    { status: "approved", label: "Approved", color: "border-green-400 dark:border-green-500" },
+    { status: "review", label: "In Review", color: "border-status-warning-border" },
+    { status: "approved", label: "Approved", color: "border-status-success-border" },
   ];
 
   const BoardView = () => {
@@ -617,7 +617,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                 <Card
                   key={task.id}
                   className={`p-3 cursor-pointer hover:shadow-md transition-shadow ${
-                    task.isOverdue ? "border-red-300 dark:border-red-700" : ""
+                    task.isOverdue ? "border-status-danger-border" : ""
                   } ${transitioning === task.id ? "opacity-50" : ""}`}
                   onClick={() => setSelectedTask(task)}
                 >
@@ -626,7 +626,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
                       {task.priority}
                     </Badge>
                     <span className="text-xs">{CATEGORY_ICONS[task.category] || "GEN"}</span>
-                    {task.isOverdue && <AlertTriangle className="h-3 w-3 text-red-500 ml-auto" />}
+                    {task.isOverdue && <AlertTriangle className="h-3 w-3 text-status-danger ml-auto" />}
                   </div>
                   <p className="text-sm font-medium line-clamp-2 mb-1">{task.title}</p>
                   <div className="flex items-center justify-between">
@@ -665,7 +665,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
             <div className="flex items-center gap-2">
               <Badge className={PRIORITY_COLORS[t.priority] || ""}>{t.priority}</Badge>
               <Badge className={STATUS_COLORS[t.status] || ""}>{STATUS_LABELS[t.status]}</Badge>
-              {t.isOverdue && <Badge className="bg-red-500 text-white text-[10px]">OVERDUE</Badge>}
+              {t.isOverdue && <Badge className="bg-status-danger-bg text-white text-[10px]">OVERDUE</Badge>}
             </div>
             <SheetTitle className="text-left text-lg mt-2">{t.title}</SheetTitle>
           </SheetHeader>
@@ -694,7 +694,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
               {t.dueDate && (
                 <div>
                   <p className="text-muted-foreground text-xs">Due Date</p>
-                  <p className={t.isOverdue ? "text-red-600 dark:text-red-400 font-medium" : ""}>
+                  <p className={t.isOverdue ? "text-status-danger font-medium" : ""}>
                     {new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
@@ -720,7 +720,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
               <div className="flex flex-wrap gap-2">
                 {t.sourceAlertId && (
                   <Link href={`/alerts?highlight=${t.sourceAlertId}`}>
-                    <Badge variant="outline" className="text-[10px] border-orange-400 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-950/30 cursor-pointer">
+                    <Badge variant="outline" className="text-[10px] border-status-warning-border text-status-warning hover:bg-status-warning-bg cursor-pointer">
                       From alert #{t.sourceAlertId}
                     </Badge>
                   </Link>
@@ -1096,7 +1096,7 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
       {/* Task list or board */}
       {tasks.length === 0 ? (
         <Card className="p-12 text-center">
-          <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
+          <CheckCircle2 className="h-12 w-12 text-status-success mx-auto mb-3" />
           <p className="text-lg font-medium">Queue clear</p>
           <p className="text-sm text-muted-foreground mt-1">No tasks match your filters.</p>
         </Card>

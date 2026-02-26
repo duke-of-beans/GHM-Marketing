@@ -46,7 +46,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
   {
     title: "Your Dashboard",
     description: "Every number on this screen is yours specifically — your territory, your pipeline, your money. It's not decorative.",
-    icon: <TrendingUp className="h-12 w-12 text-green-600" />,
+    icon: <TrendingUp className="h-12 w-12 text-status-success" />,
     route: "/sales",
     tips: [
       "Available = unclaimed leads sitting in your territory right now",
@@ -59,7 +59,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
   {
     title: "How You Get Paid",
     description: "Two income streams. One when you close, one every month after that. The math gets interesting fast if you actually retain clients.",
-    icon: <DollarSign className="h-12 w-12 text-green-600" />,
+    icon: <DollarSign className="h-12 w-12 text-status-success" />,
     route: "/sales",
     tips: [
       "Commission: one-time payment when a client closes (Month 1)",
@@ -108,7 +108,7 @@ const SALES_REP_TUTORIAL: TutorialStep[] = [
   {
     title: "That's the dashboard.",
     description: "Head to the Leads page when you're ready — it'll walk you through the pipeline, claiming leads, and how the kanban works. That tour fires once, automatically.",
-    icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
+    icon: <CheckCircle2 className="h-12 w-12 text-status-success" />,
     route: "/leads",
     tips: [
       "Hover any ? icon in the app for inline explanations",
@@ -134,7 +134,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "Your Dashboard",
     description: "Everything you need to know about your team's performance is here. If a number looks bad, it's probably accurate.",
-    icon: <LayoutDashboard className="h-12 w-12 text-green-600" />,
+    icon: <LayoutDashboard className="h-12 w-12 text-status-success" />,
     route: "/manager",
     tips: [
       "Top row: total leads, active pipeline, won deals, MRR/ARR — company-wide, not just yours",
@@ -192,7 +192,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "Team Settings",
     description: "Settings → Team is where you configure your reps — territories, rates, permissions, and account status. Don't skip this before they start closing.",
-    icon: <Filter className="h-12 w-12 text-orange-600" />,
+    icon: <Filter className="h-12 w-12 text-status-warning" />,
     route: "/settings",
     tips: [
       "Default compensation rates apply to everyone unless you override per rep or per client",
@@ -205,7 +205,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "How You Get Paid",
     description: "Management fees on every client you manage, starting Month 1. Sales commission and residuals on top if you're also closing. It compounds if you're doing both.",
-    icon: <DollarSign className="h-12 w-12 text-green-600" />,
+    icon: <DollarSign className="h-12 w-12 text-status-success" />,
     route: "/manager",
     tips: [
       "Management fees: per-client monthly, every client you manage, from Month 1",
@@ -258,7 +258,7 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   {
     title: "That's everything.",
     description: "You've got the full picture. Keep health scores up, keep your reps moving, keep your managed book growing.",
-    icon: <CheckCircle2 className="h-12 w-12 text-green-600" />,
+    icon: <CheckCircle2 className="h-12 w-12 text-status-success" />,
     route: "/manager",
     tips: [
       "Every ? icon in the app has an inline explanation — hover before you ask",
@@ -422,7 +422,7 @@ export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialPro
                 idx === currentStep
                   ? "w-4 bg-blue-600"
                   : idx < currentStep
-                  ? "w-1.5 bg-green-600"
+                  ? "w-1.5 bg-status-success-bg"
                   : "w-1.5 bg-gray-300"
               }`}
             />

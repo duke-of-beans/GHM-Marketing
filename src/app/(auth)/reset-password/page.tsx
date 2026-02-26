@@ -54,7 +54,7 @@ function ResetForm() {
   if (!token) {
     return (
       <div className="text-center space-y-3">
-        <p className="text-sm text-red-600">Invalid or missing reset link.</p>
+        <p className="text-sm text-status-danger">Invalid or missing reset link.</p>
         <Link href="/forgot-password" className="text-sm text-primary underline">Request a new one</Link>
       </div>
     );
@@ -63,7 +63,7 @@ function ResetForm() {
   if (status === "done") {
     return (
       <div className="text-center space-y-3">
-        <p className="text-sm text-green-700 font-medium">Password updated successfully.</p>
+        <p className="text-sm text-status-success font-medium">Password updated successfully.</p>
         <p className="text-sm text-muted-foreground">Redirecting you to sign in...</p>
       </div>
     );
@@ -81,7 +81,7 @@ function ResetForm() {
         <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)}
           placeholder="Re-enter password" required />
       </div>
-      {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+      {error && <p className="text-sm text-status-danger text-center">{error}</p>}
       <Button type="submit" className="w-full" disabled={status === "loading"}>
         {status === "loading" ? "Updating..." : "Set new password"}
       </Button>

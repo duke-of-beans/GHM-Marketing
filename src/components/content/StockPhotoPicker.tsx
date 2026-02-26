@@ -179,7 +179,7 @@ export function StockPhotoPicker({ onSelect, trigger, initialQuery = "", inline 
                         className="h-7 w-7 rounded-md bg-background/90 flex items-center justify-center hover:bg-background transition-colors"
                       >
                         {copiedId === photo.id
-                          ? <Check className="h-3.5 w-3.5 text-green-500" />
+                          ? <Check className="h-3.5 w-3.5 text-status-success" />
                           : <Copy className="h-3.5 w-3.5" />}
                       </button>
                       <a

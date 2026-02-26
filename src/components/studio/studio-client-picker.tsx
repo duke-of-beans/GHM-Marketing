@@ -192,8 +192,8 @@ export function StudioClientPicker({ studioName, studioIcon, renderStudio }: Pro
                     <div
                       className={cn(
                         "h-full rounded-full",
-                        client.healthScore >= 70 ? "bg-green-500" :
-                        client.healthScore >= 40 ? "bg-amber-500" : "bg-red-500"
+                        client.healthScore >= 70 ? "bg-status-success-bg" :
+                        client.healthScore >= 40 ? "bg-status-warning-bg" : "bg-status-danger-bg"
                       )}
                       style={{ width: `${client.healthScore}%` }}
                     />

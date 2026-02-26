@@ -85,8 +85,8 @@ function initials(name: string) {
 }
 
 function priorityBadge(priority: string) {
-  if (priority === "urgent") return <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 text-[10px] py-0">Urgent</Badge>;
-  if (priority === "important") return <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 text-[10px] py-0">Important</Badge>;
+  if (priority === "urgent") return <Badge className="bg-status-danger-bg text-status-danger text-[10px] py-0">Urgent</Badge>;
+  if (priority === "important") return <Badge className="bg-status-warning-bg text-status-warning text-[10px] py-0">Important</Badge>;
   return null;
 }
 
@@ -323,7 +323,7 @@ function MessageRow({
     <div
       className={`rounded-lg border p-3 transition-colors ${
         !isRead ? "border-primary/40 bg-primary/5" : "border-border bg-card"
-      } ${msg.isPinned ? "border-amber-400/60 dark:border-amber-600/60" : ""}`}
+      } ${msg.isPinned ? "border-status-warning-border/60" : ""}`}
       onClick={markRead}
     >
       {/* Header */}
@@ -339,7 +339,7 @@ function MessageRow({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Pin className="h-3 w-3 text-amber-500 cursor-default" />
+                    <Pin className="h-3 w-3 text-status-warning cursor-default" />
                   </TooltipTrigger>
                   <TooltipContent side="top">
                     <p className="text-xs">Pinned — always visible at the top of the feed</p>

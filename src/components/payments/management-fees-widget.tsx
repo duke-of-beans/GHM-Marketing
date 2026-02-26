@@ -138,7 +138,7 @@ export function ManagementFeesWidget() {
           <div className="pt-3 border-t">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">Pending</p>
-              <p className="text-sm font-medium text-orange-600">
+              <p className="text-sm font-medium text-status-warning">
                 {formatCurrency(data.pendingFees)}
               </p>
             </div>

@@ -78,7 +78,7 @@ export function LiveSitesPanel() {
       <div className="flex items-center gap-4 text-sm">
         <span className="text-muted-foreground">{sites.length} live site{sites.length !== 1 ? "s" : ""}</span>
         {staleCount > 0 && (
-          <span className="flex items-center gap-1 text-amber-600">
+          <span className="flex items-center gap-1 text-status-warning">
             <AlertTriangle className="h-3.5 w-3.5" />
             {staleCount} stale
           </span>
@@ -100,7 +100,7 @@ function SiteRow({ site }: { site: LiveSite }) {
   const tierColors: Record<string, string> = {
     tier1: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
     tier2: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-    tier3: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+    tier3: "bg-status-warning-bg text-status-warning",
   };
 
   return (
@@ -108,7 +108,7 @@ function SiteRow({ site }: { site: LiveSite }) {
       {/* Status dot */}
       <span
         className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-          site.isStale ? "bg-amber-400" : "bg-green-500"
+          site.isStale ? "bg-status-warning-bg" : "bg-status-success-bg"
         }`}
       />
 
@@ -141,7 +141,7 @@ function SiteRow({ site }: { site: LiveSite }) {
       {/* Health indicators */}
       <div className="flex items-center gap-3 shrink-0 text-xs">
         {site.dnsVerified && site.sslActive ? (
-          <span className="flex items-center gap-1 text-green-600">
+          <span className="flex items-center gap-1 text-status-success">
             <ShieldCheck className="h-3.5 w-3.5" /> DNS + SSL
           </span>
         ) : (
@@ -156,7 +156,7 @@ function SiteRow({ site }: { site: LiveSite }) {
       {/* Deploy age */}
       <div className="text-right shrink-0">
         {site.daysSinceDeploy !== null ? (
-          <div className={`text-xs tabular-nums ${site.isStale ? "text-amber-600 font-medium" : "text-muted-foreground"}`}>
+          <div className={`text-xs tabular-nums ${site.isStale ? "text-status-warning font-medium" : "text-muted-foreground"}`}>
             {site.daysSinceDeploy === 0
               ? "Today"
               : site.daysSinceDeploy === 1

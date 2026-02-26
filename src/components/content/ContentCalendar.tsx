@@ -58,7 +58,7 @@ export function ContentCalendar({ clientId }: ContentCalendarProps) {
       case 'social':
         return 'bg-purple-100 text-purple-800'
       case 'meta':
-        return 'bg-green-100 text-green-800'
+        return 'bg-status-success-bg text-status-success'
       default:
         return 'bg-gray-100 text-gray-800'
     }

@@ -47,7 +47,7 @@ export function MetricCard({ title, value, subtitle, trend, className, tooltip }
             <p
               className={cn(
                 "text-xs mt-1 font-medium",
-                trend.value >= 0 ? "text-green-600" : "text-red-600"
+                trend.value >= 0 ? "text-status-success" : "text-status-danger"
               )}
             >
               {trend.value >= 0 ? "↑" : "↓"} {Math.abs(trend.value)}% {trend.label}

@@ -28,7 +28,7 @@ export function MetricsRow({ totalLeads, activeLeads, conversionRate, wonDeals, 
       <MetricCard
         title="Won Deals"
         value={wonDeals}
-        className="[&_p.text-2xl]:text-green-600 [&_p.text-3xl]:text-green-600"
+        className="[&_p.text-2xl]:text-status-success [&_p.text-3xl]:text-status-success"
         tooltip="Successfully closed deals that converted to active clients."
       />
       <MetricCard

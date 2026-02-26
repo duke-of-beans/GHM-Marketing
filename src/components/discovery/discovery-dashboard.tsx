@@ -148,7 +148,7 @@ export function DiscoveryDashboard() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600 bg-green-50";
+    if (score >= 80) return "text-status-success bg-status-success-bg";
     if (score >= 60) return "text-blue-600 bg-blue-50";
     return "text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-800";
   };

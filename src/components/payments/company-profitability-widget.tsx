@@ -107,7 +107,7 @@ export function CompanyProfitabilityWidget() {
         {/* Net Profit */}
         <div>
           <div className="flex items-baseline justify-between">
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-status-success">
               {formatCurrency(data.netProfit)}
             </p>
             <p className="text-xs text-muted-foreground">Net Profit</p>
@@ -137,7 +137,7 @@ export function CompanyProfitabilityWidget() {
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Total Expenses</span>
-            <span className="font-medium text-red-600">
+            <span className="font-medium text-status-danger">
               ({formatCurrency(data.totalExpenses)})
             </span>
           </div>
@@ -174,11 +174,11 @@ export function CompanyProfitabilityWidget() {
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
               <p className="text-muted-foreground">Paid Out</p>
-              <p className="font-medium text-green-600">{formatCurrency(data.totalPaid)}</p>
+              <p className="font-medium text-status-success">{formatCurrency(data.totalPaid)}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Pending</p>
-              <p className="font-medium text-orange-600">{formatCurrency(data.totalPending)}</p>
+              <p className="font-medium text-status-warning">{formatCurrency(data.totalPending)}</p>
             </div>
           </div>
         </div>

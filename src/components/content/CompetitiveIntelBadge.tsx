@@ -36,9 +36,9 @@ interface Props {
 }
 
 const LEVEL_COLORS: Record<IntelLevel, { fill: string; text: string; border: string }> = {
-  urgent:   { fill: "bg-red-500",    text: "text-red-700 dark:text-red-400",    border: "border-red-200 dark:border-red-800" },
-  moderate: { fill: "bg-yellow-400", text: "text-yellow-700 dark:text-yellow-400", border: "border-yellow-200 dark:border-yellow-700" },
-  good:     { fill: "bg-green-500",  text: "text-green-700 dark:text-green-400", border: "border-green-200 dark:border-green-800" },
+  urgent:   { fill: "bg-status-danger-bg",    text: "text-status-danger",    border: "border-status-danger-border" },
+  moderate: { fill: "bg-status-warning-bg", text: "text-status-warning", border: "border-status-warning-border" },
+  good:     { fill: "bg-status-success-bg",  text: "text-status-success", border: "border-status-success-border" },
   none:     { fill: "bg-muted",      text: "text-muted-foreground",              border: "border-border" },
 };
 

@@ -119,7 +119,7 @@ function ChecklistRow({
   const [noteValue, setNoteValue] = useState(state.note ?? "");
 
   return (
-    <div className={`rounded-lg border p-3 space-y-2 transition-colors ${state.completed ? "bg-green-50/50 dark:bg-green-950/10 border-green-200 dark:border-green-900" : ""}`}>
+    <div className={`rounded-lg border p-3 space-y-2 transition-colors ${state.completed ? "bg-status-success-bg/50 border-status-success-border" : ""}`}>
       <div className="flex items-start gap-2">
         <button
           onClick={onToggle}
@@ -127,7 +127,7 @@ function ChecklistRow({
           className="mt-0.5 shrink-0 text-muted-foreground hover:text-foreground transition-colors"
         >
           {state.completed ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <CheckCircle2 className="h-5 w-5 text-status-success" />
           ) : (
             <Circle className="h-5 w-5" />
           )}
@@ -294,7 +294,7 @@ export default function OnboardingDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           {submission.onboardingComplete ? (
-            <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50 dark:bg-green-950/30">
+            <Badge variant="outline" className="text-status-success border-status-success-border bg-status-success-bg">
               ✅ Onboarding Complete
             </Badge>
           ) : (

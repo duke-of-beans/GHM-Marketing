@@ -292,19 +292,19 @@ function SectionEditor({
         <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</label>
         {feedback && (
           feedback.pass
-            ? <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-            : <XCircle className="h-3.5 w-3.5 text-red-500" />
+            ? <CheckCircle2 className="h-3.5 w-3.5 text-status-success" />
+            : <XCircle className="h-3.5 w-3.5 text-status-danger" />
         )}
       </div>
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={4}
-        className={`resize-y text-sm ${failed ? "border-red-400 focus-visible:ring-red-400" : ""}`}
+        className={`resize-y text-sm ${failed ? "border-status-danger-border focus-visible:ring-red-400" : ""}`}
         placeholder={`Write ${label.toLowerCase()} copy...`}
       />
       {failed && feedback?.failures && feedback.failures.length > 0 && (
-        <ul className="text-xs text-red-600 space-y-0.5 pl-1">
+        <ul className="text-xs text-status-danger space-y-0.5 pl-1">
           {feedback.failures.map((f, i) => (
             <li key={i}>· {f}</li>
           ))}
@@ -320,9 +320,9 @@ function ScrvnrGateBadge({ status }: { status: ScrvnrGateStatus }) {
   const configs: Record<ScrvnrGateStatus, { label: string; className: string; icon: React.ReactNode }> = {
     unprocessed: { label: "Not checked",  className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400", icon: null },
     processing:  { label: "Running...",   className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: <Loader2 className="h-3 w-3 animate-spin" /> },
-    cleared:     { label: "Gate: OPEN",   className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: <ShieldCheck className="h-3 w-3" /> },
-    failed:      { label: "Gate: CLOSED", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300", icon: <ShieldX className="h-3 w-3" /> },
-    override:    { label: "Override",     className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300", icon: <AlertCircle className="h-3 w-3" /> },
+    cleared:     { label: "Gate: OPEN",   className: "bg-status-success-bg text-status-success", icon: <ShieldCheck className="h-3 w-3" /> },
+    failed:      { label: "Gate: CLOSED", className: "bg-status-danger-bg text-status-danger", icon: <ShieldX className="h-3 w-3" /> },
+    override:    { label: "Override",     className: "bg-status-warning-bg text-status-warning", icon: <AlertCircle className="h-3 w-3" /> },
   };
   const cfg = configs[status] ?? configs.unprocessed;
   return (
@@ -333,9 +333,9 @@ function ScrvnrGateBadge({ status }: { status: ScrvnrGateStatus }) {
 }
 
 function PageStatusIcon({ status, reviewStatus }: { status: ScrvnrGateStatus; reviewStatus: string }) {
-  if (reviewStatus === "approved") return <CheckCircle2 className="h-3 w-3 text-green-500 shrink-0" />;
-  if (status === "cleared") return <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />;
-  if (status === "failed") return <XCircle className="h-3 w-3 text-red-400 shrink-0" />;
-  if (status === "override") return <AlertCircle className="h-3 w-3 text-amber-400 shrink-0" />;
+  if (reviewStatus === "approved") return <CheckCircle2 className="h-3 w-3 text-status-success shrink-0" />;
+  if (status === "cleared") return <CheckCircle2 className="h-3 w-3 text-status-success shrink-0" />;
+  if (status === "failed") return <XCircle className="h-3 w-3 text-status-danger shrink-0" />;
+  if (status === "override") return <AlertCircle className="h-3 w-3 text-status-warning shrink-0" />;
   return null;
 }

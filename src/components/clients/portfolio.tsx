@@ -58,9 +58,9 @@ type PortfolioStats = {
 };
 
 function healthColor(score: number): string {
-  if (score >= 75) return "bg-green-100 text-green-800 border-green-200";
-  if (score >= 50) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  return "bg-red-100 text-red-800 border-red-200";
+  if (score >= 75) return "bg-status-success-bg text-status-success border-status-success-border";
+  if (score >= 50) return "bg-status-warning-bg text-status-warning border-status-warning-border";
+  return "bg-status-danger-bg text-status-danger border-status-danger-border";
 }
 
 function healthLabel(score: number): string {
@@ -89,10 +89,10 @@ function isScanOverdue(client: ClientItem): boolean {
 }
 
 function paymentBadgeClass(status: string | null): string {
-  if (!status || status === "current") return "bg-green-100 text-green-800 border-green-200";
-  if (status === "overdue_7")  return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  if (status === "overdue_15") return "bg-orange-100 text-orange-800 border-orange-200";
-  if (status === "overdue_30") return "bg-red-100 text-red-800 border-red-200";
+  if (!status || status === "current") return "bg-status-success-bg text-status-success border-status-success-border";
+  if (status === "overdue_7")  return "bg-status-warning-bg text-status-warning border-status-warning-border";
+  if (status === "overdue_15") return "bg-status-warning-bg text-status-warning border-status-warning-border";
+  if (status === "overdue_30") return "bg-status-danger-bg text-status-danger border-status-danger-border";
   return "bg-muted text-muted-foreground";
 }
 
@@ -105,9 +105,9 @@ function paymentLabel(status: string | null): string {
 }
 
 function healthDot(score: number): string {
-  if (score >= 75) return "bg-green-500";
-  if (score >= 50) return "bg-yellow-500";
-  return "bg-red-500";
+  if (score >= 75) return "bg-status-success-bg";
+  if (score >= 50) return "bg-status-warning-bg";
+  return "bg-status-danger-bg";
 }
 
 export function ClientPortfolio({
@@ -308,7 +308,7 @@ export function ClientPortfolio({
                     <p><span className="font-medium text-foreground">Site speed (15%)</span> — PageSpeed score, mobile-weighted</p>
                   </div>
                   <div className="border-t pt-1.5">
-                    <p><span className="text-green-600 font-medium">75+</span> healthy · <span className="text-yellow-600 font-medium">50–74</span> competitive · <span className="text-red-600 font-medium">&lt;50</span> needs attention</p>
+                    <p><span className="text-status-success font-medium">75+</span> healthy · <span className="text-status-warning font-medium">50–74</span> competitive · <span className="text-status-danger font-medium">&lt;50</span> needs attention</p>
                   </div>
                 </div>
               </TooltipContent>
@@ -319,7 +319,7 @@ export function ClientPortfolio({
           value={stats.needsAttention}
           className={
             stats.needsAttention > 0
-              ? "[&_p.text-2xl]:text-red-600 [&_p.text-3xl]:text-red-600"
+              ? "[&_p.text-2xl]:text-status-danger [&_p.text-3xl]:text-status-danger"
               : ""
           }
         />
@@ -408,26 +408,26 @@ export function ClientPortfolio({
         const paymentIssues = clients.filter(c => c.paymentStatus && c.paymentStatus !== "current").length;
         return (
           <div className="flex flex-wrap gap-2 text-xs">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-800 border border-green-200 font-medium">
-              <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-success-bg text-status-success border border-status-success-border font-medium">
+              <span className="w-2 h-2 rounded-full bg-status-success-bg inline-block" />
               {healthy} Healthy
             </span>
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200 font-medium">
-              <span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-warning-bg text-status-warning border border-status-warning-border font-medium">
+              <span className="w-2 h-2 rounded-full bg-status-warning-bg inline-block" />
               {competitive} Competitive
             </span>
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 font-medium">
-              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-danger-bg text-status-danger border border-status-danger-border font-medium">
+              <span className="w-2 h-2 rounded-full bg-status-danger-bg inline-block" />
               {attention} Needs Attention
             </span>
             {scanOverdue > 0 && (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-200 font-medium">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-warning-bg text-status-warning border border-status-warning-border font-medium">
                 <AlertTriangle className="w-3 h-3" />
                 {scanOverdue} Scan Overdue
               </span>
             )}
             {paymentIssues > 0 && (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 font-medium">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-status-danger-bg text-status-danger border border-status-danger-border font-medium">
                 <AlertTriangle className="w-3 h-3" />
                 {paymentIssues} Payment Issues
               </span>
@@ -540,7 +540,7 @@ export function ClientPortfolio({
                     </td>
                     <td className="px-3 py-3 text-center text-xs">
                       {isScanOverdue(client) ? (
-                        <span className="text-orange-600 font-medium flex items-center justify-center gap-1">
+                        <span className="text-status-warning font-medium flex items-center justify-center gap-1">
                           <AlertTriangle className="w-3 h-3" />
                           {daysAgo(client.lastScanAt)}
                         </span>
@@ -563,7 +563,7 @@ export function ClientPortfolio({
                     </td>
                     <td className="px-4 py-3 text-center">
                       {client.googleAdsConnection?.isActive ? (
-                        <span className="text-xs text-green-600 font-medium">Connected</span>
+                        <span className="text-xs text-status-success font-medium">Connected</span>
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
@@ -674,7 +674,7 @@ export function ClientPortfolio({
                           {paymentLabel(client.paymentStatus)}
                         </Badge>
                       )}
-                      <span className={isScanOverdue(client) ? "text-orange-600 font-medium flex items-center gap-1" : ""}>
+                      <span className={isScanOverdue(client) ? "text-status-warning font-medium flex items-center gap-1" : ""}>
                         {isScanOverdue(client) && <AlertTriangle className="w-3 h-3" />}
                         Scanned {daysAgo(client.lastScanAt)}
                       </span>

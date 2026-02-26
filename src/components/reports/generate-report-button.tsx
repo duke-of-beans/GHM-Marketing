@@ -138,7 +138,7 @@ export function GenerateReportButton({ clientId }: { clientId: number }) {
                 ))}
               </div>
               {sections.size === 0 && (
-                <p className="text-xs text-red-600">Select at least one section.</p>
+                <p className="text-xs text-status-danger">Select at least one section.</p>
               )}
             </div>
 

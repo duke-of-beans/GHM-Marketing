@@ -81,11 +81,11 @@ export function ClientIntegrationsTab({ clientId }: Props) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {connection.connected
-                ? <CheckCircle2 className="h-4 w-4 text-green-500" />
+                ? <CheckCircle2 className="h-4 w-4 text-status-success" />
                 : <Circle className="h-4 w-4 text-muted-foreground" />}
               <CardTitle className="text-base">{title}</CardTitle>
             </div>
-            <Badge variant={connection.connected ? "default" : "outline"} className={connection.connected ? "bg-green-500/10 text-green-700 border-green-200" : ""}>
+            <Badge variant={connection.connected ? "default" : "outline"} className={connection.connected ? "bg-status-success-bg/10 text-status-success border-status-success-border" : ""}>
               {connection.connected ? "Connected" : "Not Connected"}
             </Badge>
           </div>

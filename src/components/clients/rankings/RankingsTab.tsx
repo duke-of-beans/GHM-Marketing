@@ -62,12 +62,12 @@ function PositionDelta({ current, previous }: { current: number | null; previous
   const delta = previous - current; // positive = improved (moved up)
   if (delta === 0) return <Minus className="h-3 w-3 text-gray-400 inline" />;
   if (delta > 0) return (
-    <span className="text-green-600 text-xs flex items-center gap-0.5">
+    <span className="text-status-success text-xs flex items-center gap-0.5">
       <ArrowUp className="h-3 w-3" />{delta}
     </span>
   );
   return (
-    <span className="text-red-500 text-xs flex items-center gap-0.5">
+    <span className="text-status-danger text-xs flex items-center gap-0.5">
       <ArrowDown className="h-3 w-3" />{Math.abs(delta)}
     </span>
   );
@@ -75,7 +75,7 @@ function PositionDelta({ current, previous }: { current: number | null; previous
 
 function PositionBadge({ pos, type }: { pos: number | null; type: "organic" | "pack" }) {
   if (pos === null) return <span className="text-gray-400 text-sm">—</span>;
-  const color = pos <= 3 ? "bg-green-100 text-green-800" : pos <= 10 ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-600";
+  const color = pos <= 3 ? "bg-status-success-bg text-status-success" : pos <= 10 ? "bg-status-warning-bg text-status-warning" : "bg-gray-100 text-gray-600";
   return (
     <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${color}`}>
       #{pos}
@@ -327,7 +327,7 @@ export function RankingsTab({ clientId }: { clientId: number }) {
                     <td className="py-2 px-4 text-right">
                       <button
                         onClick={() => handleDeactivate(kw.id)}
-                        className="text-xs text-gray-400 hover:text-red-500"
+                        className="text-xs text-gray-400 hover:text-status-danger"
                         title="Remove keyword"
                       >
                         ×

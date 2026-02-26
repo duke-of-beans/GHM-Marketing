@@ -33,8 +33,8 @@ const tools = [
     label: "Claim Leads",
     icon: Target,
     href: "/leads?filter=available",
-    color: "text-green-600 dark:text-green-400",
-    bg: "bg-green-50 dark:bg-green-950/40",
+    color: "text-status-success",
+    bg: "bg-status-success-bg",
     tooltip: "Unclaimed leads available in your territory.",
   },
   {
@@ -49,8 +49,8 @@ const tools = [
     label: "Live Demo",
     icon: MonitorPlay,
     href: "/leads",
-    color: "text-orange-600 dark:text-orange-400",
-    bg: "bg-orange-50 dark:bg-orange-950/40",
+    color: "text-status-warning",
+    bg: "bg-status-warning-bg",
     tooltip: "Open any lead, then use the Live Demo button to generate a personalized demo page.",
   },
   {
@@ -66,8 +66,8 @@ const tools = [
     label: "Comp Sheet",
     icon: BarChart3,
     href: "/comp-sheet",
-    color: "text-yellow-600 dark:text-yellow-400",
-    bg: "bg-yellow-50 dark:bg-yellow-950/40",
+    color: "text-status-warning",
+    bg: "bg-status-warning-bg",
     tooltip: "Earnings projections by book size.",
     external: true,
   },
@@ -87,7 +87,7 @@ export function SalesToolsPanel() {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Zap className="h-4 w-4 text-yellow-500" />
+          <Zap className="h-4 w-4 text-status-warning" />
           Sales Tools
         </CardTitle>
       </CardHeader>

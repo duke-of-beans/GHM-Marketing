@@ -77,16 +77,16 @@ interface Props {
 
 function scoreColor(score: number | null): string {
   if (score === null) return "text-muted-foreground";
-  if (score >= 90) return "text-green-600";
-  if (score >= 50) return "text-yellow-600";
-  return "text-red-600";
+  if (score >= 90) return "text-status-success";
+  if (score >= 50) return "text-status-warning";
+  return "text-status-danger";
 }
 
 function scoreBg(score: number | null): string {
   if (score === null) return "bg-muted";
-  if (score >= 90) return "bg-green-100 border-green-200";
-  if (score >= 50) return "bg-yellow-100 border-yellow-200";
-  return "bg-red-100 border-red-200";
+  if (score >= 90) return "bg-status-success-bg border-status-success-border";
+  if (score >= 50) return "bg-status-warning-bg border-status-warning-border";
+  return "bg-status-danger-bg border-status-danger-border";
 }
 
 function TrendArrow({ trend, delta }: { trend: string; delta: number | null }) {
@@ -95,14 +95,14 @@ function TrendArrow({ trend, delta }: { trend: string; delta: number | null }) {
   }
   if (trend === "up") {
     return (
-      <span className="flex items-center gap-0.5 text-green-600 text-xs font-medium">
+      <span className="flex items-center gap-0.5 text-status-success text-xs font-medium">
         <ArrowUp className="h-3.5 w-3.5" />+{delta}
       </span>
     );
   }
   if (trend === "down") {
     return (
-      <span className="flex items-center gap-0.5 text-red-600 text-xs font-medium">
+      <span className="flex items-center gap-0.5 text-status-danger text-xs font-medium">
         <ArrowDown className="h-3.5 w-3.5" />{delta}
       </span>
     );
@@ -130,9 +130,9 @@ function cwvStatus(
 }
 
 function cwvStatusColor(status: string): string {
-  if (status === "good") return "text-green-600 bg-green-50 border-green-200";
-  if (status === "needs-improvement") return "text-yellow-600 bg-yellow-50 border-yellow-200";
-  if (status === "poor") return "text-red-600 bg-red-50 border-red-200";
+  if (status === "good") return "text-status-success bg-status-success-bg border-status-success-border";
+  if (status === "needs-improvement") return "text-status-warning bg-status-warning-bg border-status-warning-border";
+  if (status === "poor") return "text-status-danger bg-status-danger-bg border-status-danger-border";
   return "text-muted-foreground bg-muted border-border";
 }
 
@@ -233,7 +233,7 @@ export function SiteHealthTab({ clientId }: Props) {
   if (error) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
-        <AlertTriangle className="h-8 w-8 text-yellow-500" />
+        <AlertTriangle className="h-8 w-8 text-status-warning" />
         <p className="text-sm">{error}</p>
         <Button variant="outline" size="sm" onClick={handleRefresh}>
           Retry

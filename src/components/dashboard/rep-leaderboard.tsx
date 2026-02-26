@@ -48,7 +48,7 @@ export function RepLeaderboard({ reps }: RepLeaderboardProps) {
                     <p className="text-xs text-muted-foreground">Active</p>
                   </div>
                   <div>
-                    <p className="font-medium text-green-600">{rep.won}</p>
+                    <p className="font-medium text-status-success">{rep.won}</p>
                     <p className="text-xs text-muted-foreground">Won</p>
                   </div>
                   <div>

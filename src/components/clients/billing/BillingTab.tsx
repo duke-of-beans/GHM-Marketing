@@ -69,11 +69,11 @@ const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secon
 };
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  current:     { label: "Current",     color: "text-green-600" },
-  grace:       { label: "Grace Period",color: "text-yellow-600" },
-  overdue:     { label: "Overdue",     color: "text-orange-600" },
-  paused:      { label: "Paused",      color: "text-red-500" },
-  collections: { label: "Collections", color: "text-red-700 font-bold" },
+  current:     { label: "Current",     color: "text-status-success" },
+  grace:       { label: "Grace Period",color: "text-status-warning" },
+  overdue:     { label: "Overdue",     color: "text-status-warning" },
+  paused:      { label: "Paused",      color: "text-status-danger" },
+  collections: { label: "Collections", color: "text-status-danger font-bold" },
   terminated:  { label: "Terminated",  color: "text-gray-500" },
 };
 
@@ -166,7 +166,7 @@ export function BillingTab({ clientId, businessName }: { clientId: number; busin
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground mb-1">Outstanding</p>
-            <p className={`font-semibold ${summary.outstanding > 0 ? "text-orange-600" : "text-green-600"}`}>
+            <p className={`font-semibold ${summary.outstanding > 0 ? "text-status-warning" : "text-status-success"}`}>
               ${summary.outstanding.toLocaleString()}
             </p>
           </CardContent>

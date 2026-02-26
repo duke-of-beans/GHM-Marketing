@@ -56,7 +56,7 @@ export function MyBookWidget({ activeClients }: MyBookWidgetProps) {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base">
-          <BookOpen className="h-4 w-4 text-emerald-500" />
+          <BookOpen className="h-4 w-4 text-status-success" />
           My Book
         </CardTitle>
       </CardHeader>
@@ -70,7 +70,7 @@ export function MyBookWidget({ activeClients }: MyBookWidgetProps) {
           <div className="space-y-4">
             {/* Current monthly residual */}
             <div>
-              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+              <p className="text-3xl font-bold text-status-success">
                 {formatCurrency(monthly)}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">

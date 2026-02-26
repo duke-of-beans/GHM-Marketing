@@ -93,7 +93,7 @@ function StepIndicator({ current }: { current: Step }) {
       {STEPS.map((step, i) => (
         <div key={step.key} className="flex items-center gap-1">
           <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold ${
-            i < idx  ? "bg-green-500 text-white" :
+            i < idx  ? "bg-status-success-bg text-white" :
             i === idx ? "bg-primary text-primary-foreground" :
             "bg-muted text-muted-foreground"
           }`}>
@@ -358,7 +358,7 @@ export function DataImportTab() {
                   {loading && <Loader2 className="h-5 w-5 mx-auto mt-3 animate-spin" />}
                 </div>
                 {showMapper && csvHeaders.length > 0 && (
-                  <Card className="border-amber-200 bg-amber-50/40 dark:bg-amber-950/20">
+                  <Card className="border-status-warning-border bg-status-warning-bg/40">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm">Column Mapping</CardTitle>
                       <CardDescription className="text-xs">Review auto-detected mappings. Adjust any that are wrong.</CardDescription>
@@ -481,20 +481,20 @@ export function DataImportTab() {
       {step === "validate" && validation && (
         <div className="space-y-4">
           {/* Summary banner */}
-          <Card className={validation.canProceed ? "border-green-200 bg-green-50/50 dark:bg-green-950/20" : "border-red-200 bg-red-50/50 dark:bg-red-950/20"}>
+          <Card className={validation.canProceed ? "border-status-success-border bg-status-success-bg/50" : "border-status-danger-border bg-status-danger-bg/50"}>
             <CardContent className="pt-4 pb-4">
               <div className="flex items-center gap-3">
                 {validation.canProceed
-                  ? <CheckCircle2 className="h-6 w-6 text-green-500 shrink-0" />
-                  : <AlertCircle className="h-6 w-6 text-red-500 shrink-0" />}
+                  ? <CheckCircle2 className="h-6 w-6 text-status-success shrink-0" />
+                  : <AlertCircle className="h-6 w-6 text-status-danger shrink-0" />}
                 <div>
                   <p className="font-semibold text-sm">{validation.canProceed ? "Validation passed — ready to import" : "Validation failed — resolve errors before importing"}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {validation.summary.totalSelected} tasks selected ·{" "}
-                    {validation.summary.errorCount > 0 && <span className="text-red-600">{validation.summary.errorCount} errors · </span>}
-                    {validation.summary.warningCount > 0 && <span className="text-amber-600">{validation.summary.warningCount} warnings · </span>}
+                    {validation.summary.errorCount > 0 && <span className="text-status-danger">{validation.summary.errorCount} errors · </span>}
+                    {validation.summary.warningCount > 0 && <span className="text-status-warning">{validation.summary.warningCount} warnings · </span>}
                     {validation.summary.duplicateCount > 0 && <span className="text-blue-600">{validation.summary.duplicateCount} duplicates · </span>}
-                    {validation.summary.assigneeMismatches > 0 && <span className="text-orange-600">{validation.summary.assigneeMismatches} unmatched assignees</span>}
+                    {validation.summary.assigneeMismatches > 0 && <span className="text-status-warning">{validation.summary.assigneeMismatches} unmatched assignees</span>}
                   </p>
                 </div>
               </div>
@@ -503,9 +503,9 @@ export function DataImportTab() {
 
           {/* Assignee mismatch report */}
           {validation.assigneeMismatches.length > 0 && (
-            <Card className="border-orange-200 bg-orange-50/40 dark:bg-orange-950/20">
+            <Card className="border-status-warning-border bg-status-warning-bg/40">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm flex items-center gap-2"><UserX className="h-4 w-4 text-orange-500" />Unmatched Assignees ({validation.assigneeMismatches.length})</CardTitle>
+                <CardTitle className="text-sm flex items-center gap-2"><UserX className="h-4 w-4 text-status-warning" />Unmatched Assignees ({validation.assigneeMismatches.length})</CardTitle>
                 <CardDescription className="text-xs">These assignees were not found in your user list. Affected tasks will be imported as unassigned.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -526,7 +526,7 @@ export function DataImportTab() {
             <Card>
               <CardHeader className="pb-2 cursor-pointer" onClick={() => setIssuesOpen(o => !o)}>
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                  <AlertTriangle className="h-4 w-4 text-status-warning" />
                   Task Issues ({validation.taskIssues.length})
                   {issuesOpen ? <ChevronDown className="h-4 w-4 ml-auto" /> : <ChevronRight className="h-4 w-4 ml-auto" />}
                 </CardTitle>
@@ -535,7 +535,7 @@ export function DataImportTab() {
                 <CardContent>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {validation.taskIssues.map(issue => (
-                      <div key={issue.externalId} className={`rounded-lg border p-3 text-xs ${issue.severity === "error" ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : "border-amber-200 bg-amber-50/50 dark:bg-amber-950/20"}`}>
+                      <div key={issue.externalId} className={`rounded-lg border p-3 text-xs ${issue.severity === "error" ? "border-status-danger-border bg-status-danger-bg/50" : "border-status-warning-border bg-status-warning-bg/50"}`}>
                         <p className="font-medium truncate">{issue.title}</p>
                         <ul className="mt-1 space-y-0.5 text-muted-foreground">
                           {issue.issues.map((iss, j) => <li key={j}>• {iss}</li>)}
@@ -595,9 +595,9 @@ export function DataImportTab() {
 
       {/* ── Step done: Results ── */}
       {step === "done" && commitResult && (
-        <Card className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
+        <Card className="border-status-success-border bg-status-success-bg/50">
           <CardContent className="pt-6 flex flex-col items-center gap-4 text-center">
-            <CheckCircle2 className="h-12 w-12 text-green-500" />
+            <CheckCircle2 className="h-12 w-12 text-status-success" />
             <div>
               <div className="text-lg font-semibold">Import Complete</div>
               <div className="text-sm text-muted-foreground mt-1">
@@ -614,14 +614,14 @@ export function DataImportTab() {
             {commitResult.errors.length > 0 && (
               <div className="w-full text-left">
                 <button onClick={() => setErrorsOpen(o => !o)}
-                  className="flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400 hover:underline">
+                  className="flex items-center gap-1 text-xs text-status-warning hover:underline">
                   {errorsOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                   {commitResult.errors.length} task{commitResult.errors.length > 1 ? "s" : ""} had errors
                 </button>
                 {errorsOpen && (
                   <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
                     {commitResult.errors.map((e, i) => (
-                      <div key={i} className="rounded border border-red-200 bg-red-50/50 dark:bg-red-950/20 px-3 py-2 text-xs">
+                      <div key={i} className="rounded border border-status-danger-border bg-status-danger-bg/50 px-3 py-2 text-xs">
                         <p className="font-medium truncate">{e.title}</p>
                         <p className="text-muted-foreground mt-0.5">{e.error}</p>
                       </div>
@@ -634,7 +634,7 @@ export function DataImportTab() {
             <div className="flex gap-2">
               <Button variant="outline" onClick={handleReset}><RefreshCw className="h-4 w-4 mr-2" />New Import</Button>
               <Button variant="ghost" onClick={handleRollback} disabled={rolling}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                className="text-status-danger hover:text-status-danger hover:bg-status-danger-bg">
                 {rolling ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <AlertCircle className="h-4 w-4 mr-2" />}
                 Undo Import
               </Button>

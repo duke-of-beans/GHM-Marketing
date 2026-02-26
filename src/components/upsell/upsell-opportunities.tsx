@@ -126,9 +126,9 @@ export function UpsellOpportunities({
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-red-600 bg-red-50 border-red-200";
-    if (score >= 60) return "text-orange-600 bg-orange-50 border-orange-200";
-    return "text-yellow-600 bg-yellow-50 border-yellow-200";
+    if (score >= 80) return "text-status-danger bg-status-danger-bg border-status-danger-border";
+    if (score >= 60) return "text-status-warning bg-status-warning-bg border-status-warning-border";
+    return "text-status-warning bg-status-warning-bg border-status-warning-border";
   };
 
   const getScoreBadgeVariant = (score: number): "destructive" | "default" | "secondary" => {
@@ -220,7 +220,7 @@ export function UpsellOpportunities({
                 {opp.projectedRoi !== null && (
                   <div>
                     <span className="text-muted-foreground">Est. ROI: </span>
-                    <span className="font-semibold text-green-600">{opp.projectedRoi}%</span>
+                    <span className="font-semibold text-status-success">{opp.projectedRoi}%</span>
                   </div>
                 )}
               </div>

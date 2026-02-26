@@ -189,7 +189,7 @@ export function ReviewTaskModal({
               variant="default"
               onClick={handleApprove}
               disabled={isSubmitting}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-status-success-bg hover:bg-status-success-bg"
             >
               <CheckCircle className="h-4 w-4 mr-1" />
               Approve

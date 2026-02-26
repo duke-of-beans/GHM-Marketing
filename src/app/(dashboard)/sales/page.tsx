@@ -152,7 +152,7 @@ export default async function SalesDashboard() {
           title="My Book"
           value={activeClients}
           subtitle="Active clients"
-          className="[&_p.text-2xl]:text-green-600 [&_p.text-3xl]:text-green-600"
+          className="[&_p.text-2xl]:text-status-success [&_p.text-3xl]:text-status-success"
           tooltip="Clients you closed who are actively paying. These generate your residuals."
         />
         <MetricCard
@@ -211,7 +211,7 @@ export default async function SalesDashboard() {
                       <p className="text-xs text-muted-foreground">
                         {lead.city}
                         {" · "}
-                        <span className={isStale ? "text-amber-500 font-medium" : ""}>
+                        <span className={isStale ? "text-status-warning font-medium" : ""}>
                           {daysSince}d in stage
                         </span>
                       </p>

@@ -67,11 +67,11 @@ export default function OnboardingQueuePage() {
         </div>
         <div className="flex gap-4 text-sm text-center">
           <div>
-            <p className="text-2xl font-bold text-amber-600">{pending}</p>
+            <p className="text-2xl font-bold text-status-warning">{pending}</p>
             <p className="text-xs text-muted-foreground">Pending</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-green-600">{complete}</p>
+            <p className="text-2xl font-bold text-status-success">{complete}</p>
             <p className="text-xs text-muted-foreground">Complete</p>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function OnboardingQueuePage() {
                     </td>
                     <td className="p-3">
                       {s.onboardingComplete ? (
-                        <Badge variant="outline" className="text-green-700 border-green-300 bg-green-50 dark:bg-green-950/30 gap-1">
+                        <Badge variant="outline" className="text-status-success border-status-success-border bg-status-success-bg gap-1">
                           <CheckCircle2 className="h-3 w-3" /> Done
                         </Badge>
                       ) : (

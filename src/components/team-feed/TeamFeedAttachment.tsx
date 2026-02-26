@@ -65,7 +65,7 @@ export function AttachmentBlock({ msg }: { msg: AttachmentMsg }) {
         title={savedId ? "Saved to Vault" : "Save to Vault"}
         className="flex-shrink-0 text-muted-foreground hover:text-primary disabled:opacity-50 transition-colors">
         {savedId
-          ? <CheckCircle className="h-4 w-4 text-green-500" />
+          ? <CheckCircle className="h-4 w-4 text-status-success" />
           : saving ? <span className="text-[10px]">…</span>
           : <HardDriveDownload className="h-4 w-4" />}
       </button>

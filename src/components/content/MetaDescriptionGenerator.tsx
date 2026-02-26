@@ -154,7 +154,7 @@ export function MetaDescriptionGenerator({ clientId, onSuccess }: MetaDescriptio
       )}
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-lg border border-status-danger-border bg-status-danger-bg p-4 text-sm text-status-danger">
           {error}
         </div>
       )}

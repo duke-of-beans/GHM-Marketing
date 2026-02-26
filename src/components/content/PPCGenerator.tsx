@@ -25,7 +25,7 @@ function CharCount({ text, limit }: { text: string; limit: number }) {
   const count = text.length;
   const over = count > limit;
   return (
-    <span className={cn("text-[10px] tabular-nums", over ? "text-red-600 font-semibold" : "text-muted-foreground")}>
+    <span className={cn("text-[10px] tabular-nums", over ? "text-status-danger font-semibold" : "text-muted-foreground")}>
       {count}/{limit}
       {over && <AlertCircle className="inline h-3 w-3 ml-0.5" />}
     </span>
@@ -97,7 +97,7 @@ export function PPCGenerator({ clientId }: PPCGeneratorProps) {
 
       <div className="grid gap-3">
         <div>
-          <label className="text-sm font-medium mb-1.5 block">Service / Campaign Focus <span className="text-red-500">*</span></label>
+          <label className="text-sm font-medium mb-1.5 block">Service / Campaign Focus <span className="text-status-danger">*</span></label>
           <Input
             placeholder="e.g. Emergency Plumbing Services, Roof Replacement"
             value={service}

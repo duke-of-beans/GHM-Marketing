@@ -125,7 +125,7 @@ export function VaultClient({
         <TabsContent value="shared" className="mt-4">
           {/* Version warning banner — shown to non-elevated users only */}
           {!isElevated && (
-            <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 mb-4 text-xs text-amber-800 dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-300">
+            <div className="flex items-start gap-2.5 rounded-lg border border-status-warning-border bg-status-warning-bg px-3.5 py-2.5 mb-4 text-xs text-status-warning">
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
               <span>
                 <strong>Always use files from this Shared folder.</strong> Documents saved to your device or private files may become outdated. Contracts, agreements, and comp sheets are only guaranteed current here.

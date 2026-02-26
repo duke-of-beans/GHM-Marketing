@@ -132,7 +132,7 @@ export function MyEarningsWidget() {
           {/* Total Earned */}
           <div>
             <div className="flex items-baseline justify-between">
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(totalEarned)}</p>
+              <p className="text-2xl font-bold text-status-success">{formatCurrency(totalEarned)}</p>
               <p className="text-xs text-muted-foreground">Total Paid</p>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
@@ -214,13 +214,13 @@ export function MyEarningsWidget() {
                 {data.thisMonthResidualsPaid > 0 && (
                   <div>
                     <p className="text-muted-foreground">Residuals Paid</p>
-                    <p className="font-medium text-green-600">{formatCurrency(data.thisMonthResidualsPaid)}</p>
+                    <p className="font-medium text-status-success">{formatCurrency(data.thisMonthResidualsPaid)}</p>
                   </div>
                 )}
                 {data.thisMonthResidualsPending > 0 && (
                   <div>
                     <p className="text-muted-foreground">Residuals Pending</p>
-                    <p className="font-medium text-orange-600">{formatCurrency(data.thisMonthResidualsPending)}</p>
+                    <p className="font-medium text-status-warning">{formatCurrency(data.thisMonthResidualsPending)}</p>
                   </div>
                 )}
               </div>
@@ -237,7 +237,7 @@ export function MyEarningsWidget() {
                 <span>Service Commissions</span>
                 <div className="flex items-center gap-1">
                   {data.pendingUpsell > 0 && (
-                    <Badge variant="outline" className="text-xs text-orange-600 border-orange-300">
+                    <Badge variant="outline" className="text-xs text-status-warning border-status-warning-border">
                       {formatCurrency(data.pendingUpsell)} pending
                     </Badge>
                   )}
@@ -262,7 +262,7 @@ export function MyEarningsWidget() {
                           <span className="font-medium">{formatCurrency(item.amount)}</span>
                           <Badge
                             variant={item.status === "paid" ? "secondary" : "outline"}
-                            className={`text-xs ${item.status === "pending" ? "text-orange-600 border-orange-300" : ""}`}
+                            className={`text-xs ${item.status === "pending" ? "text-status-warning border-status-warning-border" : ""}`}
                           >
                             {item.status}
                           </Badge>
@@ -280,7 +280,7 @@ export function MyEarningsWidget() {
             <div className="pt-3 border-t">
               <div className="flex items-center justify-between text-sm">
                 <p className="text-muted-foreground">Total Pending</p>
-                <p className="font-medium text-orange-600">{formatCurrency(totalPending)}</p>
+                <p className="font-medium text-status-warning">{formatCurrency(totalPending)}</p>
               </div>
             </div>
           )}

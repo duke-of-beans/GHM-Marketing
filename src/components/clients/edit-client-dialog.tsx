@@ -217,7 +217,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
             {/* Business Name */}
             <div className="grid gap-2">
               <Label htmlFor="businessName">
-                Business Name <span className="text-red-500">*</span>
+                Business Name <span className="text-status-danger">*</span>
               </Label>
               <Input
                 id="businessName"
@@ -226,7 +226,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                 placeholder="The German Auto Doctor"
               />
               {errors.businessName && (
-                <p className="text-sm text-red-500">{errors.businessName}</p>
+                <p className="text-sm text-status-danger">{errors.businessName}</p>
               )}
             </div>
 
@@ -234,7 +234,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="phone">
-                  Phone <span className="text-red-500">*</span>
+                  Phone <span className="text-status-danger">*</span>
                 </Label>
                 <Input
                   id="phone"
@@ -243,7 +243,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                   placeholder="(805) 555-1234"
                 />
                 {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone}</p>
+                  <p className="text-sm text-status-danger">{errors.phone}</p>
                 )}
               </div>
 
@@ -257,7 +257,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                   placeholder="contact@example.com"
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email}</p>
+                  <p className="text-sm text-status-danger">{errors.email}</p>
                 )}
               </div>
             </div>
@@ -271,7 +271,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                 placeholder="https://example.com"
               />
               {errors.website && (
-                <p className="text-sm text-red-500">{errors.website}</p>
+                <p className="text-sm text-status-danger">{errors.website}</p>
               )}
             </div>
 
@@ -289,7 +289,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
             <div className="grid grid-cols-3 gap-4">
               <div className="grid gap-2 col-span-2">
                 <Label htmlFor="city">
-                  City <span className="text-red-500">*</span>
+                  City <span className="text-status-danger">*</span>
                 </Label>
                 <Input
                   id="city"
@@ -298,13 +298,13 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                   placeholder="Simi Valley"
                 />
                 {errors.city && (
-                  <p className="text-sm text-red-500">{errors.city}</p>
+                  <p className="text-sm text-status-danger">{errors.city}</p>
                 )}
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="state">
-                  State <span className="text-red-500">*</span>
+                  State <span className="text-status-danger">*</span>
                 </Label>
                 <Input
                   id="state"
@@ -314,7 +314,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                   maxLength={2}
                 />
                 {errors.state && (
-                  <p className="text-sm text-red-500">{errors.state}</p>
+                  <p className="text-sm text-status-danger">{errors.state}</p>
                 )}
               </div>
             </div>
@@ -328,7 +328,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                 placeholder="93065"
               />
               {errors.zipCode && (
-                <p className="text-sm text-red-500">{errors.zipCode}</p>
+                <p className="text-sm text-status-danger">{errors.zipCode}</p>
               )}
             </div>
 
@@ -339,7 +339,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="retainerAmount">
-                    Monthly Retainer <span className="text-red-500">*</span>
+                    Monthly Retainer <span className="text-status-danger">*</span>
                   </Label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-gray-500">$</span>
@@ -353,7 +353,7 @@ export function EditClientDialog({ client, onUpdate, onDelete }: EditClientDialo
                     />
                   </div>
                   {errors.retainerAmount && (
-                    <p className="text-sm text-red-500">{errors.retainerAmount}</p>
+                    <p className="text-sm text-status-danger">{errors.retainerAmount}</p>
                   )}
                 </div>
 

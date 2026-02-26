@@ -254,7 +254,7 @@ export default function OnboardingPage() {
             <span className="text-xs text-gray-400">Saving...</span>
           )}
           {saveIndicator === "saved" && (
-            <span className="text-xs text-green-600">Saved ✓</span>
+            <span className="text-xs text-status-success">Saved ✓</span>
           )}
         </div>
 
@@ -359,7 +359,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
   return (
     <div className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required && <span className="text-status-danger">*</span>}
       </label>
       {children}
     </div>
@@ -450,8 +450,8 @@ function NavButtons({
 
 function SectionBadge({ level }: { level: "REQUIRED" | "RECOMMENDED" | "OPTIONAL" }) {
   const colors = {
-    REQUIRED: "bg-red-50 text-red-700 border-red-200",
-    RECOMMENDED: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    REQUIRED: "bg-status-danger-bg text-status-danger border-status-danger-border",
+    RECOMMENDED: "bg-status-warning-bg text-status-warning border-status-warning-border",
     OPTIONAL: "bg-gray-50 text-gray-600 border-gray-200",
   };
   return (
@@ -498,15 +498,15 @@ function Step1({
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-status-danger">*</span></label>
           <Input value={data.city} onChange={(v) => onChange({ city: v })} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">State <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">State <span className="text-status-danger">*</span></label>
           <Input value={data.state} onChange={(v) => onChange({ state: v })} placeholder="CA" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">ZIP <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">ZIP <span className="text-status-danger">*</span></label>
           <Input value={data.zipCode} onChange={(v) => onChange({ zipCode: v })} />
         </div>
       </div>
@@ -1065,7 +1065,7 @@ function Step5Review({
     <div className="border border-gray-200 rounded-lg p-4 mb-3">
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-green-500 text-sm">✅</span>
+          <span className="text-status-success text-sm">✅</span>
           <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
         </div>
         <button onClick={() => onEdit(step)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
@@ -1236,8 +1236,8 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
         {errorCode === 410 && (
           <>
             {refreshed ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-green-700 font-medium">✅ Fresh link generated — redirecting...</p>
+              <div className="bg-status-success-bg border border-status-success-border rounded-lg p-3 mb-4">
+                <p className="text-sm text-status-success font-medium">✅ Fresh link generated — redirecting...</p>
               </div>
             ) : (
               <button
@@ -1249,7 +1249,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
               </button>
             )}
             {refreshError && (
-              <p className="text-sm text-red-600 mb-3">{refreshError}</p>
+              <p className="text-sm text-status-danger mb-3">{refreshError}</p>
             )}
           </>
         )}

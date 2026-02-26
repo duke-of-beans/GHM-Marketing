@@ -62,9 +62,9 @@ const fmt = {
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "ENABLED")
-    return <Badge className="bg-green-100 text-green-800 border-green-200 text-[10px]">Active</Badge>;
+    return <Badge className="bg-status-success-bg text-status-success border-status-success-border text-[10px]">Active</Badge>;
   if (status === "PAUSED")
-    return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 text-[10px]">Paused</Badge>;
+    return <Badge className="bg-status-warning-bg text-status-warning border-status-warning-border text-[10px]">Paused</Badge>;
   return <Badge variant="outline" className="text-[10px]">{status}</Badge>;
 }
 
@@ -222,7 +222,7 @@ export function CampaignsTab({ clientId }: { clientId: number }) {
     return (
       <Card>
         <CardContent className="py-8 text-center space-y-3">
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-status-danger">{error}</p>
           <Button size="sm" variant="outline" onClick={() => load(preset)}>Retry</Button>
         </CardContent>
       </Card>

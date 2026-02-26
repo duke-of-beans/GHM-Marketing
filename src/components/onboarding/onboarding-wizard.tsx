@@ -245,12 +245,12 @@ function StepContractor({
         GHM pays all partners through their business entity — not personally. Enter your company name below. Your manager will complete the Wave vendor setup on their end.
       </p>
       {saved ? (
-        <div className="rounded-lg bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 p-4">
+        <div className="rounded-lg bg-status-success-bg border border-status-success-border p-4">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-            <p className="text-sm font-semibold text-green-800 dark:text-green-200">Entity info saved</p>
+            <CheckCircle2 className="h-5 w-5 text-status-success" />
+            <p className="text-sm font-semibold text-status-success">Entity info saved</p>
           </div>
-          <p className="text-xs text-green-600 dark:text-green-400 mt-1">Your manager will link this to Wave before your first payment.</p>
+          <p className="text-xs text-status-success mt-1">Your manager will link this to Wave before your first payment.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -290,9 +290,9 @@ function StepTerritory({ territory }: { territory: Territory | null }) {
           </p>
         </div>
       ) : (
-        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 p-4">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Territory not yet assigned</p>
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Your manager will assign it shortly. You can start exploring leads in the meantime.</p>
+        <div className="rounded-lg bg-status-warning-bg border border-status-warning-border p-4">
+          <p className="text-sm font-medium text-status-warning">Territory not yet assigned</p>
+          <p className="text-xs text-status-warning mt-0.5">Your manager will assign it shortly. You can start exploring leads in the meantime.</p>
         </div>
       )}
     </StepCard>
@@ -301,13 +301,13 @@ function StepTerritory({ territory }: { territory: Territory | null }) {
 
 function StepTools({ positionType }: { positionType: string }) {
   const salesTools = [
-    { icon: FileText, color: "text-orange-500", name: "Prospect Audit", desc: "Branded domain analysis for any prospect — rankings, competitor gap, speed. Print-ready PDF.", where: "Lead detail → Audit PDF" },
+    { icon: FileText, color: "text-status-warning", name: "Prospect Audit", desc: "Branded domain analysis for any prospect — rankings, competitor gap, speed. Print-ready PDF.", where: "Lead detail → Audit PDF" },
     { icon: MonitorPlay, color: "text-violet-500", name: "Live Demo", desc: "Personalized demo page using the prospect's real data — shows what GHM looks like after 90 days.", where: "Lead detail → Live Demo" },
-    { icon: Target, color: "text-green-500", name: "Discovery", desc: "Search Google Maps for businesses in your territory. Filter, score, import directly into pipeline.", where: "Leads → Discovery tab" },
+    { icon: Target, color: "text-status-success", name: "Discovery", desc: "Search Google Maps for businesses in your territory. Filter, score, import directly into pipeline.", where: "Leads → Discovery tab" },
   ];
   const opsTools = [
     { icon: FileText, color: "text-blue-500", name: "Content Studio", desc: "Create and submit content briefs. Your work flows into the review queue for manager approval.", where: "Clients → Content tab" },
-    { icon: Target, color: "text-green-500", name: "Tasks", desc: "Your assigned work lives here. Update status, add notes, and track deliverables per client.", where: "Tasks page" },
+    { icon: Target, color: "text-status-success", name: "Tasks", desc: "Your assigned work lives here. Update status, add notes, and track deliverables per client.", where: "Tasks page" },
     { icon: BookOpen, color: "text-purple-500", name: "Document Vault", desc: "Shared resources, templates, and client reports. Your manager curates the shared space.", where: "Document Vault" },
   ];
   const tools = positionType === "sales" ? salesTools : opsTools;
@@ -347,8 +347,8 @@ function StepFirstLead() {
             <p className="text-xs text-muted-foreground mt-0.5">Leads in your territory ready to pick up</p>
           </div>
         </a>
-        <a href="/leads" className="flex flex-col gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-950/40 hover:bg-green-100 transition-colors">
-          <Rocket className="h-6 w-6 text-green-600" />
+        <a href="/leads" className="flex flex-col gap-2 p-4 rounded-lg bg-status-success-bg hover:bg-status-success-bg transition-colors">
+          <Rocket className="h-6 w-6 text-status-success" />
           <div>
             <p className="text-sm font-semibold">Discovery Search</p>
             <p className="text-xs text-muted-foreground mt-0.5">Find businesses via Google Maps and import</p>
@@ -415,7 +415,7 @@ function StepDone({ firstName, positionType }: { firstName: string; positionType
   return (
     <StepCard>
       <div className="text-center space-y-3 py-2">
-        <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+        <CheckCircle2 className="h-12 w-12 text-status-success mx-auto" />
         <h2 className="text-2xl font-bold">You're live, {firstName}.</h2>
         <p className="text-muted-foreground text-sm">
           {isSales

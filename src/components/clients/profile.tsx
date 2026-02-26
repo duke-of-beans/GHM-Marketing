@@ -145,9 +145,9 @@ type ClientData = {
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function healthColor(score: number) {
-  if (score >= 75) return "bg-green-100 text-green-800 border-green-200";
-  if (score >= 50) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  return "bg-red-100 text-red-800 border-red-200";
+  if (score >= 75) return "bg-status-success-bg text-status-success border-status-success-border";
+  if (score >= 50) return "bg-status-warning-bg text-status-warning border-status-warning-border";
+  return "bg-status-danger-bg text-status-danger border-status-danger-border";
 }
 
 function formatDate(d: string | null) {
@@ -281,9 +281,9 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
                         </div>
                       </div>
                       <div className="border-t pt-2 space-y-0.5">
-                        <p><span className="text-green-600 font-medium">75–100</span> — Healthy. Leading or competitive across all metrics.</p>
-                        <p><span className="text-yellow-600 font-medium">50–74</span> — Competitive. Gaps exist but within striking range.</p>
-                        <p><span className="text-red-600 font-medium">0–49</span> — Needs attention. At least one metric is significantly behind.</p>
+                        <p><span className="text-status-success font-medium">75–100</span> — Healthy. Leading or competitive across all metrics.</p>
+                        <p><span className="text-status-warning font-medium">50–74</span> — Competitive. Gaps exist but within striking range.</p>
+                        <p><span className="text-status-danger font-medium">0–49</span> — Needs attention. At least one metric is significantly behind.</p>
                       </div>
                     </div>
                   </TooltipContent>
@@ -298,7 +298,7 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
                   variant="outline"
                   size="sm"
                   onClick={() => setVoiceDialogOpen(true)}
-                  className={`gap-2 ${localHasVoice ? "border-green-500/60 text-green-700 dark:text-green-400 hover:border-green-500" : ""}`}
+                  className={`gap-2 ${localHasVoice ? "border-status-success-border/60 text-status-success hover:border-status-success-border" : ""}`}
                 >
                   {localHasVoice ? (
                     <><Sparkles className="h-4 w-4" />Voice Captured</>
@@ -307,7 +307,7 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
                   )}
                 </Button>
                 {localHasVoice && (
-                  <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white shadow-sm">
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-status-success-bg text-white shadow-sm">
                     <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="2,6 5,9 10,3" />
                     </svg>

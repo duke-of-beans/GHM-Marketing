@@ -114,9 +114,9 @@ export function AuditLogsViewer() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "success":
-        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" />Success</Badge>;
+        return <Badge className="bg-status-success-bg text-status-success"><CheckCircle className="h-3 w-3 mr-1" />Success</Badge>;
       case "denied":
-        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" />Denied</Badge>;
+        return <Badge className="bg-status-danger-bg text-status-danger"><XCircle className="h-3 w-3 mr-1" />Denied</Badge>;
       case "error":
         return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Error</Badge>;
       default:
@@ -128,12 +128,12 @@ export function AuditLogsViewer() {
     const colors: Record<string, string> = {
       page_access: "bg-blue-100 text-blue-700",
       api_call: "bg-purple-100 text-purple-700",
-      permission_check: "bg-green-100 text-green-700",
-      permission_denied: "bg-red-100 text-red-700",
-      data_export: "bg-orange-100 text-orange-700",
+      permission_check: "bg-status-success-bg text-status-success",
+      permission_denied: "bg-status-danger-bg text-status-danger",
+      data_export: "bg-status-warning-bg text-status-warning",
       data_create: "bg-teal-100 text-teal-700",
-      data_update: "bg-yellow-100 text-yellow-700",
-      data_delete: "bg-red-100 text-red-700",
+      data_update: "bg-status-warning-bg text-status-warning",
+      data_delete: "bg-status-danger-bg text-status-danger",
     };
     
     return (
@@ -166,7 +166,7 @@ export function AuditLogsViewer() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">
+              <div className="text-2xl font-bold text-status-danger">
                 {stats.deniedActions.toLocaleString()}
               </div>
             </CardContent>
@@ -190,7 +190,7 @@ export function AuditLogsViewer() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold text-status-success">
                 {stats.totalActions > 0 
                   ? (((stats.totalActions - stats.deniedActions) / stats.totalActions) * 100).toFixed(1)
                   : 0}%
@@ -301,7 +301,7 @@ export function AuditLogsViewer() {
                         </p>
                       )}
                       {log.errorMessage && (
-                        <p className="text-sm text-red-600">
+                        <p className="text-sm text-status-danger">
                           Error: {log.errorMessage}
                         </p>
                       )}

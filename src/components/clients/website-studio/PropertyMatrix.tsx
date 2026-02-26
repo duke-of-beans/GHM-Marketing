@@ -8,7 +8,7 @@ import type { WebPropertyMatrix, WebPropertySummary, WebPropertyTier } from "@/t
 const TIER_CONFIG: Record<WebPropertyTier, { label: string; color: string; bg: string; border: string; dot: string }> = {
   tier1: { label: "Tier 1 — Extension",  color: "text-blue-700 dark:text-blue-300",   bg: "bg-blue-50 dark:bg-blue-950/40",   border: "border-blue-200 dark:border-blue-800",   dot: "bg-blue-500" },
   tier2: { label: "Tier 2 — Satellite",  color: "text-purple-700 dark:text-purple-300", bg: "bg-purple-50 dark:bg-purple-950/40", border: "border-purple-200 dark:border-purple-800", dot: "bg-purple-500" },
-  tier3: { label: "Tier 3 — Pure Brand", color: "text-amber-700 dark:text-amber-300",  bg: "bg-amber-50 dark:bg-amber-950/40",  border: "border-amber-200 dark:border-amber-800",  dot: "bg-amber-500" },
+  tier3: { label: "Tier 3 — Pure Brand", color: "text-status-warning",  bg: "bg-status-warning-bg",  border: "border-status-warning-border",  dot: "bg-status-warning-bg" },
 };
 
 interface Props {
@@ -119,7 +119,7 @@ function TierCell({
             </div>
             <div className="h-1 rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full rounded-full bg-green-500 transition-all"
+                className="h-full rounded-full bg-status-success-bg transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -150,13 +150,13 @@ function TierCell({
 
         {/* Alerts */}
         {property.isStale && (
-          <div className="flex items-center gap-1 text-[10px] text-amber-600">
+          <div className="flex items-center gap-1 text-[10px] text-status-warning">
             <AlertTriangle className="h-3 w-3" />
             Stale
           </div>
         )}
         {property.dnsVerified && property.sslActive && property.deployStatus === "live" && (
-          <div className="flex items-center gap-1 text-[10px] text-green-600">
+          <div className="flex items-center gap-1 text-[10px] text-status-success">
             <CheckCircle2 className="h-3 w-3" />
             Live · DNS ✓ · SSL ✓
           </div>
@@ -167,14 +167,14 @@ function TierCell({
 }
 
 function StatusDot({ status, isStale }: { status: string; isStale: boolean }) {
-  if (isStale) return <span className="inline-block w-2 h-2 rounded-full bg-amber-400 shrink-0" />;
+  if (isStale) return <span className="inline-block w-2 h-2 rounded-full bg-status-warning-bg shrink-0" />;
   const colors: Record<string, string> = {
-    live:       "bg-green-500",
-    approved:   "bg-emerald-400",
-    review:     "bg-yellow-400",
+    live:       "bg-status-success-bg",
+    approved:   "bg-status-success-bg",
+    review:     "bg-status-warning-bg",
     composing:  "bg-blue-400",
     scaffolded: "bg-gray-400",
-    error:      "bg-red-500",
+    error:      "bg-status-danger-bg",
   };
   return <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${colors[status] ?? "bg-gray-400"}`} />;
 }

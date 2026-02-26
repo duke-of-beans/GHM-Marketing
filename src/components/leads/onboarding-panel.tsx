@@ -143,7 +143,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
         <div className="space-y-2">
           {status === "completed" || tokenData.submission ? (
             <div className="space-y-1">
-              <p className="text-sm font-medium text-green-700 dark:text-green-400">
+              <p className="text-sm font-medium text-status-success">
                 ✅ Client completed onboarding
               </p>
               {tokenData.submission?.submittedAt && (
@@ -167,7 +167,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
                   {link.replace(/^https?:\/\//, "").substring(0, 42)}…
                 </span>
                 <Button size="sm" variant="ghost" className="h-6 w-6 p-0 shrink-0" onClick={handleCopy}>
-                  {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
+                  {copied ? <Check className="h-3 w-3 text-status-success" /> : <Copy className="h-3 w-3" />}
                 </Button>
               </div>
 

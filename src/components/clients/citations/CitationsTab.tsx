@@ -49,17 +49,17 @@ interface CitationData {
 // ============================================================================
 
 function StatusIcon({ status }: { status: DirectoryResult["status"] }) {
-  if (status === "match") return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-  if (status === "mismatch") return <XCircle className="h-4 w-4 text-red-500" />;
-  if (status === "partial") return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+  if (status === "match") return <CheckCircle2 className="h-4 w-4 text-status-success" />;
+  if (status === "mismatch") return <XCircle className="h-4 w-4 text-status-danger" />;
+  if (status === "partial") return <AlertTriangle className="h-4 w-4 text-status-warning" />;
   return <XCircle className="h-4 w-4 text-gray-400" />;
 }
 
 function StatusLabel({ status }: { status: DirectoryResult["status"] }) {
   const map = {
-    match: { label: "Match", class: "bg-green-100 text-green-700" },
-    mismatch: { label: "Mismatch", class: "bg-red-100 text-red-700" },
-    partial: { label: "Partial", class: "bg-amber-100 text-amber-700" },
+    match: { label: "Match", class: "bg-status-success-bg text-status-success" },
+    mismatch: { label: "Mismatch", class: "bg-status-danger-bg text-status-danger" },
+    partial: { label: "Partial", class: "bg-status-warning-bg text-status-warning" },
     missing: { label: "Not Listed", class: "bg-gray-100 text-gray-500" },
   };
   const s = map[status];
@@ -72,7 +72,7 @@ function StatusLabel({ status }: { status: DirectoryResult["status"] }) {
 
 function FieldCheck({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <span className={`text-xs ${ok ? "text-green-600" : "text-red-500"}`}>
+    <span className={`text-xs ${ok ? "text-status-success" : "text-status-danger"}`}>
       {ok ? "✓" : "✗"} {label}
     </span>
   );
@@ -128,7 +128,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
           <div className="text-2xl font-bold flex items-end gap-1">
             {scan?.healthScore ?? "—"}
             {healthDelta !== null && (
-              <span className={`text-sm font-normal ${healthDelta >= 0 ? "text-green-600" : "text-red-500"}`}>
+              <span className={`text-sm font-normal ${healthDelta >= 0 ? "text-status-success" : "text-status-danger"}`}>
                 {healthDelta > 0 ? `+${healthDelta}` : healthDelta} pts
               </span>
             )}
@@ -136,11 +136,11 @@ export function CitationsTab({ clientId }: { clientId: number }) {
           <div className="text-xs text-gray-500 mt-0.5">Citation Score</div>
         </div>
         <div className="border rounded-lg p-3 bg-white">
-          <div className="text-2xl font-bold text-green-700">{scan?.matches ?? "—"}</div>
+          <div className="text-2xl font-bold text-status-success">{scan?.matches ?? "—"}</div>
           <div className="text-xs text-gray-500 mt-0.5">Directories matched</div>
         </div>
         <div className="border rounded-lg p-3 bg-white">
-          <div className="text-2xl font-bold text-amber-600">{scan ? scan.mismatches : "—"}</div>
+          <div className="text-2xl font-bold text-status-warning">{scan ? scan.mismatches : "—"}</div>
           <div className="text-xs text-gray-500 mt-0.5">Need fixes</div>
         </div>
         <div className="border rounded-lg p-3 bg-white">
@@ -156,7 +156,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
             ? `Last scan: ${new Date(scan.scanDate).toLocaleDateString()} · Quarterly schedule active`
             : "No scan yet — run one below"}
           {data?.degradedDirectories.length ? (
-            <span className="ml-2 text-amber-600">
+            <span className="ml-2 text-status-warning">
               {data.degradedDirectories.length} directories temporarily excluded
             </span>
           ) : null}
@@ -231,7 +231,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
                           {r.foundAddress && <p><span className="text-gray-500">Found address:</span> {r.foundAddress}</p>}
                           {r.foundPhone && <p><span className="text-gray-500">Found phone:</span> {r.foundPhone}</p>}
                           {r.details.map((d, i) => (
-                            <p key={i} className="text-amber-700">⚠ {d}</p>
+                            <p key={i} className="text-status-warning">⚠ {d}</p>
                           ))}
                           {r.status === "missing" && (
                             <p className="text-gray-500 italic">Business not found in this directory.</p>
@@ -259,7 +259,7 @@ export function CitationsTab({ clientId }: { clientId: number }) {
 
       {/* Degraded notice */}
       {data?.degradedDirectories.length ? (
-        <div className="border border-amber-200 rounded-lg p-3 bg-amber-50 text-xs text-amber-700">
+        <div className="border border-status-warning-border rounded-lg p-3 bg-status-warning-bg text-xs text-status-warning">
           <strong>Temporarily excluded:</strong> {data.degradedDirectories.join(", ")} — these adapters failed recent health checks and are excluded from your score to prevent false negatives. They'll be re-included automatically when they recover.
         </div>
       ) : null}

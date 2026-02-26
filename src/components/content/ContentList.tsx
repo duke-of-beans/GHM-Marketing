@@ -39,8 +39,8 @@ interface ContentItem {
 
 const STATUS_COLORS: Record<string, string> = {
   draft:     'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  review:    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
-  approved:  'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+  review:    'bg-status-warning-bg text-status-warning',
+  approved:  'bg-status-success-bg text-status-success',
   published: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
   scheduled: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
   archived:  'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
@@ -135,7 +135,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
   )
 
   if (error) return (
-    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+    <div className="rounded-lg border border-status-danger-border bg-status-danger-bg p-4 text-sm text-status-danger">
       {error}
     </div>
   )
@@ -276,7 +276,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
                     </Button>
                     <Button variant="outline" size="sm"
                       onClick={() => { setSelectedContent(item); setDeleteDialogOpen(true) }}
-                      className="text-red-600 hover:text-red-700">
+                      className="text-status-danger hover:text-status-danger">
                       <Trash2 className="h-4 w-4 mr-1" />
                       Delete
                     </Button>
@@ -317,7 +317,7 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-status-danger-bg hover:bg-status-danger-bg">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

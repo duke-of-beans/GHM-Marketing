@@ -276,7 +276,7 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {product.category && <Badge variant="outline" className="text-[10px]">{product.category}</Badge>}
-                      <Badge className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">Active</Badge>
+                      <Badge className="text-[10px] bg-status-success-bg/10 text-status-success border-status-success-border">Active</Badge>
                     </div>
                     <p className="text-sm font-semibold">${Number(product.price)}<span className="text-xs font-normal text-muted-foreground ml-1 capitalize">{product.pricingModel}</span></p>
                     {product.description && <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>}

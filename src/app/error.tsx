@@ -32,8 +32,8 @@ export default function Error({
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-6 text-center">
         <div className="flex justify-center">
-          <div className="rounded-full bg-red-100 p-3">
-            <AlertCircle className="h-10 w-10 text-red-600" />
+          <div className="rounded-full bg-status-danger-bg p-3">
+            <AlertCircle className="h-10 w-10 text-status-danger" />
           </div>
         </div>
         
@@ -43,7 +43,7 @@ export default function Error({
             We encountered an unexpected error. This has been logged and will be reviewed.
           </p>
           {error.message && (
-            <p className="text-sm text-red-600 font-mono bg-red-50 p-2 rounded">
+            <p className="text-sm text-status-danger font-mono bg-status-danger-bg p-2 rounded">
               {error.message}
             </p>
           )}

@@ -93,7 +93,7 @@ export default async function ClientDetailPage({
     console.error('Client detail page error:', error);
     return (
       <div className="p-8">
-        <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Client</h1>
+        <h1 className="text-2xl font-bold text-status-danger mb-4">Error Loading Client</h1>
         <p className="text-muted-foreground mb-4">
           Failed to load client details. Error: {error instanceof Error ? error.message : 'Unknown error'}
         </p>

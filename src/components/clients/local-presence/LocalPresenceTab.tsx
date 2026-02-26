@@ -85,7 +85,7 @@ function StarRating({ rating }: { rating: number }) {
         <Star
           key={i}
           size={12}
-          className={i <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}
+          className={i <= rating ? "fill-yellow-400 text-status-warning" : "text-gray-200"}
         />
       ))}
     </span>
@@ -134,7 +134,7 @@ function ReviewCard({
         </div>
         {review.replyText
           ? <Badge variant="secondary" className="shrink-0 text-xs">Replied</Badge>
-          : <Badge variant="outline" className="shrink-0 text-xs text-amber-600 border-amber-300">Needs reply</Badge>
+          : <Badge variant="outline" className="shrink-0 text-xs text-status-warning border-status-warning-border">Needs reply</Badge>
         }
       </div>
 
@@ -204,8 +204,8 @@ function InsightKPIs({ daily }: { daily: DailyInsight[] }) {
 
 function TrendArrow({ delta }: { delta: number | null }) {
   if (delta === null) return <MinusIcon size={12} className="text-gray-400 inline" />
-  if (delta > 0) return <TrendingUp size={12} className="text-green-500 inline mr-0.5" />
-  if (delta < 0) return <TrendingDown size={12} className="text-red-400 inline mr-0.5" />
+  if (delta > 0) return <TrendingUp size={12} className="text-status-success inline mr-0.5" />
+  if (delta < 0) return <TrendingDown size={12} className="text-status-danger inline mr-0.5" />
   return <MinusIcon size={12} className="text-gray-400 inline" />
 }
 
@@ -263,7 +263,7 @@ function SnapshotTrends({ clientId }: { clientId: number }) {
             <div className="text-lg font-bold leading-tight">{k.value}</div>
             <div className="text-xs text-gray-500">{k.label}</div>
             {k.delta !== null && (
-              <div className={`text-xs mt-0.5 flex items-center justify-center gap-0.5 ${k.delta > 0 ? "text-green-600" : k.delta < 0 ? "text-red-400" : "text-gray-400"}`}>
+              <div className={`text-xs mt-0.5 flex items-center justify-center gap-0.5 ${k.delta > 0 ? "text-status-success" : k.delta < 0 ? "text-status-danger" : "text-gray-400"}`}>
                 <TrendArrow delta={k.delta} />
                 {k.delta > 0 ? `+${k.delta}` : k.delta}
               </div>
@@ -368,7 +368,7 @@ function AIDraftModal({
           }
         </Button>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-status-danger">{error}</p>}
 
         {draft && (
           <div className="space-y-2">
@@ -526,7 +526,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
           <Button
             size="sm"
             variant="ghost"
-            className="text-red-500 hover:text-red-700"
+            className="text-status-danger hover:text-status-danger"
             onClick={async () => {
               await fetch(`/api/clients/${clientId}/gbp`, { method: "DELETE" })
               load()
@@ -548,7 +548,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
           <div className="text-xs text-gray-500">Total Reviews</div>
         </div>
         <div className="border rounded-lg p-3 bg-white text-center">
-          <div className={`text-xl font-bold ${needsReply.length > 0 ? "text-amber-500" : "text-green-600"}`}>
+          <div className={`text-xl font-bold ${needsReply.length > 0 ? "text-status-warning" : "text-status-success"}`}>
             {needsReply.length}
           </div>
           <div className="text-xs text-gray-500">Unanswered</div>
@@ -569,7 +569,7 @@ export function LocalPresenceTab({ clientId }: { clientId: number }) {
           >
             {t === "history" ? "Trends" : t}
             {t === "reviews" && needsReply.length > 0 && (
-              <Badge className="ml-1.5 bg-amber-100 text-amber-700 border-amber-300 text-xs" variant="outline">
+              <Badge className="ml-1.5 bg-status-warning-bg text-status-warning border-status-warning-border text-xs" variant="outline">
                 {needsReply.length}
               </Badge>
             )}

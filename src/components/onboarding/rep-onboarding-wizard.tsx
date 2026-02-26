@@ -225,11 +225,11 @@ function StepTerritory({ territory }: { territory: { id: number; name: string } 
         </div>
       ) : (
         <div className="space-y-3">
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 p-4">
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+          <div className="rounded-lg bg-status-warning-bg border border-status-warning-border p-4">
+            <p className="text-sm font-medium text-status-warning">
               Territory not yet assigned
             </p>
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+            <p className="text-xs text-status-warning mt-0.5">
               Your manager will assign your territory shortly. You can start
               exploring leads in the meantime.
             </p>
@@ -249,7 +249,7 @@ function StepTools() {
   const tools = [
     {
       icon: FileText,
-      color: "text-orange-500",
+      color: "text-status-warning",
       name: "Prospect Audit",
       desc: "Generates a branded domain analysis for any prospect — DR score, rankings, competitor gap, speed. Opens a print-ready PDF. Send it ahead of the call or share on screen.",
       where: "Lead detail → Audit PDF button",
@@ -263,7 +263,7 @@ function StepTools() {
     },
     {
       icon: Target,
-      color: "text-green-500",
+      color: "text-status-success",
       name: "Discovery",
       desc: "Search Google Maps for businesses in your territory. Filter by vertical, score by opportunity. Import directly into your pipeline.",
       where: "Leads page → Discovery tab",
@@ -317,9 +317,9 @@ function StepFirstLead() {
         </a>
         <a
           href="/leads"
-          className="flex flex-col gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+          className="flex flex-col gap-2 p-4 rounded-lg bg-status-success-bg hover:bg-status-success-bg dark:hover:bg-status-success-bg/40 transition-colors"
         >
-          <Rocket className="h-6 w-6 text-green-600 dark:text-green-400" />
+          <Rocket className="h-6 w-6 text-status-success" />
           <div>
             <p className="text-sm font-semibold">Discovery Search</p>
             <p className="text-xs text-muted-foreground mt-0.5">
@@ -380,7 +380,7 @@ function StepDone({ firstName }: { firstName: string }) {
   return (
     <StepCard>
       <div className="text-center space-y-3 py-2">
-        <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
+        <CheckCircle2 className="h-12 w-12 text-status-success mx-auto" />
         <h2 className="text-2xl font-bold">You're live, {firstName}.</h2>
         <p className="text-muted-foreground text-sm">
           Your dashboard is ready. Your territory is yours. Everything you need

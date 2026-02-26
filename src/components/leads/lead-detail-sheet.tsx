@@ -88,7 +88,7 @@ function AuditDemoHistory({
               <div key={a.id} className="flex items-center justify-between text-sm py-1.5 border-b last:border-0">
                 <div className="flex items-center gap-3">
                   {a.healthScore !== null && (
-                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${a.healthScore >= 70 ? "bg-green-100 text-green-700" : a.healthScore >= 50 ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"}`}>
+                    <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${a.healthScore >= 70 ? "bg-status-success-bg text-status-success" : a.healthScore >= 50 ? "bg-status-warning-bg text-status-warning" : "bg-status-danger-bg text-status-danger"}`}>
                       {a.healthScore}
                     </span>
                   )}

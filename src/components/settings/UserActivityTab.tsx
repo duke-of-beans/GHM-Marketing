@@ -36,7 +36,7 @@ function activityBadge(count: number) {
   if (count === 0) return <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>;
   if (count < 20) return <Badge variant="outline" className="text-xs">{count} events</Badge>;
   if (count < 100) return <Badge variant="secondary" className="text-xs">{count} events</Badge>;
-  return <Badge className="text-xs bg-emerald-600 text-white">{count} events</Badge>;
+  return <Badge className="text-xs bg-status-success-bg text-white">{count} events</Badge>;
 }
 
 export function UserActivityTab() {
@@ -116,7 +116,7 @@ export function UserActivityTab() {
                 <td className="px-4 py-3 text-muted-foreground">{u.pagesVisited30d || "—"}</td>
                 <td className="px-4 py-3">
                   {u.isActive
-                    ? <Badge variant="outline" className="text-xs text-emerald-600 border-emerald-300">Active</Badge>
+                    ? <Badge variant="outline" className="text-xs text-status-success border-status-success-border">Active</Badge>
                     : <Badge variant="outline" className="text-xs text-muted-foreground">Inactive</Badge>
                   }
                 </td>

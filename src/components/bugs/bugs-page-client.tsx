@@ -111,11 +111,11 @@ export function BugsPageClient({ isAdmin = false }: { isAdmin?: boolean }) {
 
   function statusIcon(status: string) {
     switch (status) {
-      case "resolved":     return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+      case "resolved":     return <CheckCircle2 className="h-4 w-4 text-status-success" />;
       case "in-progress":  return <Clock className="h-4 w-4 text-blue-600" />;
       case "acknowledged": return <Eye className="h-4 w-4 text-purple-600" />;
       case "wont-fix":     return <XCircle className="h-4 w-4 text-gray-400" />;
-      case "new":          return <AlertCircle className="h-4 w-4 text-orange-600" />;
+      case "new":          return <AlertCircle className="h-4 w-4 text-status-warning" />;
       default:             return <Bug className="h-4 w-4" />;
     }
   }

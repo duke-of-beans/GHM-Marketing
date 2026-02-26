@@ -136,10 +136,10 @@ export function BulkImportDialog({ open, onClose, onSuccess, endpoint, title, de
         ) : (
           /* Results view */
           <div className="space-y-4">
-            <div className={`flex items-center gap-3 rounded-lg p-4 ${result.failed === 0 ? "bg-green-50 dark:bg-green-950/20" : "bg-amber-50 dark:bg-amber-950/20"}`}>
+            <div className={`flex items-center gap-3 rounded-lg p-4 ${result.failed === 0 ? "bg-status-success-bg" : "bg-status-warning-bg"}`}>
               {result.failed === 0
-                ? <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                : <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />}
+                ? <CheckCircle2 className="h-5 w-5 text-status-success shrink-0" />
+                : <AlertCircle className="h-5 w-5 text-status-warning shrink-0" />}
               <div>
                 <p className="text-sm font-medium">{result.summary}</p>
                 {result.failed > 0 && <p className="text-xs text-muted-foreground mt-0.5">{result.failed} rows had errors (see below)</p>}

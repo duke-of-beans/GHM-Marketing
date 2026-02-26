@@ -131,9 +131,9 @@ function ScanCard({ scan }: { scan: Scan }) {
   const totalAlerts = scan.alerts.critical.length + scan.alerts.warning.length + scan.alerts.info.length;
   
   const scoreColor = 
-    scan.healthScore >= 75 ? 'text-green-600' : 
-    scan.healthScore >= 50 ? 'text-yellow-600' : 
-    'text-red-600';
+    scan.healthScore >= 75 ? 'text-status-success' : 
+    scan.healthScore >= 50 ? 'text-status-warning' : 
+    'text-status-danger';
   
   return (
     <Card>
@@ -155,7 +155,7 @@ function ScanCard({ scan }: { scan: Scan }) {
                 </Badge>
               )}
               {scan.alerts.warning.length > 0 && (
-                <Badge variant="outline" className="gap-1 text-yellow-600 border-yellow-600">
+                <Badge variant="outline" className="gap-1 text-status-warning border-status-warning-border">
                   <AlertTriangle className="h-3 w-3" />
                   {scan.alerts.warning.length}
                 </Badge>
@@ -207,8 +207,8 @@ function AlertItem({
 }) {
   const Icon = severity === 'critical' ? AlertCircle : severity === 'warning' ? AlertTriangle : Info;
   const colorClass = 
-    severity === 'critical' ? 'text-red-600' : 
-    severity === 'warning' ? 'text-yellow-600' : 
+    severity === 'critical' ? 'text-status-danger' : 
+    severity === 'warning' ? 'text-status-warning' : 
     'text-blue-600';
   
   const metricLabel = METRIC_LABELS[alert.metric] || alert.metric.replace(/([A-Z])/g, ' $1').trim();

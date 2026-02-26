@@ -250,7 +250,7 @@ function TokenRow({
           <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} className="h-6 text-xs flex-1" />
           <Input value={editNote} onChange={(e) => setEditNote(e.target.value)} placeholder="Note (required)" className="h-6 text-xs w-32" />
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={handleSave} disabled={saving}>
-            <Check className="h-3 w-3 text-green-600" />
+            <Check className="h-3 w-3 text-status-success" />
           </Button>
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => setEditing(false)}>
             <X className="h-3 w-3" />
@@ -286,9 +286,9 @@ function TokenRow({
 
 function ConfidenceBadge({ confidence }: { confidence: DnaTokenConfidence }) {
   const cfg: Record<DnaTokenConfidence, string> = {
-    high: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-    medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
-    low: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+    high: "bg-status-success-bg text-status-success",
+    medium: "bg-status-warning-bg text-status-warning",
+    low: "bg-status-danger-bg text-status-danger",
   };
   return <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 ${cfg[confidence]}`}>{confidence}</span>;
 }
@@ -297,7 +297,7 @@ function SourceBadge({ source }: { source: DnaTokenSource }) {
   const cfg: Record<DnaTokenSource, string> = {
     machine: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
     human: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-    machine_overridden: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+    machine_overridden: "bg-status-warning-bg text-status-warning",
   };
   const labels: Record<DnaTokenSource, string> = { machine: "M", human: "H", machine_overridden: "M→H" };
   return <span className={`text-[10px] px-1.5 py-0.5 rounded shrink-0 font-mono ${cfg[source]}`}>{labels[source]}</span>;

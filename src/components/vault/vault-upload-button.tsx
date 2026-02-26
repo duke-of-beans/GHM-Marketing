@@ -147,7 +147,7 @@ export function VaultUploadButton({ space: defaultSpace, isElevated, onUpload }:
               dragging
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50",
-              pendingFile && "border-green-500 bg-green-50 dark:bg-green-950/20"
+              pendingFile && "border-status-success-border bg-status-success-bg"
             )}
             onClick={() => inputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}

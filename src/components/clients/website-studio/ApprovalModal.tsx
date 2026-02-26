@@ -179,13 +179,13 @@ export function ApprovalModal({
 
         {/* Bulk approve bar */}
         {clearedPages.length > 0 && (
-          <div className="flex items-center justify-between rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-4 py-3">
-            <div className="text-sm text-emerald-800 dark:text-emerald-300">
+          <div className="flex items-center justify-between rounded-lg bg-status-success-bg border border-status-success-border px-4 py-3">
+            <div className="text-sm text-status-success">
               <span className="font-medium">{clearedPages.length} page{clearedPages.length !== 1 ? "s" : ""}</span> passed SCRVNR and are ready for bulk approval.
             </div>
             <Button
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+              className="bg-status-success-bg hover:bg-status-success-bg text-white gap-1.5"
               onClick={bulkApproveAll}
               disabled={bulkLoading}
             >
@@ -212,11 +212,11 @@ export function ApprovalModal({
                   {/* Status icon */}
                   <div className="shrink-0">
                     {isApproved ? (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                      <CheckCircle2 className="h-4 w-4 text-status-success" />
                     ) : isRejected ? (
-                      <XCircle className="h-4 w-4 text-red-500" />
+                      <XCircle className="h-4 w-4 text-status-danger" />
                     ) : isFailed ? (
-                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      <AlertTriangle className="h-4 w-4 text-status-warning" />
                     ) : isCleared ? (
                       <CheckCircle2 className="h-4 w-4 text-blue-500" />
                     ) : (
@@ -239,7 +239,7 @@ export function ApprovalModal({
                       <ReviewBadge  status={page.reviewStatus} />
                     </div>
                     {isFailed && page.lastScrvnrResult?.failedSections?.length ? (
-                      <p className="text-[11px] text-amber-600 mt-1">
+                      <p className="text-[11px] text-status-warning mt-1">
                         Failed: {page.lastScrvnrResult.failedSections.join(", ")}
                       </p>
                     ) : null}
@@ -252,7 +252,7 @@ export function ApprovalModal({
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                          className="h-7 text-xs border-status-success-border text-status-success hover:bg-status-success-bg"
                           onClick={() => approvePage(page.id)}
                         >
                           Approve
@@ -262,7 +262,7 @@ export function ApprovalModal({
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                          className="h-7 text-xs border-status-warning-border text-status-warning hover:bg-status-warning-bg"
                           onClick={() => setOverridePageId(page.id)}
                         >
                           Override
@@ -272,7 +272,7 @@ export function ApprovalModal({
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-7 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="h-7 text-xs text-status-danger hover:text-status-danger hover:bg-status-danger-bg"
                           onClick={() => setRejectionPageId(page.id)}
                         >
                           Reject
@@ -285,8 +285,8 @@ export function ApprovalModal({
 
                 {/* Override inline form */}
                 {overridePageId === page.id && (
-                  <div className="ml-7 space-y-2 rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 p-3">
-                    <p className="text-xs font-medium text-amber-800 dark:text-amber-300">
+                  <div className="ml-7 space-y-2 rounded-md bg-status-warning-bg border border-status-warning-border p-3">
+                    <p className="text-xs font-medium text-status-warning">
                       Override SCRVNR failure — explain why this page is acceptable:
                     </p>
                     <Textarea
@@ -298,7 +298,7 @@ export function ApprovalModal({
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+                        className="h-7 text-xs bg-status-warning-bg hover:bg-status-warning-bg text-white"
                         onClick={() => approvePage(page.id, overrideNote)}
                         disabled={!overrideNote.trim()}
                       >
@@ -318,8 +318,8 @@ export function ApprovalModal({
 
                 {/* Rejection inline form */}
                 {rejectionPageId === page.id && (
-                  <div className="ml-7 space-y-2 rounded-md bg-red-50 dark:bg-red-950/20 border border-red-200 p-3">
-                    <p className="text-xs font-medium text-red-800 dark:text-red-300">
+                  <div className="ml-7 space-y-2 rounded-md bg-status-danger-bg border border-status-danger-border p-3">
+                    <p className="text-xs font-medium text-status-danger">
                       Request changes — describe what needs to be fixed:
                     </p>
                     <Textarea
@@ -362,9 +362,9 @@ function ScrvnrBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string }> = {
     unprocessed: { label: "Not run",    className: "bg-gray-100 text-gray-600" },
     processing:  { label: "Running",    className: "bg-blue-100 text-blue-700" },
-    cleared:     { label: "SCRVNR ✓",  className: "bg-emerald-100 text-emerald-700" },
-    failed:      { label: "SCRVNR ✗",  className: "bg-red-100 text-red-700" },
-    override:    { label: "Overridden", className: "bg-amber-100 text-amber-700" },
+    cleared:     { label: "SCRVNR ✓",  className: "bg-status-success-bg text-status-success" },
+    failed:      { label: "SCRVNR ✗",  className: "bg-status-danger-bg text-status-danger" },
+    override:    { label: "Overridden", className: "bg-status-warning-bg text-status-warning" },
   };
   const cfg = config[status] ?? config.unprocessed;
   return (
@@ -377,8 +377,8 @@ function ScrvnrBadge({ status }: { status: string }) {
 function ReviewBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string }> = {
     pending:            { label: "Pending",          className: "bg-gray-100 text-gray-500" },
-    approved:           { label: "Approved",         className: "bg-emerald-100 text-emerald-700" },
-    changes_requested:  { label: "Changes needed",   className: "bg-red-100 text-red-700" },
+    approved:           { label: "Approved",         className: "bg-status-success-bg text-status-success" },
+    changes_requested:  { label: "Changes needed",   className: "bg-status-danger-bg text-status-danger" },
   };
   const cfg = config[status] ?? config.pending;
   return (

@@ -107,10 +107,10 @@ export function FinancialOverviewSection() {
     <div className="space-y-4">
       {/* Wave error warning (non-fatal — DB data still shown) */}
       {waveError && (
-        <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 text-sm text-status-warning bg-status-warning-bg border border-status-warning-border rounded-lg px-3 py-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>Live bank data unavailable. Showing payment records only.</span>
-          <Button size="sm" variant="ghost" className="ml-auto h-6 px-2 text-amber-600 hover:text-amber-700" onClick={load}>
+          <Button size="sm" variant="ghost" className="ml-auto h-6 px-2 text-status-warning hover:text-status-warning" onClick={load}>
             <RefreshCw className="w-3 h-3 mr-1" />
             Retry
           </Button>
@@ -142,13 +142,13 @@ export function FinancialOverviewSection() {
               <p className="text-xs text-muted-foreground">Cash In (AR)</p>
               <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
             </div>
-            <p className={`text-xl font-bold ${ar.totalOutstanding > 0 ? "text-orange-600" : "text-green-600"}`}>
+            <p className={`text-xl font-bold ${ar.totalOutstanding > 0 ? "text-status-warning" : "text-status-success"}`}>
               {fmt(ar.totalOutstanding)}
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               outstanding invoices
               {ar.overdueCount > 0 && (
-                <span className="ml-1 text-red-500">· {ar.overdueCount} overdue</span>
+                <span className="ml-1 text-status-danger">· {ar.overdueCount} overdue</span>
               )}
             </p>
           </CardContent>
@@ -161,7 +161,7 @@ export function FinancialOverviewSection() {
               <p className="text-xs text-muted-foreground">Cash Out (AP)</p>
               <TrendingDown className="w-3.5 h-3.5 text-muted-foreground" />
             </div>
-            <p className="text-xl font-bold text-amber-600">{fmt(ap.totalPending)}</p>
+            <p className="text-xl font-bold text-status-warning">{fmt(ap.totalPending)}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {ap.pendingCount} partner payment{ap.pendingCount !== 1 ? "s" : ""} pending
             </p>
@@ -169,13 +169,13 @@ export function FinancialOverviewSection() {
         </Card>
 
         {/* Net cash */}
-        <Card className={netPositive ? "" : "border-red-300"}>
+        <Card className={netPositive ? "" : "border-status-danger-border"}>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between mb-1">
               <p className="text-xs text-muted-foreground">Net Position</p>
               <DollarSign className="w-3.5 h-3.5 text-muted-foreground" />
             </div>
-            <p className={`text-xl font-bold ${netPositive ? "text-green-600" : "text-red-600"}`}>
+            <p className={`text-xl font-bold ${netPositive ? "text-status-success" : "text-status-danger"}`}>
               {fmt(netCash)}
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">bank − pending AP</p>
@@ -195,20 +195,20 @@ export function FinancialOverviewSection() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Accounts Receivable</p>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Collected MTD</span>
-                <span className="font-medium text-green-600">{fmt(ar.collectedMTD)}</span>
+                <span className="font-medium text-status-success">{fmt(ar.collectedMTD)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Outstanding</span>
-                <span className={`font-medium ${ar.totalOutstanding > 0 ? "text-orange-600" : ""}`}>
+                <span className={`font-medium ${ar.totalOutstanding > 0 ? "text-status-warning" : ""}`}>
                   {fmt(ar.totalOutstanding)}
                 </span>
               </div>
               {ar.totalOverdue > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3 text-red-500" /> Overdue
+                    <AlertTriangle className="w-3 h-3 text-status-danger" /> Overdue
                   </span>
-                  <span className="font-medium text-red-600">{fmt(ar.totalOverdue)}</span>
+                  <span className="font-medium text-status-danger">{fmt(ar.totalOverdue)}</span>
                 </div>
               )}
               {ar.nextExpected && (
@@ -225,7 +225,7 @@ export function FinancialOverviewSection() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Accounts Payable</p>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Pending partner payments</span>
-                <span className="font-medium text-amber-600">{fmt(ap.totalPending)}</span>
+                <span className="font-medium text-status-warning">{fmt(ap.totalPending)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Transactions</span>
@@ -235,7 +235,7 @@ export function FinancialOverviewSection() {
 
             <div className="border-t pt-2 flex justify-between font-semibold">
               <span>Net working capital</span>
-              <span className={netPositive ? "text-green-600" : "text-red-600"}>{fmt(netCash)}</span>
+              <span className={netPositive ? "text-status-success" : "text-status-danger"}>{fmt(netCash)}</span>
             </div>
           </CardContent>
         </Card>
@@ -261,15 +261,15 @@ export function FinancialOverviewSection() {
                   <div key={tx.id} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2 min-w-0">
                       {tx.amount >= 0
-                        ? <ArrowUpRight className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                        : <ArrowDownRight className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                        ? <ArrowUpRight className="w-3.5 h-3.5 text-status-success shrink-0" />
+                        : <ArrowDownRight className="w-3.5 h-3.5 text-status-danger shrink-0" />
                       }
                       <div className="min-w-0">
                         <p className="truncate font-medium">{tx.description ?? "Transaction"}</p>
                         <p className="text-xs text-muted-foreground">{format(new Date(tx.date), "MMM d, yyyy")}</p>
                       </div>
                     </div>
-                    <span className={`font-medium ml-2 shrink-0 ${tx.amount >= 0 ? "text-green-600" : "text-red-600"}`}>
+                    <span className={`font-medium ml-2 shrink-0 ${tx.amount >= 0 ? "text-status-success" : "text-status-danger"}`}>
                       {tx.amount >= 0 ? "+" : ""}{fmt(Math.abs(tx.amount))}
                     </span>
                   </div>

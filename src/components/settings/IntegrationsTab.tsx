@@ -53,14 +53,14 @@ export function IntegrationsTab() {
 
   function StatusIcon({ status }: { status: IntegrationStatus }) {
     if (!status.configured) return <Circle className="h-4 w-4 text-muted-foreground" />;
-    if (status.healthy === true)  return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+    if (status.healthy === true)  return <CheckCircle2 className="h-4 w-4 text-status-success" />;
     if (status.healthy === false) return <XCircle className="h-4 w-4 text-destructive" />;
     return <Circle className="h-4 w-4 text-muted-foreground" />;
   }
 
   function StatusBadge({ status }: { status: IntegrationStatus }) {
     if (!status.configured) return <Badge variant="outline">Not Configured</Badge>;
-    if (status.healthy === true)  return <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800">Healthy</Badge>;
+    if (status.healthy === true)  return <Badge className="bg-status-success-bg/10 text-status-success border-status-success-border">Healthy</Badge>;
     if (status.healthy === false) return <Badge variant="destructive">Error</Badge>;
     return <Badge variant="secondary">Unknown</Badge>;
   }

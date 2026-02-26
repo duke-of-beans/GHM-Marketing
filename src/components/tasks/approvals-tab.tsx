@@ -90,8 +90,8 @@ const CONTENT_TYPE_LABEL: Record<string, string> = {
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  P1: "bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-200",
-  P2: "bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-200",
+  P1: "bg-status-danger-bg text-status-danger",
+  P2: "bg-status-warning-bg text-status-warning",
   P3: "bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-200",
   P4: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
 };
@@ -301,7 +301,7 @@ export function ApprovalsTab() {
     return (
       <Card>
         <CardContent className="py-16 text-center">
-          <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-3" />
+          <CheckCircle className="h-10 w-10 text-status-success mx-auto mb-3" />
           <p className="font-medium">Nothing awaiting approval</p>
           <p className="text-sm text-muted-foreground mt-1">
             Task deliverables and Content Studio pieces will appear here when submitted for review.
@@ -368,7 +368,7 @@ export function ApprovalsTab() {
                   </Button>
                   <Button
                     size="sm"
-                    className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                    className="h-7 text-xs bg-status-success-bg hover:bg-status-success-bg"
                     disabled={actioning === `task-approve-${task.id}`}
                     onClick={() => approveTask(task.id)}
                   >
@@ -435,7 +435,7 @@ export function ApprovalsTab() {
                     </Button>
                     <Button
                       size="sm"
-                      className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                      className="h-7 text-xs bg-status-success-bg hover:bg-status-success-bg"
                       disabled={actioning === `content-approve-${item.id}`}
                       onClick={() => actionContent(item.id, "approve")}
                     >
@@ -463,7 +463,7 @@ export function ApprovalsTab() {
             return (
               <Card
                 key={key}
-                className={`hover:border-primary/40 transition-colors ${!group.hasVendorId ? "border-amber-300 dark:border-amber-700" : ""}`}
+                className={`hover:border-primary/40 transition-colors ${!group.hasVendorId ? "border-status-warning-border" : ""}`}
               >
                 <CardHeader className="pb-2 pt-4 px-4">
                   <div className="flex items-start gap-2">
@@ -499,7 +499,7 @@ export function ApprovalsTab() {
                   </div>
                   {/* Vendor ID warning */}
                   {!group.hasVendorId && (
-                    <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 mb-3 bg-amber-50 dark:bg-amber-900/20 rounded px-2 py-1.5">
+                    <div className="flex items-center gap-1.5 text-xs text-status-warning mb-3 bg-status-warning-bg rounded px-2 py-1.5">
                       <AlertTriangle className="h-3 w-3 shrink-0" />
                       No Wave vendor ID — approval will succeed but Wave bill won&apos;t be created. Set contractor info in Team settings first.
                     </div>
@@ -507,7 +507,7 @@ export function ApprovalsTab() {
                   <div className="flex justify-end">
                     <Button
                       size="sm"
-                      className="h-7 text-xs bg-green-600 hover:bg-green-700"
+                      className="h-7 text-xs bg-status-success-bg hover:bg-status-success-bg"
                       disabled={isActioning}
                       onClick={() => approvePaymentGroup(group)}
                     >

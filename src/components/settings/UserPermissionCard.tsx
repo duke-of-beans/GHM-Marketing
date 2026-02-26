@@ -120,7 +120,7 @@ export function UserPermissionCard({
     (user._count?.assignedLeads ?? 0) > 0 || (user._count?.salesRepClients ?? 0) > 0;
 
   const roleColors: Record<AppRole, string> = {
-    admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    admin: "bg-status-danger-bg text-status-danger",
     manager: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
     sales: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   };
@@ -157,7 +157,7 @@ export function UserPermissionCard({
                     </Badge>
                   )}
                   {user.role === "sales" && !user.repOnboardingCompletedAt && user.isActive && (
-                    <Badge variant="outline" className="text-xs text-amber-600 border-amber-300 dark:border-amber-700">
+                    <Badge variant="outline" className="text-xs text-status-warning border-status-warning-border">
                       Setup pending
                     </Badge>
                   )}
@@ -223,7 +223,7 @@ export function UserPermissionCard({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-orange-600"
+                  className="text-muted-foreground hover:text-status-warning"
                   onClick={() => setDeactivateDialogOpen(true)}
                   title="Deactivate user"
                 >
@@ -233,7 +233,7 @@ export function UserPermissionCard({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-muted-foreground hover:text-green-600"
+                  className="text-muted-foreground hover:text-status-success"
                   onClick={onReactivate}
                   title="Reactivate user"
                 >
@@ -296,10 +296,10 @@ export function UserPermissionCard({
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                   <h4 className="text-sm font-semibold">Contractor Entity</h4>
                   {user.contractorVendorId && (
-                    <span className="text-xs text-green-600 font-medium">✓ Wave configured</span>
+                    <span className="text-xs text-status-success font-medium">✓ Wave configured</span>
                   )}
                   {!user.contractorVendorId && (
-                    <span className="text-xs text-amber-600 font-medium">⚠ Wave vendor ID missing — payments blocked</span>
+                    <span className="text-xs text-status-warning font-medium">⚠ Wave vendor ID missing — payments blocked</span>
                   )}
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -376,7 +376,7 @@ export function UserPermissionCard({
             <DialogDescription>
               {hasActiveRecords ? (
                 <>
-                  <span className="font-semibold text-orange-600">Cannot delete yet.</span>{" "}
+                  <span className="font-semibold text-status-warning">Cannot delete yet.</span>{" "}
                   {user.name} still has {user._count?.assignedLeads ?? 0} lead(s) and{" "}
                   {user._count?.salesRepClients ?? 0} client(s) assigned. Reassign or remove them
                   first, then try again.

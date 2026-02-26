@@ -161,7 +161,7 @@ export function ReportSchedulePanel({ clientId }: ReportScheduleProps) {
           Save Schedule
         </Button>
         {saveStatus === "saved" && (
-          <span className="text-sm text-green-600 flex items-center gap-1">
+          <span className="text-sm text-status-success flex items-center gap-1">
             <CheckCircle className="h-4 w-4" /> Saved
           </span>
         )}
@@ -197,7 +197,7 @@ export function ReportSchedulePanel({ clientId }: ReportScheduleProps) {
                   <span className="text-foreground">{period} report</span>
                   {sentAt ? (
                     <span className="text-muted-foreground text-xs flex items-center gap-1">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
+                      <CheckCircle className="h-3 w-3 text-status-success" />
                       Sent {sentAt}
                     </span>
                   ) : (

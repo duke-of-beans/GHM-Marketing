@@ -24,7 +24,7 @@ const TIER_DESCRIPTIONS: Record<WebPropertyTier, { label: string; desc: string; 
   tier3: {
     label: "Tier 3 — Pure Satellite",
     desc: "Fully independent brand, domain, and voice. GHM owns everything. Strongest lock-in.",
-    color: "border-amber-400 bg-amber-50 dark:bg-amber-950/30",
+    color: "border-status-warning-border bg-status-warning-bg",
   },
 };
 

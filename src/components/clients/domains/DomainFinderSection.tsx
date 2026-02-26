@@ -39,14 +39,14 @@ function SuggestionRow({ s }: { s: DomainSuggestion }) {
   return (
     <div className="flex items-center justify-between py-2 border-b last:border-0">
       <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full shrink-0 ${s.available ? "bg-green-500" : "bg-red-400"}`} />
+        <span className={`w-2 h-2 rounded-full shrink-0 ${s.available ? "bg-status-success-bg" : "bg-status-danger-bg"}`} />
         <span className="text-sm font-medium">{s.domain}</span>
       </div>
       <div className="flex items-center gap-3">
         {s.available ? (
-          <Badge className="bg-green-100 text-green-800 border-green-200 text-[10px]">Available</Badge>
+          <Badge className="bg-status-success-bg text-status-success border-status-success-border text-[10px]">Available</Badge>
         ) : (
-          <Badge variant="outline" className="text-[10px] text-red-600">Taken</Badge>
+          <Badge variant="outline" className="text-[10px] text-status-danger">Taken</Badge>
         )}
         <span className="text-xs text-muted-foreground w-14 text-right">
           {s.available ? formatPrice(s.price) : ""}
@@ -146,7 +146,7 @@ export function DomainFinderSection({
 
         {/* Error */}
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-status-danger">{error}</p>
         )}
 
         {/* Loading skeleton */}

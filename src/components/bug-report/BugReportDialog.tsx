@@ -158,7 +158,7 @@ export function BugReportDialog({
           <DialogTitle className="flex items-center gap-2">
             {type === "bug" ? (
               <>
-                <Bug className="h-5 w-5 text-orange-600" />
+                <Bug className="h-5 w-5 text-status-warning" />
                 Report a Bug
               </>
             ) : (
@@ -178,7 +178,7 @@ export function BugReportDialog({
 
         {submitted ? (
           <div className="py-8 text-center space-y-3">
-            <CheckCircle2 className="h-12 w-12 mx-auto text-green-600" />
+            <CheckCircle2 className="h-12 w-12 mx-auto text-status-success" />
             <h3 className="font-medium text-lg">Got it.</h3>
             <p className="text-sm text-muted-foreground">
               {type === "bug" 

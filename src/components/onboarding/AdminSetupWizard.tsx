@@ -325,7 +325,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
               <div className="space-y-2">
                 <Label>Logo</Label>
                 {uploadError && (
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-sm text-amber-800 dark:text-amber-200">
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-status-warning-bg border border-status-warning-border text-sm text-status-warning">
                     <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
                     <p className="text-xs">Upload unavailable. Add your logo later in <strong>Settings → Branding</strong>.</p>
                   </div>
@@ -419,7 +419,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
               </p>
 
               {inviteSent ? (
-                <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200">
+                <div className="flex items-center gap-2 p-4 rounded-lg bg-status-success-bg border border-status-success-border text-status-success">
                   <CheckCheck className="h-5 w-5 shrink-0" />
                   <div>
                     <p className="font-medium text-sm">Invite sent!</p>
@@ -480,7 +480,7 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
               </p>
 
               {importResult ? (
-                <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200">
+                <div className="flex items-center gap-2 p-4 rounded-lg bg-status-success-bg border border-status-success-border text-status-success">
                   <CheckCheck className="h-5 w-5 shrink-0" />
                   <div>
                     <p className="font-medium text-sm">{importResult.count} leads imported!</p>
@@ -542,10 +542,10 @@ export function AdminSetupWizard({ initialBranding, initialStep = 0 }: Props) {
                     <div key={int.id} className="flex items-center justify-between p-3 rounded-lg border bg-card">
                       <div className="flex items-center gap-3">
                         {int.configured && int.healthy === true && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                          <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
                         )}
                         {int.configured && int.healthy === false && (
-                          <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+                          <XCircle className="h-4 w-4 text-status-danger shrink-0" />
                         )}
                         {!int.configured && (
                           <Clock className="h-4 w-4 text-muted-foreground shrink-0" />

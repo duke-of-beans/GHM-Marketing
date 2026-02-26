@@ -194,7 +194,7 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground mb-1">Outstanding AR</p>
-            <p className={`text-xl font-bold ${totalOutstanding > 0 ? "text-orange-600" : "text-green-600"}`}>
+            <p className={`text-xl font-bold ${totalOutstanding > 0 ? "text-status-warning" : "text-status-success"}`}>
               ${totalOutstanding.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">unpaid invoices</p>
@@ -203,7 +203,7 @@ export function PaymentsOverview({ clients, partners }: { clients: ClientRow[]; 
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground mb-1">At Risk</p>
-            <p className={`text-xl font-bold ${overdueClients.length > 0 ? "text-red-600" : "text-green-600"}`}>
+            <p className={`text-xl font-bold ${overdueClients.length > 0 ? "text-status-danger" : "text-status-success"}`}>
               {overdueClients.length}
             </p>
             <p className="text-xs text-muted-foreground">overdue / paused / collections</p>

@@ -25,8 +25,8 @@ type TaskStats = {
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  P1: "bg-red-100 text-red-700 dark:bg-red-900/70 dark:text-red-200",
-  P2: "bg-orange-100 text-orange-700 dark:bg-orange-900/70 dark:text-orange-200",
+  P1: "bg-status-danger-bg text-status-danger",
+  P2: "bg-status-warning-bg text-status-warning",
   P3: "bg-blue-100 text-blue-700 dark:bg-blue-900/70 dark:text-blue-200",
   P4: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
 };
@@ -94,7 +94,7 @@ export function MyTasksWidget() {
         {total > 0 && (
           <div className="flex gap-3 text-xs">
             {stats.overdue > 0 && (
-              <span className="flex items-center gap-1 text-red-600 dark:text-red-400 font-medium">
+              <span className="flex items-center gap-1 text-status-danger font-medium">
                 <AlertTriangle className="h-3 w-3" /> {stats.overdue} overdue
               </span>
             )}
@@ -127,7 +127,7 @@ export function MyTasksWidget() {
                     <p className="text-xs text-muted-foreground">
                       {task.clientName}
                       {task.dueDate && (
-                        <span className={isOverdue ? " text-red-500 font-medium" : ""}>
+                        <span className={isOverdue ? " text-status-danger font-medium" : ""}>
                           {" · "}
                           {isOverdue ? "Overdue" : `Due ${new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
                         </span>

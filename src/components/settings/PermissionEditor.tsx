@@ -91,8 +91,8 @@ export function PermissionEditor({ permissions, onChange }: PermissionEditorProp
         </div>
       ))}
 
-      <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
-        <p className="text-xs text-amber-900 dark:text-amber-100">
+      <div className="p-3 bg-status-warning-bg rounded-lg border border-status-warning-border">
+        <p className="text-xs text-status-warning">
           <strong>Note:</strong> Settings, User Management, and Territories are restricted to Master role and above. Payments permissions default to off — grant explicitly per user.
         </p>
       </div>

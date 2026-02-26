@@ -143,7 +143,7 @@ export function ClientNotesTab({ clientId, initialNotes }: Props) {
           </p>
           <div className="space-y-2">
             {pinnedNotes.map((note) => (
-              <Card key={note.id} className="border-amber-200 bg-amber-50/50">
+              <Card key={note.id} className="border-status-warning-border bg-status-warning-bg/50">
                 <CardContent className="py-3">
                   <p className="text-sm">{note.content}</p>
                   <p className="text-xs text-muted-foreground mt-1">

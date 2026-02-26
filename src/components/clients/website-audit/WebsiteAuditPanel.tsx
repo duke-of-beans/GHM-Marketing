@@ -45,7 +45,7 @@ function ScoreRing({ score, label }: { score: number | null; label: string }) {
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   );
-  const color = score >= 90 ? "border-green-500 text-green-600" : score >= 50 ? "border-yellow-500 text-yellow-600" : "border-red-500 text-red-600";
+  const color = score >= 90 ? "border-status-success-border text-status-success" : score >= 50 ? "border-status-warning-border text-status-warning" : "border-status-danger-border text-status-danger";
   return (
     <div className="flex flex-col items-center gap-1">
       <div className={`h-14 w-14 rounded-full border-4 ${color} flex items-center justify-center text-sm font-bold`}>{score}</div>
@@ -56,7 +56,7 @@ function ScoreRing({ score, label }: { score: number | null; label: string }) {
 
 function IssueBadge({ category }: { category: AuditIssue["category"] }) {
   if (category === "critical") return <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Critical</Badge>;
-  if (category === "recommended") return <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-yellow-100 text-yellow-800 border-yellow-200">Recommended</Badge>;
+  if (category === "recommended") return <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-status-warning-bg text-status-warning border-status-warning-border">Recommended</Badge>;
   return <Badge variant="outline" className="text-[10px] px-1.5 py-0">Optional</Badge>;
 }
 
@@ -159,7 +159,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
                 { label: "Sitemap", ok: active.hasSitemap, icon: <MapPin className="h-3 w-3" /> },
                 { label: "robots.txt", ok: active.hasRobots, icon: <FileText className="h-3 w-3" /> },
               ].map(({ label, ok, icon }) => (
-                <div key={label} className={`flex items-center gap-1 rounded-full px-2.5 py-1 border ${ok ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+                <div key={label} className={`flex items-center gap-1 rounded-full px-2.5 py-1 border ${ok ? "bg-status-success-bg border-status-success-border text-status-success" : "bg-status-danger-bg border-status-danger-border text-status-danger"}`}>
                   {ok ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
                   {icon}{label}
                 </div>
@@ -179,7 +179,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
             <div className="space-y-2">
               <p className="text-sm font-semibold">
                 {active.issues!.length} Issue{active.issues!.length !== 1 ? "s" : ""}
-                {critical.length > 0 && <span className="ml-2 text-red-600 text-xs font-normal">({critical.length} critical)</span>}
+                {critical.length > 0 && <span className="ml-2 text-status-danger text-xs font-normal">({critical.length} critical)</span>}
               </p>
               {active.issues!.map((issue, idx) => (
                 <div key={idx} className="border rounded-lg overflow-hidden">
@@ -192,7 +192,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
                   {expanded.has(idx) && (
                     <div className="px-3 pb-3 pt-0 text-xs text-muted-foreground space-y-1 border-t bg-muted/20">
                       <p className="pt-2">{issue.description}</p>
-                      {issue.impact && <p className="text-orange-600 font-medium">Impact: {issue.impact}</p>}
+                      {issue.impact && <p className="text-status-warning font-medium">Impact: {issue.impact}</p>}
                     </div>
                   )}
                 </div>

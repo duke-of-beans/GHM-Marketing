@@ -149,16 +149,16 @@ export function WaveSettingsTab() {
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 {status.connected
-                  ? <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  : <XCircle className="w-4 h-4 text-red-500" />}
+                  ? <CheckCircle2 className="w-4 h-4 text-status-success" />
+                  : <XCircle className="w-4 h-4 text-status-danger" />}
                 <span className="font-medium">{status.connected ? "Connected" : "Not connected"}</span>
                 {status.businessName && <span className="text-muted-foreground">— {status.businessName}</span>}
               </div>
               {status.error && <p className="text-destructive text-xs">{status.error}</p>}
               {!status.connected && (
-                <div className="mt-3 border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40 rounded-lg p-3 space-y-2 text-xs text-orange-900 dark:text-orange-100">
+                <div className="mt-3 border border-status-warning-border bg-status-warning-bg rounded-lg p-3 space-y-2 text-xs text-status-warning">
                   <p className="font-medium">Wave is not configured for this environment.</p>
-                  <p>Add the following to your <code className="bg-orange-100 dark:bg-orange-900 px-1 rounded">.env</code> file:</p>
+                  <p>Add the following to your <code className="bg-status-warning-bg px-1 rounded">.env</code> file:</p>
                   <ul className="space-y-1 font-mono">
                     <li>WAVE_API_KEY=your_api_key</li>
                     <li>WAVE_BUSINESS_ID=your_business_id</li>
@@ -186,8 +186,8 @@ export function WaveSettingsTab() {
                     <div className="flex items-center gap-1">
                       <p className="font-mono text-xs truncate">{status.currentProductId ?? "not set"}</p>
                       {status.currentProductId
-                        ? <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0" />
-                        : <XCircle className="w-3 h-3 text-orange-500 flex-shrink-0" />}
+                        ? <CheckCircle2 className="w-3 h-3 text-status-success flex-shrink-0" />
+                        : <XCircle className="w-3 h-3 text-status-warning flex-shrink-0" />}
                     </div>
                   </div>
                   <div>
@@ -195,8 +195,8 @@ export function WaveSettingsTab() {
                     <div className="flex items-center gap-1">
                       <p className="text-xs">{status.webhookConfigured ? "Configured" : "Not configured"}</p>
                       {status.webhookConfigured
-                        ? <CheckCircle2 className="w-3 h-3 text-green-600" />
-                        : <XCircle className="w-3 h-3 text-orange-500" />}
+                        ? <CheckCircle2 className="w-3 h-3 text-status-success" />
+                        : <XCircle className="w-3 h-3 text-status-warning" />}
                     </div>
                   </div>
                 </div>

@@ -106,7 +106,7 @@ export default async function ReportsPage() {
                     <td className="py-2 text-right">{t.reps}</td>
                     <td className="py-2 text-right">{t.totalLeads}</td>
                     <td className="py-2 text-right">{t.active}</td>
-                    <td className="py-2 text-right text-green-600">{t.won}</td>
+                    <td className="py-2 text-right text-status-success">{t.won}</td>
                     <td className="py-2 text-right font-medium">
                       {formatCurrency(t.revenue)}
                     </td>
@@ -146,7 +146,7 @@ export default async function ReportsPage() {
                     <td className="py-2 font-medium">{s.name}</td>
                     <td className="py-2 text-muted-foreground">{s.type}</td>
                     <td className="py-2 text-right">{s.total}</td>
-                    <td className="py-2 text-right text-green-600">{s.won}</td>
+                    <td className="py-2 text-right text-status-success">{s.won}</td>
                     <td className="py-2 text-right">{s.conversionRate}%</td>
                     <td className="py-2 text-right font-medium">
                       {formatCurrency(s.revenue)}

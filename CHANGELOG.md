@@ -1,7 +1,25 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 25, 2026 — Sprint 23-D shipped (StatusBadge + chart color migration).
+**Last Updated:** February 26, 2026 — Sprint 23-E shipped (Status Color Token Migration — 779 replacements across 125 file-changes).
+
+---
+
+## Sprint 23-E — UI Constitution Phase 1: Status Color Token Migration — February 26, 2026
+
+**Class-name-only refactor across 125 file-changes.** Replaced all hardcoded Tailwind status-color classes with COVOS semantic token classes. Zero logic changes — class names only.
+
+**Non-orange migration (automated):** 99 files, 710 replacements. Python script replaced green/emerald → `success`, yellow/amber → `warning`, red → `danger` across all eligible `.tsx` files in one pass. Dark mode `dark:text-*`, `dark:bg-*`, `dark:border-*` variants removed from all migrated files — tokens handle dark mode via CSS variables automatically.
+
+**Orange migration (context-reviewed):** 26 files, 69 replacements. Each orange instance reviewed in surrounding code context before replacement. All 26 files confirmed → `warning` semantics: P2 priority badges, pending financial amounts (earnings, fees, upsell), outstanding AR, billing "overdue" status (sits between grace=warning and paused=danger in the escalation scale), bug "new" status icons, audit `data_export` event type, issue impact text in WebsiteAuditPanel, setup/onboarding tool category colors, dashboard "Manage Team" widget, content type "commercial" indicators, scan overdue alerts.
+
+**Intentionally excluded (7 files):** 4 PDF/print pages (`@react-pdf/renderer` requires inline styles — migration would break rendering), `status-badge.tsx` + `churn-risk-badge.tsx` (dot indicator circles — raw Tailwind intentional, these are filled SVG-circle dots not semantic text/bg), `health-sparkline.tsx` (deferred — needs trend-direction tokens not yet defined).
+
+**Intentional non-migration (1 case):** `PositionsTab.tsx` contractor `TYPE_COLORS` — orange is a categorical identity color (blue=sales, purple=management, green=operations, orange=contractor). Not semantically equivalent to `warning`. Migrating it would make "Contractor" position type visually indistinguishable from a warning state.
+
+**TypeScript check:** No new errors. Pre-existing errors in `scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/lib/basecamp/client.ts` unchanged (unrelated to this sprint).
+
+**Files changed:** 125 file-changes (99 non-orange pass + 26 orange pass, some files touched by both), 779 total replacements (710 + 69).
 
 ---
 

@@ -200,7 +200,7 @@ export function VoiceProfileDialog({
           {/* Success State */}
           {status === "success" && profile && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-green-600">
+              <div className="flex items-center gap-3 text-status-success">
                 <Check className="h-5 w-5" />
                 <span className="text-sm font-medium">
                   Voice Profile Active

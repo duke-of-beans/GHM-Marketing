@@ -153,24 +153,24 @@ export function CSVImportDialog({ onComplete }: CSVImportDialogProps) {
                   <p className="text-muted-foreground">Total rows</p>
                   <p className="font-semibold">{result.total}</p>
                 </div>
-                <div className="bg-green-50 rounded p-2">
-                  <p className="text-green-700">Imported</p>
-                  <p className="font-semibold text-green-700">{result.imported}</p>
+                <div className="bg-status-success-bg rounded p-2">
+                  <p className="text-status-success">Imported</p>
+                  <p className="font-semibold text-status-success">{result.imported}</p>
                 </div>
-                <div className="bg-yellow-50 rounded p-2">
-                  <p className="text-yellow-700">Duplicates</p>
-                  <p className="font-semibold text-yellow-700">{result.duplicates}</p>
+                <div className="bg-status-warning-bg rounded p-2">
+                  <p className="text-status-warning">Duplicates</p>
+                  <p className="font-semibold text-status-warning">{result.duplicates}</p>
                 </div>
-                <div className="bg-red-50 rounded p-2">
-                  <p className="text-red-700">Failed</p>
-                  <p className="font-semibold text-red-700">{result.failed}</p>
+                <div className="bg-status-danger-bg rounded p-2">
+                  <p className="text-status-danger">Failed</p>
+                  <p className="font-semibold text-status-danger">{result.failed}</p>
                 </div>
               </div>
 
               {result.validationErrors.length > 0 && (
                 <div className="max-h-40 overflow-y-auto text-xs space-y-1 border rounded p-2">
                   {result.validationErrors.map((err, i) => (
-                    <p key={i} className="text-red-600">
+                    <p key={i} className="text-status-danger">
                       Row {err.row}: {err.message}
                     </p>
                   ))}

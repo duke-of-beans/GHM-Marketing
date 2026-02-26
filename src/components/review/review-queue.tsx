@@ -178,7 +178,7 @@ export function ReviewQueue({ tasks, contentItems }: ReviewQueueProps) {
                       <Button
                         variant="default"
                         size="sm"
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-status-success-bg hover:bg-status-success-bg"
                         disabled={approvingId === `task-${task.id}`}
                         onClick={() => handleQuickApproveTask(task.id)}
                       >
@@ -253,7 +253,7 @@ export function ReviewQueue({ tasks, contentItems }: ReviewQueueProps) {
                         <Button
                           variant="default"
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-status-success-bg hover:bg-status-success-bg"
                           disabled={approvingId === `content-${item.id}`}
                           onClick={() => handleApproveContent(item.id)}
                         >

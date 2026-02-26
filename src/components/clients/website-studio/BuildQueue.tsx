@@ -10,9 +10,9 @@ import { toast } from "sonner";
 const STAGE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   scaffolded: { label: "Scaffolded",  color: "text-gray-500",   icon: <Clock className="h-3 w-3" /> },
   composing:  { label: "Composing",   color: "text-blue-600",   icon: <Edit3 className="h-3 w-3" /> },
-  review:     { label: "In Review",   color: "text-yellow-600", icon: <Clock className="h-3 w-3" /> },
-  approved:   { label: "Approved",    color: "text-emerald-600",icon: <CheckCircle2 className="h-3 w-3" /> },
-  error:      { label: "Error",       color: "text-red-600",    icon: <AlertCircle className="h-3 w-3" /> },
+  review:     { label: "In Review",   color: "text-status-warning", icon: <Clock className="h-3 w-3" /> },
+  approved:   { label: "Approved",    color: "text-status-success",icon: <CheckCircle2 className="h-3 w-3" /> },
+  error:      { label: "Error",       color: "text-status-danger",    icon: <AlertCircle className="h-3 w-3" /> },
 };
 
 interface Props {
@@ -62,7 +62,7 @@ export function BuildQueue({ clientId, jobs, onOpenComposer, onOpenApproval, onR
               <div className="text-xs text-muted-foreground text-right tabular-nums">
                 <div>{job.pagesApproved ?? 0}/{job.pageCount ?? 0} approved</div>
                 {pagesNeedingWork.length > 0 && (
-                  <div className="text-red-500">{pagesNeedingWork.length} need work</div>
+                  <div className="text-status-danger">{pagesNeedingWork.length} need work</div>
                 )}
               </div>
 
@@ -80,7 +80,7 @@ export function BuildQueue({ clientId, jobs, onOpenComposer, onOpenApproval, onR
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400"
+                    className="h-7 text-xs border-status-warning-border text-status-warning hover:bg-status-warning-bg"
                     onClick={() => onOpenApproval(job.id)}
                   >
                     Review Pages
@@ -104,7 +104,7 @@ function TierBadge({ tier }: { tier: string }) {
   const colors: Record<string, string> = {
     tier1: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
     tier2: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-    tier3: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+    tier3: "bg-status-warning-bg text-status-warning",
   };
   return (
     <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${colors[tier] ?? ""}`}>
@@ -147,7 +147,7 @@ function DeployButton({
   return (
     <Button
       size="sm"
-      className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
+      className="h-7 text-xs bg-status-success-bg hover:bg-status-success-bg text-white"
       onClick={handleDeploy}
       disabled={deploying}
     >

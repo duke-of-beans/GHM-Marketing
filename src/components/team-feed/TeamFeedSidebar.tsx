@@ -77,9 +77,9 @@ function initials(name: string) {
 
 function priorityBadge(priority: string) {
   if (priority === "urgent")
-    return <Badge className="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 text-[10px] py-0">Urgent</Badge>;
+    return <Badge className="bg-status-danger-bg text-status-danger text-[10px] py-0">Urgent</Badge>;
   if (priority === "important")
-    return <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 text-[10px] py-0">Important</Badge>;
+    return <Badge className="bg-status-warning-bg text-status-warning text-[10px] py-0">Important</Badge>;
   return null;
 }
 
@@ -198,9 +198,9 @@ function ComposeBox({
   }
 
   const priorityIcon = priority === "urgent"
-    ? <Zap className="h-3.5 w-3.5 text-red-500" />
+    ? <Zap className="h-3.5 w-3.5 text-status-danger" />
     : priority === "important"
-    ? <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
+    ? <AlertCircle className="h-3.5 w-3.5 text-status-warning" />
     : <AlertCircle className="h-3.5 w-3.5 text-muted-foreground/40" />;
 
   async function send() {
@@ -352,7 +352,7 @@ function ComposeBox({
           <button
             onClick={() => setIsPinned(!isPinned)}
             title={isPinned ? "Pinned" : "Pin message"}
-            className={`p-1 rounded transition-colors ${isPinned ? "text-amber-500" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
+            className={`p-1 rounded transition-colors ${isPinned ? "text-status-warning" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
           >
             <Pin className="h-3.5 w-3.5" />
           </button>
@@ -641,16 +641,16 @@ function PinnedBanner({
   if (!messages.length) return null;
 
   return (
-    <div className="border-b bg-amber-50/60 dark:bg-amber-950/20 flex-shrink-0">
+    <div className="border-b bg-status-warning-bg/60 flex-shrink-0">
       <button
-        className="w-full flex items-center gap-2 px-4 py-2 text-xs hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors"
+        className="w-full flex items-center gap-2 px-4 py-2 text-xs hover:bg-status-warning-bg/50 dark:hover:bg-status-warning-bg/20 transition-colors"
         onClick={() => setOpen(!open)}
       >
-        <Pin className="h-3 w-3 text-amber-500 flex-shrink-0" />
-        <span className="font-medium text-amber-700 dark:text-amber-400 flex-1 text-left">
+        <Pin className="h-3 w-3 text-status-warning flex-shrink-0" />
+        <span className="font-medium text-status-warning flex-1 text-left">
           {messages.length} pinned {messages.length === 1 ? "message" : "messages"}
         </span>
-        {open ? <ChevronUp className="h-3 w-3 text-amber-500" /> : <ChevronRight className="h-3 w-3 text-amber-500" />}
+        {open ? <ChevronUp className="h-3 w-3 text-status-warning" /> : <ChevronRight className="h-3 w-3 text-status-warning" />}
       </button>
       {open && (
         <div className="px-3 pb-3 space-y-2">

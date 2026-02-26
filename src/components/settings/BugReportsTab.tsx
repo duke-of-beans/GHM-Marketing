@@ -70,17 +70,17 @@ interface BugReport {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const STATUS_OPTIONS = [
-  { value: "new", label: "New", icon: AlertTriangle, color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" },
+  { value: "new", label: "New", icon: AlertTriangle, color: "bg-status-warning-bg text-status-warning" },
   { value: "acknowledged", label: "Acknowledged", icon: Eye, color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
   { value: "in-progress", label: "In Progress", icon: Clock, color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" },
-  { value: "resolved", label: "Resolved", icon: CheckCircle2, color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+  { value: "resolved", label: "Resolved", icon: CheckCircle2, color: "bg-status-success-bg text-status-success" },
   { value: "wont-fix", label: "Won't Fix", icon: XCircle, color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" },
 ];
 
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  high: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-  medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+  critical: "bg-status-danger-bg text-status-danger",
+  high: "bg-status-warning-bg text-status-warning",
+  medium: "bg-status-warning-bg text-status-warning",
   low: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
 };
 
@@ -140,7 +140,7 @@ function ReportRow({ report, onUpdate }: { report: BugReport; onUpdate: () => vo
           <button className="w-full flex items-center gap-3 p-3 text-left hover:bg-muted/50 transition-colors">
             {open ? <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />}
             {report.type === "bug" ? (
-              <Bug className="h-4 w-4 flex-shrink-0 text-orange-600" />
+              <Bug className="h-4 w-4 flex-shrink-0 text-status-warning" />
             ) : (
               <Lightbulb className="h-4 w-4 flex-shrink-0 text-blue-600" />
             )}
@@ -178,7 +178,7 @@ function ReportRow({ report, onUpdate }: { report: BugReport; onUpdate: () => vo
             {/* Console errors */}
             {report.consoleErrors?.length > 0 && (
               <details className="text-xs">
-                <summary className="cursor-pointer font-medium text-orange-600">
+                <summary className="cursor-pointer font-medium text-status-warning">
                   Console Errors ({report.consoleErrors.length})
                 </summary>
                 <pre className="mt-1 p-2 bg-muted rounded text-[11px] overflow-x-auto max-h-40 overflow-y-auto">
@@ -190,7 +190,7 @@ function ReportRow({ report, onUpdate }: { report: BugReport; onUpdate: () => vo
             {/* Network errors */}
             {report.networkErrors?.length > 0 && (
               <details className="text-xs">
-                <summary className="cursor-pointer font-medium text-red-600">
+                <summary className="cursor-pointer font-medium text-status-danger">
                   Network Errors ({report.networkErrors.length})
                 </summary>
                 <pre className="mt-1 p-2 bg-muted rounded text-[11px] overflow-x-auto max-h-40 overflow-y-auto">
@@ -337,7 +337,7 @@ export function BugReportsTab() {
 
         {/* Summary badges */}
         <div className="flex gap-3 text-xs pt-1">
-          <span className="flex items-center gap-1"><Bug className="h-3.5 w-3.5 text-orange-600" /> {bugs.length} bugs</span>
+          <span className="flex items-center gap-1"><Bug className="h-3.5 w-3.5 text-status-warning" /> {bugs.length} bugs</span>
           <span className="flex items-center gap-1"><Lightbulb className="h-3.5 w-3.5 text-blue-600" /> {features.length} features</span>
         </div>
 

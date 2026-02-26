@@ -44,7 +44,7 @@ export function TourButton({
             {/* Sparkle badge — signals guided/interactive vs passive InfoTip */}
             <span
               className="absolute -top-1 -right-1 flex items-center justify-center
-                         w-3.5 h-3.5 rounded-full bg-amber-400 dark:bg-amber-500
+                         w-3.5 h-3.5 rounded-full bg-status-warning-bg
                          ring-1 ring-background"
               aria-hidden="true"
             >

@@ -35,15 +35,15 @@ interface Props {
 const SCRVNR_BADGE: Record<string, { label: string; className: string }> = {
   unprocessed: { label: "Unprocessed", className: "bg-gray-100 text-gray-600" },
   processing:  { label: "Processing",  className: "bg-blue-100 text-blue-600" },
-  cleared:     { label: "Cleared ✓",   className: "bg-emerald-100 text-emerald-700" },
-  failed:      { label: "Failed",      className: "bg-red-100 text-red-600" },
-  override:    { label: "Override",    className: "bg-amber-100 text-amber-700" },
+  cleared:     { label: "Cleared ✓",   className: "bg-status-success-bg text-status-success" },
+  failed:      { label: "Failed",      className: "bg-status-danger-bg text-status-danger" },
+  override:    { label: "Override",    className: "bg-status-warning-bg text-status-warning" },
 };
 
 const REVIEW_BADGE: Record<string, { label: string; className: string }> = {
   pending:            { label: "Pending",            className: "bg-gray-100 text-gray-500" },
-  approved:           { label: "Approved",           className: "bg-emerald-100 text-emerald-700" },
-  changes_requested:  { label: "Changes Requested",  className: "bg-red-100 text-red-600" },
+  approved:           { label: "Approved",           className: "bg-status-success-bg text-status-success" },
+  changes_requested:  { label: "Changes Requested",  className: "bg-status-danger-bg text-status-danger" },
 };
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
             <Button
               size="sm"
               variant="outline"
-              className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              className="h-7 text-xs border-status-success-border text-status-success hover:bg-status-success-bg"
               onClick={handleBulkApprove}
               disabled={bulkBusy}
             >
@@ -258,7 +258,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                        className="h-7 text-xs border-status-warning-border text-status-warning hover:bg-status-warning-bg"
                         onClick={() => setExpanded(e => ({ ...e, [page.id]: true }))}
                       >
                         <ShieldAlert className="h-3 w-3 mr-1" />Override
@@ -268,7 +268,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                        className="h-7 text-xs border-status-success-border text-status-success hover:bg-status-success-bg"
                         onClick={() => reviewPage(page.id, "approved")}
                         disabled={isBusy}
                       >
@@ -279,7 +279,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-7 text-xs text-red-600 hover:bg-red-50"
+                      className="h-7 text-xs text-status-danger hover:bg-status-danger-bg"
                       onClick={() => reviewPage(page.id, "changes_requested")}
                       disabled={isBusy}
                     >
@@ -289,7 +289,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                 )}
 
                 {isApproved && (
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
                 )}
               </div>
 
@@ -300,12 +300,12 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                   {/* Failed sections */}
                   {result?.failedSections && result.failedSections.length > 0 && (
                     <div>
-                      <p className="text-xs font-medium text-red-600 flex items-center gap-1 mb-1">
+                      <p className="text-xs font-medium text-status-danger flex items-center gap-1 mb-1">
                         <AlertTriangle className="h-3 w-3" />Failed sections
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {result.failedSections.map(s => (
-                          <span key={s} className="text-[11px] bg-red-50 text-red-600 px-2 py-0.5 rounded border border-red-200">
+                          <span key={s} className="text-[11px] bg-status-danger-bg text-status-danger px-2 py-0.5 rounded border border-status-danger-border">
                             {s}
                           </span>
                         ))}
@@ -321,7 +321,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                   {/* Override form for failed pages */}
                   {isFailed && !isApproved && (
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-amber-700">
+                      <p className="text-xs font-medium text-status-warning">
                         Override SCRVNR failure — note required
                       </p>
                       <Textarea
@@ -333,7 +333,7 @@ export function ApprovalQueue({ clientId, jobId, onClose, onApprovalComplete }: 
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-7 text-xs border-amber-300 text-amber-700 hover:bg-amber-50"
+                        className="h-7 text-xs border-status-warning-border text-status-warning hover:bg-status-warning-bg"
                         disabled={!overrideNote[page.id]?.trim() || isBusy}
                         onClick={() =>
                           reviewPage(page.id, "approved", { overrideNote: overrideNote[page.id] })

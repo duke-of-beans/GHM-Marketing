@@ -171,7 +171,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 text-center">{error}</p>
+                <p className="text-sm text-status-danger text-center">{error}</p>
               )}
 
               <Button type="submit" className="w-full" disabled={loading}>
@@ -204,7 +204,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 text-center">{error}</p>
+                <p className="text-sm text-status-danger text-center">{error}</p>
               )}
 
               <Button type="submit" className="w-full" disabled={loading}>

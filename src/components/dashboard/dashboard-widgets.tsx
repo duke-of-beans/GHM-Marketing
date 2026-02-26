@@ -41,18 +41,18 @@ export function QuickActions() {
       icon: TrendingUp,
       href: "/leads",
       description: "Check sales progress",
-      color: "text-green-600 dark:text-green-400",
-      bgColor: "bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/70",
-      iconBg: "bg-green-100 dark:bg-green-900/60",
+      color: "text-status-success",
+      bgColor: "bg-status-success-bg hover:bg-status-success-bg dark:hover:bg-status-success-bg/70",
+      iconBg: "bg-status-success-bg",
     },
     {
       label: "Manage Team",
       icon: Users,
       href: "/settings?tab=team",
       description: "Update team members",
-      color: "text-orange-600 dark:text-orange-400",
-      bgColor: "bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/40 dark:hover:bg-orange-950/70",
-      iconBg: "bg-orange-100 dark:bg-orange-900/60",
+      color: "text-status-warning",
+      bgColor: "bg-status-warning-bg hover:bg-status-warning-bg",
+      iconBg: "bg-status-warning-bg",
     },
   ];
 
@@ -60,7 +60,7 @@ export function QuickActions() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Zap className="h-5 w-5 text-yellow-500" />
+          <Zap className="h-5 w-5 text-status-warning" />
           Quick Actions
         </CardTitle>
       </CardHeader>
@@ -103,9 +103,9 @@ export function RevenueMetricsWidget({
   const isPositiveGrowth = growth > 0;
   
   return (
-    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-900">
+    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-status-success-border">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-green-900 dark:text-green-300">
+        <CardTitle className="flex items-center gap-2 text-status-success">
           <DollarSign className="h-5 w-5" />
           Revenue Performance
         </CardTitle>
@@ -113,7 +113,7 @@ export function RevenueMetricsWidget({
       <CardContent className="space-y-4">
         <div>
           <div className="text-sm text-muted-foreground mb-1">Monthly Recurring Revenue</div>
-          <div className="text-3xl font-bold text-green-700 dark:text-green-400">
+          <div className="text-3xl font-bold text-status-success">
             ${mrr.toLocaleString()}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -121,10 +121,10 @@ export function RevenueMetricsWidget({
           </div>
         </div>
         
-        <div className="pt-3 border-t border-green-200 dark:border-green-900">
+        <div className="pt-3 border-t border-status-success-border">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Growth Rate</span>
-            <div className={`flex items-center gap-1 ${isPositiveGrowth ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+            <div className={`flex items-center gap-1 ${isPositiveGrowth ? 'text-status-success' : 'text-muted-foreground'}`}>
               <TrendingUp className={`h-4 w-4 ${isPositiveGrowth ? '' : 'opacity-50'}`} />
               <span className="font-semibold">{growth.toFixed(1)}%</span>
             </div>
@@ -186,7 +186,7 @@ export function GoalsWidget({
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div 
-              className="bg-green-500 h-2 rounded-full transition-all" 
+              className="bg-status-success-bg h-2 rounded-full transition-all" 
               style={{ width: `${Math.min(revenueProgress, 100)}%` }}
             />
           </div>

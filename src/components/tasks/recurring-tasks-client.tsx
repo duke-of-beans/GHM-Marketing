@@ -114,7 +114,7 @@ export function RecurringTasksClient() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium">{rule.name}</p>
                     <Badge variant="outline" className="text-[10px]">{rule.category.replace(/_/g, " ")}</Badge>
-                    <Badge className={`text-[10px] ${rule.priority === "P1" ? "bg-red-100 text-red-700" : rule.priority === "P2" ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700"}`}>
+                    <Badge className={`text-[10px] ${rule.priority === "P1" ? "bg-status-danger-bg text-status-danger" : rule.priority === "P2" ? "bg-status-warning-bg text-status-warning" : "bg-blue-100 text-blue-700"}`}>
                       {rule.priority}
                     </Badge>
                     {!rule.isActive && <Badge variant="secondary" className="text-[10px]">Paused</Badge>}
