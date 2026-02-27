@@ -20,7 +20,13 @@ type Client = {
   reports: any[];
 };
 
-export function ClientPortalDashboard({ client }: { client: Client }) {
+export function ClientPortalDashboard({
+  client,
+  companyName = "COVOS",
+}: {
+  client: Client;
+  companyName?: string;
+}) {
   const latestScan = client.scans[0];
   const completedTasks = client.tasks.filter(
     (t) => t.status === "deployed" || t.status === "measured"
@@ -195,7 +201,7 @@ export function ClientPortalDashboard({ client }: { client: Client }) {
       {/* Footer */}
       <footer className="bg-card border-t mt-12">
         <div className="max-w-6xl mx-auto px-6 py-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
+          © {new Date().getFullYear()} {companyName}. All rights reserved.
         </div>
       </footer>
     </div>

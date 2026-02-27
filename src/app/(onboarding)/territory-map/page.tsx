@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
+import { getTenant } from "@/lib/tenant/server";
 
-export const metadata: Metadata = {
-  title: "GHM Digital Marketing Inc — Territory Map",
-  description: "Initial territory definitions for GHM Digital Marketing Inc sales partners. Phase 1: 4 territories, land grab advantage.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenant();
+  const companyName = tenant?.companyName ?? "COVOS";
+  return {
+    title: `${companyName} — Territory Map`,
+    description: `Initial territory definitions for ${companyName} sales partners. Phase 1: 4 territories, land grab advantage.`,
+  };
+}
 
 // Palette cycles for territories that don't have a hardcoded color
 const COLORS = ["#2563eb", "#7c3aed", "#059669", "#dc2626", "#d97706", "#0891b2"];
@@ -19,6 +24,9 @@ const verticalTerritory = {
 };
 
 export default async function TerritoryMapPage() {
+  const tenant = await getTenant();
+  const companyName = tenant?.companyName ?? "COVOS";
+
   // Pull live territories from DB — only active ones, ordered by creation date
   const dbTerritories = await prisma.territory.findMany({
     where: { isActive: true },
@@ -45,7 +53,7 @@ export default async function TerritoryMapPage() {
         color: "white", padding: "56px 32px 48px", textAlign: "center",
       }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", opacity: 0.5, marginBottom: 16 }}>
-          GHM Digital Marketing Inc
+          {companyName}
         </p>
         <h1 style={{ fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 16px" }}>
           Phase 1 Territory Map
@@ -215,7 +223,7 @@ export default async function TerritoryMapPage() {
       </section>
 
       <footer style={{ padding: "24px", textAlign: "center", fontSize: 13, color: "#94a3b8" }}>
-        GHM Digital Marketing Inc · Phase 1 Territory Map · Subject to revision as team scales
+        {companyName} · Phase 1 Territory Map · Subject to revision as team scales
       </footer>
     </div>
   );

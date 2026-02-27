@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel. Sprint 28 Track B complete. AI prompts, push, dashboard title extracted.
+**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel. Sprint 28 Track B complete. AI prompts, push, dashboard title extracted. Sprint 28 Track C complete. UI components, public pages, client portal extracted. Sprint 28 fully complete — ~50 GHM hardcoded strings removed from non-tenant layer.
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 - [x] **TRACK A COMPLETE** — Extracted all hardcoded GHM strings from 5 target files into `TenantConfig`. Zero behavior change for GHM tenant. Blueprint: `docs/blueprints/SPRINT28_TRACK_A_BLUEPRINT.md`.
@@ -15,6 +15,18 @@
   - **Verification:** `tsc --noEmit` passes (only 5 pre-existing known errors in scripts/ and basecamp/). Zero GHM/ghmdigital/ghmmarketing strings remain in target files or API routes.
   - **Extra catch:** `src/lib/ops/notification-service.ts` — missed in blueprint's caller list, caught by tsc, fixed with `TENANT_REGISTRY["ghm"]`.
   - **Next:** Tracks B (AI/scan layer) + C (dashboard/auth layer) can now run in parallel.
+
+### SPRINT 28 TRACK C — UI Components + Public Pages + Client Portal (February 27, 2026)
+- [x] **TRACK C COMPLETE** — Extracted all hardcoded GHM strings from UI components, public-facing onboarding pages, and client portal. Zero new TS errors. Blueprint: `docs/blueprints/SPRINT28_TRACK_C_BLUEPRINT.md`.
+  - **branding/route.ts:** Added `getTenant()` + `supportEmail` field to `/api/public/branding` response — now serves `companyName` and `supportEmail` to all client-side consumers.
+  - **nav.tsx:** Fallback `<Image>` alt text replaced with `companyName ?? "Dashboard"` — fully dynamic, no GHM string remains.
+  - **client-portal-dashboard.tsx:** Added `companyName` prop (default `"COVOS"`), replaced copyright footer.
+  - **onboarding-panel.tsx:** Removed `"https://app.ghmdigital.com"` SSR fallback — component is `"use client"`, simplified to `window.location.origin`.
+  - **brochure/page.tsx + comp-sheet/page.tsx:** Converted static `metadata` export to `generateMetadata()`, made page components `async`, injected `companyName` from `getTenant()`. 3 instances each replaced.
+  - **territory-map/page.tsx:** Same pattern — already `async`, added `getTenant()` call, converted metadata, replaced 4 instances (title, description, hero eyebrow, footer). Territory/city/phase data untouched.
+  - **welcome/[token]/page.tsx:** Added `supportEmail` state (default `"support@covos.app"`), `useEffect` fetches from `/api/public/branding` on mount. Threaded into `ConfirmationScreen` + `ErrorScreen` props. All 3 hardcoded `support@ghmdigital.com` instances replaced with dynamic `<a href>` links.
+  - **Verification:** Zero matches for `ghmdigital|ghmmarketing|GHM Digital Marketing` across all 8 target files. `tsc --noEmit` — only 5 pre-existing known errors (scripts/basecamp). Zero new errors.
+  - **Sprint 28 fully complete.** ~50 GHM hardcoded strings removed across Tracks A + B + C.
 
 ### COVOS EXTRACTION AUDIT — Phase 1 Complete (February 26, 2026)
 - [x] **AUDIT COMPLETE** — Full tenant coupling analysis. Documents at `docs/blueprints/COVOS_EXTRACTION_AUDIT.md`.

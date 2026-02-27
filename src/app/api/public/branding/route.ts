@@ -3,20 +3,25 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getTenant } from "@/lib/tenant/server";
 
 export async function GET() {
-  const settings = await prisma.globalSettings.findFirst({
-    select: {
-      companyName: true,
-      logoUrl: true,
-      brandColor: true,
-      brandColorSecondary: true,
-      brandColorAccent: true,
-    },
-  });
+  const [settings, tenant] = await Promise.all([
+    prisma.globalSettings.findFirst({
+      select: {
+        companyName: true,
+        logoUrl: true,
+        brandColor: true,
+        brandColorSecondary: true,
+        brandColorAccent: true,
+      },
+    }),
+    getTenant(),
+  ]);
 
   return NextResponse.json({
     companyName: settings?.companyName ?? null,
+    supportEmail: tenant?.supportEmail ?? "support@covos.app",
     logoUrl: settings?.logoUrl ?? null,
     brandColor: settings?.brandColor ?? null,
     brandColorSecondary: settings?.brandColorSecondary ?? null,

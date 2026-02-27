@@ -279,7 +279,7 @@ export function DashboardNav({
             ) : (
               <Image
                 src="/logo.png"
-                alt="GHM Digital Marketing"
+                alt={companyName ?? "Dashboard"}
                 width={180}
                 height={59}
                 className="mb-1 brightness-0 invert hover:opacity-80 transition-opacity"

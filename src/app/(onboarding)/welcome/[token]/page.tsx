@@ -51,6 +51,7 @@ export default function OnboardingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [partnerName, setPartnerName] = useState<string>("");
+  const [supportEmail, setSupportEmail] = useState<string>("support@covos.app");
 
   const [form, setForm] = useState<FormState>({
     step1: {},
@@ -68,6 +69,14 @@ export default function OnboardingPage() {
     step4: {},
     step5: {},
   });
+
+  // Load branding (support email) on mount
+  useEffect(() => {
+    fetch("/api/public/branding")
+      .then((r) => r.json())
+      .then((d) => { if (d.supportEmail) setSupportEmail(d.supportEmail); })
+      .catch(() => { /* keep default */ });
+  }, []);
 
   // Load token data on mount
   useEffect(() => {
@@ -223,11 +232,11 @@ export default function OnboardingPage() {
   }
 
   if (error) {
-    return <ErrorScreen errorCode={errorCode} expiredToken={token} />;
+    return <ErrorScreen errorCode={errorCode} expiredToken={token} supportEmail={supportEmail} />;
   }
 
   if (submitted) {
-    return <ConfirmationScreen businessName={data?.lead.businessName ?? ""} partnerName={partnerName} />;
+    return <ConfirmationScreen businessName={data?.lead.businessName ?? ""} partnerName={partnerName} supportEmail={supportEmail} />;
   }
 
   return (
@@ -1127,7 +1136,7 @@ function Step5Review({
 
 // ── Confirmation Screen ───────────────────────────────────────────────────────
 
-function ConfirmationScreen({ businessName, partnerName }: { businessName: string; partnerName: string }) {
+function ConfirmationScreen({ businessName, partnerName, supportEmail }: { businessName: string; partnerName: string; supportEmail: string }) {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
@@ -1158,7 +1167,7 @@ function ConfirmationScreen({ businessName, partnerName }: { businessName: strin
             Questions? Contact your GHM rep: <span className="font-medium text-foreground">{partnerName}</span>
           </p>
         )}
-        <p className="text-xs text-muted-foreground mt-2">Or reach us at support@ghmdigital.com</p>
+        <p className="text-xs text-muted-foreground mt-2">Or reach us at <a href={`mailto:${supportEmail}`} className="underline underline-offset-2">{supportEmail}</a></p>
       </div>
     </div>
   );
@@ -1166,7 +1175,7 @@ function ConfirmationScreen({ businessName, partnerName }: { businessName: strin
 
 // ── Error Screen ─────────────────────────────────────────────────────────────
 
-function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; expiredToken: string }) {
+function ErrorScreen({ errorCode, expiredToken, supportEmail }: { errorCode: number | null; expiredToken: string; supportEmail: string }) {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshed, setRefreshed] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
@@ -1211,7 +1220,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
             Your onboarding form has already been received. Our operations team is getting everything set up for you.
           </p>
           <p className="text-muted-foreground text-xs mt-4">
-            Questions? Reach us at support@ghmdigital.com
+            Questions? Reach us at <a href={`mailto:${supportEmail}`} className="underline underline-offset-2">{supportEmail}</a>
           </p>
         </div>
       </div>
@@ -1258,7 +1267,7 @@ function ErrorScreen({ errorCode, expiredToken }: { errorCode: number | null; ex
         )}
 
         <p className="text-muted-foreground text-xs">
-          Need help? Contact us at support@ghmdigital.com
+          Need help? Contact us at <a href={`mailto:${supportEmail}`} className="underline underline-offset-2">{supportEmail}</a>
         </p>
       </div>
     </div>

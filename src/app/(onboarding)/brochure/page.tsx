@@ -1,12 +1,19 @@
 ﻿import type { Metadata } from "next";
+import { getTenant } from "@/lib/tenant/server";
 
-export const metadata: Metadata = {
-  title: "GHM Digital Marketing Inc — Local SEO That Dominates",
-  description:
-    "All-inclusive local SEO at $2,400/month. Month-to-month, no lock-in. Satellite site cluster methodology proven to dominate local search.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenant();
+  const companyName = tenant?.companyName ?? "COVOS";
+  return {
+    title: `${companyName} — Local SEO That Dominates`,
+    description:
+      "All-inclusive local SEO at $2,400/month. Month-to-month, no lock-in. Satellite site cluster methodology proven to dominate local search.",
+  };
+}
 
-export default function BrochurePage() {
+export default async function BrochurePage() {
+  const tenant = await getTenant();
+  const companyName = tenant?.companyName ?? "COVOS";
   return (
     <div className="min-h-screen bg-white">
       {/* HERO */}
@@ -28,7 +35,7 @@ export default function BrochurePage() {
             marginBottom: 20,
           }}
         >
-          GHM Digital Marketing Inc
+          {companyName}
         </p>
         <h1
           style={{
@@ -490,7 +497,7 @@ export default function BrochurePage() {
           borderTop: "1px solid #f3f4f6",
         }}
       >
-        GHM Digital Marketing Inc · All-inclusive local SEO · Month-to-month
+        {companyName} · All-inclusive local SEO · Month-to-month
       </footer>
     </div>
   );

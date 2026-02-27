@@ -88,7 +88,7 @@ export function OnboardingPanel({ leadId, leadStatus }: OnboardingPanelProps) {
 
   const getLink = () => {
     if (!tokenData) return "";
-    const base = typeof window !== "undefined" ? window.location.origin : "https://app.ghmdigital.com";
+    const base = window.location.origin;
     return `${base}/welcome/${tokenData.token}`;
   };
 
