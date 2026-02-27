@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/nav";
@@ -7,6 +8,14 @@ import { BrandThemeInjector } from "@/components/branding/BrandThemeInjector";
 import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
 import { isElevated } from "@/lib/auth/roles";
+import { getTenant } from "@/lib/tenant/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenant();
+  return {
+    title: tenant ? `${tenant.name} Dashboard` : "Dashboard",
+  };
+}
 
 export default async function DashboardLayout({
   children,

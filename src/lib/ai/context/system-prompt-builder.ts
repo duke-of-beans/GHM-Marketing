@@ -19,20 +19,24 @@
  */
 
 import type { FeatureContext, AIFeature } from "../router/types";
+import type { TenantConfig } from "@/lib/tenant/config";
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
-export function buildSystemPrompt(ctx: FeatureContext): string {
-  const base = buildBaseContext(ctx);
-  const feature = buildFeatureSection(ctx);
+export function buildSystemPrompt(ctx: FeatureContext, tenant?: TenantConfig): string {
+  const base = buildBaseContext(ctx, tenant);
+  const feature = buildFeatureSection(ctx, tenant);
   const outputContract = buildOutputContract(ctx.feature);
   return [base, feature, outputContract].filter(Boolean).join("\n\n");
 }
 
 // ── Base context (shared across all features) ─────────────────────────────────
 
-function buildBaseContext(ctx: FeatureContext): string {
-  return `You are an AI assistant embedded in the GHM Marketing Dashboard, an enterprise SEO services platform.
+function buildBaseContext(ctx: FeatureContext, tenant?: TenantConfig): string {
+  const platformDescription = tenant
+    ? `${tenant.name} Dashboard, a ${tenant.aiContext ?? "marketing platform"}`
+    : "Marketing Dashboard";
+  return `You are an AI assistant embedded in the ${platformDescription}.
 
 CLIENT CONTEXT:
 - Client name: ${ctx.clientName}
@@ -47,18 +51,18 @@ OPERATING CONSTRAINTS:
 
 // ── Feature-specific protocol sections ───────────────────────────────────────
 
-function buildFeatureSection(ctx: FeatureContext): string {
+function buildFeatureSection(ctx: FeatureContext, tenant?: TenantConfig): string {
   switch (ctx.feature) {
     case "content_brief":
       return buildContentBriefProtocol(ctx);
     case "website_copy":
-      return buildWebsiteCopyProtocol(ctx);
+      return buildWebsiteCopyProtocol(ctx, tenant);
     case "scrvnr_gate":
       return buildScrvnrProtocol(ctx);
     case "competitive_scan":
       return buildCompetitiveScanProtocol(ctx);
     case "upsell_detection":
-      return buildUpsellProtocol(ctx);
+      return buildUpsellProtocol(ctx, tenant);
     case "voice_capture":
       return buildVoiceCaptureProtocol(ctx);
     case "report_narrative":
@@ -113,12 +117,13 @@ BRIEF REQUIREMENTS:
 Do not pad. Every section should be actionable.`;
 }
 
-function buildWebsiteCopyProtocol(ctx: FeatureContext): string {
+function buildWebsiteCopyProtocol(ctx: FeatureContext, tenant?: TenantConfig): string {
+  const tenantName = tenant?.name ?? "Platform";
   const page = ctx.pageContext;
   const tierGuidance: Record<string, string> = {
     tier1: "This is a Site Extension — visual and voice DNA cloned from the client's primary site. Copy must feel like a natural part of that brand.",
     tier2: "This is a Branded Satellite — same brand identity, separate domain. Strong brand signals, but slightly more independent voice.",
-    tier3: "This is a Pure Satellite — independent brand, GHM-owned. Establish credibility and trust from scratch.",
+    tier3: `This is a Pure Satellite — independent brand, ${tenantName}-owned. Establish credibility and trust from scratch.`,
   };
 
   return `FEATURE: Website Copy Generation
@@ -183,14 +188,15 @@ ANALYSIS REQUIREMENTS:
 - Cite your reasoning. Every claim should trace to observable evidence.`;
 }
 
-function buildUpsellProtocol(_ctx: FeatureContext): string {
+function buildUpsellProtocol(_ctx: FeatureContext, tenant?: TenantConfig): string {
+  const tenantName = tenant?.name ?? "our platform";
   return `FEATURE: Upsell Opportunity Detection
 
 Analyze the provided client data and identify genuine upsell opportunities.
 An opportunity is genuine if:
 1. There is an observable gap in the client's current service coverage
 2. The gap is causing measurable harm (traffic loss, missed rankings, competitive disadvantage)
-3. There is a specific GHM service that directly addresses it
+3. There is a specific ${tenantName} service that directly addresses it
 
 Do not manufacture urgency. Do not recommend services that aren't warranted.
 For each opportunity: describe the gap, quantify the impact if possible, and name the service that addresses it.`;

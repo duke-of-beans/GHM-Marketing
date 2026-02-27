@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel.
+**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel. Sprint 28 Track B complete. AI prompts, push, dashboard title extracted.
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 - [x] **TRACK A COMPLETE** — Extracted all hardcoded GHM strings from 5 target files into `TenantConfig`. Zero behavior change for GHM tenant. Blueprint: `docs/blueprints/SPRINT28_TRACK_A_BLUEPRINT.md`.

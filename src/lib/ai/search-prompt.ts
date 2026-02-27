@@ -6,6 +6,8 @@
  * because search is cross-entity and not client-scoped.
  */
 
+import type { TenantConfig } from "@/lib/tenant/config";
+
 export interface SearchSystemPromptContext {
   userRole: "admin" | "manager" | "sales";
   userName: string;
@@ -20,12 +22,13 @@ export interface SearchSystemPromptContext {
   accessibleRoutes: string[];
 }
 
-export function buildSearchSystemPrompt(ctx: SearchSystemPromptContext): string {
+export function buildSearchSystemPrompt(ctx: SearchSystemPromptContext, tenant?: TenantConfig): string {
+  const dashboardName = tenant ? `${tenant.name} Dashboard` : "COVOS Dashboard";
   const scopeNote = ctx.scopedClient
     ? `The user is currently viewing client "${ctx.scopedClient.name}" (id: ${ctx.scopedClient.id}, health score: ${ctx.scopedClient.healthScore}, status: ${ctx.scopedClient.status}). Prioritize results scoped to this client.`
     : "The user is at a top-level dashboard view. Search across all entities.";
 
-  return `You are the COVOS search intelligence layer for GHM Marketing Dashboard.
+  return `You are the COVOS search intelligence layer for ${dashboardName}.
 
 Your role: Interpret natural language queries and return structured search results covering navigation, data answers, and actionable shortcuts.
 
