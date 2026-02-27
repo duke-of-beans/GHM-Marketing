@@ -4,6 +4,7 @@ import { DEFAULT_OPS_CHECKLIST } from "@/lib/onboarding/types";
 import type { TechnicalAccess, Step1Data, Step2Data, Step3Data, Step4Data, Step5Data } from "@/lib/onboarding/types";
 import { sendOpsOnboardingNotification, sendPartnerOnboardingNotification } from "@/lib/email/index";
 import { sendPushToUser } from "@/lib/push";
+import { TENANT_REGISTRY } from "@/lib/tenant/config";
 
 /**
  * POST /api/onboarding/[token]/submit
@@ -212,12 +213,14 @@ export async function POST(
         const opsEmails = opsUsers.map((u) => u.email).filter(Boolean) as string[];
 
         // Email ops team
+        // TODO: resolve tenant from onboarding token when multi-tenant launches
+        const tenant = TENANT_REGISTRY["ghm"];
         await sendOpsOnboardingNotification({
           submissionId: result.id,
           businessName: step1.businessName,
           partnerName: onboardingToken.generatedByUser.name,
           opsEmails,
-        });
+        }, tenant);
 
         // Push notification to each ops user
         for (const opsUser of opsUsers) {
@@ -235,7 +238,7 @@ export async function POST(
             partnerName: onboardingToken.generatedByUser.name,
             businessName: step1.businessName,
             submissionId: result.id,
-          });
+          }, tenant);
         }
 
         // Push notification to partner

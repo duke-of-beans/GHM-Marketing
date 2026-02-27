@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { generateMonthlyReportData } from "@/lib/reports/generator";
 import { generateReportHTML } from "@/lib/reports/template";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_clients");
@@ -38,7 +39,8 @@ export async function POST(req: NextRequest) {
       { includeNarratives: true }
     );
 
-    const html = generateReportHTML(reportData);
+    const tenant = await requireTenant();
+    const html = generateReportHTML(reportData, tenant);
 
     const report = await prisma.clientReport.create({
       data: {

@@ -5,6 +5,7 @@ import { territoryFilter } from "@/lib/auth/session";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateAuditData } from "@/lib/audit/generator";
 import { generateAuditHTML } from "@/lib/audit/template";
+import { requireTenant } from "@/lib/tenant/server";
 import { randomBytes } from "crypto";
 
 async function handleAudit(
@@ -35,8 +36,9 @@ async function handleAudit(
   }
 
   try {
+    const tenant = await requireTenant();
     const auditData = await generateAuditData(leadId, user.name ?? undefined);
-    const html = generateAuditHTML(auditData);
+    const html = generateAuditHTML(auditData, tenant);
 
     // Generate a share token (32 random bytes = 64-char hex)
     const shareToken = randomBytes(32).toString("hex");

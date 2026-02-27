@@ -8,12 +8,15 @@ import { bulkResponse } from "@/lib/bulk/types";
 import { generateMonthlyReportData } from "@/lib/reports/generator";
 import { generateReportHTML } from "@/lib/reports/template";
 import { sendReportEmail } from "@/lib/email";
+import { requireTenant } from "@/lib/tenant/server";
 
 const VALID_STATUSES = ["active","signed","paused","churned"];
 
 export async function POST(request: NextRequest) {
   const permErr = await withPermission(request, "manage_clients");
   if (permErr) return permErr;
+
+  const tenant = await requireTenant();
 
   const body = await request.json() as { ids: number[] } & BulkClientOperation;
   const { ids, operation } = body;
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
         if (!found.has(client.id)) { results.push({ id: client.id, error: "Not found" }); continue; }
         try {
           const reportData = await generateMonthlyReportData(client.id, periodStart, periodEnd, { includeNarratives: false });
-          const reportHtml = generateReportHTML(reportData);
+          const reportHtml = generateReportHTML(reportData, tenant);
           const report = await prisma.clientReport.create({
             data: { clientId: client.id, type: "monthly", periodStart, periodEnd, content: reportData as object, sentToClient: false },
           });
@@ -113,7 +116,7 @@ export async function POST(request: NextRequest) {
               const result = await sendReportEmail({
                 reportId: report.id, clientName: client.businessName,
                 periodLabel, reportHtml, recipientEmails: recipients,
-              });
+              }, tenant);
               await prisma.clientReport.update({
                 where: { id: report.id },
                 data: { sentToClient: result.success, sentAt: result.success ? new Date() : null },

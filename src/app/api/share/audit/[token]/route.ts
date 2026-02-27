@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { generateAuditData } from "@/lib/audit/generator";
 import { generateAuditHTML } from "@/lib/audit/template";
+import { TENANT_REGISTRY } from "@/lib/tenant/config";
 
 /**
  * Public audit share endpoint — no auth required.
@@ -28,11 +29,14 @@ export async function GET(
     },
   });
 
+  // TODO: resolve tenant from audit record when multi-tenant is supported
+  const tenant = TENANT_REGISTRY["ghm"];
+
   if (!auditRecord) {
     return new NextResponse(
       `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:48px;text-align:center;">
         <h2>Audit Not Found</h2>
-        <p>This link may have expired or is invalid. Contact your GHM representative for a fresh copy.</p>
+        <p>This link may have expired or is invalid. Contact your ${tenant.fromName} representative for a fresh copy.</p>
       </body></html>`,
       { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } }
     );
@@ -40,7 +44,7 @@ export async function GET(
 
   try {
     const auditData = await generateAuditData(auditRecord.leadId, auditRecord.repName ?? undefined);
-    const html = generateAuditHTML(auditData);
+    const html = generateAuditHTML(auditData, tenant);
 
     const slug = auditData.lead.businessName
       .toLowerCase()
@@ -61,7 +65,7 @@ export async function GET(
     return new NextResponse(
       `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:48px;text-align:center;">
         <h2>Unable to Load Audit</h2>
-        <p>There was a problem generating this report. Please contact your GHM representative.</p>
+        <p>There was a problem generating this report. Please contact your ${tenant.fromName} representative.</p>
       </body></html>`,
       { status: 500, headers: { "Content-Type": "text/html; charset=utf-8" } }
     );

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { hash } from "bcryptjs";
 import { createVendor } from "@/lib/wave/vendors";
 import { sendContractorWaveInvite } from "@/lib/email";
+import { requireTenant } from "@/lib/tenant/server";
 
 const createUserSchema = z.object({
   name: z.string().min(1).max(100),
@@ -126,11 +127,12 @@ export async function POST(req: NextRequest) {
       });
 
       // Fire the plain-English setup email to the contractor
+      const tenant = await requireTenant();
       await sendContractorWaveInvite({
         contractorEmail: parsed.data.contractorEmail,
         contractorName: parsed.data.name,
         entityName: parsed.data.contractorEntityName,
-      });
+      }, tenant);
     } catch (err) {
       // Log but don't fail the request — vendor can be set manually via team settings
       waveError = String(err);

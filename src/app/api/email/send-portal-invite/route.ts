@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireMaster } from "@/lib/auth/session";
 import { sendPortalInvite } from "@/lib/email/templates";
+import { requireTenant } from "@/lib/tenant/server";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -54,12 +55,14 @@ export async function POST(req: NextRequest) {
     // Generate portal URL
     const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL}/portal?token=${portalToken}`;
 
+    const tenant = await requireTenant();
+
     // Send email
     const result = await sendPortalInvite({
       to: client.lead.email,
       clientName: client.lead.businessName,
       portalUrl,
-    });
+    }, tenant);
 
     if (!result.success) {
       return NextResponse.json(

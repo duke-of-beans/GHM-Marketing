@@ -1,7 +1,20 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 26, 2026 — Sprint 26 + Security Fix shipped. COVOS Extraction Audit complete (all phases). Sprint 28 blueprints (Tracks A/B/C) + Sprint 29 Go-Live blueprint written. 14 backlog items. ARCH-002 (infrastructure fracture) identified as critical fork. Entity restructuring in ~2 weeks — Sprints 27→28→29 are the critical path. All four blueprint docs in `docs/blueprints/`.
+**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel.
+
+### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
+- [x] **TRACK A COMPLETE** — Extracted all hardcoded GHM strings from 5 target files into `TenantConfig`. Zero behavior change for GHM tenant. Blueprint: `docs/blueprints/SPRINT28_TRACK_A_BLUEPRINT.md`.
+  - **Step 1:** Extended `TenantConfig` interface with 6 new required fields (`companyName`, `companyTagline`, `fromEmail`, `fromName`, `supportEmail`, `dashboardUrl`) + updated GHM registry entry.
+  - **Step 2:** `src/lib/email/index.ts` — removed `FROM_EMAIL`/`FROM_NAME` constants, added `tenant: TenantConfig` param to all 7 exported functions, replaced all hardcoded GHM strings with tenant fields.
+  - **Step 3:** `src/lib/email/templates.ts` — removed `FROM_EMAIL` constant, added tenant param to 3 exported + 3 private functions, replaced copyright footers and support email.
+  - **Step 4:** `src/lib/reports/template.ts` — added tenant param to `generateReportHTML`, replaced footer string.
+  - **Step 5:** `src/lib/audit/template.ts` — added tenant param to `generateAuditHTML`, replaced all 6 GHM instances (cover logo, PPC mentions, CTA, disclaimer).
+  - **Step 6:** `src/lib/pdf/work-order-template.tsx` — added tenant to props, replaced company name and footer. Updated `generate-work-order.ts` to thread tenant through.
+  - **Callers updated:** 17 files total — all API routes and lib callers now pass tenant via `requireTenant()` (auth routes) or `TENANT_REGISTRY["ghm"]` (public/cron routes with TODO for multi-tenant resolution).
+  - **Verification:** `tsc --noEmit` passes (only 5 pre-existing known errors in scripts/ and basecamp/). Zero GHM/ghmdigital/ghmmarketing strings remain in target files or API routes.
+  - **Extra catch:** `src/lib/ops/notification-service.ts` — missed in blueprint's caller list, caught by tsc, fixed with `TENANT_REGISTRY["ghm"]`.
+  - **Next:** Tracks B (AI/scan layer) + C (dashboard/auth layer) can now run in parallel.
 
 ### COVOS EXTRACTION AUDIT — Phase 1 Complete (February 26, 2026)
 - [x] **AUDIT COMPLETE** — Full tenant coupling analysis. Documents at `docs/blueprints/COVOS_EXTRACTION_AUDIT.md`.

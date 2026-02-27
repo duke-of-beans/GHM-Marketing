@@ -8,6 +8,7 @@
 
 import { prisma } from "@/lib/db";
 import { publishDashboardEvent } from "@/lib/realtime/event-store";
+import { TENANT_REGISTRY } from "@/lib/tenant/config";
 import type { NotificationEvent } from "@prisma/client";
 
 // ---------------------------------------------------------------------------
@@ -66,7 +67,9 @@ async function deliverEmail(
       select: { email: true, name: true },
     });
     if (!user) return;
-    await sendNotificationEmail({ to: user.email, name: user.name, subject: title, body: body ?? title, href });
+    // TODO: resolve tenant dynamically when multi-tenant notification routing is supported
+    const tenant = TENANT_REGISTRY["ghm"];
+    await sendNotificationEmail({ to: user.email, name: user.name, subject: title, body: body ?? title, href }, tenant);
   } catch (err) {
     console.error("[notification-service] Email delivery failed:", err);
   }

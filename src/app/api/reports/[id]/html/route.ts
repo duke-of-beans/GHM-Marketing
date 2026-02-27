@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { generateReportHTML } from "@/lib/reports/template";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function GET(
   req: NextRequest,
@@ -24,7 +25,8 @@ export async function GET(
       );
     }
 
-    const html = generateReportHTML(report.content);
+    const tenant = await requireTenant();
+    const html = generateReportHTML(report.content, tenant);
 
     return NextResponse.json({ html });
   } catch (error) {

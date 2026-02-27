@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { sendUpsellNotification } from "@/lib/email/templates";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_clients");
@@ -52,6 +53,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const tenant = await requireTenant();
+
     const result = await sendUpsellNotification({
       to: opportunity.client.lead.email,
       clientName: opportunity.client.lead.businessName,
@@ -62,7 +65,7 @@ export async function POST(req: NextRequest) {
         ? Number(opportunity.projectedRoi)
         : null,
       reasoning: opportunity.reasoning || "",
-    });
+    }, tenant);
 
     if (!result.success) {
       return NextResponse.json(

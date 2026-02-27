@@ -6,8 +6,10 @@
 // Note: This uses Resend API. Install with: npm install resend
 // Add RESEND_API_KEY to .env
 
+import type { TenantConfig } from "@/lib/tenant/config";
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || "reports@ghmdigital.com";
+// FROM_EMAIL is now per-tenant. See TenantConfig.fromEmail
 
 export async function sendReportEmail(params: {
   to: string;
@@ -16,7 +18,7 @@ export async function sendReportEmail(params: {
   reportUrl: string;
   periodStart: Date;
   periodEnd: Date;
-}) {
+}, tenant: TenantConfig) {
   const { to, clientName, reportType, reportUrl, periodStart, periodEnd } = params;
 
   const html = generateReportEmailHTML({
@@ -25,12 +27,13 @@ export async function sendReportEmail(params: {
     reportUrl,
     periodStart,
     periodEnd,
-  });
+  }, tenant);
 
   return sendEmail({
     to,
     subject: `Your ${reportType} Performance Report - ${clientName}`,
     html,
+    from: `${tenant.fromName} <${tenant.fromEmail}>`,
   });
 }
 
@@ -42,7 +45,7 @@ export async function sendUpsellNotification(params: {
   projectedMrr: number;
   projectedRoi: number | null;
   reasoning: string;
-}) {
+}, tenant: TenantConfig) {
   const { to, clientName, productName, opportunityScore, projectedMrr, projectedRoi, reasoning } =
     params;
 
@@ -53,12 +56,13 @@ export async function sendUpsellNotification(params: {
     projectedMrr,
     projectedRoi,
     reasoning,
-  });
+  }, tenant);
 
   return sendEmail({
     to,
     subject: `Growth Opportunity for ${clientName}: ${productName}`,
     html,
+    from: `${tenant.fromName} <${tenant.fromEmail}>`,
   });
 }
 
@@ -66,18 +70,19 @@ export async function sendPortalInvite(params: {
   to: string;
   clientName: string;
   portalUrl: string;
-}) {
+}, tenant: TenantConfig) {
   const { to, clientName, portalUrl } = params;
 
   const html = generatePortalInviteHTML({
     clientName,
     portalUrl,
-  });
+  }, tenant);
 
   return sendEmail({
     to,
     subject: `Access Your Client Portal - ${clientName}`,
     html,
+    from: `${tenant.fromName} <${tenant.fromEmail}>`,
   });
 }
 
@@ -88,9 +93,9 @@ async function sendEmail(params: {
   to: string;
   subject: string;
   html: string;
-  from?: string;
+  from: string;
 }) {
-  const { to, subject, html, from = FROM_EMAIL } = params;
+  const { to, subject, html, from } = params;
 
   if (!RESEND_API_KEY) {
     console.warn("RESEND_API_KEY not configured. Email not sent.");
@@ -134,7 +139,7 @@ function generateReportEmailHTML(params: {
   reportUrl: string;
   periodStart: Date;
   periodEnd: Date;
-}): string {
+}, tenant: TenantConfig): string {
   const { clientName, reportType, reportUrl, periodStart, periodEnd } = params;
 
   return `
@@ -177,7 +182,7 @@ function generateReportEmailHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
+          © ${new Date().getFullYear()} ${tenant.companyName}. All rights reserved.
         </p>
         <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
           Powered by COVOS
@@ -198,7 +203,7 @@ function generateUpsellEmailHTML(params: {
   projectedMrr: number;
   projectedRoi: number | null;
   reasoning: string;
-}): string {
+}, tenant: TenantConfig): string {
   const { clientName, productName, opportunityScore, projectedMrr, projectedRoi, reasoning } =
     params;
 
@@ -250,7 +255,7 @@ function generateUpsellEmailHTML(params: {
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="mailto:hello@ghmdigital.com?subject=Growth%20Opportunity:%20${encodeURIComponent(productName)}" style="display: inline-block; background: #10b981; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+          <a href="mailto:${tenant.supportEmail}?subject=Growth%20Opportunity:%20${encodeURIComponent(productName)}" style="display: inline-block; background: #10b981; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
             Schedule a Call
           </a>
         </div>
@@ -262,7 +267,7 @@ function generateUpsellEmailHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
+          © ${new Date().getFullYear()} ${tenant.companyName}. All rights reserved.
         </p>
         <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
           Powered by COVOS
@@ -279,7 +284,7 @@ function generateUpsellEmailHTML(params: {
 function generatePortalInviteHTML(params: {
   clientName: string;
   portalUrl: string;
-}): string {
+}, tenant: TenantConfig): string {
   const { clientName, portalUrl } = params;
 
   return `
@@ -326,7 +331,7 @@ function generatePortalInviteHTML(params: {
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <p style="font-size: 12px; color: #666; text-align: center;">
-          © ${new Date().getFullYear()} GHM Digital Marketing Inc. All rights reserved.
+          © ${new Date().getFullYear()} ${tenant.companyName}. All rights reserved.
         </p>
         <p style="font-size: 10px; color: #ccc; text-align: center; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
           Powered by COVOS

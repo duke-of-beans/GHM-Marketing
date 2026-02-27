@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { sendReportEmail } from "@/lib/email/templates";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_clients");
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const tenant = await requireTenant();
+
     const reportUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/reports/${reportId}/download`;
 
     const result = await sendReportEmail({
@@ -53,7 +56,7 @@ export async function POST(req: NextRequest) {
       reportUrl,
       periodStart: report.periodStart,
       periodEnd: report.periodEnd,
-    });
+    }, tenant);
 
     if (!result.success) {
       return NextResponse.json(

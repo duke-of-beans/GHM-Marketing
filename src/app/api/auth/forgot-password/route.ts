@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendNotificationEmail } from "@/lib/email";
 import crypto from "crypto";
+import { TENANT_REGISTRY } from "@/lib/tenant/config";
 
 export async function POST(req: Request) {
   try {
@@ -33,13 +34,15 @@ export async function POST(req: Request) {
     const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
+    // TODO: resolve tenant from request host when multi-tenant launches
+    const tenant = TENANT_REGISTRY["ghm"];
     const emailResult = await sendNotificationEmail({
       to: user.email,
       name: user.name,
-      subject: "Reset your GHM Dashboard password",
-      body: `You requested a password reset for your GHM Dashboard account.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\nIf you did not request this, you can safely ignore this email — your password has not changed.`,
+      subject: `Reset your ${tenant.name} Dashboard password`,
+      body: `You requested a password reset for your ${tenant.name} Dashboard account.\n\nClick the link below to set a new password. This link expires in 1 hour.\n\nIf you did not request this, you can safely ignore this email — your password has not changed.`,
       href: resetUrl,
-    });
+    }, tenant);
 
     if (!emailResult?.success) {
       console.error("Forgot password: email send failed", {

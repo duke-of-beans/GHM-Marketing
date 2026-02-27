@@ -2,6 +2,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import React from "react";
 import { prisma } from "@/lib/db";
 import { WorkOrderPDF, type WorkOrderData } from "./work-order-template";
+import type { TenantConfig } from "@/lib/tenant/config";
 
 function generateWONumber(): string {
   const date = new Date();
@@ -13,6 +14,7 @@ function generateWONumber(): string {
 export async function generateWorkOrder(
   leadId: number,
   userId: number,
+  tenant: TenantConfig,
   notes?: string
 ): Promise<{ buffer: Buffer; workOrder: { id: number; woNumber: string } }> {
   // Fetch lead with all needed relations
@@ -101,7 +103,7 @@ export async function generateWorkOrder(
 
   // Render PDF to buffer (type assertion needed for React-PDF/Next.js type compatibility)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const buffer = await renderToBuffer(React.createElement(WorkOrderPDF, { data }) as any);
+  const buffer = await renderToBuffer(React.createElement(WorkOrderPDF, { data, tenant }) as any);
 
   // Save work order record
   const pricingBreakdown = {

@@ -1,6 +1,7 @@
 ﻿import type { AuditData, AuditGap } from "./generator";
+import type { TenantConfig } from "@/lib/tenant/config";
 
-export function generateAuditHTML(data: AuditData): string {
+export function generateAuditHTML(data: AuditData, tenant: TenantConfig): string {
   const { lead, intel, rankings, nap, gaps, healthScore, generatedAt, repName, ppc } = data;
 
   const fmt = (d: Date) =>
@@ -120,7 +121,7 @@ export function generateAuditHTML(data: AuditData): string {
 
   <!-- COVER -->
   <div class="cover">
-    <div class="cover-logo">GHM Digital Marketing Inc</div>
+    <div class="cover-logo">${tenant.companyName}</div>
     <div class="cover-title">Local SEO Audit Report</div>
     <div class="cover-business">${lead.businessName}</div>
     <div class="cover-meta">
@@ -204,7 +205,7 @@ export function generateAuditHTML(data: AuditData): string {
     <p style="font-size:13px;color:#374151;line-height:1.7;margin-bottom:20px;">
       Organic SEO captures intent at the research stage — but <strong>paid search captures buyers who are ready to act right now</strong>. 
       A combined organic + paid strategy means ${lead.businessName} appears at the top of search results <em>and</em> in the ads section, 
-      dramatically increasing total search visibility and call volume. GHM manages paid campaigns at no additional management fee as part of the $2,400/mo retainer.
+      dramatically increasing total search visibility and call volume. ${tenant.fromName} manages paid campaigns at no additional management fee as part of the $2,400/mo retainer.
     </p>
     <div class="kpi-grid-3" style="margin-bottom:0;">
       <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
@@ -223,13 +224,13 @@ export function generateAuditHTML(data: AuditData): string {
       </div>
     </div>
     <div style="margin-top:16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;font-size:13px;color:#1e40af;">
-      <strong>Free PPC Audit Included:</strong> GHM will analyze your market's paid search landscape — keyword costs, competitor ad spend, and campaign structure — at no charge. Request your audit at the bottom of this report.
+      <strong>Free PPC Audit Included:</strong> ${tenant.fromName} will analyze your market's paid search landscape — keyword costs, competitor ad spend, and campaign structure — at no charge. Request your audit at the bottom of this report.
     </div>
   </div>
 
   <!-- WHAT WE DO -->
   <div class="section" style="background:#f8fafc;">
-    <div class="section-title">🏆 How GHM Closes These Gaps</div>
+    <div class="section-title">🏆 How ${tenant.fromName} Closes These Gaps</div>
     <div class="kpi-grid-3">
       <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:20px;">
         <div style="font-size:24px;margin-bottom:8px;">📍</div>
@@ -252,12 +253,12 @@ export function generateAuditHTML(data: AuditData): string {
   <!-- CTA -->
   <div class="cta">
     <h2>Ready to Dominate Local Search?</h2>
-    <p>This audit reveals the exact gaps holding ${lead.businessName} back from page-one visibility. GHM has a proven system for local businesses in ${lead.city} to climb rankings, earn more reviews, and convert more searchers into customers.</p>
+    <p>This audit reveals the exact gaps holding ${lead.businessName} back from page-one visibility. ${tenant.fromName} has a proven system for local businesses in ${lead.city} to climb rankings, earn more reviews, and convert more searchers into customers.</p>
     <div class="cta-pill">Let's Build a Plan →</div>
   </div>
 
   <div class="disclaimer">
-    This audit was generated on ${fmt(generatedAt)} using live ranking data, Ahrefs domain analysis, and directory citation checks. Rankings may fluctuate. Contact GHM Digital Marketing Inc for a comprehensive strategy session.
+    This audit was generated on ${fmt(generatedAt)} using live ranking data, Ahrefs domain analysis, and directory citation checks. Rankings may fluctuate. Contact ${tenant.companyName} for a comprehensive strategy session.
     ${intel.intelAge !== null ? ` Business profile data is ${intel.intelAge} day${intel.intelAge !== 1 ? "s" : ""} old.` : ""}
   </div>
 

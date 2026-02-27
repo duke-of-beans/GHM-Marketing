@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { generateMonthlyReportData } from "@/lib/reports/generator";
 import { generateReportHTML } from "@/lib/reports/template";
 import { sendReportEmail } from "@/lib/email";
+import { TENANT_REGISTRY } from "@/lib/tenant/config";
 import { log } from "@/lib/logger";
 
 /**
@@ -20,6 +21,9 @@ export async function POST(req: NextRequest) {
 
   const today = new Date();
   const dayOfMonth = today.getDate();
+
+  // TODO: resolve tenant from request when multi-tenant cron is supported
+  const tenant = TENANT_REGISTRY["ghm"];
 
   log.info({ dayOfMonth }, "deliver-reports cron start");
 
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
         { includeNarratives: true }
       );
 
-      const reportHtml = generateReportHTML(reportData);
+      const reportHtml = generateReportHTML(reportData, tenant);
 
       // Persist report record
       const report = await prisma.clientReport.create({
@@ -98,7 +102,7 @@ export async function POST(req: NextRequest) {
         periodLabel,
         reportHtml,
         recipientEmails: recipients,
-      });
+      }, tenant);
 
       // Mark report as sent (or log failure)
       await prisma.clientReport.update({

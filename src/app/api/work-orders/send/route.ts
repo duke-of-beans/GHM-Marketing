@@ -5,6 +5,7 @@ import { sendWorkOrderEmail } from "@/lib/email";
 import type { SessionUser } from "@/lib/auth/session";
 import { territoryFilter } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function POST(req: NextRequest) {
   // Check permission
@@ -48,10 +49,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const tenant = await requireTenant();
+
     // Generate PDF
     const { buffer, workOrder } = await generateWorkOrder(
       leadId,
       Number(user.id),
+      tenant,
       notes
     );
 
@@ -71,7 +75,7 @@ export async function POST(req: NextRequest) {
       repEmail: lead.assignedUser?.email ?? user.email ?? "",
       businessName: lead.businessName,
       grandTotal,
-    });
+    }, tenant);
 
     if (!emailResult.success) {
       return NextResponse.json(

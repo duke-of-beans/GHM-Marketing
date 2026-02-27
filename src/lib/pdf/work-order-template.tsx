@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer";
+import type { TenantConfig } from "@/lib/tenant/config";
 
 // ============================================================================
 // Styles
@@ -249,7 +250,7 @@ export type WorkOrderData = {
 // PDF Component
 // ============================================================================
 
-export function WorkOrderPDF({ data }: { data: WorkOrderData }) {
+export function WorkOrderPDF({ data, tenant }: { data: WorkOrderData; tenant: TenantConfig }) {
   const formatCurrency = (val: number) =>
     `$${val.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
@@ -268,8 +269,8 @@ export function WorkOrderPDF({ data }: { data: WorkOrderData }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.companyName}>GHM Marketing</Text>
-            <Text style={styles.companyTagline}>DIGITAL MARKETING SOLUTIONS</Text>
+            <Text style={styles.companyName}>{tenant.fromName}</Text>
+            <Text style={styles.companyTagline}>{(tenant.companyTagline ?? "").toUpperCase()}</Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.woNumber}>WO #{data.workOrderNumber}</Text>
@@ -428,7 +429,7 @@ export function WorkOrderPDF({ data }: { data: WorkOrderData }) {
 
         {/* Footer */}
         <Text style={styles.footer}>
-          GHM Marketing · Digital Marketing Solutions{"\n"}
+          {tenant.fromName} · {tenant.companyTagline ?? ""}{"\n"}
           This work order is valid for 30 days from the date of issue.
         </Text>
       </Page>

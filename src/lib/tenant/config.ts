@@ -5,12 +5,32 @@
 import type { TenantProviderConfig } from '@/lib/providers/types'
 
 export interface TenantConfig {
+  // Core identity
   slug: string;           // Subdomain identifier (e.g. "ghm")
-  name: string;           // Display name
-  databaseUrl?: string;   // Override DATABASE_URL for this tenant (future use)
-  logoUrl?: string;       // Custom branding (future use)
-  primaryColor?: string;  // Custom branding (future use)
+  name: string;           // Short display name: "GHM Digital Marketing"
+  companyName: string;    // Full legal entity: "GHM Digital Marketing Inc"
+  companyTagline?: string; // Footer/subheading: "Digital Marketing Solutions"
+
+  // Email
+  fromEmail: string;      // Outbound from address: "noreply@ghmmarketing.com"
+  fromName: string;       // From display name: "GHM Marketing"
+  supportEmail: string;   // Contact/help links: "support@ghmdigital.com"
+
+  // URLs
+  dashboardUrl: string;   // Base app URL: "https://ghm.covos.app"
+
+  // AI
+  aiContext?: string;     // Injected into AI system prompts as platform description
+
+  // Branding (future use — read from GlobalSettings for now)
+  logoUrl?: string;
+  primaryColor?: string;
+
+  // Infrastructure
+  databaseUrl?: string;   // Override DATABASE_URL for this tenant
   active: boolean;
+
+  // Vendors
   /** Vendor provider selection. Omit a key to use the platform default. */
   providers?: Partial<TenantProviderConfig>;
 }
@@ -30,6 +50,13 @@ export const TENANT_REGISTRY: Record<string, TenantConfig> = {
   ghm: {
     slug: "ghm",
     name: "GHM Digital Marketing",
+    companyName: "GHM Digital Marketing Inc",
+    companyTagline: "Digital Marketing Solutions",
+    fromEmail: "noreply@ghmmarketing.com",
+    fromName: "GHM Marketing",
+    supportEmail: "support@ghmdigital.com",
+    dashboardUrl: "https://ghm.covos.app",
+    aiContext: "enterprise SEO services platform for local businesses",
     active: true,
     providers: {
       accounting: 'wave',

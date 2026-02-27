@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/db";
+import type { TenantConfig } from "@/lib/tenant/config";
 
 let _resend: Resend | null = null;
 function getResend(): Resend | null {
@@ -10,8 +11,7 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@ghmmarketing.com";
-const FROM_NAME = "GHM Marketing";
+// FROM_EMAIL and FROM_NAME are now per-tenant. See TenantConfig.fromEmail / .fromName
 
 // ============================================================================
 // Send Work Order PDF via email
@@ -27,7 +27,7 @@ export async function sendWorkOrderEmail(params: {
   repEmail: string;
   businessName: string;
   grandTotal: number;
-}) {
+}, tenant: TenantConfig) {
   const { workOrderId, pdfBuffer, woNumber, recipientEmail, recipientName, repName, repEmail, businessName, grandTotal } = params;
 
   if (!process.env.RESEND_API_KEY) {
@@ -40,15 +40,15 @@ export async function sendWorkOrderEmail(params: {
       `$${val.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 
     const { data, error } = await getResend()!.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: recipientEmail,
       cc: repEmail,
       subject: `Work Order ${woNumber} - ${businessName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #1a1a2e; padding: 24px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">GHM Marketing</h1>
-            <p style="color: #a0a0b0; margin: 4px 0 0 0; font-size: 12px; letter-spacing: 1px;">DIGITAL MARKETING SOLUTIONS</p>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">${tenant.fromName}</h1>
+            <p style="color: #a0a0b0; margin: 4px 0 0 0; font-size: 12px; letter-spacing: 1px;">${(tenant.companyTagline ?? "").toUpperCase()}</p>
           </div>
 
           <div style="padding: 32px 24px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
@@ -128,7 +128,7 @@ export async function sendStatusNotification(params: {
   repName: string;
   repEmail: string;
   message?: string;
-}) {
+}, tenant: TenantConfig) {
   if (!process.env.RESEND_API_KEY) return { success: false, error: "Email not configured" };
 
   const statusLabels: Record<string, string> = {
@@ -143,7 +143,7 @@ export async function sendStatusNotification(params: {
 
   try {
     const { error } = await getResend()!.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: params.recipientEmail,
       replyTo: params.repEmail,
       subject,
@@ -151,14 +151,14 @@ export async function sendStatusNotification(params: {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
           <h2 style="color: #1a1a2e;">${subject}</h2>
           <p style="color: #666; line-height: 1.6;">
-            Hi, this is ${params.repName} from GHM Marketing.
+            Hi, this is ${params.repName} from ${tenant.fromName}.
           </p>
           ${params.message ? `<p style="color: #666; line-height: 1.6;">${params.message}</p>` : ""}
           <p style="color: #666; line-height: 1.6;">
             If you have any questions, feel free to reply to this email.
           </p>
           <p style="color: #999; font-size: 12px; margin-top: 24px;">
-            GHM Marketing · Digital Marketing Solutions
+            ${tenant.fromName} · ${tenant.companyTagline ?? ""}
           </p>
           <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;">
             Powered by COVOS
@@ -184,18 +184,18 @@ export async function sendOpsOnboardingNotification(params: {
   partnerName: string;
   opsEmails: string[];
   dashboardUrl?: string;
-}) {
+}, tenant: TenantConfig) {
   const { submissionId, businessName, partnerName, opsEmails, dashboardUrl } = params;
   if (!process.env.RESEND_API_KEY || opsEmails.length === 0) {
     console.warn("Ops onboarding notification skipped — no RESEND_API_KEY or no recipients");
     return { success: false, error: "Not configured" };
   }
 
-  const viewUrl = dashboardUrl ?? `https://app.ghmdigital.com/clients/onboarding/${submissionId}`;
+  const viewUrl = dashboardUrl ?? `${tenant.dashboardUrl}/clients/onboarding/${submissionId}`;
 
   try {
     const { error } = await getResend()!.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: opsEmails,
       subject: `🎉 New onboarding completed — ${businessName}`,
       html: `
@@ -248,19 +248,19 @@ export async function sendContractorWaveInvite(params: {
   contractorEmail: string;
   contractorName: string;
   entityName: string;
-}) {
+}, tenant: TenantConfig) {
   const { contractorEmail, contractorName, entityName } = params;
   if (!process.env.RESEND_API_KEY) return { success: false, error: "Email not configured" };
 
   try {
     const { data, error } = await getResend()!.emails.send({
-      from: `GHM Marketing <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: contractorEmail,
-      subject: "Action required: Set up your payment account with GHM Marketing",
+      subject: `Action required: Set up your payment account with ${tenant.fromName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f9fafb;">
           <div style="background: #1a1a2e; padding: 24px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: #fff; margin: 0; font-size: 22px;">GHM Marketing</h1>
+            <h1 style="color: #fff; margin: 0; font-size: 22px;">${tenant.fromName}</h1>
             <p style="color: #a0a0b0; margin: 4px 0 0; font-size: 12px; letter-spacing: 1px;">PARTNER PAYMENT SETUP</p>
           </div>
 
@@ -268,7 +268,7 @@ export async function sendContractorWaveInvite(params: {
             <p style="color: #111827; font-size: 16px; margin-top: 0;">Hi ${contractorName},</p>
 
             <p style="color: #374151; line-height: 1.7;">
-              You've been added to GHM's payment system as a contractor under the entity
+              You've been added to ${tenant.fromName}'s payment system as a contractor under the entity
               <strong>${entityName}</strong>. To receive your commissions and residuals, you need
               to complete one quick step: connect your bank account through Wave, our payment platform.
             </p>
@@ -288,7 +288,7 @@ export async function sendContractorWaveInvite(params: {
               <p style="color: #6b7280; font-size: 13px; margin: 0 0 6px; font-weight: 600;">A few things to know:</p>
               <ul style="color: #6b7280; font-size: 13px; margin: 0; padding-left: 18px; line-height: 1.9;">
                 <li>Wave is free for contractors — you won't be charged anything.</li>
-                <li>Your bank details are entered directly into Wave and are never stored by GHM.</li>
+                <li>Your bank details are entered directly into Wave and are never stored by ${tenant.fromName}.</li>
                 <li>Payments are processed once your commissions are approved each month.</li>
                 <li>Wave will issue your 1099 at year-end automatically.</li>
               </ul>
@@ -304,12 +304,12 @@ export async function sendContractorWaveInvite(params: {
             </p>
 
             <p style="color: #374151; margin-bottom: 0;">
-              — The GHM Team
+              — The ${tenant.name} Team
             </p>
 
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 28px 0 16px;" />
             <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-              GHM Digital Marketing Inc · Questions? Reply to this email.
+              ${tenant.companyName} · Questions? Reply to this email.
             </p>
             <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;margin-bottom:0;">
               Powered by COVOS
@@ -336,23 +336,23 @@ export async function sendPartnerOnboardingNotification(params: {
   businessName: string;
   submissionId: number;
   dashboardUrl?: string;
-}) {
+}, tenant: TenantConfig) {
   const { partnerEmail, partnerName, businessName, submissionId, dashboardUrl } = params;
   if (!process.env.RESEND_API_KEY) {
     return { success: false, error: "Not configured" };
   }
 
-  const viewUrl = dashboardUrl ?? `https://app.ghmdigital.com/clients/onboarding/${submissionId}`;
+  const viewUrl = dashboardUrl ?? `${tenant.dashboardUrl}/clients/onboarding/${submissionId}`;
 
   try {
     const { error } = await getResend()!.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: partnerEmail,
       subject: `🎉 ${businessName} completed onboarding!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9fafb;">
           <div style="background: #1a1a2e; padding: 20px 24px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: #fff; margin: 0; font-size: 20px;">GHM Marketing</h1>
+            <h1 style="color: #fff; margin: 0; font-size: 20px;">${tenant.fromName}</h1>
           </div>
           <div style="background: #fff; padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
             <p style="color: #374151; font-size: 16px; margin-top: 0;">Hi ${partnerName},</p>
@@ -399,7 +399,7 @@ export async function sendNotificationEmail(params: {
   subject: string;
   body: string;
   href?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}, tenant: TenantConfig): Promise<{ success: boolean; error?: string }> {
   const resend = getResend();
   if (!resend) return { success: false, error: "Email not configured" };
 
@@ -415,7 +415,7 @@ export async function sendNotificationEmail(params: {
       : "";
 
     const { error } = await resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to,
       subject,
       html: `
@@ -426,7 +426,7 @@ export async function sendNotificationEmail(params: {
             <p style="color:#374151;white-space:pre-wrap;">${body}</p>
             ${actionButton}
             <p style="color:#9ca3af;font-size:12px;margin-top:24px;margin-bottom:0;">
-              GHM Marketing Dashboard — automated notification
+              ${tenant.name} Dashboard — automated notification
             </p>
             <p style="color:#d1d5db;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px;margin-bottom:0;">
               Powered by COVOS
@@ -455,7 +455,7 @@ export async function sendReportEmail(params: {
   reportHtml: string;     // Full rendered HTML report body (inline)
   recipientEmails: string[];
   pdfUrl?: string;
-}) {
+}, tenant: TenantConfig) {
   const { reportId, clientName, periodLabel, reportHtml, recipientEmails, pdfUrl } = params;
 
   if (!process.env.RESEND_API_KEY) {
@@ -473,7 +473,7 @@ export async function sendReportEmail(params: {
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
         <div style="background-color: #1a1a2e; padding: 24px; border-radius: 8px 8px 0 0;">
-          <h1 style="color: #ffffff; margin: 0; font-size: 22px;">GHM Marketing</h1>
+          <h1 style="color: #ffffff; margin: 0; font-size: 22px;">${tenant.fromName}</h1>
           <p style="color: #a0a0b0; margin: 4px 0 0 0; font-size: 12px; letter-spacing: 1px;">MONTHLY PERFORMANCE REPORT</p>
         </div>
         <div style="padding: 32px 24px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
@@ -498,7 +498,7 @@ export async function sendReportEmail(params: {
     `;
 
     const { error } = await resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${tenant.fromName} <${tenant.fromEmail}>`,
       to: recipientEmails[0],
       cc: recipientEmails.slice(1),
       subject: `${clientName} — ${periodLabel} Performance Report`,
