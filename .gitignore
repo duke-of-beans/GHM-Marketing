@@ -51,3 +51,8 @@ _tmp2.txt
 _git_out.txt 
 _git_err.txt 
 _commit_msg.txt  
+
+# Session tooling scripts (auto-generated, never commit)
+_*.bat
+_*.txt
+_*.ps1
