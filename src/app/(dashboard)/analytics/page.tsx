@@ -122,7 +122,7 @@ export default async function AnalyticsPage() {
 
       {/* Platform Usage Analytics — FEAT-019 (admin only) */}
       {isAdmin && (
-        <div>
+        <div data-tour="analytics-usage-panel">
           <h2 className="text-lg font-semibold mb-4">Platform Usage</h2>
           <DashboardUsagePanel />
         </div>

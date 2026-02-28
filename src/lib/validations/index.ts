@@ -31,6 +31,7 @@ export const createLeadSchema = z.object({
   email: z.string().email().optional().or(z.literal("")),
   address: z.string().optional(),
   leadSourceId: z.number().int().positive().optional(),
+  territoryId: z.number().int().positive().optional(),
 });
 
 export const updateLeadStatusSchema = z.object({

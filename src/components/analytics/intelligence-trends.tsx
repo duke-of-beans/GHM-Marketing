@@ -44,7 +44,7 @@ export function IntelligenceTrends({ trend }: Props) {
       </div>
 
       {/* MRR Trend */}
-      <Card>
+      <Card data-tour="analytics-revenue-chart">
         <CardHeader>
           <CardTitle className="text-sm">Revenue Trend — MRR</CardTitle>
         </CardHeader>
@@ -70,7 +70,7 @@ export function IntelligenceTrends({ trend }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Client Count Trend */}
-        <Card>
+        <Card data-tour="analytics-client-chart">
           <CardHeader>
             <CardTitle className="text-sm">Active Clients</CardTitle>
           </CardHeader>
@@ -95,7 +95,7 @@ export function IntelligenceTrends({ trend }: Props) {
         </Card>
 
         {/* New Closes + Churn */}
-        <Card>
+        <Card data-tour="analytics-churn-panel">
           <CardHeader>
             <CardTitle className="text-sm">New Clients vs. Churn</CardTitle>
           </CardHeader>
@@ -116,7 +116,7 @@ export function IntelligenceTrends({ trend }: Props) {
       </div>
 
       {/* Avg Health Score Trend */}
-      <Card>
+      <Card data-tour="analytics-health-sparklines">
         <CardHeader>
           <CardTitle className="text-sm">Average Health Score Trend</CardTitle>
         </CardHeader>

@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       email: parsed.data.email || null,
       address: parsed.data.address || null,
       leadSourceId: parsed.data.leadSourceId || null,
+      territoryId: parsed.data.territoryId || null,
     },
     include: {
       territory: { select: { id: true, name: true } },

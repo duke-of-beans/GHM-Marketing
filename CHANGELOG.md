@@ -1,8 +1,41 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 27, 2026 — Sprint 28 complete. COVOS tenant extraction: ~50 GHM hardcoded strings removed from non-tenant layer across 5 commits.
+**Last Updated:** February 28, 2026 — Wave 1: 29-A verified, ARCH-002 ADR written (PROPOSED), 31-A/B/C data display foundations shipped.
 
+## Wave 1 (Instance 2) — Tenant Hardening Verified + ARCH-002 ADR + Data Display Foundations — February 28, 2026
+
+**29-A — Tenant registry hardening:** Verified complete (shipped Sprint 30). `getTenant()` in `src/lib/tenant/server.ts` already handles all four edge cases: unknown subdomain, inactive tenant, localhost, Vercel preview URLs — all fall back to `TENANT_REGISTRY["ghm"]` with `console.warn`. No changes required this session.
+
+**ARCH-002 — Repo/Service/DB Separation ADR:** Created `docs/blueprints/ARCH_002_REPO_SEPARATION.md`. Status: PROPOSED. Covers current monorepo state, three options (A: stay monorepo, B: platform fork, C: Turborepo monorepo), recommendation (Option A for 6-month sellability window with mitigation layer), concrete A‒B migration steps, and five trigger conditions that would change the recommendation. Requires David sign-off before ACCEPTED.
+
+**31-A — Shared DataTable component:** Created `src/components/ui/data-table.tsx`. Enforces: standard column widths via `ColumnDef.width`, sortable headers with ArrowUpDown/ArrowUp/ArrowDown (controlled + uncontrolled sort state), `hover:bg-muted/50` on all rows, `emptyMessage` prop, `isLoading` prop with 5 skeleton rows (`Skeleton className="h-4 w-full"` per cell).
+
+**31-B — MetricCard standards:** Updated `src/components/dashboard/metric-card.tsx`. Added `min-h-[120px]`, `delta?: number` prop with TrendingUp/TrendingDown icons (status color tokens), `isLoading?: boolean` with Skeleton. Legacy `trend` prop preserved for backward compat. Re-exports `formatCurrency` so existing callers unaffected.
+
+**31-C — Chart color tokens:** Created `src/lib/chart-tokens.ts` with `CHART_COLORS` object (primary–quinary + domain aliases: revenue, clients, churn, health, new), grid/axis/tooltip constants, and `getChartColorScale()` helper. Verified `--chart-1` through `--chart-8` already present in `:root` and `.dark` in `globals.css` — no CSS changes needed.
+
+**Supporting — format.ts:** Created `src/lib/format.ts` with `formatMetric()` (K/M/B abbreviation), `formatCurrency()` (Intl USD, 0 decimals), `formatCurrencyCompact()`, `formatDelta()`. Central number formatting — components import from here.
+
+**TypeScript gate:** `npx tsc --noEmit` — exactly 5 pre-existing errors in scripts/basecamp and src/lib/basecamp. Zero new errors.
+
+---
+
+
+
+## Sprint 32 (Instance 3) — DocuSign Schema + Tour Configs — February 28, 2026
+
+**32-A — SignatureEnvelope schema:** Added `SignatureEnvelope` model to `prisma/schema.prisma` with all fields per spec (envelopeId, documentName, documentUrl, recipientEmail, recipientName, status, sentAt, viewedAt, completedAt, vaultFileId, clientId, createdById). Reverse relations added: `User.signatureEnvelopes`, `Lead.signatures`, `VaultFile.signatures`. `npx prisma db push` applied. Prisma Client regenerated.
+
+**32-F — Leads tour updated:** `src/lib/tutorials/tours/leads-tour.ts` rewritten to Sprint 32 spec — 4 steps covering pipeline header, smart filtering, lead intelligence cards, and bulk actions area. `data-tour="leads-bulk-actions"` added to leads/client.tsx actions div (also picked up `<NewLeadDialog />` added by Instance 1).
+
+**32-G — Client detail tour updated:** `src/lib/tutorials/tours/client-detail-tour.ts` rewritten to Sprint 32 spec — 7 steps covering header, tabs, tasks, rankings, reports, billing, and audit. `data-tour="client-tabs"` added to profile.tsx tab bar wrapper. `data-tour={client-tab-${value}}` added to overflow DropdownMenuItems (reports, billing, etc.).
+
+**32-H — Analytics tour created:** `src/lib/tutorials/tours/analytics-tour.ts` created — 5 steps covering revenue trajectory, portfolio growth, churn panel, health sparklines, and platform telemetry. `data-tour` attrs added to all 4 IntelligenceTrends cards and the admin DashboardUsagePanel div. `useTour(ANALYTICS_TOUR)` + `TourButton` wired into `AnalyticsDashboard`. `ANALYTICS_TOUR` exported from `tours/index.ts` and `lib/tutorials/index.ts`.
+
+**TypeScript gate:** `npx tsc --noEmit` — exactly 5 pre-existing errors (basecamp-crawl.ts, import-wave-history.ts, basecamp/client.ts). Zero new errors.
+
+---
 
 ## INFRA-001 — Resend covos.app Domain Verification — February 27, 2026
 

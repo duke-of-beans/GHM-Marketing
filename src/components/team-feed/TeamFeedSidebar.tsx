@@ -320,56 +320,60 @@ function ComposeBox({
         </div>
       )}
 
-      {/* Action bar */}
-      <div className="flex items-center gap-1">
-        {/* Audience chip — always visible, one click to change */}
-        {!parentId && chipLabel && (
-          <button
-            onClick={() => setShowAudiencePicker(!showAudiencePicker)}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium transition-colors ${
-              audienceType !== "all"
-                ? "bg-primary/10 border-primary/40 text-primary"
-                : "bg-muted/60 border-muted-foreground/20 text-muted-foreground hover:text-foreground hover:bg-muted"
-            }`}
-          >
-            <Users className="h-3 w-3" />
-            {chipLabel}
-          </button>
-        )}
+      {/* Action bar — left group compresses, Send never clips */}
+      <div className="flex items-center gap-1 min-w-0">
+        {/* Left controls — allowed to compress if panel is narrow */}
+        <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
+          {/* Audience chip — always visible, one click to change */}
+          {!parentId && chipLabel && (
+            <button
+              onClick={() => setShowAudiencePicker(!showAudiencePicker)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium transition-colors flex-shrink-0 ${
+                audienceType !== "all"
+                  ? "bg-primary/10 border-primary/40 text-primary"
+                  : "bg-muted/60 border-muted-foreground/20 text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              <Users className="h-3 w-3" />
+              {chipLabel}
+            </button>
+          )}
 
-        {/* Priority toggle — cycles normal→important→urgent */}
-        {!parentId && (
-          <button
-            onClick={cyclePriority}
-            title={`Priority: ${priority} (click to change)`}
-            className="p-1 rounded hover:bg-muted transition-colors"
-          >
-            {priorityIcon}
-          </button>
-        )}
+          {/* Priority toggle — cycles normal→important→urgent */}
+          {!parentId && (
+            <button
+              onClick={cyclePriority}
+              title={`Priority: ${priority} (click to change)`}
+              className="p-1 rounded hover:bg-muted transition-colors flex-shrink-0"
+            >
+              {priorityIcon}
+            </button>
+          )}
 
-        {/* Pin toggle (masters only) */}
-        {isMaster && !parentId && (
-          <button
-            onClick={() => setIsPinned(!isPinned)}
-            title={isPinned ? "Pinned" : "Pin message"}
-            className={`p-1 rounded transition-colors ${isPinned ? "text-status-warning" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
-          >
-            <Pin className="h-3.5 w-3.5" />
-          </button>
-        )}
+          {/* Pin toggle (masters only) */}
+          {isMaster && !parentId && (
+            <button
+              onClick={() => setIsPinned(!isPinned)}
+              title={isPinned ? "Pinned" : "Pin message"}
+              className={`p-1 rounded transition-colors flex-shrink-0 ${isPinned ? "text-status-warning" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
+            >
+              <Pin className="h-3.5 w-3.5" />
+            </button>
+          )}
 
-        <div className="flex items-center gap-0.5 ml-0.5">
-          <EmojiPickerButton onPick={(emoji) => setContent((c) => c + emoji)} />
-          {!gifAttachment && <GifPickerButton onPick={setGifAttachment} />}
+          <div className="flex items-center gap-0.5 ml-0.5 flex-shrink-0">
+            <EmojiPickerButton onPick={(emoji) => setContent((c) => c + emoji)} />
+            {!gifAttachment && <GifPickerButton onPick={setGifAttachment} />}
+          </div>
         </div>
 
-        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground ml-auto">
+        {/* Right controls — flex-shrink-0 guarantees Send is always visible */}
+        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground flex-shrink-0">
           {modSymbol}<CornerDownLeft className="h-3 w-3" />
         </span>
 
         <Button size="sm" onClick={send}
-          disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs px-3 ml-1">
+          disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs px-3 ml-1 flex-shrink-0">
           {sending ? "…" : <><Send className="h-4 w-4 mr-1" />Send</>}
         </Button>
       </div>

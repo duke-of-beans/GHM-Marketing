@@ -78,6 +78,7 @@ model User {
   // Document Vault
   vaultUploads          VaultFile[]  @relation("VaultUploads")
   vaultPrivateFiles     VaultFile[]  @relation("VaultOwned")
+  signatureEnvelopes    SignatureEnvelope[]
 
   // Team messaging
   sentMessages          TeamMessage[] @relation("MessageAuthor")
@@ -218,6 +219,7 @@ model Lead {
   notes             Note[]
   workOrders        WorkOrder[]
   vaultFiles        VaultFile[]
+  signatures        SignatureEnvelope[]
   prospectAudits    ProspectAudit[]
   prospectDemos     ProspectDemo[]
 
@@ -1815,6 +1817,7 @@ model VaultFile {
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
+  signatures   SignatureEnvelope[]
 
   @@index([space, category])
   @@index([uploadedBy])
@@ -2205,4 +2208,30 @@ model PmImportSession {
   @@index([userId, createdAt(sort: Desc)])
   @@index([platform, status])
   @@map("pm_import_sessions")
+}
+
+// ─── DocuSign / Signature Envelopes ──────────────────────────────────────────
+
+model SignatureEnvelope {
+  id              Int       @id @default(autoincrement())
+  envelopeId      String?   @unique
+  documentName    String
+  documentUrl     String
+  recipientEmail  String
+  recipientName   String
+  status          String    @default("draft")
+  sentAt          DateTime?
+  viewedAt        DateTime?
+  completedAt     DateTime?
+  vaultFileId     Int?
+  clientId        Int?
+  createdById     Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  vaultFile       VaultFile?  @relation(fields: [vaultFileId], references: [id])
+  client          Lead?       @relation(fields: [clientId], references: [id])
+  createdBy       User        @relation(fields: [createdById], references: [id])
+
+  @@map("signature_envelopes")
 }

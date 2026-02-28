@@ -432,7 +432,7 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
           const activeIsOverflow = overflowValues.includes(activeTab);
 
           return (
-            <div className="flex items-center gap-0.5 border-b">
+            <div className="flex items-center gap-0.5 border-b" data-tour="client-tabs">
               <TabsList className="h-10 bg-transparent p-0 gap-0 border-0 rounded-none flex-shrink-0">
                 {PRIMARY_TABS.map((tab) => (
                   <TabsTrigger
@@ -476,6 +476,7 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
                       {OVERFLOW_TABS.filter((t) => t.group === group).map((tab) => (
                         <DropdownMenuItem
                           key={tab.value}
+                          data-tour={`client-tab-${tab.value}`}
                           onClick={() => setActiveTab(tab.value)}
                           className={`cursor-pointer ${activeTab === tab.value ? "bg-accent font-medium" : ""}`}
                         >

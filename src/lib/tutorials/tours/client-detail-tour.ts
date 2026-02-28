@@ -1,7 +1,7 @@
 import type { TourConfig } from "../types";
 
 /**
- * Client Detail page tour.
+ * Client Detail page tour — Sprint 32-G.
  * Fires automatically on first visit to any client detail page.
  * Covers the header, health score, tabs, and what lives in each.
  */
@@ -11,59 +11,51 @@ export const CLIENT_DETAIL_TOUR: TourConfig = {
   steps: [
     {
       element: '[data-tour="client-header"]',
-      title: "Client Header",
+      title: "Client at a Glance",
       description:
-        "Name, health score, monthly revenue, quick-action buttons. Everything about this client starts here. If the health score looks bad, that's not a display bug.",
+        "Name, health score, monthly retainer, last scan date, and quick-action buttons. If the health score is red, something needs attention — don't wait for the next check-in to deal with it.",
       side: "bottom",
-    },
-    {
-      element: '[data-tour="client-health-badge"]',
-      title: "Health Score",
-      description:
-        "0–100. Measures how this client is performing against their local competitors. 75+ is healthy. Below 50 is a problem. It updates automatically after every scan — no manual refresh needed.",
-      side: "bottom",
-      padding: 4,
     },
     {
       element: '[data-tour="client-tabs"]',
-      title: "Tabs",
+      title: "Full Client Picture",
       description:
-        "Each tab is a different area of the client relationship. The URL updates when you switch — you can bookmark or share a direct link to any tab. This is relevant more often than you'd think.",
-      side: "bottom",
-    },
-    {
-      element: '[data-tour="client-tab-scorecard"]',
-      title: "Scorecard — Start Here",
-      description:
-        "Service recommendations, competitive gaps, full scan history. If you're not sure what to work on, this tab will tell you.",
+        "Each tab is a different lens on this client: Scorecard for gaps and history, Tasks for work queue, Rankings for live SEO data, Reports for PDF generation, Billing for Wave invoices. The URL updates when you switch — you can bookmark or share any tab directly.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-tasks"]',
-      title: "Tasks",
+      title: "Track All Work",
       description:
-        "Work queue for this client. Create tasks, assign them, track progress. AI Content Briefs live here — click Generate and the system does the brief for you.",
+        "The client's full work queue. Create tasks, assign them, set due dates, and track progress through stages. Recurring task rules run automatically so nothing gets missed. AI Content Briefs live here too — click Generate and it writes the brief for you.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-rankings"]',
-      title: "SEO — Rankings",
+      title: "Rankings and Citations",
       description:
-        "Live keyword rankings from DataForSEO. Climbing, declining, new — it's all here. Updates daily via cron. If a keyword disappeared, it's not gone, check the filter.",
+        "Live keyword rankings from DataForSEO — climbing, declining, and newly tracked. Updates daily via cron. Also check NAP health and citation consistency here. If a keyword disappears it's not gone, check the status filter.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-reports"]',
-      title: "Reports",
+      title: "Generate Reports",
       description:
-        "Generate, preview, and download the monthly client report PDF. Pulls live data — rankings, citations, scan results — into a branded PDF. Ready to send directly to the client.",
+        "On-demand PDF report generation. Pulls live data — rankings, citations, scan results — into a branded PDF. Ready to send directly to the client. You can also schedule monthly delivery from this tab.",
       side: "bottom",
     },
     {
       element: '[data-tour="client-tab-billing"]',
-      title: "Billing",
+      title: "Wave Integration",
       description:
-        "Wave invoice history, payment status, and outstanding balance. Invoices generate automatically every month. If a payment is late, this is where you confirm it and then call them.",
+        "Invoice history, payment status, and outstanding balance — all pulled live from Wave. Invoices generate automatically each month. If a payment is late, confirm it here, then call them.",
+      side: "bottom",
+    },
+    {
+      element: '[data-tour="client-tab-audit"]',
+      title: "One-Click Audit",
+      description:
+        "Runs a full technical audit of the client's website: PageSpeed, Core Web Vitals, broken links, on-page SEO gaps. Generates a shareable PDF and opens the demo builder so you can present findings directly to the client.",
       side: "bottom",
     },
   ],

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { KanbanBoard } from "@/components/leads/kanban-board";
 import { LeadDetailSheet } from "@/components/leads/lead-detail-sheet";
 import { CSVImportDialog } from "@/components/leads/csv-import-dialog";
+import { NewLeadDialog } from "@/components/leads/new-lead-dialog";
 import { 
   AdvancedLeadFilterBar, 
   type AdvancedFilterState,
@@ -358,8 +359,10 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
             Manage leads from first contact through deal close — {filteredLeads.length} leads • Drag cards between stages
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" data-tour="leads-bulk-actions">
           <TourButton onStart={startTour} tooltip="Tour the Sales Pipeline" />
+          {/* Manual single-lead entry — all roles */}
+          <NewLeadDialog />
           {/* Import — available to admin + master, not sales reps */}
           {userRole !== "sales" && (
             <CSVImportDialog onComplete={handleImportComplete} />
@@ -471,6 +474,7 @@ export function LeadsClientPage({ initialLeads, totalLeadCount, userRole }: Lead
                   Add your first lead manually, import a CSV, or use the Discovery engine to find local businesses that match your criteria.
                 </p>
                 <div className="flex items-center gap-3 mt-2">
+                  <NewLeadDialog />
                   {userRole !== "sales" && <CSVImportDialog onComplete={handleImportComplete} />}
                   <a href="/discovery" className="text-sm underline text-muted-foreground hover:text-foreground">
                     Find leads in Discovery →

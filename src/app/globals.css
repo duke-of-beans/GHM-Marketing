@@ -110,8 +110,8 @@
     --muted: 217.2 32.6% 17.5%;       /* slate-800 */
     --muted-foreground: 215 16.3% 46.9%; /* slate-500 */
 
-    /* Accent — amber brightened */
-    --accent: 50.4 97.8% 63.5%;       /* yellow-400 #fbbf24 */
+    /* Accent — warm amber (matches light mode amber-500 tone) */
+    --accent: 38 92% 50%;              /* amber-500 #f59e0b */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     /* Destructive */

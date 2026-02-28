@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTour } from "@/lib/tutorials";
+import { ANALYTICS_TOUR } from "@/lib/tutorials";
+import { TourButton } from "@/components/tutorials/TourButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Tooltip as InfoTooltip,
@@ -38,10 +41,14 @@ const COLORS = [...CHART_FALLBACKS];
 
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const metrics = useMemo(() => calculateMetrics(data), [data]);
+  const { startTour } = useTour(ANALYTICS_TOUR);
 
   return (
     <TooltipProvider>
       <div className="space-y-6">
+      <div className="flex justify-end">
+        <TourButton onStart={startTour} tooltip="Tour the Analytics page" />
+      </div>
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
