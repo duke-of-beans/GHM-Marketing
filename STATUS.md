@@ -1,10 +1,18 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 29 complete. Second-tenant dry-run successful: covosdemo.covos.app live, isolated DB verified. Resend + GCP OAuth pending David (async).
+**Last Updated:** February 27, 2026 — Sprint 30 complete. Per-tenant logo wiring live. Tenant resolution hardened + debug endpoint verified: covosdemo resolves correctly, hasDatabaseUrl true. DNS fixed. Resend + GCP OAuth pending David (async).
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
-### SPRINT 29 — COVOS Entity Go-Live (February 27, 2026 — COMPLETE)
+### SPRINT 30 — Tenant Branding + Resolution Hardening (February 27, 2026 — COMPLETE)
+
+- [x] **Per-tenant logo serving** — `TenantConfig.logoUrl` field added. `/api/public/branding` returns `logoUrl`. Login page + nav both fetch and render dynamically. `public/logos/covos.png` placeholder created. GHM unchanged. Commit `e1949dc`.
+- [x] **getTenant() hardened** — Unknown slugs, inactive tenants, localhost, and Vercel preview URLs all fall back gracefully to `TENANT_REGISTRY["ghm"]` with console warning. No crash path.
+- [x] **Debug endpoint live** — `GET /api/debug/tenant` (admin-gated). Returns slug, companyName, dashboardUrl, hasDatabaseUrl, active, resolvedFrom. databaseUrl never exposed.
+- [x] **Tenant resolution verified** — `covosdemo.covos.app/api/debug/tenant` returns `slug:"covosdemo"`, `hasDatabaseUrl:true`, `resolvedFrom:"covosdemo.covos.app"`. DB isolation confirmed.
+- [x] **DNS fixed** — Removed `*.covos.app` wildcard from Vercel (unsupported on free tier). Added explicit `ghm CNAME cname.vercel-dns.com` in Namecheap. `covos.app` A record confirmed correct (`76.76.21.21`).
+
+
 
 - [x] **getTenantPrismaClient() shipped** — `src/lib/tenant/server.ts`. Singleton cache, one PrismaClient per unique DB URL. Falls back to `DATABASE_URL` if `tenant.databaseUrl` is unset (zero behavior change for current tenant). TypeScript clean.
 - [x] **TENANT_PROVISIONING.md written** — `docs/TENANT_PROVISIONING.md`. Full 8-step onboarding checklist, offboarding checklist, GHM→Easter migration path, technical notes.
