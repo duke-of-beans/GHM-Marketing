@@ -1,7 +1,13 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 28, 2026 — Wave 1: 29-A verified, ARCH-002 ADR written (PROPOSED), 31-A/B/C data display foundations shipped.
+**Last Updated:** February 28, 2026 — Sprint 27 complete (Wave 1 Instance 1): BUG-030/031/032 + FEAT-037 shipped. Wave 1 Instance 2: 29-A verified, ARCH-002 ADR written (PROPOSED), 31-A/B/C data display foundations shipped.
+
+## Sprint 27 — Bug Triage + FEAT-037 — February 28, 2026
+
+BUG-030 TeamFeed send button clip fixed — ComposeBox action bar split into left group (`flex-1 min-w-0 overflow-hidden`) + right group (`flex-shrink-0`), ensuring Send is always visible in the 320px sidebar panel. BUG-031 dark mode `--accent` corrected from cool yellow-400 (`50.4 97.8% 63.5%`) to warm amber-500 (`38 92% 50%`) — matches light mode amber tone. BUG-032 pipeline Kanban column header backgrounds changed from washed-out `dark:bg-X-500/15` to deep `dark:bg-X-950/40` across all 8 status variants. FEAT-037 single lead manual entry dialog added — `new-lead-dialog.tsx` with Business Name, Phone, Email, Website, Address, City, State, ZIP, Territory (graceful degradation if no `manage_territories` permission), Notes; wired into leads header controls and empty pipeline CTA; POST /api/leads + optional POST /api/leads/[id]/notes; `territoryId` added to `createLeadSchema` and Prisma create call.
+
+---
 
 ## Wave 1 (Instance 2) — Tenant Hardening Verified + ARCH-002 ADR + Data Display Foundations — February 28, 2026
 

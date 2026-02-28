@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 28, 2026 — Sprint 32 Wave 1 Instance 3 complete: 32-A SignatureEnvelope schema + prisma db push, 32-F leads-tour updated, 32-G client-detail-tour updated, 32-H analytics-tour created + wired. data-tour attrs added to leads/client/analytics components. TypeScript gate: 5 pre-existing errors, zero new.
+**Last Updated:** February 28, 2026 — Sprint 27 Wave 1 Instance 1 complete: BUG-030 TeamFeed send button flex fix, BUG-031 dark mode accent warm amber, BUG-032 pipeline column dark mode headers, FEAT-037 new-lead-dialog.tsx + API wiring. TypeScript gate: 5 pre-existing errors, zero new. Also: Sprint 32 Wave 1 Instance 3 complete: 32-A SignatureEnvelope schema + prisma db push, 32-F/G/H tour configs, data-tour attrs added.
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 ### SPRINT 30 — Tenant Branding + Resolution Hardening (February 27, 2026 — COMPLETE)
