@@ -65,6 +65,24 @@ export const TENANT_REGISTRY: Record<string, TenantConfig> = {
       email:      'resend',
     },
   },
+  covosdemo: {
+    slug: "covosdemo",
+    name: "COVOS Demo",
+    companyName: "COVOS Demo Agency",
+    companyTagline: "Powered by COVOS",
+    fromEmail: "noreply@covos.app",
+    fromName: "COVOS Demo",
+    supportEmail: "support@covos.app",
+    dashboardUrl: "https://covosdemo.covos.app",
+    databaseUrl: process.env.COVOS_TEST_DATABASE_URL,
+    active: true,
+    providers: {
+      accounting: 'wave',
+      domain:     'godaddy',
+      payroll:    'wave',
+      email:      'resend',
+    },
+  },
 };
 
 // Subdomains that are NOT tenants — reserved for platform use.
