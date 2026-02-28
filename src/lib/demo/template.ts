@@ -1,6 +1,7 @@
 ﻿import type { DemoData } from "./generator";
+import type { TenantConfig } from "@/lib/tenant/config";
 
-export function generateDemoHTML(data: DemoData): string {
+export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
   const { lead, currentRankings, projectedRankings, satelliteSites, competitorSnapshot, monthlyValue, generatedAt, expiresAt, repName } = data;
 
   const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -42,7 +43,7 @@ export function generateDemoHTML(data: DemoData): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GHM Digital Marketing Inc — Your SEO Preview: ${lead.businessName}</title>
+  <title>${tenant.companyName} — Your SEO Preview: ${lead.businessName}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #111827; }
@@ -54,7 +55,7 @@ export function generateDemoHTML(data: DemoData): string {
 <!-- HEADER BAR -->
 <div style="background:#1e3a5f;color:white;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
   <div>
-    <span style="font-weight:800;font-size:16px;letter-spacing:-0.5px;">GHM Digital Marketing Inc</span>
+    <span style="font-weight:800;font-size:16px;letter-spacing:-0.5px;">${tenant.companyName}</span>
     <span style="opacity:0.5;margin:0 8px;">·</span>
     <span style="opacity:0.7;font-size:13px;">Personalized SEO Preview</span>
   </div>
@@ -188,7 +189,7 @@ ${competitorSnapshot.length > 0 ? `
 <section style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);color:white;padding:56px 24px;text-align:center;">
   <h2 style="font-size:28px;font-weight:800;margin-bottom:10px;">Ready to Own ${lead.city}?</h2>
   <p style="opacity:0.8;font-size:16px;max-width:440px;margin:0 auto 16px;">Month-to-month. No setup fees. Just DNS access and we handle everything else.</p>
-  <p style="opacity:0.6;font-size:13px;">${repName ? `Questions? Contact ${repName} · ` : ""}GHM Digital Marketing Inc</p>
+  <p style="opacity:0.6;font-size:13px;">${repName ? `Questions? Contact ${repName} · ` : ""}${tenant.companyName}</p>
 </section>
 
 <div style="padding:16px;text-align:center;font-size:11px;color:#94a3b8;background:#f8fafc;">

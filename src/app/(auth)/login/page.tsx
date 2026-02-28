@@ -126,7 +126,7 @@ export default function LoginPage() {
           ) : (
             <Image
               src="/logo.png"
-              alt="GHM Digital Marketing"
+              alt={tenantName ?? "Company logo"}
               width={240}
               height={80}
               className="mx-auto"

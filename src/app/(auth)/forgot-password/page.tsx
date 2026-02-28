@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2 pb-4">
-          <Image src="/logo.png" alt="GHM Digital Marketing" width={240} height={80} className="mx-auto" priority />
+          <Image src="/logo.png" alt="Company logo" width={240} height={80} className="mx-auto" priority />
           <p className="text-sm text-muted-foreground">Password reset</p>
         </CardHeader>
         <CardContent>

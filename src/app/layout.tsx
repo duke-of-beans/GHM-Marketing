@@ -8,7 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GHM Marketing Dashboard",
+  title: "Dashboard",
   description: "SEO lead generation and sales management platform",
   manifest: "/manifest.json",
 };

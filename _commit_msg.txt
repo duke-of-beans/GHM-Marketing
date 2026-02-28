@@ -1,0 +1,16 @@
+fix: mop-up missed GHM strings from Sprint 28 post-scan
+
+Four files missed by Track A/B/C blueprints:
+
+- src/lib/demo/template.ts: sister file to audit/template.ts, same
+  3 GHM strings. Add tenant param, update caller in leads/[id]/demo/route.ts.
+- src/app/layout.tsx: root layout (Track B fixed dashboard layout only).
+  Static title changed to generic "Dashboard" fallback.
+- src/app/(auth)/login/page.tsx: alt text in logo fallback branch now
+  uses tenantName already in scope from branding fetch.
+- src/app/(auth)/forgot-password/page.tsx: generic "Company logo" alt.
+- src/app/(auth)/reset-password/page.tsx: generic "Company logo" alt.
+
+Full codebase scan now returns zero GHM runtime strings outside
+tenant/config.ts (which holds the tenant data values -- correct).
+TypeScript: 5 pre-existing errors only. Zero new errors.

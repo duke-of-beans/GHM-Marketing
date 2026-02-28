@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { generateDemoData } from "@/lib/demo/generator";
 import { generateDemoHTML } from "@/lib/demo/template";
+import { requireTenant } from "@/lib/tenant/server";
 
 export async function GET(
   request: NextRequest,
@@ -24,8 +25,9 @@ export async function GET(
   const repName = user.name ?? undefined;
 
   try {
+    const tenant = await requireTenant();
     const data = await generateDemoData(leadId, repName);
-    const html = generateDemoHTML(data);
+    const html = generateDemoHTML(data, tenant);
 
     // Persist history record (non-fatal)
     await prisma.prospectDemo.create({
