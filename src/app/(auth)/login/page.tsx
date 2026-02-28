@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
 
 type LoginStep = "credentials" | "totp";
@@ -18,7 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<LoginStep>("credentials");
   const [useBackupCode, setUseBackupCode] = useState(false);
-  const [tenantLogoUrl, setTenantLogoUrl] = useState<string | null>(null);
+  const [tenantLogoUrl, setTenantLogoUrl] = useState<string>("/logo.png");
   const [tenantName, setTenantName] = useState<string | null>(null);
 
   // Store credentials across the two-step flow
@@ -30,7 +29,7 @@ export default function LoginPage() {
     fetch("/api/public/branding")
       .then((r) => r.json())
       .then((d) => {
-        if (d.logoUrl) setTenantLogoUrl(d.logoUrl);
+        setTenantLogoUrl(d.logoUrl ?? "/logo.png");
         if (d.companyName) setTenantName(d.companyName);
       })
       .catch(() => {});
@@ -116,23 +115,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2 pb-4">
-          {tenantLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={tenantLogoUrl}
-              alt={tenantName ?? "Company logo"}
-              className="mx-auto max-h-16 max-w-48 object-contain"
-            />
-          ) : (
-            <Image
-              src="/logo.png"
-              alt={tenantName ?? "Company logo"}
-              width={240}
-              height={80}
-              className="mx-auto"
-              priority
-            />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tenantLogoUrl}
+            alt={tenantName ?? "Company logo"}
+            className="mx-auto max-h-16 max-w-48 object-contain"
+          />
           <p className="text-sm text-muted-foreground">
             {step === "credentials" ? "Sign in to your dashboard" : "Two-factor authentication"}
           </p>

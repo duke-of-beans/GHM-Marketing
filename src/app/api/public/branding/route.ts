@@ -22,7 +22,7 @@ export async function GET() {
   return NextResponse.json({
     companyName: settings?.companyName ?? null,
     supportEmail: tenant?.supportEmail ?? "support@covos.app",
-    logoUrl: settings?.logoUrl ?? null,
+    logoUrl: tenant?.logoUrl ?? settings?.logoUrl ?? "/logo.png",
     brandColor: settings?.brandColor ?? null,
     brandColorSecondary: settings?.brandColorSecondary ?? null,
     brandColorAccent: settings?.brandColorAccent ?? null,

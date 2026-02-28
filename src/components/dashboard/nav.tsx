@@ -21,7 +21,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ChevronDown, Search, Users, Building2, CheckSquare, Repeat, PenTool, Globe, TrendingUp, CreditCard, Package, Archive, LayoutDashboard, User, Settings, LogOut } from "lucide-react";
@@ -245,6 +244,17 @@ export function DashboardNav({
   const pathname = usePathname();
   const elevated = isElevated(user.role);
 
+  // Fetch branding on mount so the nav always shows the correct per-tenant logo
+  // regardless of what the parent passes as a prop. Defaults to "/logo.png"
+  // while loading or on error.
+  const [dynamicLogoUrl, setDynamicLogoUrl] = useState<string>(logoUrl ?? "/logo.png");
+  useEffect(() => {
+    fetch("/api/public/branding")
+      .then((r) => r.json())
+      .then((d) => setDynamicLogoUrl(d.logoUrl ?? "/logo.png"))
+      .catch(() => {}); // keep default on network error
+  }, []);
+
   const dashboardHref = elevated ? "/manager" : "/sales";
 
   // Active path: exact match OR prefix match for nested routes (/clients/123)
@@ -269,23 +279,12 @@ export function DashboardNav({
         {/* Logo + user */}
         <div className="mb-4 flex-shrink-0">
           <Link href={dashboardHref}>
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={logoUrl}
-                alt={companyName ?? "Company logo"}
-                className="mb-1 max-h-12 max-w-[180px] object-contain brightness-0 invert hover:opacity-80 transition-opacity"
-              />
-            ) : (
-              <Image
-                src="/logo.png"
-                alt={companyName ?? "Dashboard"}
-                width={180}
-                height={59}
-                className="mb-1 brightness-0 invert hover:opacity-80 transition-opacity"
-                priority
-              />
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={dynamicLogoUrl}
+              alt={companyName ?? "Company logo"}
+              className="mb-1 max-h-12 max-w-[180px] object-contain brightness-0 invert hover:opacity-80 transition-opacity"
+            />
           </Link>
           <p className="text-xs sidebar-text-muted">{user.name}</p>
         </div>

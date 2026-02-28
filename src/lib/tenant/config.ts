@@ -75,6 +75,7 @@ export const TENANT_REGISTRY: Record<string, TenantConfig> = {
     supportEmail: "support@covos.app",
     dashboardUrl: "https://covosdemo.covos.app",
     databaseUrl: process.env.COVOS_TEST_DATABASE_URL,
+    logoUrl: "/logos/covos.png",
     active: true,
     providers: {
       accounting: 'wave',

@@ -20,9 +20,27 @@ import type { TenantConfig } from "./config";
  */
 export async function getTenant(): Promise<TenantConfig | null> {
   const headerStore = await headers();
+
+  // Existing behaviour: trust the tenant slug injected by middleware.
   const slug = headerStore.get(TENANT_HEADER);
-  if (!slug) return null;
-  return TENANT_REGISTRY[slug] ?? null;
+  if (slug) {
+    const tenant = TENANT_REGISTRY[slug];
+    if (tenant && tenant.active) return tenant;
+  }
+
+  // Hardened fallback: derive subdomain from the Host header so that
+  // localhost, Vercel preview URLs, and unknown subdomains never crash.
+  const host =
+    headerStore.get("host") ?? headerStore.get("x-forwarded-host");
+  const subdomain = (host ?? "").split(".")[0];
+  const tenant = TENANT_REGISTRY[subdomain];
+  if (!tenant || !tenant.active) {
+    console.warn(
+      `[getTenant] Unknown or inactive slug "${subdomain}", falling back to ghm`
+    );
+    return TENANT_REGISTRY["ghm"];
+  }
+  return tenant;
 }
 
 /**
