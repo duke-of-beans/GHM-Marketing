@@ -11,6 +11,22 @@
 
 ---
 
+## Wave 2 (Instance 2) — Sprint 31 D/E/F/G/H: Data Display Standards — February 28, 2026
+
+**31-D — Leads page table standards:** `src/app/(dashboard)/leads/client.tsx` — no changes required. Page is Kanban-only (renders `<KanbanBoard>`, no table/list view). All three empty-state scenarios already correctly implemented: empty pipeline, filters hiding results, no assigned leads. 31-D confirmed compliant as shipped.
+
+**31-E — Clients portfolio table standards:** `src/components/clients/portfolio.tsx` — applied column width classes to all `<th>` elements in the table view: `min-w-[200px]` on Client column, `w-[100px]` on Health/Retainer/Open Tasks/Payment/Risk, `w-[120px]` on Last Scan and Google Ads. Row hover upgraded from `hover:bg-muted/20` → `hover:bg-muted/50` to match DataTable standard.
+
+**31-F — Manager dashboard metric tiles:** `src/components/dashboard/MetricsRow.tsx` — added `import { formatMetric } from "@/lib/format"`. Applied `formatMetric()` to `totalLeads`, `activeLeads`, and `wonDeals` card values (K/M/B abbreviation). MRR and ARR values retain `formatCurrency()` wrapper already present. MetricCard `min-h-[120px]`, delta prop, and isLoading skeleton were already in place from 31-B.
+
+**31-G — Analytics dashboard metric tiles + chart tokens:** `src/components/analytics/analytics-dashboard.tsx` — replaced `CHART_FALLBACKS` import with named tokens from `@/lib/chart-tokens`; added `formatCurrencyCompact` and `cn` imports. Applied `min-h-[120px]` to all 7 KPI cards (4 top row + 3 bottom row). Applied `formatCurrencyCompact()` to MRR, ARR subtitle, Avg Client Value, and Upsell Pipeline displays. Added MRR delta badge using `mrrGrowth` with `text-status-success/bg-status-success-bg` and `text-status-danger/bg-status-danger-bg` color tokens. Applied `CHART_COLORS.revenue` + `CHART_COLORS.secondary` to Revenue Forecast lines; `CHART_COLORS.revenue` to Pipeline bar; `CHART_GRID_COLOR`, `CHART_AXIS_COLOR`, `CHART_TOOLTIP_BG/BORDER` to all three charts.
+
+**31-H — Chart color token migration:** Three files updated. `src/components/analytics/intelligence-trends.tsx` — replaced `CHART_FALLBACKS` import with named token imports; mapped MRR line → `CHART_COLORS.revenue`, Active Clients line → `CHART_COLORS.clients`, New Clients bar → `CHART_COLORS.new`, Churned Clients bar → `CHART_COLORS.churn`, Health Score line → `CHART_COLORS.health`; added `CHART_GRID_COLOR` to all CartesianGrid strokes, `CHART_AXIS_COLOR` to all axis tick objects, `CHART_TOOLTIP_BG/BORDER` contentStyle to all Tooltips. `src/components/analytics/advanced-charts.tsx` — replaced `CHART_FALLBACKS` with `getChartColorScale(8)`; applied grid/axis/tooltip tokens to all 6 chart components (RevenueTrendChart, SalesRepPerformanceChart, TaskCompletionTrendChart, ServiceMixChart, ClientHealthChart, TerritoryComparisonChart). `src/components/analytics/analytics-dashboard.tsx` — same token migration applied alongside 31-G changes above.
+
+**TypeScript gate:** `npx tsc --noEmit` — exactly 5 pre-existing errors in scripts/basecamp-crawl.ts (TS2307), scripts/import-wave-history.ts (TS2307), src/lib/basecamp/client.ts (3× TS7022). Zero new errors.
+
+---
+
 ## Sprint 27 — Bug Triage + FEAT-037 — February 28, 2026
 
 BUG-030 TeamFeed send button clip fixed — ComposeBox action bar split into left group (`flex-1 min-w-0 overflow-hidden`) + right group (`flex-shrink-0`), ensuring Send is always visible in the 320px sidebar panel. BUG-031 dark mode `--accent` corrected from cool yellow-400 (`50.4 97.8% 63.5%`) to warm amber-500 (`38 92% 50%`) — matches light mode amber tone. BUG-032 pipeline Kanban column header backgrounds changed from washed-out `dark:bg-X-500/15` to deep `dark:bg-X-950/40` across all 8 status variants. FEAT-037 single lead manual entry dialog added — `new-lead-dialog.tsx` with Business Name, Phone, Email, Website, Address, City, State, ZIP, Territory (graceful degradation if no `manage_territories` permission), Notes; wired into leads header controls and empty pipeline CTA; POST /api/leads + optional POST /api/leads/[id]/notes; `territoryId` added to `createLeadSchema` and Prisma create call.
