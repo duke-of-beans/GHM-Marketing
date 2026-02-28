@@ -70,6 +70,7 @@ import { ClientTasksTab, type ClientTask } from "./tasks/ClientTasksTab";
 import { ClientNotesTab, type ClientNote } from "./notes/ClientNotesTab";
 import { ClientDomainsTab, type ClientDomain } from "./domains/ClientDomainsTab";
 import { SiteHealthTab } from "./site-health/SiteHealthTab";
+import { SignaturesTab } from "./SignaturesTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -173,7 +174,7 @@ function timeAgo(d: string | null) {
 const VALID_TABS = [
   "scorecard", "tasks", "rankings", "citations", "local",
   "content", "websites", "audit", "health", "reports", "domains", "compensation",
-  "billing", "campaigns", "integrations", "notes", "competitors",
+  "billing", "campaigns", "integrations", "notes", "competitors", "signatures",
 ] as const;
 
 type TabId = (typeof VALID_TABS)[number];
@@ -426,6 +427,9 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
             { value: "billing",      label: "Billing",       group: "Account" },
             { value: "campaigns",    label: "Google Ads",    group: "Account" },
             { value: "integrations", label: "Integrations",  group: "Account" },
+            ...(isElevated(currentUserRole ?? "")
+              ? [{ value: "signatures" as TabId, label: "Signatures", group: "Account" }]
+              : []),
           ];
 
           const overflowValues = OVERFLOW_TABS.map((t) => t.value);
@@ -587,6 +591,12 @@ export function ClientProfile({ client, currentUserRole }: { client: ClientData;
         <TabsContent value="competitors" className="space-y-4">
           <CompetitorsTab clientId={client.id} />
         </TabsContent>
+
+        {isElevated(currentUserRole ?? "") && (
+          <TabsContent value="signatures" className="space-y-4">
+            <SignaturesTab clientId={client.id} />
+          </TabsContent>
+        )}
       </Tabs>
 
       <VoiceProfileDialog

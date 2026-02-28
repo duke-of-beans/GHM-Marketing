@@ -25,15 +25,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Save, Bell } from "lucide-react";
+import { Loader2, Save, Bell, BookOpen, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
+import { resetAllTours } from "@/lib/tutorials";
 
 export function GeneralSettingsTab() {
   const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<any>(null);
+  const [resettingTours, setResettingTours] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -52,6 +54,16 @@ export function GeneralSettingsTab() {
       toast.error("Failed to load settings");
     } finally {
       setLoading(false);
+    }
+  }
+
+  function handleResetTours() {
+    setResettingTours(true);
+    try {
+      resetAllTours();
+      toast.success("Page tours reset. Each tour will replay on your next visit.");
+    } finally {
+      setResettingTours(false);
     }
   }
 
@@ -161,6 +173,41 @@ export function GeneralSettingsTab() {
               checked={!!settings.pushTasksEnabled}
               onCheckedChange={(checked) => updateSetting("pushTasksEnabled", checked)}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Help & Onboarding */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5" />
+            Help &amp; Onboarding
+          </CardTitle>
+          <CardDescription>
+            Each page has a guided tour that runs automatically on your first visit. Once seen, it
+            won&apos;t show again — but you can replay any tour using the{" "}
+            <strong>?</strong> icon in the page header.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Reset all page tours</p>
+              <p className="text-sm text-muted-foreground">
+                Clears the &quot;seen&quot; flag so every tour auto-starts again on your next visit
+                to each page.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetTours}
+              disabled={resettingTours}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset Tours
+            </Button>
           </div>
         </CardContent>
       </Card>

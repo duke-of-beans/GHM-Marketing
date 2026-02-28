@@ -18,10 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   FileText, FileImage, FileVideo, FileArchive, File,
-  Download, Trash2, Globe, MoreVertical, X,
+  Download, Trash2, Globe, MoreVertical, X, PenLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { SendForSignatureDialog } from "./SendForSignatureDialog";
 
 function fileIcon(mimeType: string) {
   if (mimeType.startsWith("image/")) return FileImage;
@@ -68,6 +69,7 @@ export function VaultFileTile({
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [sendSigOpen, setSendSigOpen] = useState(false);
   const Icon = fileIcon(file.mimeType);
 
   const canDelete =
@@ -76,6 +78,10 @@ export function VaultFileTile({
 
   const showTransferToShared =
     canTransferToShared && file.space === "private";
+
+  const canSendForSig =
+    file.mimeType === "application/pdf" &&
+    (isElevated || file.ownerId === currentUserId);
 
   const previewable = isPreviewable(file.mimeType);
 
@@ -153,7 +159,7 @@ export function VaultFileTile({
           <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
             <Icon className="h-5 w-5 text-muted-foreground" />
           </div>
-          {(canDelete || showTransferToShared) && (
+          {(canDelete || showTransferToShared || canSendForSig) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild data-radix-dropdown-menu-trigger>
                 <Button
@@ -178,6 +184,13 @@ export function VaultFileTile({
                     <Download className="h-3.5 w-3.5 mr-2" /> Download
                   </a>
                 </DropdownMenuItem>
+                {canSendForSig && (
+                  <DropdownMenuItem
+                    onClick={(e) => { e.stopPropagation(); setSendSigOpen(true); }}
+                  >
+                    <PenLine className="h-3.5 w-3.5 mr-2" /> Send for Signature
+                  </DropdownMenuItem>
+                )}
                 {showTransferToShared && (
                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleTransferToShared(); }}>
                     <Globe className="h-3.5 w-3.5 mr-2" /> Move to Shared
@@ -215,6 +228,17 @@ export function VaultFileTile({
           )}
         </div>
       </div>
+
+      {/* Send for Signature dialog */}
+      {canSendForSig && (
+        <SendForSignatureDialog
+          open={sendSigOpen}
+          onOpenChange={setSendSigOpen}
+          documentName={file.displayName ?? file.name}
+          documentUrl={file.blobUrl}
+          vaultFileId={file.id}
+        />
+      )}
 
       {/* Preview modal */}
       {previewable && (

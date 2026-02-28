@@ -23,7 +23,16 @@ export async function GET(req: NextRequest) {
     const skip = parseInt(searchParams.get("skip") ?? "0") || 0;
     const take = 20;
 
-    const where = isElevated(user.role) ? {} : { createdById: parseInt(user.id) };
+    const where: Record<string, unknown> = isElevated(user.role)
+      ? {}
+      : { createdById: parseInt(user.id) };
+
+    // Optional clientId filter — used by the Signatures tab on client detail
+    const clientIdParam = searchParams.get("clientId");
+    if (clientIdParam) {
+      const clientId = parseInt(clientIdParam);
+      if (!isNaN(clientId)) where.clientId = clientId;
+    }
 
     const envelopes = await prisma.signatureEnvelope.findMany({
       where,
