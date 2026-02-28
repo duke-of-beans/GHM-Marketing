@@ -3,6 +3,7 @@
 // DO NOT import in client components.
 
 import { headers } from "next/headers";
+import { PrismaClient } from "@prisma/client";
 import { TENANT_HEADER, TENANT_REGISTRY } from "./index";
 import type { TenantConfig } from "./config";
 
@@ -36,4 +37,38 @@ export async function requireTenant(): Promise<TenantConfig> {
     );
   }
   return tenant;
+}
+
+// ── Per-tenant Prisma client ──────────────────────────────────────────────────
+
+// Singleton cache — one PrismaClient per unique DB URL.
+// Prevents connection pool exhaustion across hot-reloads and concurrent requests.
+const _tenantClientCache = new Map<string, PrismaClient>();
+
+/**
+ * Returns a PrismaClient scoped to the given tenant's database.
+ *
+ * If tenant.databaseUrl is set, connects to that database.
+ * If not set, falls back to DATABASE_URL (current default — Easter Agency's DB).
+ *
+ * This is the sole mechanism for per-tenant DB routing in COVOS Phase 1.
+ * Each tenant gets a separate Neon project — no tenantId columns, no row-level
+ * filtering, no risk of data bleed between tenants.
+ *
+ * Usage:
+ *   const tenant = await requireTenant();
+ *   const db = getTenantPrismaClient(tenant);
+ *   const clients = await db.clientProfile.findMany();
+ *
+ * DO NOT instantiate PrismaClient directly in API routes.
+ */
+export function getTenantPrismaClient(tenant: TenantConfig): PrismaClient {
+  const url = tenant.databaseUrl ?? process.env.DATABASE_URL!;
+  if (!_tenantClientCache.has(url)) {
+    _tenantClientCache.set(
+      url,
+      new PrismaClient({ datasources: { db: { url } } })
+    );
+  }
+  return _tenantClientCache.get(url)!;
 }

@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 27, 2026 — Sprint 28 COMPLETE. ~50 GHM hardcoded strings extracted across Tracks A/B/C + mop-up. Codebase scan clean. Sprint 29 (infra transfer + entity go-live) is next. Answer questions I1–I5 in SPRINT29_GO_LIVE_BLUEPRINT.md before starting.
+**Last Updated:** February 27, 2026 — Sprint 29 in progress. getTenantPrismaClient() + TENANT_PROVISIONING.md shipped. Blocked on David creating test Neon DB and submitting GCP OAuth app.
 
 **Owner:** David Kirsch
 
