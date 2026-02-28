@@ -1,7 +1,7 @@
-# GHM DASHBOARD — MASTER STATUS
+﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 30 complete. Per-tenant logo wiring live. Tenant resolution hardened + debug endpoint verified: covosdemo resolves correctly, hasDatabaseUrl true. DNS fixed. Resend + GCP OAuth pending David (async).
+**Last Updated:** February 27, 2026 — Sprint 30 complete. INFRA-001 closed (covos.app Resend domain verified + pending internal verification). Docs synced. Sprint 31 options queued.
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 ### SPRINT 30 — Tenant Branding + Resolution Hardening (February 27, 2026 — COMPLETE)
@@ -1033,3 +1033,4 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 - **David (id=1) legitimately receives $240/mo management fee** through the engine as master_fee transactions. His masterFeeEnabled=true in UserCompensationConfig is correct.
 - **Test account (userId=6)** must never have contractorVendorId set or be assigned as salesRepId/masterManagerId on any real client.
 - **Vercel build script:** `vercel-build` (not `build`) is what Vercel runs. `prisma db push` was removed — schema changes are manual only.
+

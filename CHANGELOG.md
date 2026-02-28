@@ -1,9 +1,14 @@
-# GHM DASHBOARD — CHANGELOG
+﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
 **Last Updated:** February 27, 2026 — Sprint 28 complete. COVOS tenant extraction: ~50 GHM hardcoded strings removed from non-tenant layer across 5 commits.
 
----
+
+## INFRA-001 — Resend covos.app Domain Verification — February 27, 2026
+
+Verified covos.app as a sending domain in the COVOS Platform Resend account. All 4 DNS records added to Namecheap: DKIM TXT (esend._domainkey), SPF TXT (send), MX (send → eedback-smtp.us-east-1.amazonses.com priority 10), DMARC TXT (_dmarc). Namecheap Mail Settings switched from Email Forwarding → Custom MX. Resend verification triggered — status progressed to Pending → Records Validated → Internal Verification. Domain confirms verified. Email delivery from covos.app is now operational.
+
+**Also closed:** Sprint 30 complete (per-tenant logo wiring, getTenant() hardening, debug endpoint, covosdemo.covos.app live). Commits e1949dc + 47c4740.
 
 ## Sprint 28 — COVOS Tenant Extraction — February 27, 2026
 
@@ -564,3 +569,4 @@ Trigger button upgraded to `flex-1 min-w-0 max-w-sm` — fills available space b
 | 2026-02-17 | 2abf973 | PWA manifest + push notifications — VAPID keys, service worker, PushSubscription table, settings toggles |
 | 2026-02-17 | f61d299 | TeamFeed permanent collapsible sidebar — squeezes content, toggle in header, unread badge, localStorage state |
 | 2026-02-17 | (phase 1–11) | Core platform — auth, client management, lead database, task system, competitive scanning, content review, reports, upsell detection, product catalog, analytics, client portal, email automation |
+
