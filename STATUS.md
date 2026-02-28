@@ -1,18 +1,16 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 29 in progress. getTenantPrismaClient() shipped. TENANT_PROVISIONING.md written. Async infra tasks (Resend, GCP OAuth) pending David. Second-tenant dry-run pending Neon DB + env vars.
+**Last Updated:** February 27, 2026 — Sprint 29 complete. Second-tenant dry-run successful: covosdemo.covos.app live, isolated DB verified. Resend + GCP OAuth pending David (async).
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
-### SPRINT 29 — COVOS Entity Go-Live (February 27, 2026 — IN PROGRESS)
+### SPRINT 29 — COVOS Entity Go-Live (February 27, 2026 — COMPLETE)
 
 - [x] **getTenantPrismaClient() shipped** — `src/lib/tenant/server.ts`. Singleton cache, one PrismaClient per unique DB URL. Falls back to `DATABASE_URL` if `tenant.databaseUrl` is unset (zero behavior change for current tenant). TypeScript clean.
 - [x] **TENANT_PROVISIONING.md written** — `docs/TENANT_PROVISIONING.md`. Full 8-step onboarding checklist, offboarding checklist, GHM→Easter migration path, technical notes.
+- [x] **Second-tenant dry-run complete** — `covos-test` Neon DB created (same project, isolated database). `COVOS_TEST_DATABASE_URL` + `COVOS_TEST_DIRECT_URL` added to Vercel. Schema pushed via `prisma db push`. `covosdemo` added to TENANT_REGISTRY (commit `f5bdfad`). `covosdemo.covos.app` domain added to Vercel (wildcard CNAME in Namecheap resolved instantly). Redeploy successful. **covosdemo.covos.app is live and serving the correct isolated tenant.** "POWERED BY COVOS" footer confirmed. DB isolation verified.
 - [ ] **Resend platform account** — Create COVOS Resend account, verify `covos.app` sending domain. **David manual — ~20 min.**
 - [ ] **GCP OAuth app** — Create `COVOS Platform` GCP project, submit GBP OAuth app for Google review. **David manual — submit ASAP, review takes 1–3 weeks.**
-- [ ] **Second-tenant dry-run** — Create `covos-test` Neon DB, add `covosdemo` to TENANT_REGISTRY, add DNS + Vercel domain, verify clean tenant isolation. **Pending Neon DB creation (David) + COVOS_TEST_DATABASE_URL env var in Vercel.**
-
-**Blocked on:** Neon DB for test tenant (5 min to create), and Resend/GCP infra tasks above.
 
 ### SPRINT 28 — COVOS Tenant Extraction (February 27, 2026)
 - [x] **SPRINT 28 COMPLETE** — All ~50 runtime GHM hardcoded strings extracted from non-tenant layer. Commits: 315c3bd (Track A), 033562e (Track B), 6b487f9 (Track C), 986b9f2 (mop-up), 69a3508 (chore). Post-sprint full-codebase scan: clean. Only remaining GHM strings are in `src/lib/tenant/config.ts` registry values (correct by design). TypeScript: zero new errors across all tracks.
