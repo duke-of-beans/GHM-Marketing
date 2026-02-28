@@ -215,7 +215,7 @@ export default async function BrochurePage() {
         </h2>
         <p style={{ color: "#4b5563", lineHeight: 1.7, fontSize: 15, maxWidth: 620, marginBottom: 32 }}>
           Organic rankings take time. Paid search starts working the day a campaign goes live.
-          GHM manages both under one roof — no separate ad agency, no double billing,
+          {fromName} manages both under one roof — no separate ad agency, no double billing,
           no coordination overhead. Your $2,400/mo retainer includes campaign management.
           You own your ad accounts; we manage them.
         </p>
