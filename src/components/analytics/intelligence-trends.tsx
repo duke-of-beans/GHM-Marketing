@@ -13,7 +13,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
+import { CHART_COLORS, CHART_GRID_COLOR, CHART_AXIS_COLOR, CHART_TOOLTIP_BG, CHART_TOOLTIP_BORDER } from "@/lib/chart-tokens";
 import type { MonthlyTrendPoint } from "@/lib/analytics/intelligence";
 
 type Props = {
@@ -51,14 +51,14 @@ export function IntelligenceTrends({ trend }: Props) {
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={display}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-40" />
-              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-              <Tooltip formatter={formatMrr} />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} className="opacity-40" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+              <YAxis tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+              <Tooltip formatter={formatMrr} contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
               <Line
                 type="monotone"
                 dataKey="mrr"
-                stroke={CHART_FALLBACKS[0]}
+                stroke={CHART_COLORS.revenue}
                 strokeWidth={2}
                 dot={{ r: 3 }}
                 name="MRR"
@@ -77,14 +77,14 @@ export function IntelligenceTrends({ trend }: Props) {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={display}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-40" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} className="opacity-40" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
                 <Line
                   type="monotone"
                   dataKey="activeClients"
-                  stroke={CHART_FALLBACKS[1]}
+                  stroke={CHART_COLORS.clients}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   name="Active Clients"
@@ -102,13 +102,13 @@ export function IntelligenceTrends({ trend }: Props) {
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={display}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-40" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} className="opacity-40" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
                 <Legend />
-                <Bar dataKey="newClients" fill={CHART_FALLBACKS[0]} name="New" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="churnedClients" fill={CHART_FALLBACKS[3]} name="Churned" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="newClients" fill={CHART_COLORS.new} name="New" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="churnedClients" fill={CHART_COLORS.churn} name="Churned" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -128,14 +128,14 @@ export function IntelligenceTrends({ trend }: Props) {
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={display}>
-                <CartesianGrid strokeDasharray="3 3" className="opacity-40" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} className="opacity-40" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: CHART_AXIS_COLOR }} />
+                <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
                 <Line
                   type="monotone"
                   dataKey="avgHealthScore"
-                  stroke={CHART_FALLBACKS[1]}
+                  stroke={CHART_COLORS.health}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   name="Avg Health Score"

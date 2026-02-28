@@ -26,11 +26,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ChartData = any[];
 
-import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
+import { getChartColorScale, CHART_GRID_COLOR, CHART_AXIS_COLOR, CHART_TOOLTIP_BG, CHART_TOOLTIP_BORDER } from "@/lib/chart-tokens";
 
-// Uses COVOS chart token fallbacks (resolved hex). For dynamic dark-mode
-// support, components should use useChartColors() hook instead.
-const COLORS = [...CHART_FALLBACKS];
+const COLORS = getChartColorScale(8);
 
 /**
  * Revenue Trend Chart - Show MRR growth over time
@@ -50,10 +48,10 @@ export function RevenueTrendChart({ data }: { data: ChartData }) {
                 <stop offset="95%" stopColor={COLORS[0]} stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value}`} />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+            <XAxis dataKey="month" tick={{ fill: CHART_AXIS_COLOR }} />
+            <YAxis tick={{ fill: CHART_AXIS_COLOR }} />
+            <Tooltip formatter={(value) => `$${value}`} contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
             <Area 
               type="monotone" 
               dataKey="mrr" 
@@ -93,7 +91,7 @@ export function ClientHealthChart({ data }: { data: ChartData }) {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>
@@ -113,10 +111,10 @@ export function SalesRepPerformanceChart({ data }: { data: ChartData }) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis dataKey="name" type="category" width={100} />
-            <Tooltip formatter={(value) => `$${value}`} />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+            <XAxis type="number" tick={{ fill: CHART_AXIS_COLOR }} />
+            <YAxis dataKey="name" type="category" width={100} tick={{ fill: CHART_AXIS_COLOR }} />
+            <Tooltip formatter={(value) => `$${value}`} contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
             <Bar dataKey="revenue" fill={COLORS[0]} />
             <Bar dataKey="deals" fill={COLORS[1]} />
           </BarChart>
@@ -156,7 +154,7 @@ export function TerritoryComparisonChart({ data }: { data: ChartData }) {
               fillOpacity={0.3} 
             />
             <Legend />
-            <Tooltip />
+            <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
           </RadarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -176,10 +174,10 @@ export function TaskCompletionTrendChart({ data }: { data: ChartData }) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="week" />
-            <YAxis />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+            <XAxis dataKey="week" tick={{ fill: CHART_AXIS_COLOR }} />
+            <YAxis tick={{ fill: CHART_AXIS_COLOR }} />
+            <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
             <Legend />
             <Line 
               type="monotone" 
@@ -221,10 +219,10 @@ export function ServiceMixChart({ data }: { data: ChartData }) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value) => `$${value}`} />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+            <XAxis dataKey="month" tick={{ fill: CHART_AXIS_COLOR }} />
+            <YAxis tick={{ fill: CHART_AXIS_COLOR }} />
+            <Tooltip formatter={(value) => `$${value}`} contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
             <Legend />
             <Bar dataKey="seo" stackId="a" fill={COLORS[0]} name="SEO" />
             <Bar dataKey="ppc" stackId="a" fill={COLORS[2]} name="PPC" />

@@ -1,0 +1,5 @@
+scripts/basecamp-crawl.ts(19,24): error TS2307: Cannot find module '../src/lib/db.js' or its corresponding type declarations.
+scripts/import-wave-history.ts(25,25): error TS2307: Cannot find module 'dotenv' or its corresponding type declarations.
+src/lib/basecamp/client.ts(42,13): error TS7022: 'res' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+src/lib/basecamp/client.ts(51,13): error TS7022: 'link' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+src/lib/basecamp/client.ts(52,13): error TS7022: 'next' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.

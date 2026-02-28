@@ -1,4 +1,5 @@
-﻿import type { AuditData, AuditGap } from "./generator";
+﻿// TENANT-READY: all strings pull from TenantConfig as of Sprint 29-B
+import type { AuditData, AuditGap } from "./generator";
 import type { TenantConfig } from "@/lib/tenant/config";
 
 export function generateAuditHTML(data: AuditData, tenant: TenantConfig): string {

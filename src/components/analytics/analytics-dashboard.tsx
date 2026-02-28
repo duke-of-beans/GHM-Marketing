@@ -36,8 +36,10 @@ type AnalyticsData = {
   opportunities: any[];
 };
 
-import { CHART_FALLBACKS } from "@/hooks/use-chart-colors";
-const COLORS = [...CHART_FALLBACKS];
+import { getChartColorScale, CHART_COLORS, CHART_GRID_COLOR, CHART_AXIS_COLOR, CHART_TOOLTIP_BG, CHART_TOOLTIP_BORDER } from "@/lib/chart-tokens";
+import { formatCurrencyCompact } from "@/lib/format";
+import { cn } from "@/lib/utils";
+const COLORS = getChartColorScale(8);
 
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const metrics = useMemo(() => calculateMetrics(data), [data]);
@@ -51,7 +53,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
       </div>
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -70,14 +72,26 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${metrics.mrr.toLocaleString()}</div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-2xl font-bold">{formatCurrencyCompact(metrics.mrr)}</div>
+              {metrics.mrrGrowth !== 0 && (
+                <span className={cn(
+                  "text-xs font-semibold px-1.5 py-0.5 rounded",
+                  metrics.mrrGrowth > 0
+                    ? "text-status-success bg-status-success-bg"
+                    : "text-status-danger bg-status-danger-bg"
+                )}>
+                  {metrics.mrrGrowth > 0 ? "↑" : "↓"} {Math.abs(metrics.mrrGrowth).toFixed(1)}%
+                </span>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              ARR: ${metrics.arr.toLocaleString()}
+              ARR: {formatCurrencyCompact(metrics.arr)}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -103,7 +117,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -129,7 +143,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -148,7 +162,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${metrics.avgClientValue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatCurrencyCompact(metrics.avgClientValue)}</div>
             <p className="text-xs text-muted-foreground mt-1">
               Annual value estimate
             </p>
@@ -164,22 +178,25 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={metrics.forecast}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip formatter={(value) => `$${value}`} />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+              <XAxis dataKey="month" tick={{ fill: CHART_AXIS_COLOR }} />
+              <YAxis tick={{ fill: CHART_AXIS_COLOR }} />
+              <Tooltip
+                formatter={(value) => `$${value}`}
+                contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }}
+              />
               <Legend />
               <Line
                 type="monotone"
                 dataKey="actual"
-                stroke={COLORS[0]}
+                stroke={CHART_COLORS.revenue}
                 strokeWidth={2}
                 name="Actual MRR"
               />
               <Line
                 type="monotone"
                 dataKey="projected"
-                stroke={COLORS[1]}
+                stroke={CHART_COLORS.secondary}
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 name="Projected MRR"
@@ -198,11 +215,11 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={metrics.funnel}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="stage" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill={COLORS[0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_COLOR} />
+                <XAxis dataKey="stage" tick={{ fill: CHART_AXIS_COLOR }} />
+                <YAxis tick={{ fill: CHART_AXIS_COLOR }} />
+                <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
+                <Bar dataKey="count" fill={CHART_COLORS.revenue} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -229,7 +246,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ background: CHART_TOOLTIP_BG, border: `1px solid ${CHART_TOOLTIP_BORDER}` }} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -239,7 +256,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
       {/* Task Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Task Completion Rate
@@ -253,7 +270,7 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -279,14 +296,14 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-h-[120px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Additional Services Pipeline
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${metrics.upsellPipeline.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{formatCurrencyCompact(metrics.upsellPipeline)}</div>
             <p className="text-xs text-muted-foreground mt-1">
               {metrics.activeOpportunities} active opportunities
             </p>

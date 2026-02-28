@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, XCircle, RefreshCw, Copy, ExternalLink, Zap, Users } from "lucide-react";
+import { CheckCircle2, XCircle, RefreshCw, Copy, ExternalLink, Zap, Users, AlertTriangle } from "lucide-react";
 
 interface WaveProduct {
   id: string;
@@ -29,7 +29,14 @@ interface WaveStatus {
   error?: string;
 }
 
-export function WaveSettingsTab() {
+interface WaveSettingsTabProps {
+  /** Show the per-tenant configuration notice. Pass true only for elevated (admin) users. */
+  isAdmin?: boolean;
+  /** The company name for the active tenant — displayed in the admin notice. */
+  tenantCompanyName?: string;
+}
+
+export function WaveSettingsTab({ isAdmin = false, tenantCompanyName }: WaveSettingsTabProps = {}) {
   const [status, setStatus] = useState<WaveStatus | null>(null);
   const [products, setProducts] = useState<WaveProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<string>("");
@@ -131,6 +138,22 @@ export function WaveSettingsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Admin-only: per-tenant Wave account notice */}
+      {isAdmin && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-300">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <p>
+            This Wave account is configured for{" "}
+            <span className="font-semibold">{tenantCompanyName ?? "this tenant"}</span>.{" "}
+            Each tenant operates its own Wave account. To reconfigure, update the{" "}
+            <code className="rounded bg-amber-100 px-1 font-mono text-xs dark:bg-amber-900/50">
+              WAVE_API_KEY
+            </code>{" "}
+            environment variable and redeploy.
+          </p>
+        </div>
+      )}
+
       {/* Connection status */}
       <Card>
         <CardHeader>

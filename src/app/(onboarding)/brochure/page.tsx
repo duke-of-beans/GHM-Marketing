@@ -1,4 +1,5 @@
-﻿import type { Metadata } from "next";
+﻿// TENANT-READY: all strings pull from TenantConfig as of Sprint 29-B
+import type { Metadata } from "next";
 import { getTenant } from "@/lib/tenant/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BrochurePage() {
   const tenant = await getTenant();
   const companyName = tenant?.companyName ?? "COVOS";
+  const fromName = tenant?.fromName ?? companyName;
   return (
     <div className="min-h-screen bg-white">
       {/* HERO */}
@@ -130,7 +132,7 @@ export default async function BrochurePage() {
             marginBottom: 8,
           }}
         >
-          The GHM Way
+          The {fromName} Way
         </p>
         <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>
           One price. Everything included. Results or you leave — it&apos;s that simple.

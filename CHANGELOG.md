@@ -1,7 +1,15 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 28, 2026 — Sprint 27 complete (Wave 1 Instance 1): BUG-030/031/032 + FEAT-037 shipped. Wave 1 Instance 2: 29-A verified, ARCH-002 ADR written (PROPOSED), 31-A/B/C data display foundations shipped.
+**Last Updated:** February 28, 2026 — Sprint 31 Wave 2 Instance 2 complete: 31-D/E table standards on leads+clients, 31-F/G metric tile standards on manager+analytics dashboards, 31-H chart color tokens applied to intelligence-trends + advanced-charts + analytics-dashboard. Wave 2 Instance 1: 29-B contract template tenant verification complete, 29-C Wave per-tenant API key scaffolding complete. Wave 2 Instance 3: 32-B DocuSign API routes shipped.
+
+## Wave 2 (Instance 1) — Sprint 29-B/C: Contract Template Tenant Verification + Wave Per-Tenant Scaffolding — February 28, 2026
+
+**29-B — Contract template tenant verification:** `src/app/(onboarding)/brochure/page.tsx` — extracted final hardcoded string `"The GHM Way"` via `fromName = tenant?.fromName ?? companyName`; both files marked with `// TENANT-READY: all strings pull from TenantConfig as of Sprint 29-B` header comment. `src/lib/audit/template.ts` verified fully clean — all strings already used `tenant.companyName` / `tenant.fromName`; no changes required beyond the header comment. No CTA links used hardcoded URLs (all CTA buttons were `<div>` elements with no href).
+
+**29-C — Wave per-tenant API key scaffolding:** `src/lib/tenant/config.ts` — added `waveBusinessId?: string` to `TenantConfig` interface with inline comment documenting `WAVE_API_KEY_${slug.toUpperCase()}` env var pattern (key never stored in config). `src/lib/wave/client.ts` — `waveQuery()` and `waveMutation()` both accept optional `apiKey?: string` parameter; falls back to `WAVE_API_TOKEN` env var — zero behavioral change for current single-tenant setup. `src/components/settings/WaveSettingsTab.tsx` — added `isAdmin?: boolean` and `tenantCompanyName?: string` props; amber alert banner rendered at top when `isAdmin=true` informing admin that Wave account is tenant-specific and reconfiguration requires env var update + redeploy. TypeScript gate: 5 pre-existing errors only, zero new errors.
+
+---
 
 ## Sprint 27 — Bug Triage + FEAT-037 — February 28, 2026
 
@@ -39,7 +47,9 @@ BUG-030 TeamFeed send button clip fixed — ComposeBox action bar split into lef
 
 **32-H — Analytics tour created:** `src/lib/tutorials/tours/analytics-tour.ts` created — 5 steps covering revenue trajectory, portfolio growth, churn panel, health sparklines, and platform telemetry. `data-tour` attrs added to all 4 IntelligenceTrends cards and the admin DashboardUsagePanel div. `useTour(ANALYTICS_TOUR)` + `TourButton` wired into `AnalyticsDashboard`. `ANALYTICS_TOUR` exported from `tours/index.ts` and `lib/tutorials/index.ts`.
 
-**TypeScript gate:** `npx tsc --noEmit` — exactly 5 pre-existing errors (basecamp-crawl.ts, import-wave-history.ts, basecamp/client.ts). Zero new errors.
+**TypeScript gate:** `npx tsc --noEmit` — exactly 5 pre-existing errors (basecamp-crawl.ts, import-wave-history.ts, basecamp/client.ts). Zero new errors
+
+**32-B — DocuSign API routes:** Three route files created. `src/app/api/signatures/route.ts` — GET lists envelopes for current user (admin sees all, via `isElevated()`; paginated take=20/skip); POST creates draft `SignatureEnvelope` record, fetches + base64-encodes the document, calls DocuSign Create Envelope API (sandbox), updates record with `envelopeId`/`status="sent"`/`sentAt`; returns 503 `{ error: "DocuSign not configured" }` if `DOCUSIGN_API_KEY` or `DOCUSIGN_ACCOUNT_ID` unset. `src/app/api/signatures/[id]/route.ts` — GET returns single envelope with `vaultFile` + `client` relations, ownership check (own or admin); PATCH admin-only (`isElevated()` double-gate), updates `status`. `src/app/api/webhooks/docusign/route.ts` — no auth; HMAC-SHA256 verification if `DOCUSIGN_WEBHOOK_SECRET` set (warns + continues if unset); parses DocuSign Connect JSON payload; handles `completed`/`declined`/`voided` status transitions; `completedAt` set on completion; signed PDF downloaded via `GET /envelopes/{id}/documents/combined`, uploaded to Vercel Blob, `VaultFile` record created in `signed_contracts` space; download/upload wrapped in try/catch so failures never block the 200 response; `TODO` comment marks OAuth upgrade needed before go-live. All routes use `withPermission()` guard + `getCurrentUserWithPermissions()` + `isElevated()` from `@/lib/auth/roles`. TypeScript gate: 5 pre-existing errors, zero new..
 
 ---
 

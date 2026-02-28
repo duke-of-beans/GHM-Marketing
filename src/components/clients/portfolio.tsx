@@ -487,21 +487,21 @@ export function ClientPortfolio({
                       className="rounded"
                     />
                   </th>
-                  <th className="text-left px-4 py-2.5 font-medium">Client</th>
-                  <th className="text-center px-3 py-2.5 font-medium">Health</th>
-                  <th className="text-right px-3 py-2.5 font-medium">Retainer</th>
-                  <th className="text-center px-3 py-2.5 font-medium">Open Tasks</th>
-                  <th className="text-center px-3 py-2.5 font-medium">Last Scan</th>
-                  <th className="text-center px-3 py-2.5 font-medium">Payment</th>
-                  <th className="text-center px-3 py-2.5 font-medium">Risk</th>
-                  <th className="text-center px-4 py-2.5 font-medium">Google Ads</th>
+                  <th className="text-left px-4 py-2.5 font-medium min-w-[200px]">Client</th>
+                  <th className="text-center px-3 py-2.5 font-medium w-[100px]">Health</th>
+                  <th className="text-right px-3 py-2.5 font-medium w-[100px]">Retainer</th>
+                  <th className="text-center px-3 py-2.5 font-medium w-[100px]">Open Tasks</th>
+                  <th className="text-center px-3 py-2.5 font-medium w-[120px]">Last Scan</th>
+                  <th className="text-center px-3 py-2.5 font-medium w-[100px]">Payment</th>
+                  <th className="text-center px-3 py-2.5 font-medium w-[100px]">Risk</th>
+                  <th className="text-center px-4 py-2.5 font-medium w-[120px]">Google Ads</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredClients.map((client) => (
                   <tr
                     key={client.id}
-                    className={`border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer ${bulk.isSelected(client.id) ? "bg-primary/5" : ""}`}
+                    className={`border-b last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${bulk.isSelected(client.id) ? "bg-primary/5" : ""}`}
                   >
                     <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <input

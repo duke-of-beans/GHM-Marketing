@@ -13,7 +13,8 @@ async function sleep(ms: number) {
 
 export async function waveQuery<T>(
   query: string,
-  variables?: Record<string, unknown>
+  variables?: Record<string, unknown>,
+  apiKey?: string  // optional: per-tenant override; falls back to WAVE_API_TOKEN env var
 ): Promise<T> {
   let lastError: Error | null = null
 
@@ -22,7 +23,7 @@ export async function waveQuery<T>(
       const res = await fetch(WAVE_API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${WAVE_API_TOKEN}`,
+          'Authorization': `Bearer ${apiKey ?? WAVE_API_TOKEN}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ query, variables }),
@@ -58,9 +59,10 @@ export async function waveQuery<T>(
 
 export async function waveMutation<T>(
   mutation: string,
-  variables: Record<string, unknown>
+  variables: Record<string, unknown>,
+  apiKey?: string  // optional: per-tenant override; passed through to waveQuery
 ): Promise<WaveMutationResult<T>> {
-  const data = await waveQuery<{ [key: string]: WaveMutationResult<T> }>(mutation, variables)
+  const data = await waveQuery<{ [key: string]: WaveMutationResult<T> }>(mutation, variables, apiKey)
   // Mutations return a single top-level key — extract it
   const key = Object.keys(data)[0]
   return data[key]

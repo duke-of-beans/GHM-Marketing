@@ -30,6 +30,11 @@ export interface TenantConfig {
   databaseUrl?: string;   // Override DATABASE_URL for this tenant
   active: boolean;
 
+  // Wave accounting (per-tenant)
+  waveBusinessId?: string;  // Wave business ID for this tenant
+  // waveApiKey is read from process.env[`WAVE_API_KEY_${slug.toUpperCase()}`]
+  // e.g. WAVE_API_KEY_GHM, WAVE_API_KEY_EASTER — never stored in config
+
   // Vendors
   /** Vendor provider selection. Omit a key to use the platform default. */
   providers?: Partial<TenantProviderConfig>;
