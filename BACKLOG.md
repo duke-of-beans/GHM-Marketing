@@ -1,5 +1,5 @@
 ﻿# GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** February 26, 2026 — COVOS Extraction Audit complete. Sprint 28 Blueprints (Tracks A/B/C) + Sprint 29 Go-Live Blueprint written and ready for Cowork execution. 4 open decisions need David's input (see COVOS_EXTRACTION_AUDIT.md §7, and 5 infra questions in SPRINT29 blueprint). Sprint matrix through 33.
+**Last Updated:** February 27, 2026 — Sprint 28 COMPLETE. ~50 GHM hardcoded strings extracted across Tracks A/B/C + mop-up. Codebase scan clean. Sprint 29 (infra transfer + entity go-live) is next. Answer questions I1–I5 in SPRINT29_GO_LIVE_BLUEPRINT.md before starting.
 
 **Owner:** David Kirsch
 
@@ -52,7 +52,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~26~~ | ~~COVOS Signal Visual Identity~~ | ~~4-Pass sidebar/widget/component/page redesign. UI-CONST-001 Group 4 (Navigation) complete.~~ | ✅ SHIPPED | |
 | ~~SEC~~ | ~~Security Fix — Permission Gaps~~ | ~~18 unprotected API handlers secured with withPermission. createdBy hardcode fixed.~~ | ✅ SHIPPED | |
 | 27 | Bug Triage + Dark Mode Polish | BUG-030/031/032 + FEAT-037 (single lead entry) | ~1 hr | Quick wins, visual cleanup, obvious UX gap |
-| 28 | Tenant Productization Core | FEAT-016 (tenant voice+style) + FEAT-018 (logo swap) + FEAT-021 (brand assets) + UX-FEAT-003 (widget defaults) | ~1.5 sessions | **CRITICAL PATH** — gate for new entity launch |
+| ~~28~~ | ~~Tenant Productization Core~~ | ~~COVOS extraction: TenantConfig extension + email/template/AI/UI layer~~ | ✅ SHIPPED | |
 | 29 | Entity Migration Readiness | Tenant registry, contract templates, brochure hooks, Wave reconnect | ~1 session | New entity day-one operational |
 | **ARCH** | **Project Fracture + COVOS Roadmap** | **ARCH-002 (repo/service/DB separation plan) + ARCH-003 (82-category module mapping)** | **~1 session (docs)** | **⚠️ FORK — gates true productization** |
 | 30 | Communication + Polish | UX-FEAT-002 (TeamFeed overhaul) + UX-AUDIT-027 (contrast) + FEAT-035 (vault preview) | ~1.5 sessions | Alive + accessible |

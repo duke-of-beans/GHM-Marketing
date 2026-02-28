@@ -1,7 +1,25 @@
 # GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 26, 2026 — Security fix shipped (permission gaps, 18 handlers across content/* and clients/[id]/gbp, clients/[id]/voice-profile).
+**Last Updated:** February 27, 2026 — Sprint 28 complete. COVOS tenant extraction: ~50 GHM hardcoded strings removed from non-tenant layer across 5 commits.
+
+---
+
+## Sprint 28 — COVOS Tenant Extraction — February 27, 2026
+
+Extracted all hardcoded GHM strings from the non-tenant codebase layer. Platform is now tenant-ready at the application level. Adding a second tenant requires only a new `TENANT_REGISTRY` entry + separate DB.
+
+**Commits:** 315c3bd (Track A) · 033562e (Track B) · 6b487f9 (Track C) · 986b9f2 (mop-up) · 69a3508 (chore)
+
+**Track A** — TenantConfig + email/template layer: Extended `TenantConfig` interface with `companyName`, `companyTagline`, `fromEmail`, `fromName`, `supportEmail`, `dashboardUrl`, `aiContext`. Updated `TENANT_REGISTRY.ghm` with all values. Extracted from `email/index.ts` (14 strings, 7 functions), `email/templates.ts` (5 strings), `reports/template.ts` (1), `audit/template.ts` (6), `pdf/work-order-template.tsx` (2). 17 callers updated.
+
+**Track B** — AI prompts + platform config: `system-prompt-builder.ts` platform description from `tenant.name + aiContext`. `search-prompt.ts` tenant-aware. `push.ts` VAPID fallback de-GHM'd. `layout.tsx` dynamic `generateMetadata()` from `getTenant()`.
+
+**Track C** — UI + public pages: `/api/public/branding` now serves `companyName` + `supportEmail`. `nav.tsx` alt text dynamic. `client-portal-dashboard.tsx` copyright footer dynamic. `onboarding-panel.tsx` hardcoded URL removed. Three onboarding sales pages (`brochure`, `comp-sheet`, `territory-map`) — `generateMetadata()` pattern, `companyName` from TenantConfig. `welcome/[token]/page.tsx` — `supportEmail` fetched from branding API, all 3 `support@ghmdigital.com` instances replaced.
+
+**Mop-up** — Post-scan catches not in original blueprints: `src/lib/demo/template.ts` (parallel sibling to audit template), `src/app/layout.tsx` (root layout title), auth page logo alt text.
+
+**Result:** Full codebase scan returns zero runtime GHM strings outside `src/lib/tenant/config.ts` registry values. TypeScript: zero new errors (5 pre-existing in scripts/basecamp unchanged).
 
 ---
 

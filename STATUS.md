@@ -1,9 +1,15 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 27, 2026 — Sprint 28 Track A complete. All hardcoded GHM strings extracted from email, template, report, audit-PDF, and work-order layers into TenantConfig. Zero new TS errors. Tracks B + C ready to run in parallel. Sprint 28 Track B complete. AI prompts, push, dashboard title extracted. Sprint 28 Track C complete. UI components, public pages, client portal extracted. Sprint 28 fully complete — ~50 GHM hardcoded strings removed from non-tenant layer.
+**Last Updated:** February 27, 2026 — Sprint 28 COMPLETE. All ~50 runtime GHM hardcoded strings extracted across Tracks A/B/C + mop-up pass. Only remaining GHM references are config.ts registry values (correct by design). Post-sprint full-codebase scan: clean. TypeScript: zero new errors. Sprint 29 (entity go-live / infra transfer) is next. Blueprint at docs/blueprints/SPRINT29_GO_LIVE_BLUEPRINT.md.
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
+### SPRINT 28 — COVOS Tenant Extraction (February 27, 2026)
+- [x] **SPRINT 28 COMPLETE** — All ~50 runtime GHM hardcoded strings extracted from non-tenant layer. Commits: 315c3bd (Track A), 033562e (Track B), 6b487f9 (Track C), 986b9f2 (mop-up), 69a3508 (chore). Post-sprint full-codebase scan: clean. Only remaining GHM strings are in `src/lib/tenant/config.ts` registry values (correct by design). TypeScript: zero new errors across all tracks.
+  - **What shipped:** TenantConfig extended with 6 new fields. Email/template/report/audit/work-order/AI-prompts/UI-components/public-pages all read from TenantConfig. `demo/template.ts`, root `layout.tsx`, and auth page alt text cleaned up in mop-up pass.
+  - **Mop-up catches (not in original blueprints):** `src/lib/demo/template.ts` (parallel sibling to audit/template.ts), `src/app/layout.tsx` (root layout title), auth page logo alt text — all fixed.
+  - **Sprint 29 is next.** Blueprint at `docs/blueprints/SPRINT29_GO_LIVE_BLUEPRINT.md`. Answer open questions I1–I5 before starting.
+
 - [x] **TRACK A COMPLETE** — Extracted all hardcoded GHM strings from 5 target files into `TenantConfig`. Zero behavior change for GHM tenant. Blueprint: `docs/blueprints/SPRINT28_TRACK_A_BLUEPRINT.md`.
   - **Step 1:** Extended `TenantConfig` interface with 6 new required fields (`companyName`, `companyTagline`, `fromEmail`, `fromName`, `supportEmail`, `dashboardUrl`) + updated GHM registry entry.
   - **Step 2:** `src/lib/email/index.ts` — removed `FROM_EMAIL`/`FROM_NAME` constants, added `tenant: TenantConfig` param to all 7 exported functions, replaced all hardcoded GHM strings with tenant fields.
