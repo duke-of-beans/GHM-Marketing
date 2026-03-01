@@ -1,7 +1,20 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** February 28, 2026 — Wave 2 Instance 2 complete: Sprint 31 D/E/F/G/H — table standards on leads (no-op, already compliant) + clients portfolio, metric tile standards on manager + analytics dashboards, chart color tokens migrated in intelligence-trends + advanced-charts + analytics-dashboard. TypeScript gate: 5 pre-existing errors, zero new. Prior: Sprint 27 Wave 1 Instance 1: BUG-030/031/032 + FEAT-037. Sprint 32 Wave 1 Instance 3: 32-A schema + 32-F/G/H tours. Sprint 32 Wave 2 Instance 3: 32-B DocuSign API routes. Wave 2 Instance 1: Sprint 29-B/C tenant verification + Wave scaffolding.
+**Last Updated:** March 1, 2026 — Final gate sync complete. Sprints 27/29/ARCH/31/32 all shipped. Sprint 27: BUG-030/031/032 fixed, FEAT-037 (single lead entry) live. Sprint 29: tenant registry hardened, contract templates tenant-ready, Wave per-tenant scaffolding, TENANT_PROVISIONING.md updated. ARCH: ARCH-002 ADR (PROPOSED) + ARCH-003 82-category COVOS module map written. Sprint 31: DataTable + MetricCard standardized, chart tokens centralized, standards applied across leads/clients/dashboards. Sprint 32: SignatureEnvelope schema, DocuSign API routes (create/status/webhook), vault send-for-signature, signatures tab, tour configs for Leads/ClientDetail/Analytics, tour reset in Settings. TypeScript gate: 5 pre-existing errors only, zero new. Next: Sprint 30 (TeamFeed overhaul + contrast + vault preview) or Sprint 33 (customization audit).
+
+### CURRENT PLATFORM STATE — March 1, 2026
+
+**Sprints complete through 32.** The GHM dashboard is a full-stack agency intelligence platform running live at ghm.covos.app with multi-tenant infrastructure on covos.app. The platform handles lead pipeline (Kanban + manual entry), client management (health scores, portfolio table, client detail), task management, Wave billing integration, content studio, commission engine (salary-only protection for Gavin), team feed with real-time SSE, file vault with DocuSign signing workflow, reporting, analytics dashboards, and guided tours across all major pages.
+
+**Multi-tenant:** covosdemo.covos.app is live as a second isolated tenant. getTenant() handles all edge cases gracefully. Contract templates, brochure, and audit PDFs are fully tenant-ready. Wave per-tenant API key scaffolding in place. TENANT_PROVISIONING.md is the go-live runbook.
+
+**Architecture decisions:** ARCH-002 (repo/service/DB separation) is PROPOSED — awaiting David sign-off. ARCH-003 (82-category COVOS module map + 12-month roadmap) is documented. Neither is ACCEPTED yet.
+
+**UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
+
+**Next sprint candidates:** Sprint 30 (TeamFeed major overhaul + WCAG contrast + vault preview) or Sprint 33 (customization audit + guide character).
+
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 ### SPRINT 30 — Tenant Branding + Resolution Hardening (February 27, 2026 — COMPLETE)

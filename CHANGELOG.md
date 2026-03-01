@@ -1,7 +1,23 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** February 28, 2026 — Sprint 31 Wave 2 Instance 2 complete: 31-D/E table standards on leads+clients, 31-F/G metric tile standards on manager+analytics dashboards, 31-H chart color tokens applied to intelligence-trends + advanced-charts + analytics-dashboard. Wave 2 Instance 1: 29-B contract template tenant verification complete, 29-C Wave per-tenant API key scaffolding complete. Wave 2 Instance 3: 32-B DocuSign API routes shipped.
+**Last Updated:** March 1, 2026 — Final gate sync: sprints 27/29/ARCH/31/32 complete. All wave instances merged.
+
+
+## Sprint 32 — DocuSign Signing + Tour Expansion — February 27, 2026
+SignatureEnvelope schema added (prisma db push). DocuSign API routes: POST /api/signatures (create + send), GET/PATCH /api/signatures/[id] (status), POST /api/webhooks/docusign (status sync + signed doc auto-return to vault). Vault “Send for Signature” action on PDF tiles with SendForSignatureDialog. Signatures tab added to client detail (elevated users). Tour configs added for Leads, Client Detail, and Analytics pages. Tour reset option added to General Settings. Commits: `8814640` (32-A schema + 32-F/G/H tour configs), `061c9ec` (32-B DocuSign API routes), `8b028a0` (32-C vault dialog + 32-E signatures tab + 32-I tour wiring).
+
+## Sprint 31 — UI-CONST-001 Group 5: Data Display — February 27, 2026
+DataTable component standardized: column widths, sortable headers, row hover, empty states, loading skeletons. MetricCard component standardized: min-h-[120px], formatMetric() utility, delta indicators (TrendingUp/Down), loading skeleton. Chart tokens centralized in src/lib/chart-tokens.ts. Standards applied to leads table, clients portfolio table, manager dashboard KPIs, analytics dashboard KPIs, and intelligence-trends.tsx recharts components. Commits: `ee1395e` (31-A/B/C foundations), `9b7d300` (31-D/E/F/G/H standards applied).
+
+## ARCH — Architecture Decision Records — February 27, 2026
+ARCH-002 written: ADR covering monorepo vs platform fork vs Turborepo options. Recommendation documented as PROPOSED pending David sign-off. ARCH-003 written: 82-category COVOS module map across 8 groups (Revenue, Operations, Marketing, Intelligence, Communications, HR/People, Infrastructure, Customization). 12-month build sequence + first paying tenant readiness checklist. Commits: `ee1395e` (ARCH-002 ADR), `3a0a94e` (ARCH-003 module map).
+
+## Sprint 29 — Entity Migration Readiness — February 27, 2026
+29-A: getTenant() hardened with fallback for unknown/inactive/localhost/vercel slugs. 29-B: brochure and audit templates verified fully tenant-ready, all GHM hardcoded strings confirmed extracted. 29-C: Wave per-tenant API key scaffolding (WAVE_API_KEY_[SLUG] pattern), waveBusinessId field on TenantConfig, Wave client accepts optional apiKey param, WaveSettingsTab shows tenant context banner. 29-D: TENANT_PROVISIONING.md updated to Sprint 29/30 state with post-provisioning verification checklist. Commits: `ee1395e` (29-A), `37dd531` (29-B/C), `a1bb7b0` (29-B mop-up), `b20e207` (29-D).
+
+## Sprint 27 — Bug Triage + Dark Mode Polish — February 27, 2026
+BUG-030: TeamFeed send button compose bar flex layout fixed. BUG-031: Dark mode --accent HSL corrected to warm amber-500 (hsl(38 92% 50%)) from cool yellow. BUG-032: Pipeline Kanban column headers given dark: variants (bg-{color}-950/40) for all 8 status columns. FEAT-037: Single lead manual entry — NewLeadDialog component + POST /api/leads route + “New Lead” button wired to leads page. Commit: `cd799ce`.
 
 ## Wave 2 (Instance 1) — Sprint 29-B/C: Contract Template Tenant Verification + Wave Per-Tenant Scaffolding — February 28, 2026
 
@@ -71,7 +87,8 @@ BUG-030 TeamFeed send button clip fixed — ComposeBox action bar split into lef
 
 ## INFRA-001 — Resend covos.app Domain Verification — February 27, 2026
 
-Verified covos.app as a sending domain in the COVOS Platform Resend account. All 4 DNS records added to Namecheap: DKIM TXT (esend._domainkey), SPF TXT (send), MX (send → eedback-smtp.us-east-1.amazonses.com priority 10), DMARC TXT (_dmarc). Namecheap Mail Settings switched from Email Forwarding → Custom MX. Resend verification triggered — status progressed to Pending → Records Validated → Internal Verification. Domain confirms verified. Email delivery from covos.app is now operational.
+Verified covos.app as a sending domain in the COVOS Platform Resend account. All 4 DNS records added to Namecheap: DKIM TXT (
+esend._domainkey), SPF TXT (send), MX (send → eedback-smtp.us-east-1.amazonses.com priority 10), DMARC TXT (_dmarc). Namecheap Mail Settings switched from Email Forwarding → Custom MX. Resend verification triggered — status progressed to Pending → Records Validated → Internal Verification. Domain confirms verified. Email delivery from covos.app is now operational.
 
 **Also closed:** Sprint 30 complete (per-tenant logo wiring, getTenant() hardening, debug endpoint, covosdemo.covos.app live). Commits e1949dc + 47c4740.
 
