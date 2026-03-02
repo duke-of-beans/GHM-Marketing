@@ -6,6 +6,7 @@ import { PushPermissionPrompt } from "@/components/push/PushPermissionPrompt";
 import { AISearchBar } from "@/components/search/AISearchBar";
 import { KeyboardShortcutsHelp } from "@/components/ui/keyboard-shortcuts-help";
 import { OnboardingTutorial } from "@/components/onboarding/onboarding-tutorial";
+import { GuideCharacter } from "@/components/guide/GuideCharacter";
 import { useRouter, usePathname } from "next/navigation";
 import { useDashboardEvent } from "@/hooks/use-dashboard-event";
 
@@ -19,6 +20,7 @@ type Props = {
   pushEnabled?: boolean;
   userRole: "sales" | "manager" | "owner";
   userName: string;
+  guideEnabled?: boolean;
 };
 
 export function DashboardLayoutClient({
@@ -29,6 +31,7 @@ export function DashboardLayoutClient({
   pushEnabled = true,
   userRole,
   userName,
+  guideEnabled = true,
 }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -127,8 +130,10 @@ export function DashboardLayoutClient({
 
   function toggle() {
     setSidebarOpen((prev) => {
-      localStorage.setItem("team-feed-sidebar-open", String(!prev));
-      return !prev;
+      const next = !prev;
+      localStorage.setItem("team-feed-sidebar-open", String(next));
+      if (next) setUnreadCount(0); // clear badge on open
+      return next;
     });
   }
 
@@ -168,6 +173,9 @@ export function DashboardLayoutClient({
 
       {/* Global keyboard shortcuts help overlay — ? to open */}
       <KeyboardShortcutsHelp open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+
+      {/* Guide character — sardonic tips and hints */}
+      <GuideCharacter guideEnabled={guideEnabled} />
     </div>
   );
 }

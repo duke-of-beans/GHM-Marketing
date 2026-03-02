@@ -1,18 +1,17 @@
 "use client";
 
 /**
- * TeamFeedSidebar — Sprint 21-B full overhaul
+ * TeamFeedSidebar — Sprint Cowork overhaul
  *
- * What changed vs Sprint 19:
- * - SSE replaces 30s polling (instant updates)
- * - Auto-scroll to bottom on open / new messages
- * - Pinned messages extracted to collapsible banner strip (not inline)
- * - Compose always visible — audience/priority collapsed until expanded
- * - @mention support with inline autocomplete
- * - Edit message (author only, in-place)
- * - "Seen by X" read receipts on hover
- * - Search bar in panel header
- * - Dead code removed (ReactionRow && true guard)
+ * New in this version vs Sprint 21-B:
+ * - Resizable panel: drag handle on left edge, min 280px / max 520px
+ *   Persists to localStorage key `covos:teamfeed-width`
+ * - Two-pane interior: 64px people strip (left) + message thread (right)
+ * - Presence dots on people strip: green = active in last 5min, grey = offline
+ *   Polls GET /api/team/presence every 30s
+ * - Typing indicator: "X is typing…" fires from ComposeBox onChange (debounced)
+ *   POST /api/team-messages/typing → SSE "typing" event → rendered at bottom
+ *   Auto-clears on client after 4s
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -39,6 +38,13 @@ import { voice, pick } from "@/lib/voice";
 import { useModifierKey } from "@/hooks/use-modifier-key";
 import { EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia } from "./TeamFeedMultimedia";
 import { AttachmentBlock } from "./TeamFeedAttachment";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const DEFAULT_WIDTH = 320;
+const MIN_WIDTH = 280;
+const MAX_WIDTH = 520;
+const PRESENCE_ACTIVE_MS = 5 * 60 * 1000; // 5 minutes
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,6 +76,15 @@ export type TeamMessageData = {
 };
 export type TeamUser = { id: number; name: string; role: string };
 
+type PresenceUser = {
+  userId: number;
+  name: string;
+  role: string;
+  lastSeen: string | null;
+};
+
+type TypingUser = { userId: number; name: string };
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function initials(name: string) {
@@ -93,12 +108,23 @@ function audienceLabel(msg: TeamMessageData) {
   return "→ Everyone";
 }
 
+function isActive(lastSeen: string | null): boolean {
+  if (!lastSeen) return false;
+  return Date.now() - new Date(lastSeen).getTime() < PRESENCE_ACTIVE_MS;
+}
+
+function savedWidth(): number {
+  if (typeof window === "undefined") return DEFAULT_WIDTH;
+  const stored = localStorage.getItem("covos:teamfeed-width");
+  if (!stored) return DEFAULT_WIDTH;
+  const n = parseInt(stored, 10);
+  return isNaN(n) ? DEFAULT_WIDTH : Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, n));
+}
+
 // ─── @Mention Autocomplete ────────────────────────────────────────────────────
 
 function MentionAutocomplete({
-  query,
-  users,
-  onSelect,
+  query, users, onSelect,
 }: {
   query: string;
   users: TeamUser[];
@@ -107,9 +133,7 @@ function MentionAutocomplete({
   const filtered = users.filter((u) =>
     u.name.toLowerCase().includes(query.toLowerCase())
   ).slice(0, 5);
-
   if (!filtered.length) return null;
-
   return (
     <div className="absolute bottom-full mb-1 left-0 w-48 bg-popover border rounded-lg shadow-lg z-50 overflow-hidden">
       {filtered.map((u) => (
@@ -129,8 +153,6 @@ function MentionAutocomplete({
 }
 
 // ─── Compose Box ──────────────────────────────────────────────────────────────
-// Slack-bar standard: everything visible, nothing hidden behind drawers.
-// Layout: [textarea] / [audience chip] [priority toggle] [emoji] [gif] [attach] ... [send]
 
 function ComposeBox({
   onSent, users, isMaster, parentId,
@@ -155,6 +177,7 @@ function ComposeBox({
   const [mentions, setMentions] = useState<{ userId: number; name: string }[]>([]);
   const [showAudiencePicker, setShowAudiencePicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { symbol: modSymbol } = useModifierKey();
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -164,6 +187,14 @@ function ComposeBox({
     const textBeforeCursor = val.slice(0, cursor);
     const match = textBeforeCursor.match(/@(\w*)$/);
     setMentionQuery(match ? match[1] : null);
+
+    // Fire typing indicator (debounced 500ms, main compose only)
+    if (!parentId && val.trim()) {
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = setTimeout(() => {
+        fetch("/api/team-messages/typing", { method: "POST" }).catch(() => {});
+      }, 500);
+    }
   }
 
   function insertMention(user: TeamUser) {
@@ -245,8 +276,6 @@ function ComposeBox({
       {mentionQuery !== null && (
         <MentionAutocomplete query={mentionQuery} users={users} onSelect={insertMention} />
       )}
-
-      {/* Textarea */}
       <Textarea
         ref={textareaRef}
         value={content}
@@ -256,8 +285,6 @@ function ComposeBox({
         className="resize-none text-sm"
         onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(); }}
       />
-
-      {/* GIF preview */}
       {gifAttachment && (
         <div className="relative inline-block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -268,8 +295,6 @@ function ComposeBox({
           </button>
         </div>
       )}
-
-      {/* Audience picker dropdown (only when expanded) */}
       {!parentId && showAudiencePicker && (
         <div className="rounded-lg border bg-popover p-2 shadow-md space-y-1.5 text-xs">
           <p className="font-medium text-muted-foreground px-1">Who sees this?</p>
@@ -302,15 +327,10 @@ function ComposeBox({
           <div className="flex flex-wrap gap-1">
             {users.map((u) => (
               <button key={u.id}
-                onClick={() => {
-                  setAudienceType("user");
-                  setRecipientId(String(u.id));
-                  setShowAudiencePicker(false);
-                }}
+                onClick={() => { setAudienceType("user"); setRecipientId(String(u.id)); setShowAudiencePicker(false); }}
                 className={`px-2 py-1 rounded border text-xs transition-colors ${
                   audienceType === "user" && recipientId === String(u.id)
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "hover:bg-muted"
+                    ? "bg-primary text-primary-foreground border-primary" : "hover:bg-muted"
                 }`}
               >
                 {u.name}
@@ -319,12 +339,8 @@ function ComposeBox({
           </div>
         </div>
       )}
-
-      {/* Action bar — left group compresses, Send never clips */}
       <div className="flex items-center gap-1 min-w-0">
-        {/* Left controls — allowed to compress if panel is narrow */}
         <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-          {/* Audience chip — always visible, one click to change */}
           {!parentId && chipLabel && (
             <button
               onClick={() => setShowAudiencePicker(!showAudiencePicker)}
@@ -338,40 +354,26 @@ function ComposeBox({
               {chipLabel}
             </button>
           )}
-
-          {/* Priority toggle — cycles normal→important→urgent */}
           {!parentId && (
-            <button
-              onClick={cyclePriority}
-              title={`Priority: ${priority} (click to change)`}
-              className="p-1 rounded hover:bg-muted transition-colors flex-shrink-0"
-            >
+            <button onClick={cyclePriority} title={`Priority: ${priority}`}
+              className="p-1 rounded hover:bg-muted transition-colors flex-shrink-0">
               {priorityIcon}
             </button>
           )}
-
-          {/* Pin toggle (masters only) */}
           {isMaster && !parentId && (
-            <button
-              onClick={() => setIsPinned(!isPinned)}
-              title={isPinned ? "Pinned" : "Pin message"}
-              className={`p-1 rounded transition-colors flex-shrink-0 ${isPinned ? "text-status-warning" : "text-muted-foreground/40 hover:text-muted-foreground"}`}
-            >
+            <button onClick={() => setIsPinned(!isPinned)} title={isPinned ? "Pinned" : "Pin message"}
+              className={`p-1 rounded transition-colors flex-shrink-0 ${isPinned ? "text-status-warning" : "text-muted-foreground/40 hover:text-muted-foreground"}`}>
               <Pin className="h-3.5 w-3.5" />
             </button>
           )}
-
           <div className="flex items-center gap-0.5 ml-0.5 flex-shrink-0">
             <EmojiPickerButton onPick={(emoji) => setContent((c) => c + emoji)} />
             {!gifAttachment && <GifPickerButton onPick={setGifAttachment} />}
           </div>
         </div>
-
-        {/* Right controls — flex-shrink-0 guarantees Send is always visible */}
         <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground flex-shrink-0">
           {modSymbol}<CornerDownLeft className="h-3 w-3" />
         </span>
-
         <Button size="sm" onClick={send}
           disabled={sending || (!content.trim() && !gifAttachment)} className="h-7 text-xs px-3 ml-1 flex-shrink-0">
           {sending ? "…" : <><Send className="h-4 w-4 mr-1" />Send</>}
@@ -446,7 +448,6 @@ function MessageRow({
     }
   }
 
-  // Render @mentions as highlighted spans
   function renderContent(text: string, mentions?: { userId: number; name: string }[] | null) {
     if (!mentions?.length) return <span className="whitespace-pre-wrap break-words">{text}</span>;
     const parts: React.ReactNode[] = [];
@@ -456,9 +457,7 @@ function MessageRow({
       const idx = text.indexOf(tag, last);
       if (idx === -1) continue;
       parts.push(text.slice(last, idx));
-      parts.push(
-        <span key={m.userId} className="text-primary font-medium">{tag}</span>
-      );
+      parts.push(<span key={m.userId} className="text-primary font-medium">{tag}</span>);
       last = idx + tag.length;
     }
     parts.push(text.slice(last));
@@ -483,18 +482,11 @@ function MessageRow({
             {priorityBadge(msg.priority)}
             {!isRead && <span className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />}
           </div>
-
-          {/* Content / Edit */}
           {editing ? (
             <div className="mt-1 space-y-1.5" onClick={(e) => e.stopPropagation()}>
-              <Textarea
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                rows={3}
-                className="resize-none text-sm"
-                autoFocus
-                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) saveEdit(); }}
-              />
+              <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)}
+                rows={3} className="resize-none text-sm" autoFocus
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) saveEdit(); }} />
               <div className="flex gap-1.5">
                 <Button size="sm" className="h-6 text-xs" onClick={saveEdit} disabled={saving}>
                   <Check className="h-4 w-4 mr-1" />{saving ? "Saving…" : "Save"}
@@ -510,17 +502,9 @@ function MessageRow({
               {renderContent(msg.content, msg.mentions)}
             </p>
           )}
-
           <InlineMedia url={msg.attachmentUrl ?? ""} name={msg.attachmentName} mimeType={msg.attachmentMimeType} />
           <AttachmentBlock msg={msg} />
-          <ReactionRow
-            messageId={msg.id}
-            reactions={msg.reactions ?? []}
-            currentUserId={currentUserId}
-            onUpdate={onRefresh}
-          />
-
-          {/* Footer */}
+          <ReactionRow messageId={msg.id} reactions={msg.reactions ?? []} currentUserId={currentUserId} onUpdate={onRefresh} />
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <TooltipProvider>
               <Tooltip>
@@ -533,14 +517,11 @@ function MessageRow({
                 {readers.length > 0 && (
                   <TooltipContent side="top" className="max-w-[200px]">
                     <p className="text-xs font-medium mb-0.5">Seen by</p>
-                    <p className="text-xs text-muted-foreground">
-                      {readers.map((r) => r.user.name).join(", ")}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{readers.map((r) => r.user.name).join(", ")}</p>
                   </TooltipContent>
                 )}
               </Tooltip>
             </TooltipProvider>
-
             <button className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
               onClick={(e) => { e.stopPropagation(); setReplying(!replying); }}>
               <Reply className="h-4 w-4" /> Reply
@@ -553,14 +534,10 @@ function MessageRow({
               </button>
             )}
             {readers.length > 0 && (
-              <span className="text-[11px] text-muted-foreground">
-                Seen by {readers.length}
-              </span>
+              <span className="text-[11px] text-muted-foreground">Seen by {readers.length}</span>
             )}
           </div>
         </div>
-
-        {/* Actions menu */}
         {(isMaster || msg.author.id === currentUserId) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -588,8 +565,6 @@ function MessageRow({
           </DropdownMenu>
         )}
       </div>
-
-      {/* Thread replies */}
       {expanded && hasReplies && (
         <div className="mt-3 ml-9 space-y-2 border-l-2 border-muted pl-3">
           {msg.replies.map((reply) => (
@@ -606,25 +581,18 @@ function MessageRow({
                   </span>
                 </div>
                 <p className="text-xs mt-0.5 whitespace-pre-wrap break-words">{reply.content}</p>
-                <ReactionRow
-                  messageId={reply.id}
-                  reactions={reply.reactions ?? []}
-                  currentUserId={currentUserId}
-                  onUpdate={onRefresh}
-                />
+                <ReactionRow messageId={reply.id} reactions={reply.reactions ?? []}
+                  currentUserId={currentUserId} onUpdate={onRefresh} />
               </div>
             </div>
           ))}
         </div>
       )}
-
       {replying && (
         <div className="mt-3 ml-9" onClick={(e) => e.stopPropagation()}>
-          <ComposeBox
-            onSent={() => { setReplying(false); onRefresh(); }}
+          <ComposeBox onSent={() => { setReplying(false); onRefresh(); }}
             users={users} isMaster={isMaster} parentId={msg.id}
-            placeholder="Write a reply…" compact
-          />
+            placeholder="Write a reply…" compact />
         </div>
       )}
     </div>
@@ -644,7 +612,6 @@ function PinnedBanner({
 }) {
   const [open, setOpen] = useState(false);
   if (!messages.length) return null;
-
   return (
     <div className="border-b bg-status-warning-bg/60 flex-shrink-0">
       <button
@@ -660,15 +627,45 @@ function PinnedBanner({
       {open && (
         <div className="px-3 pb-3 space-y-2">
           {messages.map((msg) => (
-            <MessageRow
-              key={msg.id}
-              msg={msg}
-              currentUserId={currentUserId}
-              isMaster={isMaster}
-              users={users}
-              onRefresh={onRefresh}
-            />
+            <MessageRow key={msg.id} msg={msg} currentUserId={currentUserId}
+              isMaster={isMaster} users={users} onRefresh={onRefresh} />
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── People Strip ─────────────────────────────────────────────────────────────
+
+function PeopleStrip({ presenceUsers }: { presenceUsers: PresenceUser[] }) {
+  return (
+    <div className="w-16 flex-shrink-0 flex flex-col items-center py-3 gap-2.5 border-r bg-muted/10 overflow-y-auto">
+      {presenceUsers.map((u) => (
+        <TooltipProvider key={u.userId}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="relative cursor-default">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="text-[9px] bg-secondary">{initials(u.name)}</AvatarFallback>
+                </Avatar>
+                <span
+                  className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card ${
+                    isActive(u.lastSeen) ? "bg-green-500" : "bg-slate-400"
+                  }`}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="text-xs">
+              <p className="font-medium">{u.name}</p>
+              <p className="text-muted-foreground">{isActive(u.lastSeen) ? "Active now" : "Offline"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ))}
+      {presenceUsers.length === 0 && (
+        <div className="flex items-center justify-center py-2 opacity-30">
+          <Users className="h-4 w-4" />
         </div>
       )}
     </div>
@@ -690,9 +687,74 @@ export function TeamFeedSidebar({
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const [presenceUsers, setPresenceUsers] = useState<PresenceUser[]>([]);
+  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_WIDTH);
+  const [isMobile, setIsMobile] = useState(false);
+  const [contentVisible, setContentVisible] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isFirstLoad = useRef(true);
+  const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartWidth = useRef(DEFAULT_WIDTH);
+  const currentWidthRef = useRef(DEFAULT_WIDTH);
 
+  // Init panel width from localStorage on mount
+  useEffect(() => {
+    const w = savedWidth();
+    setPanelWidth(w);
+    currentWidthRef.current = w;
+  }, []);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    function check() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Content fade-in animation (delayed 200ms after open)
+  useEffect(() => {
+    if (open) {
+      const t = setTimeout(() => setContentVisible(true), 200);
+      return () => clearTimeout(t);
+    } else {
+      setContentVisible(false);
+    }
+  }, [open]);
+
+  // ── Drag resize ──────────────────────────────────────────────────────────
+  function handleDragStart(e: React.MouseEvent) {
+    e.preventDefault();
+    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartWidth.current = currentWidthRef.current;
+
+    function onMouseMove(ev: MouseEvent) {
+      if (!isDragging.current) return;
+      // Left edge drag: moving left (smaller clientX) → panel grows
+      const delta = dragStartX.current - ev.clientX;
+      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, dragStartWidth.current + delta));
+      currentWidthRef.current = newWidth;
+      setPanelWidth(newWidth);
+    }
+
+    function onMouseUp() {
+      isDragging.current = false;
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      localStorage.setItem("covos:teamfeed-width", String(currentWidthRef.current));
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }
+
+  // ── Messages ─────────────────────────────────────────────────────────────
   const load = useCallback(async (q = "") => {
     try {
       const url = q ? `/api/team-messages?q=${encodeURIComponent(q)}` : "/api/team-messages";
@@ -704,28 +766,24 @@ export function TeamFeedSidebar({
     }
   }, []);
 
-  // Scroll to bottom helper
   const scrollToBottom = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
   }, []);
 
-  // Load on open + scroll to bottom on first load
   useEffect(() => {
     if (!open) return;
     isFirstLoad.current = true;
     setLoading(true);
     load(search).then(() => {
       if (isFirstLoad.current) {
-        // Defer scroll until DOM has painted
         requestAnimationFrame(() => scrollToBottom());
         isFirstLoad.current = false;
       }
     });
   }, [open, load, search, scrollToBottom]);
 
-  // Scroll to bottom when new messages arrive (only if already near bottom)
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || isFirstLoad.current) return;
@@ -733,20 +791,47 @@ export function TeamFeedSidebar({
     if (nearBottom) requestAnimationFrame(() => scrollToBottom());
   }, [messages, scrollToBottom]);
 
-  // SSE — replace polling
+  // ── SSE ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
     const sse = new EventSource("/api/team-messages/stream");
-    sse.addEventListener("message", () => load(search));
-    sse.addEventListener("reconnect", () => {
-      sse.close();
-      // Browser EventSource auto-reconnects after close isn't called,
-      // but we explicitly re-mount via the effect cleanup/re-run
-    });
-    return () => sse.close();
-  }, [open, load, search]);
 
-  // Debounced search
+    sse.addEventListener("message", () => load(search));
+
+    sse.addEventListener("typing", (e) => {
+      try {
+        const typers = JSON.parse(e.data) as TypingUser[];
+        const filtered = typers.filter((u) => u.userId !== currentUserId);
+        setTypingUsers(filtered);
+        if (typingClearRef.current) clearTimeout(typingClearRef.current);
+        if (filtered.length > 0) {
+          typingClearRef.current = setTimeout(() => setTypingUsers([]), 4_000);
+        }
+      } catch { /* ignore malformed */ }
+    });
+
+    sse.addEventListener("reconnect", () => sse.close());
+
+    return () => sse.close();
+  }, [open, load, search, currentUserId]);
+
+  // ── Presence polling ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!open) return;
+    async function fetchPresence() {
+      try {
+        const res = await fetch("/api/team/presence");
+        if (!res.ok) return;
+        const data = await res.json();
+        setPresenceUsers(Array.isArray(data) ? data : []);
+      } catch { /* ignore */ }
+    }
+    fetchPresence();
+    const interval = setInterval(fetchPresence, 30_000);
+    return () => clearInterval(interval);
+  }, [open]);
+
+  // ── Debounced search ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!searchActive) return;
     const t = setTimeout(() => load(search), 350);
@@ -754,87 +839,141 @@ export function TeamFeedSidebar({
   }, [search, searchActive, load]);
 
   const pinnedMessages = messages.filter((m) => m.isPinned);
-  const feedMessages = [...messages.filter((m) => !m.isPinned)].reverse(); // chronological asc
+  const feedMessages = [...messages.filter((m) => !m.isPinned)].reverse();
 
-  return (
-    <div className={`flex-shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${open ? "w-80" : "w-0"}`}>
-      <div className="w-80 h-[calc(100vh-6rem)] sticky top-0 flex flex-col border rounded-lg bg-card shadow-sm ml-4">
+  // Interior content (reused in both desktop and mobile layouts)
+  const panelInterior = (
+    <div className="flex flex-col flex-1 min-w-0">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-3 py-3 border-b flex-shrink-0">
+        {searchActive ? (
+          <div className="flex-1 flex items-center gap-1.5">
+            <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <Input autoFocus placeholder="Search messages…" value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-7 text-xs border-0 shadow-none p-0 focus-visible:ring-0" />
+            <button onClick={() => { setSearchActive(false); setSearch(""); load(""); }}
+              className="text-muted-foreground hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <>
+            <MessageSquare className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="font-semibold text-sm flex-1">Team Feed</span>
+            <button onClick={() => setSearchActive(true)}
+              className="text-muted-foreground hover:text-foreground transition-colors">
+              <Search className="h-4 w-4" />
+            </button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b flex-shrink-0">
-          {searchActive ? (
-            <div className="flex-1 flex items-center gap-1.5">
-              <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-              <Input
-                autoFocus
-                placeholder="Search messages…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-7 text-xs border-0 shadow-none p-0 focus-visible:ring-0"
-              />
-              <button onClick={() => { setSearchActive(false); setSearch(""); load(""); }}
-                className="text-muted-foreground hover:text-foreground">
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : (
-            <>
-              <MessageSquare className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="font-semibold text-sm flex-1">Team Feed</span>
-              <button onClick={() => setSearchActive(true)}
-                className="text-muted-foreground hover:text-foreground transition-colors">
-                <Search className="h-4 w-4" />
-              </button>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </>
-          )}
+      {/* Pinned banner */}
+      <PinnedBanner messages={pinnedMessages} currentUserId={currentUserId}
+        isMaster={isMaster} users={users} onRefresh={() => load(search)} />
+
+      {/* Messages scroll */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
+        {loading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}
+          </div>
+        ) : feedMessages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
+            <MessageSquare className="h-8 w-8 mb-2 opacity-30" />
+            <p className="text-sm">{search ? "No messages found." : voice.empty.teamFeed.body}</p>
+          </div>
+        ) : (
+          feedMessages.map((msg) => (
+            <MessageRow key={msg.id} msg={msg} currentUserId={currentUserId}
+              isMaster={isMaster} users={users} onRefresh={() => load(search)} />
+          ))
+        )}
+      </div>
+
+      {/* Typing indicator */}
+      {typingUsers.length > 0 && (
+        <div className="px-3 py-1.5 border-t flex-shrink-0">
+          <p className="text-xs text-muted-foreground italic">
+            {typingUsers.map((u) => u.name).join(", ")}{" "}
+            {typingUsers.length === 1 ? "is" : "are"} typing…
+          </p>
         </div>
+      )}
 
-        {/* Pinned banner — sits above scroll area, doesn't displace feed */}
-        <PinnedBanner
-          messages={pinnedMessages}
-          currentUserId={currentUserId}
-          isMaster={isMaster}
+      {/* Compose */}
+      <div className="border-t p-3 flex-shrink-0">
+        <ComposeBox
+          onSent={() => {
+            load(search).then(() => requestAnimationFrame(() => scrollToBottom()));
+          }}
           users={users}
-          onRefresh={() => load(search)}
+          isMaster={isMaster}
+        />
+      </div>
+    </div>
+  );
+
+  // Mobile bottom sheet layout
+  if (isMobile) {
+    return (
+      <>
+        {/* Backdrop */}
+        {open && (
+          <div
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            onClick={onClose}
+          />
+        )}
+        {/* Bottom sheet */}
+        <div
+          className={`fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-2xl md:hidden transition-transform duration-300 ${
+            open ? "translate-y-0" : "translate-y-full"
+          }`}
+          style={{ height: "70vh" }}
+        >
+          {/* Drag handle visual */}
+          <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+            <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+          </div>
+          {/* Two-pane interior */}
+          <div className="flex flex-1 min-h-0 h-[calc(100%-20px)]">
+            <PeopleStrip presenceUsers={presenceUsers} />
+            {panelInterior}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop side panel layout
+  return (
+    <div
+      style={{ width: open ? `${panelWidth}px` : 0 }}
+      className="flex-shrink-0 transition-[width] duration-300 ease-in-out overflow-hidden"
+    >
+      <div
+        style={{ width: `${panelWidth}px` }}
+        className={`h-[calc(100vh-6rem)] sticky top-0 flex flex-col border rounded-lg bg-card shadow-sm ml-4 relative transition-opacity duration-200 ${
+          contentVisible ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {/* Drag handle — left edge */}
+        <div
+          onMouseDown={handleDragStart}
+          className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 rounded-l-lg hover:bg-primary/20 transition-colors"
+          title="Drag to resize"
         />
 
-        {/* Messages — newest at bottom (chronological asc) */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-2 min-h-0">
-          {loading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}
-            </div>
-          ) : feedMessages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-              <MessageSquare className="h-8 w-8 mb-2 opacity-30" />
-              <p className="text-sm">{search ? "No messages found." : voice.empty.teamFeed.body}</p>
-            </div>
-          ) : (
-            feedMessages.map((msg) => (
-              <MessageRow
-                key={msg.id}
-                msg={msg}
-                currentUserId={currentUserId}
-                isMaster={isMaster}
-                users={users}
-                onRefresh={() => load(search)}
-              />
-            ))
-          )}
-        </div>
-
-        {/* Compose — always visible */}
-        <div className="border-t p-3 flex-shrink-0">
-          <ComposeBox
-            onSent={() => {
-              load(search).then(() => requestAnimationFrame(() => scrollToBottom()));
-            }}
-            users={users}
-            isMaster={isMaster}
-          />
+        {/* Two-pane interior */}
+        <div className="flex flex-1 min-h-0">
+          {/* People strip — 64px fixed */}
+          <PeopleStrip presenceUsers={presenceUsers} />
+          {panelInterior}
         </div>
       </div>
     </div>
@@ -862,6 +1001,9 @@ export function TeamFeedToggle({
           >
             {open ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
             <span className="text-xs hidden sm:inline">Team Feed</span>
+            {!open && unreadCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-indigo-500" />
+            )}
             {unreadCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-0.5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
                 {unreadCount}

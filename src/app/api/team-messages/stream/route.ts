@@ -1,17 +1,24 @@
 /**
  * GET /api/team-messages/stream
- * Server-Sent Events — pushes a lightweight "message" event when new
- * team messages arrive. Client re-fetches on each event rather than
- * receiving full payloads (stateless, simple, cheap).
+ * Server-Sent Events — pushes lightweight events when new team messages arrive
+ * or when users are typing. Client re-fetches messages on each "message" event.
+ *
+ * Events emitted:
+ *   connected  — on open
+ *   message    — new message id (client re-fetches)
+ *   typing     — JSON array of { userId, name } currently typing
+ *   reconnect  — client should reconnect (sent before auto-close)
  *
  * Heartbeat: 25s to survive proxy timeouts.
- * Poll interval: 5s DB check on new message id.
+ * Message poll: 5s DB check for new message id.
+ * Typing poll: 2s in-memory check (best-effort, ephemeral).
  * Auto-close: 4.5 min (under Vercel's 5-min function cap — client reconnects).
  */
 
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getActiveTypers } from "@/lib/team/typing-store";
 
 export const runtime = "nodejs";
 
@@ -20,7 +27,7 @@ export async function GET(req: NextRequest) {
   if (!session?.user) return new Response("Unauthorized", { status: 401 });
 
   const userId = parseInt(session.user.id);
-  const userRole = (session.user as any).role as string;
+  const userRole = (session.user as { role?: string }).role as string;
 
   const audienceFilter = {
     OR: [
@@ -53,7 +60,8 @@ export async function GET(req: NextRequest) {
 
       const heartbeat = setInterval(() => enqueue(": heartbeat\n\n"), 25_000);
 
-      const poll = setInterval(async () => {
+      // Poll DB for new messages every 5s
+      const messagePoll = setInterval(async () => {
         if (closed) return;
         try {
           const newest = await prisma.teamMessage.findFirst({
@@ -68,10 +76,23 @@ export async function GET(req: NextRequest) {
         } catch { /* skip tick on DB error */ }
       }, 5_000);
 
+      // Poll typing store every 2s (best-effort, in-memory)
+      let lastTypingSnapshot = "";
+      const typingPoll = setInterval(() => {
+        if (closed) return;
+        const typers = getActiveTypers(userId);
+        const snapshot = JSON.stringify(typers);
+        if (snapshot !== lastTypingSnapshot) {
+          lastTypingSnapshot = snapshot;
+          enqueue(`event: typing\ndata: ${snapshot}\n\n`);
+        }
+      }, 2_000);
+
       const timeout = setTimeout(() => {
         closed = true;
         clearInterval(heartbeat);
-        clearInterval(poll);
+        clearInterval(messagePoll);
+        clearInterval(typingPoll);
         enqueue("event: reconnect\ndata: timeout\n\n");
         try { controller.close(); } catch { /* already closed */ }
       }, 270_000);
@@ -79,7 +100,8 @@ export async function GET(req: NextRequest) {
       req.signal.addEventListener("abort", () => {
         closed = true;
         clearInterval(heartbeat);
-        clearInterval(poll);
+        clearInterval(messagePoll);
+        clearInterval(typingPoll);
         clearTimeout(timeout);
         try { controller.close(); } catch { /* already closed */ }
       });

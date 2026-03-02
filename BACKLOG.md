@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 1, 2026 — Sprints 27/29/ARCH/31/32 complete. Docs sync via final gate instance.
+**Last Updated:** March 2, 2026 — Sprint Cowork shipped (Sprints 30+33 scope). Sprint 34+ is next.
 
 **Owner:** David Kirsch
 
@@ -55,10 +55,10 @@ Foundation → out. Each sprint unblocks the next.
 | ~~28~~ | ~~Tenant Productization Core~~ | ~~COVOS extraction: TenantConfig extension + email/template/AI/UI layer~~ | ✅ SHIPPED | |
 | ~~29~~ | ~~Entity Migration Readiness~~ | ~~Tenant registry, contract templates, brochure hooks, Wave reconnect~~ | ✅ SHIPPED | |
 | ~~ARCH~~ | ~~Project Fracture + COVOS Roadmap~~ | ~~ARCH-002 (repo/service/DB separation plan) + ARCH-003 (82-category module mapping)~~ | ✅ SHIPPED | |
-| 30 | Communication + Polish | UX-FEAT-002 (TeamFeed overhaul) + UX-AUDIT-027 (contrast) + FEAT-035 (vault preview) | ~1.5 sessions | Alive + accessible |
+| ~~30~~ | ~~Communication + Polish~~ | ~~UX-FEAT-002 (TeamFeed overhaul) + UX-AUDIT-027 (contrast) + FEAT-035 (vault preview)~~ | ✅ SHIPPED | Sprint Cowork |
 | ~~31~~ | ~~UI-CONST-001 Group 5~~ | ~~Data Display — tables, metric tiles, charts~~ | ✅ SHIPPED | |
 | ~~32~~ | ~~Signing + Tours~~ | ~~FEAT-036 (DocuSign) + FEAT-038 (expanded tour tips)~~ | ✅ SHIPPED | |
-| 33 | Customization + Guide | FEAT-034 (customization audit) + FEAT-039 (guide character Phase 1) | ~2 sessions | Retention + personality |
+| ~~33~~ | ~~Customization + Guide~~ | ~~FEAT-034 (customization audit) + FEAT-039 (guide character Phase 1)~~ | ✅ SHIPPED | Sprint Cowork |
 | 34+ | COVOS Phase 1 Modules | Per ARCH-003 roadmap — email marketing, booking, proposals, etc. | Multi-session | Vertical ERP expansion |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
@@ -161,16 +161,9 @@ Should Tasks live under "Clients" in the left nav rather than as a standalone to
 **Direction:** Evaluate (A) keep top-level for cross-client queue management vs. (B) move under Clients with master queue accessible elsewhere. Audit actual usage pattern before committing.
 **Size:** ~2 hrs (decision + nav restructure). **Priority:** 🟡 WOULD — low disruption if changed early, high disruption later. Decide before Sprint 20.
 
-### UX-FEAT-002: TeamFeed Major Overhaul — Slack-Grade Panel
-TeamFeed needs to evolve from a sidebar chat panel into a proper communication hub. Three major upgrades:
-1. **Resizable panel** — drag handle on left edge, width persisted to localStorage, min/max constraints.
-2. **Two-pane layout** — people/channels list on left, message thread on right (Slack model). Online/offline status indicators (green dot = active in last 5 min via `DashboardEvent` heartbeat or session recency). User avatars or initials with presence dots.
-3. **Polish** — subtle accent color on the TeamFeed toggle icon in the nav (e.g., indigo dot or badge when unread). Typing indicators, "X is typing..." at bottom of message pane.
-**Size:** ~1.5 sessions (resize + layout restructure + presence system). **Priority:** 🟠 SHOULD — high-impact UX, makes the platform feel alive.
 
-### UX-AUDIT-027: Accessibility Contrast Pass — Signal Palette Review
-The Signal palette looks great but some token combinations may not meet WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large text). Particularly concerned about: muted text on dark backgrounds, status badge text on colored backgrounds, secondary text in metric cards, sidebar nav items in non-active state. Run a systematic contrast audit of all foreground/background token pairs in both light and dark mode. Adjust any failing pairs while preserving the Signal aesthetic — typically means bumping foreground lightness up 10-15% rather than changing hues.
-**Size:** ~1 hr audit + ~1 hr fixes. **Priority:** 🟠 SHOULD — accessibility + readability, especially for older users or bright environments.
+
+
 
 ### UX-FEAT-003: Dashboard Widget Default Layout per Role
 Dashboard widgets currently initialize in an undefined/random order on first login. Each role should get a thoughtful default layout reflecting what they'll use most:
@@ -179,20 +172,11 @@ Dashboard widgets currently initialize in an undefined/random order on first log
 Layout stored on first render if no saved layout exists. Users can still customize and their arrangement persists. Only affects the very first session.
 **Size:** ~1 hr. **Priority:** 🟠 SHOULD — first impression matters, especially for new reps.
 
-### UX-AUDIT-028: Customization Audit — Global User Personalization Surface
-Every user interaction with the platform should feel like *their* platform. This is a comprehensive audit of every surface that could be customizable but isn't yet. Not just widget layout — everything: which columns appear in tables, which metrics show on dashboard cards, sidebar group order, default filters on each page, notification preferences per event type, theme beyond light/dark (accent color per user?), default landing page per role, compact vs. comfortable density toggle, which quick actions appear and in what order, pipeline column visibility/ordering, report section toggles, email digest frequency. The audit produces a ranked list of customization opportunities with effort estimates and a phased implementation plan. The philosophy: reasonable defaults that work for 90% of users, with progressive disclosure of customization for power users who want control.
-**Output:** `docs/CUSTOMIZATION_AUDIT.md` — every customizable surface, current state, proposed UX, effort.
-**Size:** ~1 session audit, multi-session implementation. **Priority:** 🟡 WOULD — high-value for retention and stickiness, not blocking entity launch.
 
-### UX-FEAT-004: Document Vault — Preview Before Download
-Currently clicking a vault file triggers an immediate download. Best practice: preview first, download second. Images render inline in a lightbox/dialog. PDFs render in an iframe viewer. Documents (.docx, .xlsx) show a preview card with metadata (size, type, upload date, uploader) and prominent Download button. Unknown types show metadata + download only. The preview dialog should also surface version info if the file is from Shared space.
-**Size:** ~2 hrs. **Priority:** 🟠 SHOULD — UX quality, prevents accidental downloads, builds trust.
 
-### UX-FEAT-006: COVOS Guide Character — Reactive AI Assistant Persona
-A persistent but non-intrusive guide character that speaks in the platform's sardonic, deadpan, 4th-wall-breaking voice. NOT Clippy — doesn't pop up on a timer or frequency. Reactive: appears when it detects user idle on a page for >30 seconds, when a user visits the same page 3x without taking action, when a workflow stalls (e.g., lead sitting in "New" for 5+ days). Proactive only when patterns suggest confusion (rapid page switching, incomplete form abandonment, repeated filter resets). The character has David's sketches as design reference. Voice matches the sardonic micro-copy already in empty states. Could evolve into an AI-powered contextual assistant that actually understands what the user is trying to do.
-**Phase 1:** Static character with pre-written contextual tips (reactive triggers only).
-**Phase 2:** AI-powered contextual awareness (reads page state, suggests next action).
-**Size:** Phase 1 ~1 session, Phase 2 ~2 sessions. **Priority:** 🟡 WOULD — differentiator, personality layer, but requires design assets (David's sketches).
+
+
+
 
 ### FEAT-011: Full Button / Route / Path / Dependency & Logic Audit
 No formal audit of the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers accumulate silently.
@@ -284,17 +268,4 @@ Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant ad
 
 ## 🟡 WOULD — Additional Features & Polish
 
-### FEAT-034: Customization Audit — Global Personalization Framework
-Every surface that could be personalized should be. Systematic audit of every configurable element across the entire platform.
-**Scope (non-exhaustive):** Widget visibility (add/remove/show/hide, not just rearrange). Table column chooser per data table. Sidebar nav pin/unpin/reorder. Notification preferences per-channel per-event. Display density toggle (compact/comfortable/spacious). Default tab memory per page. Quick action visibility/order. Pipeline stage customization (tenant-level). Keyboard shortcut reference.
-**Output:** `docs/CUSTOMIZATION_AUDIT.md` — every configurable surface mapped, current state, recommendation (user-level vs. tenant-level vs. not worth it).
-**Size:** ~1 session audit + doc, multi-sprint implementation. **Priority:** 🟡 WOULD.
 
-### FEAT-035: Document Vault — Preview Before Download
-Click → preview modal instead of immediate download. PDF via iframe, images full-size with zoom, DOCX via server-side conversion, CSV/XLSX as table preview. Download as secondary action in modal footer.
-**Size:** ~2 hrs. **Priority:** 🟠 SHOULD.
-
-### FEAT-039: Reactive Guide Character — "The Voice"
-Personality-driven contextual assistant. NOT Clippy — reactive only. Triggers: idle 60s+ on actionable page, same page 3x without completing primary action, empty states, first-visit pages. Character: deadpan sardonic, fourth-wall-breaking, matches brand voice. David has character sketches.
-**Technical:** Global React component, receives page context + DashboardEvent signals. Small avatar bottom-right with speech bubble. Dismissable. Toggleable in Settings. Learns what user already knows.
-**Size:** ~2 sessions (system + content for all pages). **Priority:** 🟡 WOULD — high differentiation, needs character design finalized.

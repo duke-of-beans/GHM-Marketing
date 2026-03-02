@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { VaultFileGrid } from "@/components/vault/vault-file-grid";
 import { VaultUploadButton } from "@/components/vault/vault-upload-button";
 import { Search, Lock, Globe, FileText, PenLine, AlertTriangle } from "lucide-react";
+import { useTabMemory } from "@/hooks/use-tab-memory";
 
 export interface VaultFileRecord {
   id: number;
@@ -50,7 +51,7 @@ export function VaultClient({
   const [clientReports, setClientReports] = useState(initialClientReports);
   const [signedContracts, setSignedContracts] = useState(initialSignedContracts);
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("shared");
+  const [activeTab, setActiveTab] = useTabMemory("/vault", "shared");
 
   const filter = useCallback(
     (files: VaultFileRecord[]) =>

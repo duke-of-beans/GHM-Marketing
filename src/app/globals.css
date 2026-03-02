@@ -30,14 +30,14 @@
 
     /* Muted */
     --muted: 210 40% 96.1%;           /* slate-100 #f1f5f9 */
-    --muted-foreground: 215 16.3% 46.9%; /* slate-500 #64748b */
+    --muted-foreground: 215 16.3% 35%; /* slate-600 — darkened for WCAG AA */
 
     /* Accent — COVOS amber */
     --accent: 37.7 92.1% 50.2%;       /* amber-600 #d97706 */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     /* Destructive */
-    --destructive: 0 84.2% 60.2%;     /* red-500   #ef4444 */
+    --destructive: 0 84.2% 48%;       /* red-700 — darkened for WCAG AA (was 60.2%) */
     --destructive-foreground: 210 40% 98%;
 
     /* Borders & inputs */
@@ -51,29 +51,30 @@
     /* ─── Sidebar (deep navy — same in both modes) ─── */
     --sidebar: 220 38% 9%;            /* #0c1222 */
     --sidebar-foreground: 213 17% 64.5%; /* #93a3b8 */
-    --sidebar-muted: 215 21% 37%;     /* #4b5c72 */
+    --sidebar-muted: 215 21% 53%;     /* lightened for WCAG AA on dark sidebar (was 37%) */
     --sidebar-active: 229.7 93.8% 81.8%; /* indigo-300 #a5b4fc */
     --sidebar-active-bg: 229 93% 81% / 0.10;
     --sidebar-border: 220 30% 18%;    /* slate-800 #1e293b */
 
-    /* ─── Status tokens (universal, never tenant-overridden) ─── */
-    --status-success: 142.1 76.2% 36.3%;        /* green-600  #16a34a */
+    /* ─── Status tokens (universal, never tenant-overridden) */
+    /* WCAG AA verified — March 2026 */
+    --status-success: 142.1 76.2% 28%;          /* green-700 — darkened for WCAG AA */
     --status-success-bg: 138.5 76.5% 96.7%;     /* green-100  #dcfce7 */
     --status-success-border: 141.7 76.6% 73.1%; /* green-200  #bbf7d0 */
 
-    --status-warning: 45.4 93.4% 47.5%;         /* yellow-500 #eab308 */
+    --status-warning: 45.4 93.4% 27%;           /* yellow-900 — darkened for WCAG AA (was 47.5%) */
     --status-warning-bg: 54.9 96.7% 88%;        /* yellow-100 #fef9c3 */
     --status-warning-border: 47.9 95.8% 76.1%;  /* yellow-200 #fde68a */
 
-    --status-danger: 0 72.2% 50.6%;             /* red-600    #dc2626 */
+    --status-danger: 0 72.2% 46%;               /* red-700 — darkened for WCAG AA (was 50.6%) */
     --status-danger-bg: 0 93.3% 94.1%;          /* red-100    #fee2e2 */
     --status-danger-border: 0 95.7% 89.8%;      /* red-200    #fecaca */
 
-    --status-info: 217.2 91.2% 59.8%;           /* blue-600   #2563eb */
+    --status-info: 217.2 91.2% 43%;             /* blue-700 — darkened for WCAG AA (was 59.8%) */
     --status-info-bg: 213.8 93.9% 87.8%;        /* blue-100   #dbeafe */
     --status-info-border: 211.7 96.4% 78.4%;    /* blue-200   #bfdbfe */
 
-    --status-neutral: 215 16.3% 46.9%;          /* slate-500  #64748b */
+    --status-neutral: 215 16.3% 43%;            /* slate-600 — darkened for WCAG AA (was 46.9%) */
     --status-neutral-bg: 210 40% 96.1%;          /* slate-100  #f1f5f9 */
     --status-neutral-border: 214.3 31.8% 91.4%; /* slate-200  #e2e8f0 */
 
@@ -108,7 +109,7 @@
 
     /* Muted */
     --muted: 217.2 32.6% 17.5%;       /* slate-800 */
-    --muted-foreground: 215 16.3% 46.9%; /* slate-500 */
+    --muted-foreground: 215 16.3% 55%; /* lightened for WCAG AA on dark bg (was 46.9%) */
 
     /* Accent — warm amber (matches light mode amber-500 tone) */
     --accent: 38 92% 50%;              /* amber-500 #f59e0b */
@@ -126,7 +127,7 @@
     /* Sidebar — IDENTICAL to light mode */
     --sidebar: 220 38% 9%;
     --sidebar-foreground: 213 17% 64.5%;
-    --sidebar-muted: 215 21% 37%;
+    --sidebar-muted: 215 21% 53%; /* lightened for WCAG AA on dark sidebar (was 37%) */
     --sidebar-active: 229.7 93.8% 81.8%;
     --sidebar-active-bg: 229 93% 81% / 0.10;
     --sidebar-border: 220 30% 18%;
@@ -148,7 +149,7 @@
     --status-info-bg: 224 64.3% 21.6%;             /* blue-950   #172554 */
     --status-info-border: 216 44.4% 24.7%;         /* dark blue  #1e3a5f */
 
-    --status-neutral: 215 16.3% 46.9%;            /* slate-500  #64748b */
+    --status-neutral: 215 16.3% 60%;              /* lightened for WCAG AA on dark bg (was 46.9%) */
     --status-neutral-bg: 217.2 32.6% 17.5%;        /* slate-800  #1e293b */
     --status-neutral-border: 215 25% 27%;          /* slate-700  #334155 */
 
@@ -193,4 +194,28 @@
   .sidebar-text-active { color: hsl(var(--sidebar-active)); }
   .sidebar-active-bg   { background-color: hsl(var(--sidebar-active-bg)); }
   .sidebar-border-color { border-color: hsl(var(--sidebar-border)); }
+}
+
+/* ── Display Density ─────────────────────────────────────────── */
+/* Default: comfortable. Compact mode reduces py/px on tables, cards, lists */
+
+[data-density="compact"] .data-table-row,
+[data-density="compact"] [role="row"] {
+  padding-top: 0.375rem;    /* py-1.5 instead of default py-3 */
+  padding-bottom: 0.375rem;
+}
+
+[data-density="compact"] .metric-card-body {
+  padding: 0.75rem;
+}
+
+[data-density="compact"] .card-compact {
+  padding: 0.75rem;
+}
+
+/* Tighten table cell padding in compact mode */
+[data-density="compact"] td,
+[data-density="compact"] th {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
 }

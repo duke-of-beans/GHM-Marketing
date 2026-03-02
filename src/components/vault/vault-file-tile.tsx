@@ -2,13 +2,8 @@
 
 import { useState } from "react";
 import { VaultFileRecord } from "./vault-client";
+import { VaultPreviewModal } from "./VaultPreviewModal";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,7 +42,8 @@ function formatDate(dateStr: string) {
 }
 
 function isPreviewable(mimeType: string) {
-  return mimeType === "application/pdf" || mimeType.startsWith("image/");
+  // All file types now open the modal preview (with metadata cards for non-previewable types)
+  return true;
 }
 
 interface Props {
@@ -89,12 +85,8 @@ export function VaultFileTile({
     // Don't open preview if clicking the dropdown trigger
     if ((e.target as HTMLElement).closest('[data-radix-dropdown-menu-trigger]')) return;
     if ((e.target as HTMLElement).closest('[role="menuitem"]')) return;
-    if (previewable) {
-      setPreviewOpen(true);
-    } else {
-      // Non-previewable: trigger download directly
-      window.open(file.blobUrl, "_blank", "noopener,noreferrer");
-    }
+    // Always open modal now (all file types supported)
+    setPreviewOpen(true);
   }
 
   async function handleDelete() {
@@ -241,47 +233,11 @@ export function VaultFileTile({
       )}
 
       {/* Preview modal */}
-      {previewable && (
-        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-          <DialogContent className="max-w-4xl w-full h-[85vh] flex flex-col p-0 gap-0">
-            <DialogHeader className="flex flex-row items-center justify-between px-4 py-3 border-b shrink-0">
-              <DialogTitle className="text-sm font-medium truncate pr-4">
-                {file.displayName ?? file.name}
-              </DialogTitle>
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={file.blobUrl}
-                  download={file.name}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-                    <Download className="h-4 w-4" /> Download
-                  </Button>
-                </a>
-              </div>
-            </DialogHeader>
-            <div className="flex-1 overflow-hidden">
-              {file.mimeType === "application/pdf" ? (
-                <iframe
-                  src={file.blobUrl}
-                  className="w-full h-full border-0"
-                  title={file.displayName ?? file.name}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted/20 p-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={file.blobUrl}
-                    alt={file.displayName ?? file.name}
-                    className="max-w-full max-h-full object-contain rounded"
-                  />
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <VaultPreviewModal
+        file={file}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
     </>
   );
 }

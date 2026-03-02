@@ -329,6 +329,8 @@ export function AdvancedLeadFilterBar({
   const [saving, setSaving] = useState(false);
   const saveInputRef = useRef<HTMLInputElement>(null);
 
+  const [hasLocalDefault, setHasLocalDefault] = useState(false);
+
   useEffect(() => {
     if (showTerritoryFilter) {
       fetch("/api/territories")
@@ -348,6 +350,10 @@ export function AdvancedLeadFilterBar({
       .then((r) => r.json())
       .then((d) => { if (d.success) setSavedSearches(d.data); })
       .catch(() => {});
+    
+    // Check if there's a saved default on mount
+    const saved = localStorage.getItem("covos:leads-filters-default");
+    setHasLocalDefault(!!saved);
   }, [showTerritoryFilter]);
 
   useEffect(() => {
@@ -438,6 +444,18 @@ export function AdvancedLeadFilterBar({
       : [...filters.pitchAngles, val];
     onChange({ ...filters, pitchAngles: updated });
   };
+
+  function saveAsDefault() {
+    localStorage.setItem("covos:leads-filters-default", JSON.stringify(filters));
+    setHasLocalDefault(true);
+    toast.success("Lead filters saved as default for this device");
+  }
+
+  function clearDefault() {
+    localStorage.removeItem("covos:leads-filters-default");
+    setHasLocalDefault(false);
+    toast.success("Default filters cleared");
+  }
 
   const clearFilters = () => {
     onChange(DEFAULT_FILTERS);
@@ -730,6 +748,32 @@ export function AdvancedLeadFilterBar({
                 <X className="h-4 w-4" />
               </Button>
             </div>
+          )}
+
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 text-muted-foreground hover:text-foreground gap-1.5"
+              onClick={saveAsDefault}
+              title="Save current filters as default for this device"
+            >
+              <Bookmark className="h-3.5 w-3.5" />
+              Set default
+            </Button>
+          )}
+
+          {hasLocalDefault && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 text-muted-foreground hover:text-foreground gap-1.5"
+              onClick={clearDefault}
+              title="Clear saved default filters"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear default
+            </Button>
           )}
 
           {hasActiveFilters && (

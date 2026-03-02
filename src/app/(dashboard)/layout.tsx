@@ -5,6 +5,7 @@ import { DashboardNav } from "@/components/dashboard/nav";
 import { DashboardLayoutClient } from "@/components/dashboard/DashboardLayoutClient";
 import { BugTrackingInit } from "@/components/bug-report/BugTrackingInit";
 import { BrandThemeInjector } from "@/components/branding/BrandThemeInjector";
+import { DensityProvider } from "@/components/shared/DensityProvider";
 import { prisma } from "@/lib/db";
 import { getUserPermissions } from "@/lib/auth/permissions";
 import { isElevated } from "@/lib/auth/roles";
@@ -31,7 +32,7 @@ export default async function DashboardLayout({
   const [fullUser, teamUsers, settings] = await Promise.all([
     prisma.user.findUnique({
       where: { id: parseInt(session.user.id) },
-      select: { permissions: true, permissionPreset: true, adminOnboardingCompletedAt: true },
+      select: { permissions: true, permissionPreset: true, adminOnboardingCompletedAt: true, guideEnabled: true },
     }),
     prisma.user.findMany({
       where: { isActive: true },
@@ -74,6 +75,7 @@ export default async function DashboardLayout({
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
+      <DensityProvider />
       <BrandThemeInjector colors={brandColors} />
       <DashboardNav user={session.user} permissions={permissions} logoUrl={logoUrl} companyName={companyName} />
       <DashboardLayoutClient
@@ -83,6 +85,7 @@ export default async function DashboardLayout({
         pushEnabled={pushEnabled}
         userRole={tutorialRole}
         userName={session.user.name ?? ""}
+        guideEnabled={fullUser?.guideEnabled ?? true}
       >
         {children}
       </DashboardLayoutClient>

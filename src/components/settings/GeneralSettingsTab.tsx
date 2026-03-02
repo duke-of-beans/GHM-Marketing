@@ -29,6 +29,7 @@ import { Loader2, Save, Bell, BookOpen, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { resetAllTours } from "@/lib/tutorials";
+import { Density, applyDensity, getSavedDensity } from "@/components/shared/DensityProvider";
 
 export function GeneralSettingsTab() {
   const { theme, setTheme } = useTheme();
@@ -36,9 +37,13 @@ export function GeneralSettingsTab() {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<any>(null);
   const [resettingTours, setResettingTours] = useState(false);
+  const [guideEnabled, setGuideEnabled] = useState(true);
+  const [density, setDensity] = useState<Density>(getSavedDensity);
 
   useEffect(() => {
     loadSettings();
+    const saved = localStorage.getItem("covos:guide-enabled-pref");
+    setGuideEnabled(saved !== "false");
   }, []);
 
   async function loadSettings() {
@@ -64,6 +69,29 @@ export function GeneralSettingsTab() {
       toast.success("Page tours reset. Each tour will replay on your next visit.");
     } finally {
       setResettingTours(false);
+    }
+  }
+
+  function handleDensityChange(d: Density) {
+    setDensity(d);
+    applyDensity(d);
+  }
+
+  async function handleGuideToggle(checked: boolean) {
+    setGuideEnabled(checked);
+    localStorage.setItem("covos:guide-enabled-pref", String(checked));
+    try {
+      const res = await fetch("/api/users/me/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guideEnabled: checked }),
+      });
+      if (!res.ok) throw new Error("Failed to update preference");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update guide preference");
+      setGuideEnabled(!checked);
+      localStorage.setItem("covos:guide-enabled-pref", String(!checked));
     }
   }
 
@@ -133,6 +161,23 @@ export function GeneralSettingsTab() {
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
                 <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Display Density</Label>
+              <p className="text-sm text-muted-foreground">
+                Compact mode reduces padding on tables and cards
+              </p>
+            </div>
+            <Select value={density} onValueChange={(v) => handleDensityChange(v as Density)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="comfortable">Comfortable</SelectItem>
+                <SelectItem value="compact">Compact</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -208,6 +253,29 @@ export function GeneralSettingsTab() {
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset Tours
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Guide Assistant */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Guide Assistant</CardTitle>
+          <CardDescription>
+            The guide character gives contextual tips as you navigate. Sardonic but occasionally useful.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="guideEnabled">Show guide tips</Label>
+              <p className="text-sm text-muted-foreground">Enable the guide character on dashboard pages</p>
+            </div>
+            <Switch
+              id="guideEnabled"
+              checked={guideEnabled}
+              onCheckedChange={handleGuideToggle}
+            />
           </div>
         </CardContent>
       </Card>

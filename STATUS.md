@@ -1,11 +1,11 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 1, 2026 — Final gate sync complete. Sprints 27/29/ARCH/31/32 all shipped. Sprint 27: BUG-030/031/032 fixed, FEAT-037 (single lead entry) live. Sprint 29: tenant registry hardened, contract templates tenant-ready, Wave per-tenant scaffolding, TENANT_PROVISIONING.md updated. ARCH: ARCH-002 ADR (PROPOSED) + ARCH-003 82-category COVOS module map written. Sprint 31: DataTable + MetricCard standardized, chart tokens centralized, standards applied across leads/clients/dashboards. Sprint 32: SignatureEnvelope schema, DocuSign API routes (create/status/webhook), vault send-for-signature, signatures tab, tour configs for Leads/ClientDetail/Analytics, tour reset in Settings. TypeScript gate: 5 pre-existing errors only, zero new. Next: Sprint 30 (TeamFeed overhaul + contrast + vault preview) or Sprint 33 (customization audit).
+**Last Updated:** March 2, 2026 — Sprint Cowork shipped (covers Sprint 30 + Sprint 33 scope). TeamFeedSidebar rebuilt: drag resize (280–520px), PeopleStrip presence dots, typing indicator, mobile bottom sheet. WCAG AA contrast audit: 8 tokens fixed in globals.css, CONTRAST_AUDIT.md written. Vault preview modal: VaultPreviewModal.tsx (PDF iframe, image lightbox, DOCX/XLSX metadata cards). Customization layer: display density toggle (DensityProvider + CSS), tab memory hook (vault wired), lead filter defaults (Set Default / Clear Default). Guide Character Phase 1: GuideCharacter.tsx (idle/visit/empty triggers, sardonic tips), guide toggle in Settings. TypeScript gate: 5 pre-existing errors only, zero new. Next: Sprint 34+ (COVOS Phase 1 modules per ARCH-003 roadmap).
 
-### CURRENT PLATFORM STATE — March 1, 2026
+### CURRENT PLATFORM STATE — March 2, 2026
 
-**Sprints complete through 32.** The GHM dashboard is a full-stack agency intelligence platform running live at ghm.covos.app with multi-tenant infrastructure on covos.app. The platform handles lead pipeline (Kanban + manual entry), client management (health scores, portfolio table, client detail), task management, Wave billing integration, content studio, commission engine (salary-only protection for Gavin), team feed with real-time SSE, file vault with DocuSign signing workflow, reporting, analytics dashboards, and guided tours across all major pages.
+**Sprints complete through 32 + Cowork.** The GHM dashboard is a full-stack agency intelligence platform running live at ghm.covos.app with multi-tenant infrastructure on covos.app. The platform handles lead pipeline (Kanban + manual entry), client management (health scores, portfolio table, client detail), task management, Wave billing integration, content studio, commission engine (salary-only protection for Gavin), team feed with real-time SSE + presence + mobile bottom sheet, file vault with DocuSign signing workflow + preview modal, reporting, analytics dashboards, guided tours across all major pages, display density toggle, tab memory, lead filter defaults, and Guide Character Phase 1.
 
 **Multi-tenant:** covosdemo.covos.app is live as a second isolated tenant. getTenant() handles all edge cases gracefully. Contract templates, brochure, and audit PDFs are fully tenant-ready. Wave per-tenant API key scaffolding in place. TENANT_PROVISIONING.md is the go-live runbook.
 
@@ -13,8 +13,31 @@
 
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
-**Next sprint candidates:** Sprint 30 (TeamFeed major overhaul + WCAG contrast + vault preview) or Sprint 33 (customization audit + guide character).
+**Next sprint candidates:** Sprint 34+ (COVOS Phase 1 modules per ARCH-003 roadmap). Sprint 30 and Sprint 33 scope fully shipped in Sprint Cowork.
 
+
+### SPRINT COWORK — Communication + Polish + Customization + Guide (March 2, 2026) ✅ COMPLETE
+
+Covers Sprint 30 (TeamFeed overhaul, contrast audit, vault preview) + Sprint 33 (customization audit + guide character Phase 1) scope, executed as a single Cowork sprint.
+
+**Phase 1 (parallel):**
+- [x] **1-A TeamFeed Resize** — TeamFeedSidebar.tsx fully rebuilt (959→ lines): drag handle (left edge, 280–520px), localStorage width persist, two-pane interior (64px PeopleStrip + message thread), presence polling every 30s, typing indicator via SSE `typing` events. API routes: `/api/team/presence` (GET, presence dots), `/api/team-messages/typing` (POST, fire-and-forget).
+- [x] **1-B Contrast Audit** — CONTRAST_AUDIT.md written (17 token pairs audited, 8 fixed). globals.css patched: `--status-warning` L→27% (light), `--destructive` L→48%, `--muted-foreground` L→55% (dark). WCAG AA verified comment added.
+- [x] **1-C Vault Preview Modal** — VaultPreviewModal.tsx (220 lines): PDF→iframe, images→lightbox with zoom, DOCX/XLSX→metadata card + download CTA, version badge for shared files. vault-file-tile.tsx wired to open modal on click. VAULT_PREVIEW_TYPES.md written.
+- [x] **1-D Customization Audit** — CUSTOMIZATION_AUDIT.md written (349 lines, 16 surfaces ranked). Top 3: Display Density Toggle (ROI 9/10), Default Tab Memory (8/10), Lead Filter Defaults (8/10).
+
+**Phase 2 (sequential):**
+- [x] **2-A Guide Character Phase 1** — guide-config.ts (126 lines, sardonic tips per route), GuideCharacter.tsx (244 lines, idle/first-visit/repeated-visit/empty-state triggers, auto-dismiss 8s, session storage dismiss tracking). PATCH `/api/users/me/preferences` route. Guide toggle in GeneralSettingsTab. Mounted in DashboardLayoutClient.
+- [x] **2-B TeamFeed Polish** — Accent dot on toggle when unread. Content fade-in (200ms opacity transition on panel open). Mobile bottom sheet (fixed bottom-0, 70vh, translate-y transition, backdrop overlay). Unread count clears on panel open.
+- [x] **2-C Top 3 Customizations** — DensityProvider.tsx (applyDensity/getSavedDensity, data-density attribute, localStorage persist). Density CSS block in globals.css (compact padding for td/th/metric cards). Density select in Appearance card of Settings. useTabMemory hook (localStorage per route). vault-client.tsx tab memory wired. Lead filter bar: "Set default" (Bookmark icon) and "Clear default" (X icon) with localStorage persistence and toast feedback.
+
+**Phase 3:**
+- [x] **3-A TypeScript Gate** — 5 pre-existing basecamp/dotenv errors only. Zero new errors across all sprint work. STATUS.md, BACKLOG.md, CHANGELOG.md updated.
+- [x] **3-B Git Push** — `git commit -m "Sprint Cowork: TeamFeed overhaul, contrast audit, vault preview, guide character Phase 1, customization layer"` + push.
+
+**Files created:** `src/components/guide/guide-config.ts`, `src/components/guide/GuideCharacter.tsx`, `src/app/api/users/me/preferences/route.ts`, `src/app/api/team/presence/route.ts`, `src/app/api/team-messages/typing/route.ts`, `src/components/vault/VaultPreviewModal.tsx`, `src/components/shared/DensityProvider.tsx`, `src/hooks/use-tab-memory.ts`, `docs/CONTRAST_AUDIT.md`, `docs/CUSTOMIZATION_AUDIT.md`, `docs/VAULT_PREVIEW_TYPES.md`
+**Files modified:** `src/components/team-feed/TeamFeedSidebar.tsx`, `src/components/vault/vault-file-tile.tsx`, `src/components/vault/vault-client.tsx`, `src/components/leads/lead-filter-bar-advanced.tsx`, `src/components/settings/GeneralSettingsTab.tsx`, `src/components/dashboard/DashboardLayoutClient.tsx`, `src/app/(dashboard)/layout.tsx`, `src/app/globals.css`
+**TypeScript:** Zero new errors (5 pre-existing basecamp/dotenv unaffected).
 
 ### SPRINT 28 TRACK A — Tenant Identity Extraction (February 27, 2026)
 ### SPRINT 30 — Tenant Branding + Resolution Hardening (February 27, 2026 — COMPLETE)
