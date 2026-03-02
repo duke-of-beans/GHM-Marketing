@@ -33,7 +33,7 @@ Covers Sprint 30 (TeamFeed overhaul, contrast audit, vault preview) + Sprint 33 
 
 **Phase 3:**
 - [x] **3-A TypeScript Gate** — 5 pre-existing basecamp/dotenv errors only. Zero new errors across all sprint work. STATUS.md, BACKLOG.md, CHANGELOG.md updated.
-- [x] **3-B Git Push** — `git commit -m "Sprint Cowork: TeamFeed overhaul, contrast audit, vault preview, guide character Phase 1, customization layer"` + push.
+- [x] **3-B Git Push** — Commit `84d8492` — 33 files changed, 3064 insertions. Push to origin/main complete.
 
 **Files created:** `src/components/guide/guide-config.ts`, `src/components/guide/GuideCharacter.tsx`, `src/app/api/users/me/preferences/route.ts`, `src/app/api/team/presence/route.ts`, `src/app/api/team-messages/typing/route.ts`, `src/components/vault/VaultPreviewModal.tsx`, `src/components/shared/DensityProvider.tsx`, `src/hooks/use-tab-memory.ts`, `docs/CONTRAST_AUDIT.md`, `docs/CUSTOMIZATION_AUDIT.md`, `docs/VAULT_PREVIEW_TYPES.md`
 **Files modified:** `src/components/team-feed/TeamFeedSidebar.tsx`, `src/components/vault/vault-file-tile.tsx`, `src/components/vault/vault-client.tsx`, `src/components/leads/lead-filter-bar-advanced.tsx`, `src/components/settings/GeneralSettingsTab.tsx`, `src/components/dashboard/DashboardLayoutClient.tsx`, `src/app/(dashboard)/layout.tsx`, `src/app/globals.css`
