@@ -120,6 +120,7 @@ export default async function MasterDashboard() {
       <MasterDashboardGrid
         savedLayout={savedLayout}
         showProfitability={isOwner}
+        userRole={user.role}
       >
         {{
           "metrics": (

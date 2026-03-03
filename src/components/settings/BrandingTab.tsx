@@ -379,7 +379,11 @@ export function BrandingTab() {
                     <Label className="text-sm font-medium">{role.label}</Label>
                     <p className="text-xs text-muted-foreground">{role.description}</p>
                   </div>
-                  {val !== role.defaultHex && (
+                  {val === role.defaultHex ? (
+                    <span className="text-xs text-muted-foreground italic">
+                      Not set — using COVOS default
+                    </span>
+                  ) : (
                     <button
                       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                       onClick={() => update(role.key, role.defaultHex)}

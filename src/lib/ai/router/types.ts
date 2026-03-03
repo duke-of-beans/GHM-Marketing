@@ -133,6 +133,16 @@ export type AIFeature =
   // Universal Search (COVOS Intelligence Layer)
   | "universal_search";  // AI-powered cross-entity search and navigation
 
+/** Tenant voice settings for AI prompt injection */
+export interface TenantVoice {
+  tone?: string | null;
+  keywords?: string | null;
+  antiKeywords?: string | null;
+  sampleCopy?: string | null;
+  industry?: string | null;
+  audience?: string | null;
+}
+
 export interface FeatureContext {
   feature: AIFeature;
   clientId: number;
@@ -141,6 +151,8 @@ export interface FeatureContext {
   industry?: string;
   /** Optional: voice profile slug for copy-generation features */
   voiceProfileSlug?: string;
+  /** Optional: tenant voice settings injected into system prompt */
+  tenantVoice?: TenantVoice;
   /** Optional: competitor names for competitive features */
   competitors?: string[];
   /** Optional: property tier for Website Studio */

@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 3, 2026 — Sprint 34 shipped (GHM → Tenant Extraction). Sprint 34-OPS (manual infra) is next.
+**Last Updated:** March 3, 2026 — Sprint 35 shipped (Tenant Visual Identity + Brand System). Sprint 36 (Communication Layer + Platform Hygiene) is next.
 
 **Owner:** David Kirsch
 
@@ -60,8 +60,9 @@ Foundation → out. Each sprint unblocks the next.
 | ~~32~~ | ~~Signing + Tours~~ | ~~FEAT-036 (DocuSign) + FEAT-038 (expanded tour tips)~~ | ✅ SHIPPED | |
 | ~~33~~ | ~~Customization + Guide~~ | ~~FEAT-034 (customization audit) + FEAT-039 (guide character Phase 1)~~ | ✅ SHIPPED | Sprint Cowork |
 | ~~34~~ | ~~GHM → Tenant Extraction~~ | ~~Remove GHM default privilege, meta-DB tenant registry, env var audit, third-party stubs~~ | ✅ SHIPPED | Platform identity gate complete |
+| ~~35~~ | ~~Tenant Visual Identity + Brand System~~ | ~~AI voice injection, TenantLogo, default layouts, brochure brand colors, demo/email extraction, LEGAL-001~~ | ✅ SHIPPED | Identity gate for second tenant |
 | 34-OPS | Manual Infrastructure Inversion | INFRA-001–005 + T-001–009 per THIRD_PARTY_MIGRATION.md | David manual sprint | Follows Sprint 34 code work |
-| 35+ | Vertical 2 — Affiliate/Domain | Second vertical template after SEO vertical declared done | Future | Flywheel starts here |
+| 36 | Communication Layer + Platform Hygiene | Email templates rebuild, toast audit, empty states, route audit, psych UX audit | Next | Demo-ready gate |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**

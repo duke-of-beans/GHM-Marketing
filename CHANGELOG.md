@@ -1,8 +1,23 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 3, 2026 — Sprint 34 shipped: GHM → Tenant Extraction.
+**Last Updated:** March 3, 2026 — Sprint 35 shipped: Tenant Visual Identity + Brand System.
 
+
+## Sprint 35 — Tenant Visual Identity + Brand System — March 3, 2026
+FEAT-016: AI voice injection infrastructure — TenantVoice interface added to AI router types, system-prompt-builder.ts injects BRAND VOICE GUIDELINES block (tone/keywords/anti-keywords/sample copy/industry/audience), client.ts accepts tenant param and threads it through to buildSystemPrompt(). BrandingTab color pickers show "Not set — using COVOS default" null-state indicator.
+
+FEAT-018: TenantLogo component created (src/components/ui/tenant-logo.tsx, 81 lines) — size prop (sm/md/lg), COVOS SVG wordmark fallback, onError handler for broken logo URLs. Sidebar and login already tenant-aware from Sprint 29-B/30.
+
+UX-FEAT-003: Dashboard default layouts per role — src/lib/dashboard/default-layouts.ts (69 lines) with ADMIN_DEFAULT_LAYOUT (5 widgets) and SALES_REP_DEFAULT_LAYOUT (5 widgets). MasterDashboardGrid.tsx accepts userRole prop, persists default layout to DB on first render when no saved layout exists, localStorage key normalized from "ghm:" to "covos:".
+
+FEAT-017: Brochure brand color injection — brochure/page.tsx fetches GlobalSettings (brandColor, brandColorSecondary, logoUrl) via Prisma. 6 hardcoded #2563eb references replaced with brandPrimary variable across hero gradient, section labels, pricing border, stat colors, and CTA gradient.
+
+FEAT-021: Demo template + email GHM string extraction — template.ts: all 8 GHM hardcoded strings replaced with tenant.companyName. email/index.ts: PDF filename changed from GHM-{wo}.pdf to {tenant.slug}-{wo}.pdf, payment processing text tenant-parameterized. Zero GHM strings remaining.
+
+LEGAL-001: §7 Dashboard License & Restrictions added to CLIENT_AGREEMENT.md — partner restriction language prohibiting use of dashboard for third-party clients or purposes unrelated to tenant business.
+
+TypeScript: zero new errors (13 pre-existing in scripts/basecamp, presence route, GuideCharacter, lead-filter-bar, typing-store). Files created: tenant-logo.tsx, default-layouts.ts. Files modified: 10 (types.ts, system-prompt-builder.ts, client.ts, BrandingTab.tsx, MasterDashboardGrid.tsx, manager/page.tsx, brochure/page.tsx, demo/template.ts, email/index.ts, CLIENT_AGREEMENT.md).
 
 ## Sprint 34 — GHM → Tenant Extraction — March 3, 2026
 ARCH-006: GHM → tenant extraction (Layer 1 + Layer 2 code complete). COVOS is the platform; GHM is just a tenant.

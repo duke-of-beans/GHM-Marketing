@@ -94,7 +94,7 @@ export async function sendWorkOrderEmail(params: {
       `,
       attachments: [
         {
-          filename: `GHM-${woNumber}.pdf`,
+          filename: `${tenant.slug.toUpperCase()}-${woNumber}.pdf`,
           content: pdfBuffer,
         },
       ],
@@ -284,7 +284,7 @@ export async function sendContractorWaveInvite(params: {
                 <li>Open that email and click <strong>"Accept invitation"</strong> or <strong>"Set up account"</strong>.</li>
                 <li>Create your free Wave account (or log in if you already have one).</li>
                 <li>Go to <strong>Payments → Payout account</strong> and enter your bank account details (routing + account number).</li>
-                <li>That's it — you're set up. GHM will process your payments directly to that account each month.</li>
+                <li>That's it — you're set up. ${tenant.fromName} will process your payments directly to that account each month.</li>
               </ol>
             </div>
 

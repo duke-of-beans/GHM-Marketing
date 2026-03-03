@@ -68,7 +68,7 @@ export const DEFAULT_LAYOUTS: ResponsiveLayouts = {
 
 // ─── localStorage key ─────────────────────────────────────────────────────────
 
-const LS_KEY = "ghm:dashboard-layout";
+const LS_KEY = "covos:dashboard-layout";
 
 function readLocalLayout(): ResponsiveLayouts | null {
   if (typeof window === "undefined") return null;
@@ -88,10 +88,13 @@ export function MasterDashboardGrid({
   children,
   showProfitability,
   savedLayout,
+  userRole,
 }: {
   children: Record<string, React.ReactNode>;
   showProfitability: boolean;
   savedLayout: ResponsiveLayouts | null;
+  /** User role for selecting default layout on first render (Sprint 35 / UX-FEAT-003) */
+  userRole?: string;
 }) {
   // Prefer localStorage (same-session state) → DB-fetched → default
   // This prevents layout loss when React re-mounts the component (e.g. theme switch)
@@ -111,9 +114,19 @@ export function MasterDashboardGrid({
 
   // If no localStorage layout exists yet and the DB returned a layout, seed localStorage.
   // This handles first-load on a fresh browser without wiping a local session layout.
+  // Sprint 35 / UX-FEAT-003: If neither localStorage nor DB has a layout, persist the
+  // default to DB so first-time users get a stable layout without re-triggering defaults.
   useEffect(() => {
     if (!readLocalLayout() && savedLayout) {
       writeLocalLayout(savedLayout);
+    } else if (!readLocalLayout() && !savedLayout) {
+      // First-ever render — persist default layout to DB
+      writeLocalLayout(DEFAULT_LAYOUTS);
+      fetch("/api/dashboard-layout", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ layout: DEFAULT_LAYOUTS }),
+      }).catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

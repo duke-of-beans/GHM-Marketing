@@ -69,4 +69,10 @@ Invoices are issued monthly via Wave. Payment is due within 7 days of invoice da
 
 ---
 
+## §7 Dashboard License & Restrictions
+
+The dashboard is licensed for use solely in connection with the partner's sales and client management activities conducted on behalf of [Company]. Use of the dashboard — including access to client data, marketing tools, pipeline intelligence, or any platform features — for the partner's own clients, third-party clients, or any purpose unrelated to [Company] business is strictly prohibited and constitutes a material breach of this agreement.
+
+---
+
 *Questions? Contact your GHM account representative or david@ghmdigital.com*

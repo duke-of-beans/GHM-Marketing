@@ -59,13 +59,13 @@ export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
     <span style="opacity:0.5;margin:0 8px;">·</span>
     <span style="opacity:0.7;font-size:13px;">Personalized SEO Preview</span>
   </div>
-  <div style="font-size:12px;opacity:0.6;">Preview expires ${fmt(expiresAt)} · ${repName ? `Prepared by ${repName}` : "GHM Sales Team"}</div>
+  <div style="font-size:12px;opacity:0.6;">Preview expires ${fmt(expiresAt)} · ${repName ? `Prepared by ${repName}` : `${tenant.companyName} Sales Team`}</div>
 </div>
 
 <!-- HERO -->
 <section style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%);color:white;padding:56px 32px 40px;text-align:center;">
-  <p style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;opacity:0.55;margin-bottom:14px;">Your GHM Account Preview</p>
-  <h1 style="font-size:clamp(26px,5vw,46px);font-weight:800;line-height:1.15;margin-bottom:14px;">${lead.businessName}<br><span style="opacity:0.7;font-size:0.6em;font-weight:400;">What the next 90 days looks like with GHM</span></h1>
+  <p style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;opacity:0.55;margin-bottom:14px;">Your ${tenant.companyName} Account Preview</p>
+  <h1 style="font-size:clamp(26px,5vw,46px);font-weight:800;line-height:1.15;margin-bottom:14px;">${lead.businessName}<br><span style="opacity:0.7;font-size:0.6em;font-weight:400;">What the next 90 days looks like with ${tenant.companyName}</span></h1>
   <p style="opacity:0.75;font-size:15px;max-width:520px;margin:0 auto 32px;">${lead.city}, ${lead.state} · Generated ${fmt(generatedAt)}</p>
   <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
     <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:16px 24px;text-align:center;min-width:130px;">
@@ -86,7 +86,7 @@ export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
 <!-- RANKING IMPACT -->
 <section style="max-width:900px;margin:0 auto;padding:48px 24px;">
   <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Ranking Impact — Current vs. Projected (90 Days)</h2>
-  <p style="color:#64748b;font-size:14px;margin-bottom:24px;">Live rankings pulled ${fmt(generatedAt)}. Projections based on GHM's satellite cluster methodology and local authority building.</p>
+  <p style="color:#64748b;font-size:14px;margin-bottom:24px;">Live rankings pulled ${fmt(generatedAt)}. Projections based on ${tenant.companyName}'s satellite cluster methodology and local authority building.</p>
   <div style="overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0;background:white;">
     <table style="width:100%;border-collapse:collapse;font-size:13px;">
       <thead>
@@ -94,7 +94,7 @@ export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
           <th style="padding:12px 14px;text-align:left;font-weight:700;">Keyword</th>
           <th style="padding:12px 14px;text-align:left;font-weight:700;">Today</th>
           <th style="padding:12px 14px;text-align:center;font-weight:700;"></th>
-          <th style="padding:12px 14px;text-align:left;font-weight:700;">With GHM (90 Days)</th>
+          <th style="padding:12px 14px;text-align:left;font-weight:700;">With ${tenant.companyName} (90 Days)</th>
         </tr>
       </thead>
       <tbody>
@@ -102,14 +102,14 @@ export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
       </tbody>
     </table>
   </div>
-  <p style="font-size:12px;color:#94a3b8;margin-top:10px;">Projections are targets, not guarantees. Based on GHM's historical performance in comparable markets.</p>
+  <p style="font-size:12px;color:#94a3b8;margin-top:10px;">Projections are targets, not guarantees. Based on ${tenant.companyName}'s historical performance in comparable markets.</p>
 </section>
 
 <!-- SATELLITE CLUSTER -->
 <section style="background:white;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:48px 24px;">
   <div style="max-width:900px;margin:0 auto;">
     <h2 style="font-size:22px;font-weight:800;margin-bottom:6px;">Your Satellite Site Cluster</h2>
-    <p style="color:#64748b;font-size:14px;margin-bottom:24px;">GHM builds and maintains a cluster of supporting sites targeting your highest-value keywords. Each site is a separate ranking asset working for you 24/7.</p>
+    <p style="color:#64748b;font-size:14px;margin-bottom:24px;">${tenant.companyName} builds and maintains a cluster of supporting sites targeting your highest-value keywords. Each site is a separate ranking asset working for you 24/7.</p>
     <div style="overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
@@ -125,7 +125,7 @@ export function generateDemoHTML(data: DemoData, tenant: TenantConfig): string {
       </table>
     </div>
     <div style="margin-top:16px;padding:14px 18px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;">
-      <p style="font-size:13px;color:#1e40af;font-weight:600;margin:0;">All domains acquired, built, and maintained by GHM. You own nothing extra — it's included in your $2,400/month.</p>
+      <p style="font-size:13px;color:#1e40af;font-weight:600;margin:0;">All domains acquired, built, and maintained by ${tenant.companyName}. You own nothing extra — it's included in your monthly plan.</p>
     </div>
   </div>
 </section>

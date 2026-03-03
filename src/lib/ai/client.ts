@@ -46,6 +46,8 @@ export interface AICallInput {
   constraints?: RoutingConstraints;
   /** Optional: max tokens for response (defaults per feature) */
   maxTokens?: number;
+  /** Optional: tenant config for system prompt voice/brand context */
+  tenant?: import("@/lib/tenant/config").TenantConfig;
 }
 
 export interface AICallResult {
@@ -116,7 +118,7 @@ export async function callAI(
     });
 
     const maxTokens = input.maxTokens ?? DEFAULT_MAX_TOKENS[input.feature];
-    const systemPrompt = buildSystemPrompt(input.context);
+    const systemPrompt = buildSystemPrompt(input.context, input.tenant);
 
     // 3. First attempt
     let result = await callModel(

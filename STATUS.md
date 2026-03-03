@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 3, 2026 — Sprint 34 shipped (GHM → Tenant Extraction). COVOS is the platform, GHM is just a tenant — no default privilege, no fallback. Tenant model added to schema, getTenant() reads from DB with 5-min cache, TENANT_REGISTRY kept as deprecated fallback only. 8 third-party integrations annotated with COVOS_ACCOUNT_NEEDED TODO stubs per THIRD_PARTY_MIGRATION.md. .env.example reclassified (platform vs tenant vs needs-COVOS-account). /api/debug/tenant reports resolvedFrom field. TypeScript: zero new errors. Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md), then Vertical 2.
+**Last Updated:** March 3, 2026 — Sprint 35 shipped (Tenant Visual Identity + Brand System). AI voice injection infrastructure wired through system-prompt-builder + client.ts. TenantLogo component created. Dashboard default layouts per role with first-render persist. Brochure brand color injection from GlobalSettings (zero hardcoded colors). Demo template + email GHM strings fully extracted to tenant variables. LEGAL-001 partner restriction added to CLIENT_AGREEMENT.md. TypeScript: zero new errors (13 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md), then Sprint 36 (Communication Layer + Platform Hygiene).
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -13,8 +13,27 @@
 
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
-**Next sprint:** Sprint 34-OPS — David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md (INFRA-001 through INFRA-005, T-001 through T-009). Followed by Vertical 2 (affiliate/domain companies) once SEO vertical is declared done.
+**Next sprint:** Sprint 36 — Communication Layer + Platform Hygiene ("Demo-Ready"). Email template rebuild, toast audit, empty states pass, route audit, psych UX audit. Sprint 34-OPS (David manual infra inversion per THIRD_PARTY_MIGRATION.md) runs in parallel.
 
+
+### SPRINT 35 — Tenant Visual Identity + Brand System (March 3, 2026) ✅ COMPLETE
+
+PHASE 1 (parallel):
+- [x] **Track A (FEAT-016): AI Voice Injection + Color Null-State** — Added TenantVoice interface to AI router types.ts. Rewrote buildBaseContext() in system-prompt-builder.ts to inject BRAND VOICE GUIDELINES block (tone, keywords, anti-keywords, sample copy, industry, audience) when tenantVoice is set. Added tenant? field to AICallInput in client.ts. BrandingTab.tsx: color pickers now show "Not set — using COVOS default" indicator when value equals default hex.
+- [x] **Track B (FEAT-018): TenantLogo Component** — Created src/components/ui/tenant-logo.tsx (81 lines). Reusable component with size prop (sm/md/lg), COVOS SVG wordmark fallback, onError handler. Sidebar and login already dynamically tenant-aware from prior sprints.
+- [x] **Track C (UX-FEAT-003): Dashboard Default Layouts** — Created src/lib/dashboard/default-layouts.ts (69 lines) with ADMIN_DEFAULT_LAYOUT (revenue-metrics, client-health, team-activity, goals-tracker, quick-actions) and SALES_REP_DEFAULT_LAYOUT (my-pipeline, assigned-clients, needs-attention, sales-tools, my-earnings). MasterDashboardGrid.tsx: added userRole prop, first-render DB persist when no saved layout exists, localStorage key changed from "ghm:" to "covos:".
+
+PHASE 2 (sequential):
+- [x] **Track D (FEAT-017): Brochure Brand Color Injection** — src/app/(onboarding)/brochure/page.tsx: added prisma import + GlobalSettings fetch for brandColor/brandColorSecondary/logoUrl. Replaced 6 hardcoded #2563eb references with brandPrimary variable (hero gradient, section labels, pricing border, stat colors, CTA gradient).
+- [x] **Track E (FEAT-021): Demo Template + Email Extraction** — src/lib/demo/template.ts: replaced all 8 GHM hardcoded strings with tenant.companyName. src/lib/email/index.ts: filename changed from GHM-{wo}.pdf to {tenant.slug}-{wo}.pdf, payment text tenant-parameterized. Zero GHM strings remaining in either file.
+
+PHASE 3:
+- [x] **TypeScript Gate** — npx tsc --noEmit: 13 pre-existing errors (scripts/basecamp, presence route Prisma types, GuideCharacter downlevelIteration, lead-filter-bar toast, typing-store). Zero errors in any Sprint 35 changed files. Zero new TypeScript errors introduced.
+- [x] **LEGAL-001** — Added §7 Dashboard License & Restrictions to CLIENT_AGREEMENT.md with partner restriction language per blueprint.
+
+**Files created:** `src/components/ui/tenant-logo.tsx`, `src/lib/dashboard/default-layouts.ts`
+**Files modified:** `src/lib/ai/router/types.ts`, `src/lib/ai/context/system-prompt-builder.ts`, `src/lib/ai/client.ts`, `src/components/settings/BrandingTab.tsx`, `src/components/dashboard/MasterDashboardGrid.tsx`, `src/app/(dashboard)/manager/page.tsx`, `src/app/(onboarding)/brochure/page.tsx`, `src/lib/demo/template.ts`, `src/lib/email/index.ts`, `CLIENT_AGREEMENT.md`
+**TypeScript:** Zero new errors (13 pre-existing unaffected).
 
 ### SPRINT COWORK — Communication + Polish + Customization + Guide (March 2, 2026) ✅ COMPLETE
 

@@ -1,6 +1,8 @@
 ﻿// TENANT-READY: all strings pull from TenantConfig as of Sprint 29-B
+// Sprint 35 / FEAT-017: brand color injection from GlobalSettings
 import type { Metadata } from "next";
 import { getTenant } from "@/lib/tenant/server";
+import { prisma } from "@/lib/db";
 
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
@@ -16,12 +18,21 @@ export default async function BrochurePage() {
   const tenant = await getTenant();
   const companyName = tenant?.companyName ?? "COVOS";
   const fromName = tenant?.fromName ?? companyName;
+
+  // Sprint 35: Read brand colors from GlobalSettings for this tenant
+  const gs = await prisma.globalSettings.findFirst({
+    select: { brandColor: true, brandColorSecondary: true, logoUrl: true },
+  });
+  const brandPrimary = gs?.brandColor ?? "#2563eb";
+  const brandDark = "#1e3a5f"; // Navy base — used for gradient start
+  const logoUrl = gs?.logoUrl;
+
   return (
     <div className="min-h-screen bg-white">
       {/* HERO */}
       <section
         style={{
-          background: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)",
+          background: `linear-gradient(135deg, ${brandDark} 0%, ${brandPrimary} 100%)`,
           color: "white",
           padding: "64px 32px",
           textAlign: "center",
@@ -128,7 +139,7 @@ export default async function BrochurePage() {
             fontWeight: 700,
             letterSpacing: 2,
             textTransform: "uppercase",
-            color: "#2563eb",
+            color: brandPrimary,
             marginBottom: 8,
           }}
         >
@@ -204,7 +215,7 @@ export default async function BrochurePage() {
             fontWeight: 700,
             letterSpacing: 2,
             textTransform: "uppercase",
-            color: "#2563eb",
+            color: brandPrimary,
             marginBottom: 8,
           }}
         >
@@ -325,7 +336,7 @@ export default async function BrochurePage() {
           style={{
             display: "inline-block",
             background: "white",
-            border: "2px solid #2563eb",
+            border: `2px solid ${brandPrimary}`,
             borderRadius: 16,
             padding: "36px 48px",
             textAlign: "center",
@@ -333,7 +344,7 @@ export default async function BrochurePage() {
             width: "100%",
           }}
         >
-          <p style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: brandPrimary, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>
             All-Inclusive Retainer
           </p>
           <div style={{ fontSize: 52, fontWeight: 800, color: "#111827", lineHeight: 1 }}>
@@ -435,7 +446,7 @@ export default async function BrochurePage() {
                 style={{
                   fontSize: 32,
                   fontWeight: 800,
-                  color: "#2563eb",
+                  color: brandPrimary,
                   marginBottom: 4,
                 }}
               >
@@ -450,7 +461,7 @@ export default async function BrochurePage() {
       {/* CTA */}
       <section
         style={{
-          background: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)",
+          background: `linear-gradient(135deg, ${brandDark} 0%, ${brandPrimary} 100%)`,
           color: "white",
           padding: "56px 32px",
           textAlign: "center",

@@ -36,7 +36,8 @@ function buildBaseContext(ctx: FeatureContext, tenant?: TenantConfig): string {
   const platformDescription = tenant
     ? `${tenant.name} Dashboard, a ${tenant.aiContext ?? "marketing platform"}`
     : "Marketing Dashboard";
-  return `You are an AI assistant embedded in the ${platformDescription}.
+
+  let base = `You are an AI assistant embedded in the ${platformDescription}.
 
 CLIENT CONTEXT:
 - Client name: ${ctx.clientName}
@@ -47,6 +48,21 @@ OPERATING CONSTRAINTS:
 - Do not fabricate statistics, citations, or competitor data.
 - If asked to produce copy, it must be original — not generic AI filler.
 - Always respond in the exact output format specified at the end of this prompt.`;
+
+  // Inject tenant voice guidelines if configured (Sprint 35 / FEAT-016)
+  if (ctx.tenantVoice) {
+    const v = ctx.tenantVoice;
+    let voiceBlock = "\n\nBRAND VOICE GUIDELINES:";
+    if (v.tone) voiceBlock += `\n- Tone: ${v.tone}`;
+    if (v.keywords) voiceBlock += `\n- Preferred terms: ${v.keywords}`;
+    if (v.antiKeywords) voiceBlock += `\n- Terms to avoid: ${v.antiKeywords}`;
+    if (v.sampleCopy) voiceBlock += `\n- Match this voice: "${v.sampleCopy.slice(0, 500)}"`;
+    if (v.industry) voiceBlock += `\n- Industry context: ${v.industry}`;
+    if (v.audience) voiceBlock += `\n- Target audience: ${v.audience}`;
+    base += voiceBlock;
+  }
+
+  return base;
 }
 
 // ── Feature-specific protocol sections ───────────────────────────────────────
