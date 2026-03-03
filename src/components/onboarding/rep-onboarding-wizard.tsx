@@ -29,6 +29,7 @@ const TOTAL_STEPS = 7;
 export function RepOnboardingWizard({ userName, currentStep, territory }: Props) {
   const [step, setStep] = useState(Math.max(0, currentStep));
   const [saving, setSaving] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const router = useRouter();
 
   const firstName = userName.split(" ")[0];
@@ -50,7 +51,8 @@ export function RepOnboardingWizard({ userName, currentStep, territory }: Props)
     const next = step + 1;
     if (next >= TOTAL_STEPS) {
       await saveProgress(TOTAL_STEPS, true);
-      router.push("/sales");
+      setCelebrating(true);
+      setTimeout(() => router.push("/sales"), 2500);
       return;
     }
     await saveProgress(next);
@@ -83,42 +85,69 @@ export function RepOnboardingWizard({ userName, currentStep, territory }: Props)
         <Progress value={progress} className="h-1.5" />
       </div>
 
-      {step === 0 && <StepWelcome firstName={firstName} />}
-      {step === 1 && <StepRole />}
-      {step === 2 && <StepTerritory territory={territory} />}
-      {step === 3 && <StepTools />}
-      {step === 4 && <StepFirstLead />}
-      {step === 5 && <StepResources />}
-      {step === 6 && <StepDone firstName={firstName} />}
+      {celebrating ? (
+        <CompletionCelebration />
+      ) : (
+        <>
+          {step === 0 && <StepWelcome firstName={firstName} />}
+          {step === 1 && <StepRole />}
+          {step === 2 && <StepTerritory territory={territory} />}
+          {step === 3 && <StepTools />}
+          {step === 4 && <StepFirstLead />}
+          {step === 5 && <StepResources />}
+          {step === 6 && <StepDone firstName={firstName} />}
+        </>
+      )}
 
       {/* Nav */}
-      <div className="flex justify-between mt-6">
-        {step > 0 ? (
-          <Button variant="ghost" size="sm" onClick={back} disabled={saving}>
-            <ChevronLeft className="h-4 w-4 mr-1" /> Back
-          </Button>
-        ) : (
-          <div />
-        )}
-        <div className="flex items-center gap-2">
-          {step < TOTAL_STEPS - 1 && (
-            <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
-              Skip
+      {!celebrating && (
+        <div className="flex justify-between mt-6">
+          {step > 0 ? (
+            <Button variant="ghost" size="sm" onClick={back} disabled={saving}>
+              <ChevronLeft className="h-4 w-4 mr-1" /> Back
             </Button>
+          ) : (
+            <div />
           )}
-          <Button onClick={advance} disabled={saving} className="min-w-[120px]">
-            {saving
-              ? "Saving..."
-              : step === TOTAL_STEPS - 1
-              ? "Go close something →"
-              : (
-                <>
-                  {step === 0 ? "Let's go" : "Continue"}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </>
-              )}
-          </Button>
+          <div className="flex items-center gap-2">
+            {step < TOTAL_STEPS - 1 && (
+              <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
+                Skip
+              </Button>
+            )}
+            <Button onClick={advance} disabled={saving} className="min-w-[120px]">
+              {saving
+                ? "Saving..."
+                : step === TOTAL_STEPS - 1
+                ? "Go close something →"
+                : (
+                  <>
+                    {step === 0 ? "Let's go" : "Continue"}
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </>
+                )}
+            </Button>
+          </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Completion Celebration ───────────────────────────────────────────────────
+
+function CompletionCelebration() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
+      </div>
+      <h2 className="text-2xl font-semibold">You're all set</h2>
+      <p className="text-muted-foreground text-center max-w-sm">
+        Your platform is ready. Taking you to your dashboard now.
+      </p>
+      <div className="w-32 h-1 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-green-500 animate-[progress_2.5s_linear_forwards]" />
       </div>
     </div>
   );

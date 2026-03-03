@@ -16,6 +16,16 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RecurringTaskForm } from "./recurring-task-form";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface RecurringRule {
   id: number;
@@ -37,6 +47,7 @@ export function RecurringTasksClient() {
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editRule, setEditRule] = useState<RecurringRule | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const fetchRules = useCallback(async () => {
     try {
@@ -62,16 +73,21 @@ export function RecurringTasksClient() {
     if (!json.success) { setRules(prev); toast.error("Failed to update"); }
   }
 
-  async function deleteRule(id: number) {
-    if (!confirm("Delete this recurring rule? Tasks already created are unaffected.")) return;
-    const res = await fetch(`/api/recurring-tasks/${id}`, { method: "DELETE" });
+  function deleteRule(id: number) {
+    setDeleteId(id);
+  }
+
+  async function confirmDeleteRule() {
+    if (!deleteId) return;
+    const res = await fetch(`/api/recurring-tasks/${deleteId}`, { method: "DELETE" });
     const json = await res.json();
     if (json.success) {
-      setRules((r) => r.filter((x) => x.id !== id));
+      setRules((r) => r.filter((x) => x.id !== deleteId));
       toast.success("Rule deleted");
     } else {
-      toast.error("Failed to delete");
+      toast.error("Failed to delete rule");
     }
+    setDeleteId(null);
   }
 
   function formatCron(expr: string): string {
@@ -169,6 +185,23 @@ export function RecurringTasksClient() {
           onSaved={() => { setFormOpen(false); fetchRules(); }}
         />
       )}
+
+      <AlertDialog open={deleteId !== null} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete recurring rule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This rule will stop generating future tasks. Existing tasks are not affected.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteRule} className="bg-destructive text-destructive-foreground">
+              Delete rule
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

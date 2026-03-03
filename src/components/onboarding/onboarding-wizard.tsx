@@ -57,6 +57,7 @@ export function OnboardingWizard({
   const TOTAL = steps.length;
   const [stepIndex, setStepIndex] = useState(Math.min(Math.max(0, currentStep), TOTAL - 1));
   const [saving, setSaving] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
 
   // Contractor entity form state
   const [contractorEntityName, setContractorEntityName] = useState("");
@@ -85,7 +86,8 @@ export function OnboardingWizard({
     const next = stepIndex + 1;
     if (next >= TOTAL) {
       await saveProgress(TOTAL, true);
-      router.push(role === "sales" ? "/sales" : "/manager");
+      setCelebrating(true);
+      setTimeout(() => router.push(role === "sales" ? "/sales" : "/manager"), 2500);
       return;
     }
     await saveProgress(next);
@@ -139,45 +141,72 @@ export function OnboardingWizard({
         <Progress value={progress} className="h-1.5" />
       </div>
 
-      {currentStepId === "welcome" && <StepWelcome firstName={firstName} positionName={positionName} positionType={positionType} />}
-      {currentStepId === "profile" && <StepProfile firstName={firstName} />}
-      {currentStepId === "contractor" && (
-        <StepContractor
-          positionType={positionType}
-          contractorEntityName={contractorEntityName}
-          setContractorEntityName={setContractorEntityName}
-          contractorEmail={contractorEmail}
-          setContractorEmail={setContractorEmail}
-          onSave={saveContractorEntity}
-          saving={savingContractor}
-          saved={contractorSaved}
-        />
-      )}
-      {currentStepId === "territory" && <StepTerritory territory={territory} />}
-      {currentStepId === "tools" && <StepTools positionType={positionType} />}
-      {currentStepId === "first_lead" && <StepFirstLead />}
-      {currentStepId === "resources" && <StepResources />}
-      {currentStepId === "scope" && <StepScope positionType={positionType} positionName={positionName} />}
-      {currentStepId === "done" && <StepDone firstName={firstName} positionType={positionType} />}
-
-      <div className="flex justify-between mt-6">
-        {stepIndex > 0 ? (
-          <Button variant="ghost" size="sm" onClick={back} disabled={saving}>
-            <ChevronLeft className="h-4 w-4 mr-1" /> Back
-          </Button>
-        ) : <div />}
-        <div className="flex items-center gap-2">
-          {!isLastStep && (
-            <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
-              Skip
-            </Button>
+      {celebrating ? (
+        <CompletionCelebration />
+      ) : (
+        <>
+          {currentStepId === "welcome" && <StepWelcome firstName={firstName} positionName={positionName} positionType={positionType} />}
+          {currentStepId === "profile" && <StepProfile firstName={firstName} />}
+          {currentStepId === "contractor" && (
+            <StepContractor
+              positionType={positionType}
+              contractorEntityName={contractorEntityName}
+              setContractorEntityName={setContractorEntityName}
+              contractorEmail={contractorEmail}
+              setContractorEmail={setContractorEmail}
+              onSave={saveContractorEntity}
+              saving={savingContractor}
+              saved={contractorSaved}
+            />
           )}
-          <Button onClick={advance} disabled={saving} className="min-w-[120px]">
-            {saving ? "Saving..." : isLastStep ? "Let's go →" : (
-              <>{stepIndex === 0 ? "Get started" : "Continue"}<ChevronRight className="h-4 w-4 ml-1" /></>
+          {currentStepId === "territory" && <StepTerritory territory={territory} />}
+          {currentStepId === "tools" && <StepTools positionType={positionType} />}
+          {currentStepId === "first_lead" && <StepFirstLead />}
+          {currentStepId === "resources" && <StepResources />}
+          {currentStepId === "scope" && <StepScope positionType={positionType} positionName={positionName} />}
+          {currentStepId === "done" && <StepDone firstName={firstName} positionType={positionType} />}
+        </>
+      )}
+
+      {!celebrating && (
+        <div className="flex justify-between mt-6">
+          {stepIndex > 0 ? (
+            <Button variant="ghost" size="sm" onClick={back} disabled={saving}>
+              <ChevronLeft className="h-4 w-4 mr-1" /> Back
+            </Button>
+          ) : <div />}
+          <div className="flex items-center gap-2">
+            {!isLastStep && (
+              <Button variant="ghost" size="sm" onClick={advance} disabled={saving} className="text-muted-foreground">
+                Skip
+              </Button>
             )}
-          </Button>
+            <Button onClick={advance} disabled={saving} className="min-w-[120px]">
+              {saving ? "Saving..." : isLastStep ? "Let's go →" : (
+                <>{stepIndex === 0 ? "Get started" : "Continue"}<ChevronRight className="h-4 w-4 ml-1" /></>
+              )}
+            </Button>
+          </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Completion Celebration ───────────────────────────────────────────────────
+
+function CompletionCelebration() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
+      </div>
+      <h2 className="text-2xl font-semibold">You're all set</h2>
+      <p className="text-muted-foreground text-center max-w-sm">
+        Your platform is ready. Taking you to your dashboard now.
+      </p>
+      <div className="w-32 h-1 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-green-500 animate-[progress_2.5s_linear_forwards]" />
       </div>
     </div>
   );

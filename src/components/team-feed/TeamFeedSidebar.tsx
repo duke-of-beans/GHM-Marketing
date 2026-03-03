@@ -34,6 +34,16 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { formatDistanceToNow } from "date-fns";
 import { voice, pick } from "@/lib/voice";
 import { useModifierKey } from "@/hooks/use-modifier-key";
@@ -398,6 +408,7 @@ function MessageRow({
   const [replying, setReplying] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editContent, setEditContent] = useState(msg.content);
   const [saving, setSaving] = useState(false);
 
@@ -422,8 +433,11 @@ function MessageRow({
     toast.success(msg.isPinned ? pick(voice.messages.unpinned) : pick(voice.messages.pinned));
   }
 
-  async function deleteMsg() {
-    if (!confirm(voice.confirm.deleteMessage)) return;
+  function deleteMsg() {
+    setShowDeleteConfirm(true);
+  }
+
+  async function confirmDeleteMsg() {
     await fetch(`/api/team-messages/${msg.id}`, { method: "DELETE" });
     onRefresh();
     toast.success(pick(voice.messages.deleted));
@@ -596,6 +610,23 @@ function MessageRow({
             placeholder="Write a reply…" compact />
         </div>
       )}
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete message?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message will be removed for everyone in the feed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMsg} className="bg-destructive text-destructive-foreground">
+              Delete message
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

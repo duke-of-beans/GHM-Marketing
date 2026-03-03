@@ -54,7 +54,8 @@ These routes were originally flagged as UNGUARDED but actually use `requirePermi
 
 | Route | Issue |
 |-------|-------|
-| `/api/clients/[id]/gbp/reviews` | Tombstone — file contains only `export {}`. No HTTP methods. |
+| `/api/clients/[id]/gbp/reviews` | ~~Tombstone — file contains only `export {}`. No HTTP methods.~~ **Deleted in Sprint 37.** |
+| `/api/leads/[id]/audit` | **NOT dead — Sprint 37 review found active GET + POST handlers (79 lines, `handleAudit`). Incorrectly flagged by audit script. Do not delete.** |
 
 ### Fixed in Sprint 36
 
@@ -72,8 +73,8 @@ Routes with no exported HTTP methods or suspicious patterns:
 
 | Route | Issue |
 |-------|-------|
-| `/api/clients/[id]/gbp/reviews` | No HTTP methods exported — likely a stub or dead |
-| `/api/leads/[id]/audit` | No HTTP methods detected — verify if used |
+| `/api/clients/[id]/gbp/reviews` | **Deleted Sprint 37** — was a tombstone (`export {}` only) |
+| `/api/leads/[id]/audit` | **FALSE POSITIVE** — Sprint 37 manual review confirmed active GET + POST handlers. Audit script missed them (uses `handleAudit` helper pattern). Route is live and should not be deleted. |
 
 ## Guard Pattern Reference
 
@@ -91,8 +92,8 @@ The codebase uses three guard patterns:
 
 All genuinely unguarded routes have been fixed in Sprint 36. Remaining backlog items:
 
-1. **DEAD CODE** — `/api/clients/[id]/gbp/reviews` — Tombstone file (`export {}`). Safe to delete when convenient.
-2. **DEAD CODE** — `/api/leads/[id]/audit` — No HTTP methods detected. Verify and clean up.
+1. ~~**DEAD CODE** — `/api/clients/[id]/gbp/reviews` — Tombstone file (`export {}`). Safe to delete when convenient.~~ **Deleted Sprint 37.**
+2. ~~**DEAD CODE** — `/api/leads/[id]/audit` — No HTTP methods detected. Verify and clean up.~~ **NOT dead — Sprint 37 manual review found active GET + POST handlers. Do not delete.**
 
 
 ## Button + Logic Chain Audit

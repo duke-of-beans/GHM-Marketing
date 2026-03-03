@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 3, 2026 — Sprint 36 shipped (Communication Layer + Platform Hygiene). Email template rebuild (base + 5 individual templates), toast audit (380 calls verified Sonner-only, dead useToast hook identified), empty states pass (shared EmptyState component wired into 9 surfaces), route audit (239 routes scanned, 3 genuinely unguarded fixed, 7 false positives corrected), psych UX audit (8-section spec), security fixes (3 unguarded API routes patched), TenantConfig import path fix (4 files). TypeScript: zero new errors (12 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md).
+**Last Updated:** March 3, 2026 — Sprint 37 shipped (Magic Moments + Platform Polish). confirm() → AlertDialog migration (4 instances), breadcrumb component built + wired, onboarding completion celebration (CSS animation + auto-redirect), Settings tab grouping (4 sections), AIProgressIndicator component applied to 3 surfaces (blog gen, website audit, voice capture). TypeScript: zero new errors (12 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md).
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -14,6 +14,27 @@
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
+
+
+### SPRINT 37 — Magic Moments + Platform Polish (March 3, 2026) ✅ COMPLETE
+
+PHASE 1 (parallel):
+- [x] **Track A: confirm() → AlertDialog migration** — 4 browser confirm() calls replaced with shadcn AlertDialog: vault bulk-delete, TeamFeed message delete (×2), recurring-tasks delete. State-driven pattern: `open={state !== null}`, `onOpenChange` resets state, destructive action className.
+- [x] **Track B: Generic error toast cleanup** — Audit pass (no-op: zero pure generic "Something went wrong" messages found; all toast.error() calls already had action-specific copy).
+- [x] **Track C: Dead route deletion + missing confirms** — gbp/reviews tombstone deleted. leads/[id]/audit inspected and flagged NOT dead (79-line active GET + POST handler — docs/ROUTE_AUDIT.md updated). AlertDialog added for deactivate-user (TeamManagementTab) and deactivate-territory (territories-client).
+- [x] **Track D: Breadcrumb component** — src/components/ui/breadcrumb.tsx created (CSS-only, BreadcrumbItem interface, optional href). Wired into clients/[id]/page.tsx and clients/[id]/composer/[jobId]/page.tsx. Remaining nested client routes are tabs within ClientProfile — not separate page.tsx files.
+
+PHASE 2 (parallel, after Phase 1):
+- [x] **Track E: Onboarding completion celebration** — `celebrating` state intercepts `advance()` at final step. CompletionCelebration component: CheckCircle2, animate-in fade-in slide-in-from-bottom-4, 2.5s CSS progress bar, setTimeout → router.push(). Applied to onboarding-wizard.tsx and rep-onboarding-wizard.tsx. `@keyframes progress` added to globals.css.
+- [x] **Track F: Settings tab grouping** — 4 section label `<span>` elements added inside TabsList in settings/page.tsx: Platform Config (General, Compensation, Branding), Team & Access (Team, Territories), Data & Ops (Audit Log, Bug Reports, User Activity, Data Import), Integrations (Wave, Integrations — admin-conditional).
+- [x] **Track G: AI operation progress indicators** — src/components/ui/ai-progress-indicator.tsx created ("use client", useEffect-based setTimeout timers, key={step} forces CSS re-animation). Applied to blog-generator.tsx (CONTENT_GEN_STEPS ×5), WebsiteAuditPanel.tsx (AUDIT_STEPS ×5, replaced animate-pulse text), VoiceProfileDialog.tsx (VOICE_STEPS ×5, Progress bar retained alongside).
+
+PHASE 3:
+- [x] **Track H: TypeScript gate + regression + sprint close** — npx tsc --noEmit: 12 errors, all pre-existing (scripts/basecamp, presence route, GuideCharacter, lead-filter-bar, typing-store). Zero errors in any Sprint 37 files. Regression spot-checks passed across all 8 tracks. STATUS.md, CHANGELOG.md, BACKLOG.md updated.
+
+**Files created:** `src/components/ui/breadcrumb.tsx`, `src/components/ui/ai-progress-indicator.tsx`
+**Files modified:** `src/components/territories/territories-client.tsx`, `src/components/settings/TeamManagementTab.tsx`, `src/components/onboarding/onboarding-wizard.tsx`, `src/components/onboarding/rep-onboarding-wizard.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/app/(dashboard)/clients/[id]/page.tsx`, `src/app/(dashboard)/clients/[id]/composer/[jobId]/page.tsx`, `src/components/clients/content/blog-generator.tsx`, `src/components/clients/website-audit/WebsiteAuditPanel.tsx`, `src/components/clients/voice/VoiceProfileDialog.tsx`, `src/app/globals.css`, `docs/ROUTE_AUDIT.md`
+**TypeScript:** Zero new errors (12 pre-existing unaffected).
 
 
 ### SPRINT 36 — Communication Layer + Platform Hygiene (March 3, 2026) ✅ COMPLETE

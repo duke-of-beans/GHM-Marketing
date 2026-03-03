@@ -12,6 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, X, Sparkles, AlertCircle } from "lucide-react";
+import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+
+const VOICE_STEPS = [
+  "Analyzing writing sample...",
+  "Identifying tone patterns...",
+  "Building voice profile...",
+  "Calibrating...",
+  "Almost done...",
+];
 import { toast } from "sonner";
 
 interface VoiceProfile {
@@ -150,34 +159,8 @@ export function VoiceProfileDialog({
           {/* Analyzing State */}
           {status === "analyzing" && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                <span className="text-sm font-medium">
-                  Analyzing brand voice...
-                </span>
-              </div>
               <Progress value={progress} className="h-2" />
-              <div className="text-xs text-muted-foreground space-y-2">
-                <p className="flex items-start gap-2">
-                  <span className="text-primary">✓</span>
-                  <span>Scanning website content and extracting writing samples</span>
-                </p>
-                <p className="flex items-start gap-2">
-                  <span className="text-primary">✓</span>
-                  <span>Analyzing tonality, vocabulary patterns, and sentence structure</span>
-                </p>
-                <p className="flex items-start gap-2">
-                  <span className="text-primary">✓</span>
-                  <span>Measuring formality, enthusiasm, technical depth, and brevity</span>
-                </p>
-                <p className="flex items-start gap-2">
-                  <span className="text-primary animate-pulse">→</span>
-                  <span>Building comprehensive voice profile for content generation</span>
-                </p>
-              </div>
-              <p className="text-xs text-muted-foreground italic pt-2">
-                This sophisticated analysis takes 20-40 seconds to ensure accuracy. Your custom voice profile will preserve the unique character of your brand in all generated content.
-              </p>
+              <AIProgressIndicator steps={VOICE_STEPS} />
             </div>
           )}
 

@@ -19,6 +19,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type { AuditIssue } from "@/lib/website-audit/auditor";
+import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+
+const AUDIT_STEPS = [
+  "Fetching page data...",
+  "Running performance checks...",
+  "Analyzing SEO signals...",
+  "Scoring results...",
+  "Almost done...",
+];
 
 interface AuditSummary {
   id: number;
@@ -130,7 +139,7 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
               {running ? "Running…" : "Run Audit"}
             </Button>
           </div>
-          {running && <p className="text-xs text-muted-foreground mt-2 animate-pulse">Analyzing performance, SEO, technical health… this takes 20–30 seconds.</p>}
+          {running && <AIProgressIndicator steps={AUDIT_STEPS} />}
         </CardContent>
       </Card>
 

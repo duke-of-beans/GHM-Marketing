@@ -54,6 +54,8 @@ export default function SettingsPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="flex-wrap h-auto gap-1">
+          {/* ── Platform Config ── */}
+          <span className="w-full text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 pt-1 pb-0.5">Platform Config</span>
           <TabsTrigger value="general" className="gap-1.5">
             <Sliders className="h-4 w-4" />General
           </TabsTrigger>
@@ -67,12 +69,16 @@ export default function SettingsPage() {
               <Paintbrush className="h-4 w-4" />Branding
             </TabsTrigger>
           )}
+          {/* ── Team & Access ── */}
+          <span className="w-full text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 pt-3 pb-0.5">Team & Access</span>
           <TabsTrigger value="team" className="gap-1.5">
             <Users className="h-4 w-4" />Team
           </TabsTrigger>
           <TabsTrigger value="territories" className="gap-1.5">
             <Map className="h-4 w-4" />Territories
           </TabsTrigger>
+          {/* ── Data & Ops ── */}
+          <span className="w-full text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 pt-3 pb-0.5">Data & Ops</span>
           <TabsTrigger value="audit" className="gap-1.5">
             <FileText className="h-4 w-4" />Audit Log
           </TabsTrigger>
@@ -87,6 +93,15 @@ export default function SettingsPage() {
             </TabsTrigger>
           )}
           {isAdmin && (
+            <TabsTrigger value="data-import" className="gap-1.5">
+              <Database className="h-4 w-4" />Data Import
+            </TabsTrigger>
+          )}
+          {/* ── Integrations ── */}
+          {isAdmin && (
+            <span className="w-full text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 pt-3 pb-0.5">Integrations</span>
+          )}
+          {isAdmin && (
             <TabsTrigger value="wave" className="gap-1.5">
               <Wallet className="h-4 w-4" />Wave
             </TabsTrigger>
@@ -94,11 +109,6 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="integrations" className="gap-1.5">
               <Zap className="h-4 w-4" />Integrations
-            </TabsTrigger>
-          )}
-          {isAdmin && (
-            <TabsTrigger value="data-import" className="gap-1.5">
-              <Database className="h-4 w-4" />Data Import
             </TabsTrigger>
           )}
         </TabsList>

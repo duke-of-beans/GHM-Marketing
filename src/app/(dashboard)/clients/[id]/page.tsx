@@ -3,6 +3,7 @@ import { getClient } from "@/lib/db/clients";
 import { notFound } from "next/navigation";
 import { ClientProfile } from "@/components/clients/profile";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 // Helper to convert all Decimal fields to numbers recursively
 function serializeDecimals(obj: any): any {
@@ -79,13 +80,10 @@ export default async function ClientDetailPage({
 
     return (
       <div className="space-y-4 pb-20 md:pb-0">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/clients" className="hover:text-foreground transition-colors">
-            Clients
-          </Link>
-          <span>/</span>
-          <span className="text-foreground">{safeSerialized.businessName}</span>
-        </div>
+        <Breadcrumb items={[
+          { label: "Clients", href: "/clients" },
+          { label: safeSerialized.businessName },
+        ]} />
         <ClientProfile client={safeSerialized} currentUserRole={(currentUser as any).role} />
       </div>
     );

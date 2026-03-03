@@ -49,6 +49,16 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { formatDistanceToNow } from "date-fns";
 import { useModifierKey } from "@/hooks/use-modifier-key";
 import { EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia } from "./TeamFeedMultimedia";
@@ -295,6 +305,7 @@ function MessageRow({
 }) {
   const [replying, setReplying] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const isRead = msg.reads.length > 0;
   const hasReplies = msg.replies.length > 0;
 
@@ -314,8 +325,11 @@ function MessageRow({
     toast.success(msg.isPinned ? "Unpinned" : "Pinned to top");
   }
 
-  async function deleteMsg() {
-    if (!confirm("Delete this message?")) return;
+  function deleteMsg() {
+    setShowDeleteConfirm(true);
+  }
+
+  async function confirmDeleteMsg() {
     await fetch(`/api/team-messages/${msg.id}`, { method: "DELETE" });
     onRefresh();
     toast.success("Message deleted");
@@ -442,6 +456,23 @@ function MessageRow({
           />
         </div>
       )}
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete message?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This message will be removed for everyone in the feed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteMsg} className="bg-destructive text-destructive-foreground">
+              Delete message
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { PageComposer } from "@/components/clients/website-studio/PageComposer";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export default function ComposerPage() {
   const params = useParams();
@@ -50,6 +51,11 @@ export default function ComposerPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      <Breadcrumb items={[
+        { label: "Clients", href: "/clients" },
+        { label: "Client", href: `/clients/${clientId}` },
+        { label: "Composer" },
+      ]} />
       <PageComposer
         clientId={clientId}
         job={job}

@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Territory = {
   id: number;
@@ -44,6 +48,7 @@ export function TerritoriesClient() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<TerritoryForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [deactivateId, setDeactivateId] = useState<number | null>(null);
 
   const fetchTerritories = useCallback(async () => {
     try {
@@ -99,11 +104,17 @@ export function TerritoriesClient() {
     setShowForm(true);
   };
 
-  const handleDeactivate = async (id: number) => {
+  const handleDeactivate = (id: number) => {
+    setDeactivateId(id);
+  };
+
+  const confirmDeactivate = async () => {
+    if (deactivateId === null) return;
     try {
-      await fetch(`/api/territories/${id}`, { method: "DELETE" });
+      await fetch(`/api/territories/${deactivateId}`, { method: "DELETE" });
       toast.success("Territory deactivated"); fetchTerritories();
     } catch { toast.error("Failed to deactivate"); }
+    finally { setDeactivateId(null); }
   };
 
   const scopeLabel = (t: Territory) => {
@@ -229,6 +240,23 @@ export function TerritoriesClient() {
           ))
         )}
       </div>
+
+      <AlertDialog open={deactivateId !== null} onOpenChange={(open) => { if (!open) setDeactivateId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deactivate territory?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Leads in this territory will be unassigned. This can be reversed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeactivate} className="bg-destructive text-destructive-foreground">
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

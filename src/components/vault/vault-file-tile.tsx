@@ -18,6 +18,16 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SendForSignatureDialog } from "./SendForSignatureDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 function fileIcon(mimeType: string) {
   if (mimeType.startsWith("image/")) return FileImage;
@@ -66,6 +76,7 @@ export function VaultFileTile({
   const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [sendSigOpen, setSendSigOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const Icon = fileIcon(file.mimeType);
 
   const canDelete =
@@ -89,8 +100,11 @@ export function VaultFileTile({
     setPreviewOpen(true);
   }
 
-  async function handleDelete() {
-    if (!confirm(`Delete "${file.displayName ?? file.name}"?`)) return;
+  function handleDelete() {
+    setShowDeleteConfirm(true);
+  }
+
+  async function confirmDelete() {
     setLoading(true);
     try {
       const res = await fetch(`/api/vault/files?id=${file.id}`, { method: "DELETE" });
@@ -238,6 +252,23 @@ export function VaultFileTile({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
       />
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete file?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This file will be permanently removed from the vault. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
+              Delete file
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

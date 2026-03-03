@@ -7,6 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
+import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+
+const CONTENT_GEN_STEPS = [
+  "Analyzing brief...",
+  "Applying brand voice...",
+  "Drafting content...",
+  "Reviewing quality...",
+  "Finalizing...",
+];
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface BlogGeneratorProps {
@@ -188,32 +197,8 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
         </Button>
 
         {generating && (
-          <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-              <p className="text-sm font-medium">Creating your blog post...</p>
-            </div>
-            <div className="space-y-2 text-xs text-muted-foreground">
-              <p className="flex items-start gap-2">
-                <span className="text-primary">✓</span>
-                <span>Researching industry trends and local market data for {industry || 'your business'}</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-primary">✓</span>
-                <span>Analyzing competitor content and identifying content gaps</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-primary">✓</span>
-                <span>Incorporating target keywords naturally while maintaining readability</span>
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="text-primary animate-pulse">→</span>
-                <span>Writing engaging, SEO-optimized content tailored to your audience</span>
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground italic">
-              This sophisticated analysis typically takes 15-30 seconds. Your content will be ready shortly.
-            </p>
+          <div className="p-4 bg-muted/50 rounded-lg border">
+            <AIProgressIndicator steps={CONTENT_GEN_STEPS} />
           </div>
         )}
       </CardContent>

@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 3, 2026 — Sprint 36 shipped (Communication Layer + Platform Hygiene). Next: Sprint 34-OPS (David manual infrastructure inversion).
+**Last Updated:** March 3, 2026 — Sprint 37 shipped (Magic Moments + Platform Polish). Next: Sprint 34-OPS (David manual infrastructure inversion).
 
 **Owner:** David Kirsch
 
@@ -63,6 +63,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~35~~ | ~~Tenant Visual Identity + Brand System~~ | ~~AI voice injection, TenantLogo, default layouts, brochure brand colors, demo/email extraction, LEGAL-001~~ | ✅ SHIPPED | Identity gate for second tenant |
 | 34-OPS | Manual Infrastructure Inversion | INFRA-001–005 + T-001–009 per THIRD_PARTY_MIGRATION.md | David manual sprint | Follows Sprint 34 code work |
 | ~~36~~ | ~~Communication Layer + Platform Hygiene~~ | ~~Email templates, toast audit, empty states, route audit, psych UX audit, security fixes~~ | ✅ SHIPPED | Demo-ready gate |
+| ~~37~~ | ~~Magic Moments + Platform Polish~~ | ~~PSYCH_UX_AUDIT.md implementation: AlertDialog migration (4), breadcrumb component, onboarding celebration, settings grouping, AI progress indicators~~ | ✅ SHIPPED | UX polish gate |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**

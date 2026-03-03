@@ -1,7 +1,25 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 3, 2026 — Sprint 36 shipped: Communication Layer + Platform Hygiene.
+**Last Updated:** March 3, 2026 — Sprint 37 shipped: Magic Moments + Platform Polish.
+
+
+## Sprint 37 — Magic Moments + Platform Polish — March 3, 2026
+Track A: confirm() → AlertDialog migration — 4 browser confirm() calls replaced with shadcn AlertDialog: vault bulk-delete, TeamFeed message delete (×2), recurring-tasks delete.
+
+Track B: Generic error toast cleanup — Audit pass on toast.error() calls (no-op: zero matches for pure generic messages; all toasts already had action-specific copy).
+
+Track C: Dead route deletion + missing confirms — gbp/reviews tombstone deleted. leads/[id]/audit flagged NOT dead (active GET + POST handlers, 79 lines). AlertDialog added for deactivate-user (TeamManagementTab) and deactivate-territory (territories-client).
+
+Track D: Breadcrumb component — src/components/ui/breadcrumb.tsx created (CSS-only, no library). Wired into clients/[id]/page.tsx and clients/[id]/composer/[jobId]/page.tsx. Remaining nested client routes are tabs within ClientProfile (not separate page.tsx files).
+
+Track E: Onboarding completion celebration — celebrating state intercepts advance() at final step. CompletionCelebration card (CheckCircle2, fade-in slide-in-from-bottom-4, 2.5s progress bar, auto-redirect). Applied to onboarding-wizard.tsx and rep-onboarding-wizard.tsx. @keyframes progress added to globals.css.
+
+Track F: Settings tab grouping — 4 section labels added to TabsList in settings/page.tsx: Platform Config, Team & Access, Data & Ops, Integrations (admin-conditional).
+
+Track G: AI operation progress indicators — AIProgressIndicator component created (src/components/ui/ai-progress-indicator.tsx): stepped text with useEffect setTimeout timers, key={step} forces CSS re-animation per step. Applied to blog-generator.tsx (CONTENT_GEN_STEPS), WebsiteAuditPanel.tsx (AUDIT_STEPS), VoiceProfileDialog.tsx (VOICE_STEPS, Progress bar retained).
+
+TypeScript: Zero new errors (12 pre-existing unaffected — scripts/basecamp, presence route, GuideCharacter, lead-filter-bar, typing-store).
 
 
 ## Sprint 36 — Communication Layer + Platform Hygiene — March 3, 2026

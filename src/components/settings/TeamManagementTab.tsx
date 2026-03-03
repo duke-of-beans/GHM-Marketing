@@ -20,6 +20,10 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { UserImportDialog } from "@/components/bulk/import-dialogs";
 import { useBulkSelect } from "@/hooks/use-bulk-select";
@@ -67,6 +71,7 @@ export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false
   const [newRole, setNewRole] = useState<AppRole>("sales");
   const [newPassword, setNewPassword] = useState("");
   const [addingSaving, setAddingSaving] = useState(false);
+  const [deactivateUserId, setDeactivateUserId] = useState<number | null>(null);
   const [positions, setPositions] = useState<{ id: number; name: string }[]>([]);
   const [newPositionId, setNewPositionId] = useState<string>("");
 
@@ -202,9 +207,14 @@ export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false
     }
   }
 
-  async function handleDeactivate(userId: number) {
+  function handleDeactivate(userId: number) {
+    setDeactivateUserId(userId);
+  }
+
+  async function confirmDeactivate() {
+    if (deactivateUserId === null) return;
     try {
-      const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+      const res = await fetch(`/api/users/${deactivateUserId}`, { method: "DELETE" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to deactivate user");
       toast.success("User deactivated — showing inactive users so you can permanently delete if needed.");
@@ -212,6 +222,8 @@ export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false
       loadUsers();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to deactivate user");
+    } finally {
+      setDeactivateUserId(null);
     }
   }
 
@@ -541,6 +553,24 @@ export function TeamManagementTab({ currentUserRole = "manager", isAdmin = false
         actions={bulkUserActions}
         entityLabel="user"
       />
+
+      {/* Deactivate User Confirm */}
+      <AlertDialog open={deactivateUserId !== null} onOpenChange={(open) => { if (!open) setDeactivateUserId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deactivate user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This user will lose access immediately. You can reactivate them from this panel.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeactivate} className="bg-destructive text-destructive-foreground">
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </>
       )}
     </div>
