@@ -1,3 +1,7 @@
+// TODO: COVOS_ACCOUNT_NEEDED — INFRA-005 Vercel Blob
+// Current: ghm-marketing-blob store (IAD1, Public)
+// Target: COVOS Platform Blob store, paths namespaced by tenant slug (/{tenantSlug}/...)
+// Track: THIRD_PARTY_MIGRATION.md → INFRA-005
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";

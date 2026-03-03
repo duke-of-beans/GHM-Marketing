@@ -1,5 +1,10 @@
 // lib/wave/client.ts
 // Core GraphQL client for Wave API — auth, retry, error handling
+//
+// TODO: COVOS_ACCOUNT_NEEDED — T-001 Wave
+// Current: reads WAVE_API_TOKEN from platform env (registered under GHM)
+// Target: Per-tenant Wave API key stored in TenantConfig.providers or AppSetting
+// Track: THIRD_PARTY_MIGRATION.md → T-001
 
 import { WAVE_API_URL, WAVE_API_TOKEN } from './constants'
 import type { WaveMutationResult } from './types'

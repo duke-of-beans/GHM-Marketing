@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 2, 2026 — Sprint Cowork shipped (Sprints 30+33 scope). Sprint 34+ is next.
+**Last Updated:** March 3, 2026 — Sprint 34 shipped (GHM → Tenant Extraction). Sprint 34-OPS (manual infra) is next.
 
 **Owner:** David Kirsch
 
@@ -59,7 +59,9 @@ Foundation → out. Each sprint unblocks the next.
 | ~~31~~ | ~~UI-CONST-001 Group 5~~ | ~~Data Display — tables, metric tiles, charts~~ | ✅ SHIPPED | |
 | ~~32~~ | ~~Signing + Tours~~ | ~~FEAT-036 (DocuSign) + FEAT-038 (expanded tour tips)~~ | ✅ SHIPPED | |
 | ~~33~~ | ~~Customization + Guide~~ | ~~FEAT-034 (customization audit) + FEAT-039 (guide character Phase 1)~~ | ✅ SHIPPED | Sprint Cowork |
-| 34+ | COVOS Phase 1 Modules | Per ARCH-003 roadmap — email marketing, booking, proposals, etc. | Multi-session | Vertical ERP expansion |
+| ~~34~~ | ~~GHM → Tenant Extraction~~ | ~~Remove GHM default privilege, meta-DB tenant registry, env var audit, third-party stubs~~ | ✅ SHIPPED | Platform identity gate complete |
+| 34-OPS | Manual Infrastructure Inversion | INFRA-001–005 + T-001–009 per THIRD_PARTY_MIGRATION.md | David manual sprint | Follows Sprint 34 code work |
+| 35+ | Vertical 2 — Affiliate/Domain | Second vertical template after SEO vertical declared done | Future | Flywheel starts here |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**

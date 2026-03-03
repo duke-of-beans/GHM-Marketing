@@ -7,6 +7,11 @@
  * Flow:
  *   postSerpTasks()  →  DataForSEO queues tasks, returns task IDs
  *   getSerpResults() →  Call when ready, returns SerpResult[]
+ *
+ * TODO: COVOS_ACCOUNT_NEEDED — T-004 DataForSEO
+ * Current: reads DATAFORSEO_LOGIN + DATAFORSEO_PASSWORD from platform env (registered under GHM)
+ * Target: COVOS Platform DataForSEO account (platform-level, shared across tenants)
+ * Track: THIRD_PARTY_MIGRATION.md → T-004
  */
 
 const API_BASE = "https://api.dataforseo.com/v3";

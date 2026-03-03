@@ -2238,3 +2238,28 @@ model SignatureEnvelope {
 
   @@map("signature_envelopes")
 }
+
+// ─── Tenant Registry (Sprint 34 — GHM → Tenant Extraction) ─────────────────
+
+model Tenant {
+  id             Int      @id @default(autoincrement())
+  slug           String   @unique                        // e.g. "ghm", "covosdemo"
+  name           String                                  // "GHM Digital Marketing"
+  companyName    String   @map("company_name")           // "GHM Digital Marketing Inc"
+  companyTagline String?  @map("company_tagline")
+  fromEmail      String   @map("from_email")
+  fromName       String   @map("from_name")
+  supportEmail   String   @map("support_email")
+  dashboardUrl   String   @map("dashboard_url")
+  databaseUrl    String?  @map("database_url")           // per-tenant Neon DB URL
+  logoUrl        String?  @map("logo_url")
+  primaryColor   String?  @map("primary_color")
+  aiContext      String?  @map("ai_context")
+  providers      Json?                                    // Partial<TenantProviderConfig>
+  securityTier   String   @default("standard") @map("security_tier") // "standard" | "vault"
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("tenants")
+}

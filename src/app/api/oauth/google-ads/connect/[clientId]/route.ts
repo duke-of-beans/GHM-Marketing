@@ -1,3 +1,7 @@
+// TODO: COVOS_ACCOUNT_NEEDED — T-003 Google Ads, INFRA-004
+// Current: Google Ads credentials under GHM GCP project
+// Target: COVOS MCC account + per-tenant OAuth
+// Track: THIRD_PARTY_MIGRATION.md → T-003, INFRA-004
 import { NextRequest, NextResponse } from 'next/server'
 import { buildAuthUrl } from '@/lib/oauth/google-ads'
 

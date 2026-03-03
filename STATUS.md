@@ -1,19 +1,19 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 2, 2026 — Sprint Cowork shipped (covers Sprint 30 + Sprint 33 scope). TeamFeedSidebar rebuilt: drag resize (280–520px), PeopleStrip presence dots, typing indicator, mobile bottom sheet. WCAG AA contrast audit: 8 tokens fixed in globals.css, CONTRAST_AUDIT.md written. Vault preview modal: VaultPreviewModal.tsx (PDF iframe, image lightbox, DOCX/XLSX metadata cards). Customization layer: display density toggle (DensityProvider + CSS), tab memory hook (vault wired), lead filter defaults (Set Default / Clear Default). Guide Character Phase 1: GuideCharacter.tsx (idle/visit/empty triggers, sardonic tips), guide toggle in Settings. TypeScript gate: 5 pre-existing errors only, zero new. Next: Sprint 34+ (COVOS Phase 1 modules per ARCH-003 roadmap).
+**Last Updated:** March 3, 2026 — Sprint 34 shipped (GHM → Tenant Extraction). COVOS is the platform, GHM is just a tenant — no default privilege, no fallback. Tenant model added to schema, getTenant() reads from DB with 5-min cache, TENANT_REGISTRY kept as deprecated fallback only. 8 third-party integrations annotated with COVOS_ACCOUNT_NEEDED TODO stubs per THIRD_PARTY_MIGRATION.md. .env.example reclassified (platform vs tenant vs needs-COVOS-account). /api/debug/tenant reports resolvedFrom field. TypeScript: zero new errors. Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md), then Vertical 2.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
 **Sprints complete through 32 + Cowork.** The GHM dashboard is a full-stack agency intelligence platform running live at ghm.covos.app with multi-tenant infrastructure on covos.app. The platform handles lead pipeline (Kanban + manual entry), client management (health scores, portfolio table, client detail), task management, Wave billing integration, content studio, commission engine (salary-only protection for Gavin), team feed with real-time SSE + presence + mobile bottom sheet, file vault with DocuSign signing workflow + preview modal, reporting, analytics dashboards, guided tours across all major pages, display density toggle, tab memory, lead filter defaults, and Guide Character Phase 1.
 
-**Multi-tenant:** covosdemo.covos.app is live as a second isolated tenant. getTenant() handles all edge cases gracefully. Contract templates, brochure, and audit PDFs are fully tenant-ready. Wave per-tenant API key scaffolding in place. TENANT_PROVISIONING.md is the go-live runbook.
+**Multi-tenant:** covosdemo.covos.app is live as a second isolated tenant. Sprint 34 completed: getTenant() reads from tenants DB table with 5-min in-memory cache (TENANT_REGISTRY is deprecated fallback). GHM has no default privilege — unknown slugs return null → middleware redirects to covos.app?error=unknown-tenant. Contract templates, brochure, and audit PDFs are fully tenant-ready. Wave per-tenant API key scaffolding in place. TENANT_PROVISIONING.md is the go-live runbook. THIRD_PARTY_MIGRATION.md has code-side stubs for all 8 integration files.
 
-**Architecture decisions:** ARCH-002 (repo/service/DB separation) is PROPOSED — awaiting David sign-off. ARCH-003 (82-category COVOS module map + 12-month roadmap) is documented. Neither is ACCEPTED yet.
+**Architecture decisions:** ARCH-002 (repo/service/DB separation) REJECTED March 2, 2026 — single codebase, data isolation via per-tenant DB URLs is the permanent model. ARCH-003 (82-category COVOS module map) ACCEPTED. ARCH-004 (meta-DB tenant architecture) ACCEPTED March 2, 2026 — one central COVOS-owned Neon meta-DB, per-tenant isolated DBs, read replica + in-memory cache for resilience. ARCH-005 (COVOS Vault compliance tier) reserved for future regulated clients. See docs/ARCH.md for full decision log.
 
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
-**Next sprint candidates:** Sprint 34+ (COVOS Phase 1 modules per ARCH-003 roadmap). Sprint 30 and Sprint 33 scope fully shipped in Sprint Cowork.
+**Next sprint:** Sprint 34-OPS — David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md (INFRA-001 through INFRA-005, T-001 through T-009). Followed by Vertical 2 (affiliate/domain companies) once SEO vertical is declared done.
 
 
 ### SPRINT COWORK — Communication + Polish + Customization + Guide (March 2, 2026) ✅ COMPLETE

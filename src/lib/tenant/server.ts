@@ -1,15 +1,79 @@
 // src/lib/tenant/server.ts
 // Server-side tenant utilities — safe to import in API routes and Server Components.
 // DO NOT import in client components.
+//
+// Sprint 34: getTenant() reads from DB (Tenant table) with 5-min in-memory cache.
+// TENANT_REGISTRY kept as deprecated fallback — will be removed once DB path is stable.
 
 import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { TENANT_HEADER, TENANT_REGISTRY } from "./index";
 import type { TenantConfig } from "./config";
+import type { TenantProviderConfig } from "@/lib/providers/types";
+
+// ── In-memory tenant cache (slug → TenantConfig, 5-min TTL) ────────────────
+
+const _tenantCache = new Map<string, { config: TenantConfig; expiresAt: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
+// Platform-level prisma client (meta-DB; currently the GHM Neon DB until INFRA-002)
+import { prisma } from "@/lib/prisma";
+
+/**
+ * Resolve a TenantConfig by slug. Reads from the `tenants` table first,
+ * falls back to TENANT_REGISTRY if the DB query fails (e.g. table missing).
+ * Returns null if the slug is not found in either source.
+ */
+async function getTenantBySlug(slug: string): Promise<{ config: TenantConfig; source: "tenants_table" | "registry_fallback" } | null> {
+  const now = Date.now();
+  const cached = _tenantCache.get(slug);
+  if (cached && cached.expiresAt > now) {
+    return { config: cached.config, source: "tenants_table" };
+  }
+
+  try {
+    const row = await prisma.tenant.findUnique({ where: { slug } });
+    if (row && row.active) {
+      const config: TenantConfig = {
+        slug: row.slug,
+        name: row.name,
+        companyName: row.companyName,
+        companyTagline: row.companyTagline ?? undefined,
+        fromEmail: row.fromEmail,
+        fromName: row.fromName,
+        supportEmail: row.supportEmail,
+        dashboardUrl: row.dashboardUrl,
+        databaseUrl: row.databaseUrl ?? undefined,
+        logoUrl: row.logoUrl ?? undefined,
+        primaryColor: row.primaryColor ?? undefined,
+        aiContext: row.aiContext ?? undefined,
+        providers: (row.providers as Partial<TenantProviderConfig>) ?? undefined,
+        active: row.active,
+      };
+      _tenantCache.set(slug, { config, expiresAt: now + CACHE_TTL_MS });
+      return { config, source: "tenants_table" };
+    }
+  } catch (err) {
+    // DB query failed (table missing, connection error, etc.)
+    // Fall through to registry fallback.
+    console.warn(`[getTenantBySlug] DB lookup failed for "${slug}", trying registry fallback:`, err);
+  }
+
+  // Deprecated fallback — TENANT_REGISTRY in config.ts
+  const registryTenant = TENANT_REGISTRY[slug];
+  if (registryTenant && registryTenant.active) {
+    return { config: registryTenant, source: "registry_fallback" };
+  }
+
+  return null;
+}
 
 /**
  * Read the current tenant from the request headers injected by middleware.
- * Returns null on the root domain (landing page) or if the header is missing.
+ * Returns null on the root domain (landing page), if the header is missing,
+ * or if the slug does not match any known tenant.
+ *
+ * Sprint 34: NO GHM fallback. Unknown slugs return null. GHM has no special status.
  *
  * Usage in a Server Component:
  *   const tenant = await getTenant();
@@ -20,27 +84,27 @@ import type { TenantConfig } from "./config";
  */
 export async function getTenant(): Promise<TenantConfig | null> {
   const headerStore = await headers();
-
-  // Existing behaviour: trust the tenant slug injected by middleware.
   const slug = headerStore.get(TENANT_HEADER);
+
   if (slug) {
-    const tenant = TENANT_REGISTRY[slug];
-    if (tenant && tenant.active) return tenant;
+    const result = await getTenantBySlug(slug);
+    if (result) return result.config;
   }
 
-  // Hardened fallback: derive subdomain from the Host header so that
-  // localhost, Vercel preview URLs, and unknown subdomains never crash.
-  const host =
-    headerStore.get("host") ?? headerStore.get("x-forwarded-host");
-  const subdomain = (host ?? "").split(".")[0];
-  const tenant = TENANT_REGISTRY[subdomain];
-  if (!tenant || !tenant.active) {
-    console.warn(
-      `[getTenant] Unknown or inactive slug "${subdomain}", falling back to ghm`
-    );
-    return TENANT_REGISTRY["ghm"];
-  }
-  return tenant;
+  // No valid slug found — return null. Caller decides what to do.
+  // DO NOT fall back to GHM. GHM has no special status.
+  return null;
+}
+
+/**
+ * Like getTenant() but also returns the resolution source for debug/telemetry.
+ * Used by /api/debug/tenant.
+ */
+export async function getTenantWithSource(): Promise<{ config: TenantConfig; source: "tenants_table" | "registry_fallback" } | null> {
+  const headerStore = await headers();
+  const slug = headerStore.get(TENANT_HEADER);
+  if (!slug) return null;
+  return getTenantBySlug(slug);
 }
 
 /**

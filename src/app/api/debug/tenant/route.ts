@@ -2,28 +2,26 @@
 // Returns the resolved tenant config for the current request.
 // Admin-only — uses the same requirePermission guard as other admin routes.
 // NOTE: databaseUrl is intentionally excluded for security.
+// Sprint 34: reports `resolvedFrom` field ("tenants_table" | "registry_fallback").
 
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
 import { requirePermission } from "@/lib/auth/permissions";
-import { getTenant } from "@/lib/tenant/server";
+import { getTenantWithSource } from "@/lib/tenant/server";
 
 export async function GET() {
   // Enforce admin auth — throws 401/403 if caller lacks permission.
   await requirePermission("manage_settings");
 
-  const headerStore = await headers();
-  const resolvedFrom = headerStore.get("host") ?? "unknown";
+  const result = await getTenantWithSource();
 
-  const tenant = await getTenant();
-
-  // getTenant() always returns a tenant after hardening, but guard for safety.
-  if (!tenant) {
+  if (!result) {
     return NextResponse.json(
-      { error: "Tenant resolution failed" },
-      { status: 500 }
+      { error: "Tenant resolution failed — no valid tenant slug in request headers" },
+      { status: 404 }
     );
   }
+
+  const { config: tenant, source } = result;
 
   return NextResponse.json({
     slug: tenant.slug,
@@ -32,6 +30,6 @@ export async function GET() {
     dashboardUrl: tenant.dashboardUrl,
     hasDatabaseUrl: !!tenant.databaseUrl,
     active: tenant.active,
-    resolvedFrom,
+    resolvedFrom: source,
   });
 }

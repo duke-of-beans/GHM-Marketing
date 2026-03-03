@@ -7,6 +7,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+// TODO: COVOS_ACCOUNT_NEEDED — T-005 Tenor
+// Current: reads TENOR_API_KEY from platform env (registered under GHM)
+// Target: COVOS Platform Tenor API key
+// Track: THIRD_PARTY_MIGRATION.md → T-005
 const TENOR_KEY = process.env.TENOR_API_KEY ?? "LIVDSRZULELA"; // Tenor demo key
 const TENOR_BASE = "https://tenor.googleapis.com/v2";
 

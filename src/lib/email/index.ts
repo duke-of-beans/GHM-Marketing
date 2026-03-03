@@ -1,3 +1,7 @@
+// TODO: COVOS_ACCOUNT_NEEDED — INFRA-003 Resend
+// Current: GHM Resend account, sends from noreply@ghmmarketing.com
+// Target: COVOS Resend account, covos.app domain verified, per-tenant FROM_EMAIL from Tenant row
+// Track: THIRD_PARTY_MIGRATION.md → INFRA-003
 import { Resend } from "resend";
 import { prisma } from "@/lib/db";
 import type { TenantConfig } from "@/lib/tenant/config";

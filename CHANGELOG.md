@@ -1,8 +1,25 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 2, 2026 — Sprint Cowork shipped: TeamFeed overhaul, contrast audit, vault preview, guide character Phase 1, customization layer.
+**Last Updated:** March 3, 2026 — Sprint 34 shipped: GHM → Tenant Extraction.
 
+
+## Sprint 34 — GHM → Tenant Extraction — March 3, 2026
+ARCH-006: GHM → tenant extraction (Layer 1 + Layer 2 code complete). COVOS is the platform; GHM is just a tenant.
+
+Track A: Tenant model added to prisma/schema.prisma (prisma db push). scripts/seed-tenants.ts seeds GHM + covosdemo rows via upsert. Both rows verified in DB.
+
+Track B + D (merged): getTenant() in src/lib/tenant/server.ts completely rewritten. GHM fallback block removed — unknown slugs return null, not GHM content. New getTenantBySlug() reads from tenants table with 5-minute in-memory cache (_tenantCache Map). Falls back to TENANT_REGISTRY only on DB query failure (deprecated path). getTenantWithSource() added for debug/telemetry. src/app/not-a-tenant/page.tsx created (minimal error page, TODO: COVOS_LANDING_PAGE_NEEDED). All 30 getTenant()/requireTenant() call sites audited — all already null-safe (requireTenant throws, Server Components use optional chaining with ?? fallback).
+
+Track C: .env.example fully reclassified with PLATFORM / TENANT / TODO: COVOS_ACCOUNT_NEEDED annotations. Header renamed from "GHM Marketing Dashboard" to "COVOS Platform." GBP and DataForSEO credential placeholders added with migration references.
+
+Track E: 8 third-party integration files annotated with COVOS_ACCOUNT_NEEDED TODO stubs referencing THIRD_PARTY_MIGRATION.md items: gif-search (T-005 Tenor), stock-photos (T-006 Unsplash, T-007 Pexels), wave/client.ts (T-001), oauth/google GBP connect (T-002, INFRA-004), oauth/google-ads connect (T-003, INFRA-004), enrichment/providers/dataforseo.ts (T-004), vault/upload (INFRA-005), email/index.ts (INFRA-003).
+
+Track F: npx tsc --noEmit — 12 pre-existing errors (5 from basecamp/dotenv scripts + 7 from Sprint Cowork session), zero in any Sprint 34 changed files. Zero new TypeScript errors introduced.
+
+/api/debug/tenant updated: uses getTenantWithSource(), reports resolvedFrom field ("tenants_table" | "registry_fallback"). 404 response on unknown tenant (was 500).
+
+Manual ops follow-up: Sprint 34-OPS per THIRD_PARTY_MIGRATION.md. No behavior changes in this sprint — GHM and covosdemo continue operating throughout.
 
 ## Sprint Cowork — TeamFeed + Contrast + Vault Preview + Customization + Guide — March 2, 2026
 Full sprint covering Sprint 30 + Sprint 33 scope. Phase 1 (parallel): TeamFeedSidebar rebuilt with drag resize (280–520px), PeopleStrip presence dots, typing indicator SSE, `/api/team/presence` + `/api/team-messages/typing` routes. WCAG AA contrast audit: 8 globals.css tokens patched, CONTRAST_AUDIT.md written. VaultPreviewModal.tsx (220 lines): PDF iframe, image lightbox, DOCX/XLSX metadata cards, vault-file-tile.tsx wired. CUSTOMIZATION_AUDIT.md written (349 lines, 16 surfaces ranked). Phase 2: Guide Character Phase 1 — guide-config.ts + GuideCharacter.tsx (idle/first-visit/repeated-visit/empty-state triggers, sardonic tips per route, auto-dismiss), PATCH /api/users/me/preferences, guide toggle in Settings, mounted in DashboardLayoutClient. TeamFeed polish: accent dot on toggle, content fade-in animation, mobile bottom sheet (fixed bottom-0, 70vh, translate-y). Top 3 customizations: DensityProvider (data-density attribute, localStorage, CSS compact block), useTabMemory hook (vault wired), lead filter defaults (Set Default / Clear Default buttons + localStorage + toast). TypeScript: 5 pre-existing errors only, zero new. Commit: `84d8492`.

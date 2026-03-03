@@ -12,6 +12,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+// TODO: COVOS_ACCOUNT_NEEDED — T-006 Unsplash, T-007 Pexels
+// Current: reads UNSPLASH_ACCESS_KEY + PEXELS_API_KEY from platform env (registered under GHM/personal)
+// Target: COVOS Platform Unsplash app + COVOS Platform Pexels key
+// Track: THIRD_PARTY_MIGRATION.md → T-006, T-007
 const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY ?? null;
 const PEXELS_KEY = process.env.PEXELS_API_KEY ?? null;
 
