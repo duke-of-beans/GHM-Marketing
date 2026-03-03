@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 3, 2026 — Sprint 35 shipped (Tenant Visual Identity + Brand System). Sprint 36 (Communication Layer + Platform Hygiene) is next.
+**Last Updated:** March 3, 2026 — Sprint 36 shipped (Communication Layer + Platform Hygiene). Next: Sprint 34-OPS (David manual infrastructure inversion).
 
 **Owner:** David Kirsch
 
@@ -62,7 +62,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~34~~ | ~~GHM → Tenant Extraction~~ | ~~Remove GHM default privilege, meta-DB tenant registry, env var audit, third-party stubs~~ | ✅ SHIPPED | Platform identity gate complete |
 | ~~35~~ | ~~Tenant Visual Identity + Brand System~~ | ~~AI voice injection, TenantLogo, default layouts, brochure brand colors, demo/email extraction, LEGAL-001~~ | ✅ SHIPPED | Identity gate for second tenant |
 | 34-OPS | Manual Infrastructure Inversion | INFRA-001–005 + T-001–009 per THIRD_PARTY_MIGRATION.md | David manual sprint | Follows Sprint 34 code work |
-| 36 | Communication Layer + Platform Hygiene | Email templates rebuild, toast audit, empty states, route audit, psych UX audit | Next | Demo-ready gate |
+| ~~36~~ | ~~Communication Layer + Platform Hygiene~~ | ~~Email templates, toast audit, empty states, route audit, psych UX audit, security fixes~~ | ✅ SHIPPED | Demo-ready gate |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**
@@ -110,12 +110,8 @@ Current wizard (Sprint 9) is the basic 4-step shell. Full scope: guided path thr
 **Scope:** Steps: (1) Company profile; (2) Team setup (invite users, assign roles); (3) Client import (CSV or PM adapter); (4) Integrations checklist (Wave, GBP, Google Ads — status indicators); (5) Completion screen with suggested next actions. Each step skippable, progress persists. Wizard state per-tenant-per-user. Completion unlocks achievement indicators.
 **Size:** ~2 sessions. **Priority:** 🟠 SHOULD. **Also see:** FEAT-015 (same item).
 
-### UX-AUDIT-009: Psychological / Human Nature UX Audit
-Magic moments per archetype are currently accidental. They need to be designed.
-**Archetypes:** Admin ("platform came alive"), Sales Rep ("automation did my job"), Manager ("AI just worked").
-**Audit direction:** Walk each user flow. Identify 3 most emotionally resonant moments per archetype. Design micro-interactions, state transitions, copy that amplify those moments. Remove friction from the path to each magic moment.
-**Output:** `docs/PSYCH_UX_AUDIT.md` with findings + interventions spec, then implementation sprint.
-**Size:** ~1 session audit + spec; ~1 session implementation. **Priority:** 🟡 WOULD.
+### ~~UX-AUDIT-009: Psychological / Human Nature UX Audit~~ ✅ SHIPPED Sprint 36 (audit phase)
+docs/PSYCH_UX_AUDIT.md written (141 lines, 8 sections). Implementation of recommended interventions remains in backlog.
 
 ### UX-AUDIT-012: Branding System — Expanded Color Options + Reset/Delete
 Current branding tab has a single brand color field. Need three roles: Primary (CTAs), Secondary (supporting UI), Accent (highlights/badges).
@@ -156,8 +152,8 @@ Marketing materials currently use generic GHM placeholders. Each tenant needs th
 
 ## 🟡 WOULD — High Value, No Current Blocker
 
-### UX-AUDIT-009: Psychological / Human Nature UX Audit
-See full scope above (in SHOULD section — moved here pending pitch/demo timeline decision).
+### ~~UX-AUDIT-009: Psychological / Human Nature UX Audit~~ ✅ SHIPPED Sprint 36
+See above — audit complete. Implementation sprint remains backlog.
 
 ### UX-AUDIT-011: Tasks/Recurring Tasks Nav Placement
 Should Tasks live under "Clients" in the left nav rather than as a standalone top-level section? Most task work is client-contextual.
@@ -181,12 +177,8 @@ Layout stored on first render if no saved layout exists. Users can still customi
 
 
 
-### FEAT-011: Full Button / Route / Path / Dependency & Logic Audit
-No formal audit of the complete button-to-route-to-handler chain. Stale routes, dead buttons, orphaned handlers accumulate silently.
-**Scope:** Enumerate every `<Button>`, `<Link>`, `router.push()`, form `onSubmit`. Map to handler and route. Flag: dead routes, broken routes, duplicate logic, permission gaps, dependency tangles.
-**Output:** `docs/ROUTE_AUDIT.md` findings table. Fix critical gaps immediately.
-**Note:** Sprint 12 covered security-critical routes. This is the full functional audit.
-**Size:** ~1 session audit + doc; ~1 session fix pass. **Priority:** 🟡 WOULD — before first external tenant.
+### ~~FEAT-011: Full Button / Route / Path / Dependency & Logic Audit~~ ✅ SHIPPED Sprint 36
+Delivered as Track B + Track D. scripts/route-audit.js scanned 239 routes. docs/ROUTE_AUDIT.md written. 3 unguarded routes fixed. Button chain audit complete.
 
 ### FEAT-021 subset: Pipeline Filter — Lead Source Filter
 `leadSourceId` field (organic/referral/discovery/import) exists in DB, not surfaced in filter bar. Covered by FEAT-025 full scope — can be pulled forward as a standalone quick win if needed.

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Edit, Trash2, Search, SlidersHorizontal, LayoutList, LayoutGrid } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ProductDialog } from "./product-dialog";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -224,18 +225,12 @@ export function ProductCatalog({ products: initialProducts }: { products: Produc
         <Card>
           <CardContent className="py-12 text-center">
             {products.length === 0 ? (
-              <>
-                <p className="text-muted-foreground mb-2 font-medium">
-                  No services in your catalog yet
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Add your SEO service packages here. The system will automatically suggest relevant additions to clients based on competitive gaps detected in scans.
-                </p>
-                <Button onClick={handleAdd}>
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Your First Service
-                </Button>
-              </>
+              <EmptyState
+                title="No services in your catalog yet"
+                description="Add your SEO service packages here. The system will automatically suggest relevant additions to clients based on competitive gaps detected in scans."
+                action={{ label: "Add Your First Service", onClick: handleAdd }}
+                variant="inline"
+              />
             ) : (
               <>
                 <p className="text-muted-foreground mb-2">

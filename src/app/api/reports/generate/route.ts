@@ -4,6 +4,7 @@ import { withPermission } from "@/lib/auth/api-permissions";
 import { generateMonthlyReportData } from "@/lib/reports/generator";
 import { generateReportHTML } from "@/lib/reports/template";
 import { requireTenant } from "@/lib/tenant/server";
+import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
 
 export async function POST(req: NextRequest) {
   const permissionError = await withPermission(req, "manage_clients");
@@ -32,14 +33,15 @@ export async function POST(req: NextRequest) {
       periodStart = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
     }
 
+    const tenant = await requireTenant();
+    const tenantVoice = await getTenantVoiceSettings();
+
     const reportData = await generateMonthlyReportData(
       clientId,
       periodStart,
       periodEnd,
-      { includeNarratives: true }
+      { includeNarratives: true, tenant, tenantVoice }
     );
-
-    const tenant = await requireTenant();
     const html = generateReportHTML(reportData, tenant);
 
     const report = await prisma.clientReport.create({

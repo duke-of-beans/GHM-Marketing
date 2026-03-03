@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db'
 import { getCurrentUserWithPermissions } from '@/lib/auth/api-permissions'
 import { isElevated } from '@/lib/auth/roles'
 import { callAI } from '@/lib/ai/client'
+import { requireTenant } from "@/lib/tenant/server"
+import { getTenantVoiceSettings } from "@/lib/ai/voice-settings"
 
 // POST /api/clients/[id]/gbp/draft-post
 // Body: { topic?: string; postType?: 'update' | 'offer' | 'event' }
@@ -86,6 +88,10 @@ RULES:
 - End with a natural, non-pushy CTA if appropriate
 - Output ONLY the post text — no preamble, no quotes`
 
+  // Sprint 36 — FEAT-016b: tenant voice injection
+  const tenant = await requireTenant()
+  const tenantVoice = await getTenantVoiceSettings()
+
   const result = await callAI({
     feature: 'gbp_post',
     prompt,
@@ -93,7 +99,9 @@ RULES:
       feature:    'gbp_post',
       clientId,
       clientName: client.businessName,
+      tenantVoice,
     },
+    tenant,
   })
 
   if (!result.ok) {

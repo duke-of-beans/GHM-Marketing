@@ -1,5 +1,5 @@
 # COVOS — ARCHITECTURAL DECISIONS
-**Last Updated:** March 2, 2026
+**Last Updated:** March 3, 2026
 **Status:** ACTIVE — living document. Update when decisions change.
 
 ---
@@ -7,7 +7,8 @@
 ## ARCH-001 — UI Constitution + Design System ✅ ACCEPTED
 
 Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display).
-Groups 6–8 remain (Communication, Content, Identity). Runs parallel to product sprints.
+Group 6 (Communication) substantially addressed by Sprint 36 — email templates rebuilt, toast system audited (380 calls, Sonner-only confirmed), empty states standardized (shared EmptyState component, 9 surfaces), psych UX audit written.
+Groups 7–8 remain (Content, Identity). Runs parallel to product sprints.
 
 ---
 

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type LiveSite = {
   id: number;
@@ -62,13 +63,12 @@ export function LiveSitesPanel() {
 
   if (sites.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
-        <Globe className="h-8 w-8 text-muted-foreground mx-auto" />
-        <p className="font-medium">No live sites yet</p>
-        <p className="text-sm text-muted-foreground">
-          Deploy a build from Website Studio to see live sites here.
-        </p>
-      </div>
+      <EmptyState
+        icon={Globe}
+        title="No live sites yet"
+        description="Deploy a build from Website Studio to see live sites here."
+        iconSize="h-8 w-8"
+      />
     );
   }
 

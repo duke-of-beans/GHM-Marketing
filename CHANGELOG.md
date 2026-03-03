@@ -1,7 +1,25 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 3, 2026 — Sprint 35 shipped: Tenant Visual Identity + Brand System.
+**Last Updated:** March 3, 2026 — Sprint 36 shipped: Communication Layer + Platform Hygiene.
+
+
+## Sprint 36 — Communication Layer + Platform Hygiene — March 3, 2026
+Track A0: Tenant voice wiring — getTenantVoiceSettings() wired into all 7 AI API routes (generate-blog, generate-meta, generate-ppc, generate-social, generate-strategy, generate-brief, capture-voice). Each route fetches tenant config, extracts voice, passes to callAI().
+
+Track A1: Email template system — Base template with tenant branding (logo, company name, tagline, brand color). 5 individual templates: welcome, forgot-password, work-order, partner-notification, report-ready. All React Email components.
+
+Track A2: Toast audit — All 380 toast calls confirmed Sonner-only. Dead code identified: src/hooks/use-toast.ts (shadcn useToast hook, zero imports). docs/TOAST_AUDIT.md written.
+
+Track A3: Empty states pass — Shared EmptyState component (src/components/ui/empty-state.tsx, 78 lines). Wired into 9 surfaces: ContentList, reports-list, vault-file-grid, TeamFeed (×2), TeamFeedSidebar, recurring-tasks-client, task-queue-client, product-catalog, LiveSitesPanel.
+
+Track B: Route + button + logic audit — scripts/route-audit.js scanned 239 API routes. 140 permission-guarded, 68 session-guarded, 13 cron, 9 public, 3 genuinely unguarded, 1 dead code. docs/ROUTE_AUDIT.md written.
+
+Track C: Psychological UX audit — docs/PSYCH_UX_AUDIT.md (141 lines, 8 sections): First Impressions, Empty States, Feedback Loops, Navigation, Cognitive Load, Trust/Security, Error Recovery, Delight/Momentum.
+
+Track D: Security fix pass — 3 unguarded routes patched: /api/clients/[id]/gbp/posts + /api/clients/[id]/gbp/reviews/[reviewId]/reply (withPermission "manage_clients"), /api/checklist-templates (getCurrentUser session guard). ROUTE_AUDIT.md corrected for 7 false positives.
+
+Track E: TypeScript gate — Fixed quote escaping in reports-list.tsx. Fixed TenantConfig import path in 4 files (→ @/lib/tenant barrel). Zero new TS errors (12 pre-existing).
 
 
 ## Sprint 35 — Tenant Visual Identity + Brand System — March 3, 2026

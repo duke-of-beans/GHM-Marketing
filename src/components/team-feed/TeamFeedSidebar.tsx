@@ -33,6 +33,7 @@ import {
   Search, ChevronRight, Pencil, Check, Users, AlertCircle, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatDistanceToNow } from "date-fns";
 import { voice, pick } from "@/lib/voice";
 import { useModifierKey } from "@/hooks/use-modifier-key";
@@ -883,10 +884,12 @@ export function TeamFeedSidebar({
             {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}
           </div>
         ) : feedMessages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-            <MessageSquare className="h-8 w-8 mb-2 opacity-30" />
-            <p className="text-sm">{search ? "No messages found." : voice.empty.teamFeed.body}</p>
-          </div>
+          <EmptyState
+            icon={MessageSquare}
+            title={search ? "No messages found" : voice.empty.teamFeed.body}
+            variant="inline"
+            iconSize="h-8 w-8"
+          />
         ) : (
           feedMessages.map((msg) => (
             <MessageRow key={msg.id} msg={msg} currentUserId={currentUserId}

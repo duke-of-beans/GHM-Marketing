@@ -10,7 +10,8 @@
  */
 
 import { callAI } from "@/lib/ai/client";
-import type { FeatureContext } from "@/lib/ai/router/types";
+import type { FeatureContext, TenantVoice } from "@/lib/ai/router/types";
+import type { TenantConfig } from "@/lib/tenant";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -37,7 +38,8 @@ export interface VoiceProfileData {
 
 export async function generateAINarratives(
   reportData: any,
-  voiceProfile: VoiceProfileData | null
+  voiceProfile: VoiceProfileData | null,
+  options?: { tenant?: TenantConfig; tenantVoice?: TenantVoice }
 ): Promise<NarrativeSections> {
   const fallback: NarrativeSections = {
     executiveSummary: "",
@@ -52,6 +54,7 @@ export async function generateAINarratives(
     feature: "report_narrative",
     clientId: reportData.client.id,
     clientName: reportData.client.businessName,
+    tenantVoice: options?.tenantVoice,
   };
 
   const voiceInstruction = voiceProfile
@@ -67,12 +70,12 @@ export async function generateAINarratives(
     competitivePositioning,
     recommendedNextSteps,
   ] = await Promise.allSettled([
-    narrativeCall(context, voiceInstruction, buildExecutiveSummaryPrompt(reportData)),
-    narrativeCall(context, voiceInstruction, buildRankingChangesPrompt(reportData)),
-    narrativeCall(context, voiceInstruction, buildSiteHealthPrompt(reportData)),
-    narrativeCall(context, voiceInstruction, buildGMBPrompt(reportData)),
-    narrativeCall(context, voiceInstruction, buildCompetitivePrompt(reportData)),
-    narrativeCall(context, voiceInstruction, buildNextStepsPrompt(reportData)),
+    narrativeCall(context, voiceInstruction, buildExecutiveSummaryPrompt(reportData), options?.tenant),
+    narrativeCall(context, voiceInstruction, buildRankingChangesPrompt(reportData), options?.tenant),
+    narrativeCall(context, voiceInstruction, buildSiteHealthPrompt(reportData), options?.tenant),
+    narrativeCall(context, voiceInstruction, buildGMBPrompt(reportData), options?.tenant),
+    narrativeCall(context, voiceInstruction, buildCompetitivePrompt(reportData), options?.tenant),
+    narrativeCall(context, voiceInstruction, buildNextStepsPrompt(reportData), options?.tenant),
   ]);
 
   return {
@@ -97,12 +100,14 @@ function resolveSettled(
 async function narrativeCall(
   context: FeatureContext,
   voiceInstruction: string,
-  prompt: string
+  prompt: string,
+  tenant?: TenantConfig
 ): Promise<string> {
   const result = await callAI({
     feature: "report_narrative",
     prompt: `${voiceInstruction}\n\n${prompt}`,
     context,
+    tenant,
   });
 
   if (result.ok) return result.content.trim();

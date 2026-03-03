@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withPermission } from '@/lib/auth/api-permissions'
 import { getGBPClient } from '@/lib/enrichment/providers/google-business/client'
 import { createPost } from '@/lib/enrichment/providers/google-business/posts'
 
@@ -6,6 +7,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
+
   const clientId = parseInt(params.id)
   const body = await req.json()
 

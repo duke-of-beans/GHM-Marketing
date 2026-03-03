@@ -1,4 +1,6 @@
 import { callAI } from "@/lib/ai";
+import type { TenantConfig } from "@/lib/tenant";
+import type { TenantVoice } from "@/lib/ai/router/types";
 import * as cheerio from 'cheerio';
 
 export interface VoiceProfile {
@@ -112,7 +114,8 @@ async function scrapeWebsiteContent(url: string): Promise<string> {
 export async function captureVoiceFromWebsite(
   websiteUrl: string,
   clientId = 0,
-  clientName = "Unknown"
+  clientName = "Unknown",
+  options?: { tenant?: TenantConfig; tenantVoice?: TenantVoice }
 ): Promise<VoiceProfile> {
   // Scrape website content
   console.log(`Scraping website: ${websiteUrl}`);
@@ -132,7 +135,9 @@ export async function captureVoiceFromWebsite(
       feature: "voice_capture",
       clientId,
       clientName,
+      tenantVoice: options?.tenantVoice,
     },
+    tenant: options?.tenant,
     maxTokens: 1200,
   });
 

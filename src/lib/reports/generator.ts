@@ -5,6 +5,8 @@ import { generateGBPPerformanceSection } from "./sections/gbp-performance";
 import { generatePPCSection } from "./sections/ppc-performance";
 import { generateAINarratives } from "./ai-narrative";
 import type { VoiceProfileData } from "./ai-narrative";
+import type { TenantConfig } from "@/lib/tenant";
+import type { TenantVoice } from "@/lib/ai/router/types";
 
 /**
  * Generate monthly report data for a client
@@ -13,7 +15,7 @@ export async function generateMonthlyReportData(
   clientId: number,
   periodStart: Date,
   periodEnd: Date,
-  options: { includeNarratives?: boolean } = {}
+  options: { includeNarratives?: boolean; tenant?: TenantConfig; tenantVoice?: TenantVoice } = {}
 ) {
   // Get all scans in the period
   const scans = await prisma.competitiveScan.findMany({
@@ -176,7 +178,10 @@ export async function generateMonthlyReportData(
         }
       : null;
 
-    baseReport.narratives = await generateAINarratives(baseReport, voiceProfile);
+    baseReport.narratives = await generateAINarratives(baseReport, voiceProfile, {
+      tenant: options.tenant,
+      tenantVoice: options.tenantVoice,
+    });
   }
 
   return baseReport;

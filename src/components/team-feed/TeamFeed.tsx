@@ -48,6 +48,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatDistanceToNow } from "date-fns";
 import { useModifierKey } from "@/hooks/use-modifier-key";
 import { EmojiPickerButton, GifPickerButton, ReactionRow, InlineMedia } from "./TeamFeedMultimedia";
@@ -496,11 +497,12 @@ export function TeamFeedPanel({
               {[1,2,3].map(i => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">No messages yet.</p>
-              <p className="text-xs mt-1">Be the first to post something.</p>
-            </div>
+            <EmptyState
+              icon={MessageSquare}
+              title="No messages yet"
+              description="Be the first to post something."
+              variant="inline"
+            />
           ) : (
             messages.map((msg) => (
               <MessageRow
@@ -612,10 +614,13 @@ export function TeamFeedWidget({
             {[1,2].map(i => <div key={i} className="h-14 bg-muted animate-pulse rounded-lg" />)}
           </div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
-            <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">No messages yet</p>
-          </div>
+          <EmptyState
+            icon={MessageSquare}
+            title="No messages yet"
+            variant="inline"
+            iconSize="h-8 w-8"
+            className="py-2"
+          />
         ) : (
           <>
             {/* Pinned messages first */}

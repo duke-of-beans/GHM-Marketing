@@ -4,6 +4,8 @@
  */
 
 import { callAI } from "@/lib/ai";
+import type { TenantConfig } from "@/lib/tenant";
+import type { TenantVoice } from "@/lib/ai/router/types";
 
 export async function generateContentBrief(params: {
   title: string;
@@ -12,8 +14,10 @@ export async function generateContentBrief(params: {
   category: string;
   competitorInfo?: string;
   clientId?: number;
+  tenant?: TenantConfig;
+  tenantVoice?: TenantVoice;
 }): Promise<string> {
-  const { title, description, clientName, category, competitorInfo, clientId } = params;
+  const { title, description, clientName, category, competitorInfo, clientId, tenant, tenantVoice } = params;
 
   const prompt = `Task Category: ${category}
 Task Title: ${title}
@@ -38,7 +42,9 @@ Keep it practical, specific, and actionable. Format in markdown.`;
       feature: "content_brief",
       clientId: clientId ?? 0,
       clientName,
+      tenantVoice,
     },
+    tenant,
     maxTokens: 2000,
   });
 

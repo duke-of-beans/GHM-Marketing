@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { captureVoiceFromWebsite } from '@/lib/scrvnr/voice-capture';
 import { withPermission } from '@/lib/auth/api-permissions';
+import { requireTenant } from '@/lib/tenant/server';
+import { getTenantVoiceSettings } from '@/lib/ai/voice-settings';
 
 export async function POST(
   request: NextRequest,
@@ -50,8 +52,11 @@ export async function POST(
     }
 
     // Capture voice profile
+    const tenant = await requireTenant();
+    const tenantVoice = await getTenantVoiceSettings();
+
     console.log(`Capturing voice profile for ${client.businessName} from ${websiteUrl}`);
-    const voiceProfile = await captureVoiceFromWebsite(websiteUrl, clientId, client.businessName);
+    const voiceProfile = await captureVoiceFromWebsite(websiteUrl, clientId, client.businessName, { tenant, tenantVoice });
 
     // Store voice profile in database
     const saved = await prisma.voiceProfile.upsert({

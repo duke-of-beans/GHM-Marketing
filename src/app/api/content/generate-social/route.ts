@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
+import { requireTenant } from "@/lib/tenant/server";
+import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,6 +46,10 @@ export async function POST(request: NextRequest) {
       sourceContent = topic;
     }
 
+    // Sprint 36 — FEAT-016b: tenant voice injection
+    const tenant = await requireTenant();
+    const tenantVoice = await getTenantVoiceSettings();
+
     const targetPlatforms = platforms || ['linkedin', 'facebook', 'twitter'];
     const postTone = tone || 'professional';
 
@@ -78,7 +84,9 @@ Return ONLY a JSON array — no preamble, no markdown fences:
         feature: 'social_posts',
         clientId,
         clientName: client.businessName,
+        tenantVoice,
       },
+      tenant,
     });
 
     if (!result.ok) {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { generateContentBrief } from "@/lib/ai/task-intelligence";
+import { requireTenant } from "@/lib/tenant/server";
+import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
 
 export async function POST(
   req: NextRequest,
@@ -40,12 +42,17 @@ export async function POST(
       .map((c) => `${c.businessName}${c.domain ? ` (${c.domain})` : ""}`)
       .join(", ");
 
+    const tenant = await requireTenant();
+    const tenantVoice = await getTenantVoiceSettings();
+
     const brief = await generateContentBrief({
       title: task.title,
       description: task.description || "",
       clientName: task.client.businessName,
       category: task.category,
       competitorInfo: competitorInfo || undefined,
+      tenant,
+      tenantVoice,
     });
 
     const updated = await prisma.clientTask.update({

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withPermission } from '@/lib/auth/api-permissions'
 import { getGBPClient } from '@/lib/enrichment/providers/google-business/client'
 import { replyToReview } from '@/lib/enrichment/providers/google-business/reviews'
 
@@ -6,6 +7,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string; reviewId: string } }
 ) {
+  const permissionError = await withPermission(req, "manage_clients");
+  if (permissionError) return permissionError;
+
   const clientId = parseInt(params.id)
   const { replyText } = await req.json()
   if (!replyText?.trim()) return NextResponse.json({ error: 'replyText required' }, { status: 400 })

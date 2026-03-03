@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Eye, Mail } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ReportPreviewModal } from "./report-preview-modal";
 
 type Report = {
@@ -66,13 +67,11 @@ export function ReportsList({ reports }: { reports: Report[] }) {
 
   if (reports.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No reports generated yet</p>
-          <p className="text-sm mt-2">Use the &ldquo;Generate Report&rdquo; button to create one</p>
-        </CardContent>
-      </Card>
+      <EmptyState
+        icon={FileText}
+        title="No reports generated yet"
+        description='Use the "Generate Report" button to create one.'
+      />
     );
   }
 

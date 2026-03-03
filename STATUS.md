@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 3, 2026 — Sprint 35 shipped (Tenant Visual Identity + Brand System). AI voice injection infrastructure wired through system-prompt-builder + client.ts. TenantLogo component created. Dashboard default layouts per role with first-render persist. Brochure brand color injection from GlobalSettings (zero hardcoded colors). Demo template + email GHM strings fully extracted to tenant variables. LEGAL-001 partner restriction added to CLIENT_AGREEMENT.md. TypeScript: zero new errors (13 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md), then Sprint 36 (Communication Layer + Platform Hygiene).
+**Last Updated:** March 3, 2026 — Sprint 36 shipped (Communication Layer + Platform Hygiene). Email template rebuild (base + 5 individual templates), toast audit (380 calls verified Sonner-only, dead useToast hook identified), empty states pass (shared EmptyState component wired into 9 surfaces), route audit (239 routes scanned, 3 genuinely unguarded fixed, 7 false positives corrected), psych UX audit (8-section spec), security fixes (3 unguarded API routes patched), TenantConfig import path fix (4 files). TypeScript: zero new errors (12 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md).
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -13,7 +13,28 @@
 
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
-**Next sprint:** Sprint 36 — Communication Layer + Platform Hygiene ("Demo-Ready"). Email template rebuild, toast audit, empty states pass, route audit, psych UX audit. Sprint 34-OPS (David manual infra inversion per THIRD_PARTY_MIGRATION.md) runs in parallel.
+**Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
+
+
+### SPRINT 36 — Communication Layer + Platform Hygiene (March 3, 2026) ✅ COMPLETE
+
+PHASE 1 (parallel):
+- [x] **Track A0: Tenant Voice Wiring** — Wired getTenantVoiceSettings() into all 7 AI API routes (generate-blog, generate-meta, generate-ppc, generate-social, generate-strategy, generate-brief, capture-voice). Each route fetches tenant config, extracts voice settings, passes tenantVoice + tenant to callAI().
+- [x] **Track A1: Email Template System** — Built base email template with tenant branding (logo, company name, tagline, brand color). 5 individual templates: welcome, forgot-password, work-order, partner-notification, report-ready. All React Email components with consistent header/footer.
+- [x] **Track A2: Toast + Alert Audit** — Audited all 380 toast calls. Confirmed 100% Sonner. Dead code: src/hooks/use-toast.ts (shadcn useToast, zero imports). docs/TOAST_AUDIT.md written.
+- [x] **Track A3: Empty States Pass** — Shared EmptyState component (src/components/ui/empty-state.tsx, 78 lines) with icon/title/description/action/variant(card|inline)/iconSize props. Wired into 9 surfaces: ContentList, reports-list, vault-file-grid, TeamFeed (×2), TeamFeedSidebar, recurring-tasks-client, task-queue-client, product-catalog, LiveSitesPanel.
+- [x] **Track B: Route + Button + Logic Audit** — scripts/route-audit.js scanned 239 API routes. 140 permission-guarded, 68 session-guarded, 13 cron, 9 public, 3 genuinely unguarded, 1 dead code. Button chain: 10 destructive actions reviewed. docs/ROUTE_AUDIT.md written.
+- [x] **Track C: Psychological UX Audit** — docs/PSYCH_UX_AUDIT.md (141 lines, 8 sections): First Impressions, Empty States, Feedback Loops, Navigation, Cognitive Load, Trust/Security, Error Recovery, Delight/Momentum.
+
+PHASE 2 (after Track B):
+- [x] **Track D: Fix Pass** — 3 unguarded routes patched: /api/clients/[id]/gbp/posts + /api/clients/[id]/gbp/reviews/[reviewId]/reply (withPermission "manage_clients"), /api/checklist-templates (getCurrentUser session guard). ROUTE_AUDIT.md corrected for 7 false positives. 1 tombstone identified (gbp/reviews — export {}).
+
+PHASE 3:
+- [x] **Track E: TypeScript Gate** — Fixed quote escaping in reports-list.tsx. Fixed TenantConfig import path in 4 files (→ @/lib/tenant barrel). Zero new TS errors (12 pre-existing).
+
+**Files created:** `src/components/ui/empty-state.tsx`, `scripts/route-audit.js`, `docs/ROUTE_AUDIT.md`, `docs/PSYCH_UX_AUDIT.md`, `docs/TOAST_AUDIT.md`
+**Files modified:** 7 AI API routes (tenant voice), 9 UI components (EmptyState), 3 API routes (security), 4 lib files (TenantConfig import), `reports-list.tsx` (quote fix)
+**TypeScript:** Zero new errors (12 pre-existing unaffected).
 
 
 ### SPRINT 35 — Tenant Visual Identity + Brand System (March 3, 2026) ✅ COMPLETE

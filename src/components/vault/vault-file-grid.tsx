@@ -4,6 +4,7 @@ import { useState } from "react";
 import { VaultFileRecord } from "./vault-client";
 import { VaultFileTile } from "./vault-file-tile";
 import { FileX } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Props {
   files: VaultFileRecord[];
@@ -28,12 +29,11 @@ export function VaultFileGrid({
 }: Props) {
   if (files.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <FileX className="h-10 w-10 text-muted-foreground/40 mb-3" />
-        <p className="text-sm text-muted-foreground max-w-xs">
-          {emptyMessage ?? "No files here yet."}
-        </p>
-      </div>
+      <EmptyState
+        icon={FileX}
+        title={emptyMessage ?? "No files here yet"}
+        variant="inline"
+      />
     );
   }
 

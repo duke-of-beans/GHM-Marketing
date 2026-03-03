@@ -16,6 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { EmptyState } from '@/components/ui/empty-state'
 import { EditContentDialog } from './EditContentDialog'
 import { VersionHistoryDialog } from './versioning/VersionHistoryDialog'
 import { toast } from 'sonner'
@@ -141,13 +142,12 @@ export function ContentList({ clientId, refreshTrigger, isMaster = false }: Cont
   )
 
   if (content.length === 0) return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <FileText className="h-12 w-12 text-muted-foreground/50" />
-      <h3 className="mt-4 text-lg font-medium">No content yet</h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Generate content using the tools above to get started.
-      </p>
-    </div>
+    <EmptyState
+      icon={FileText}
+      title="No content yet"
+      description="Generate content using the tools above to get started."
+      variant="inline"
+    />
   )
 
   return (

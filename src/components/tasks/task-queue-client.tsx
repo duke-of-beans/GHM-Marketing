@@ -44,6 +44,7 @@ import {
   ArrowRightCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { isElevated as checkElevated } from "@/lib/auth/roles";
 import type { UserRole } from "@prisma/client";
 import {
@@ -1096,11 +1097,11 @@ export function TaskQueueClient({ currentUserId, currentUserRole }: Props) {
 
       {/* Task list or board */}
       {tasks.length === 0 ? (
-        <Card className="p-6 text-center">
-          <CheckCircle2 className="h-12 w-12 text-status-success mx-auto mb-3" />
-          <p className="text-lg font-medium">Queue clear</p>
-          <p className="text-sm text-muted-foreground mt-1">No tasks match your filters.</p>
-        </Card>
+        <EmptyState
+          icon={CheckCircle2}
+          title="Queue clear"
+          description="No tasks match your filters."
+        />
       ) : viewMode === "list" ? (
         <Card className="overflow-hidden">
         {selectMode ? (

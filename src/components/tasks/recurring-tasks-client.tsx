@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { RecurringTaskForm } from "./recurring-task-form";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
@@ -101,11 +102,11 @@ export function RecurringTasksClient() {
       </div>
 
       {rules.length === 0 ? (
-        <Card className="p-6 text-center">
-          <RefreshCw className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
-          <p className="text-muted-foreground text-sm">No recurring rules yet.</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">Create a rule to automate task creation on a schedule.</p>
-        </Card>
+        <EmptyState
+          icon={RefreshCw}
+          title="No recurring rules yet"
+          description="Create a rule to automate task creation on a schedule."
+        />
       ) : (
         <div className="space-y-2">
           {rules.map((rule) => (
