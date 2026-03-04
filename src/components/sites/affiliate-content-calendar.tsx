@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ExternalLink, RefreshCw, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 type Site = { id: number; domain: string };
 type Brief = {
@@ -53,7 +52,6 @@ function formatCurrency(n: number | null): string {
 }
 
 export function AffiliateContentCalendar({ sites, briefs: initialBriefs }: { sites: Site[]; briefs: Brief[] }) {
-  const router = useRouter();
   const [briefs, setBriefs] = useState(initialBriefs);
   const [siteFilter, setSiteFilter] = useState<string>("all");
   const [statusTab, setStatusTab] = useState<string>("All");
@@ -68,7 +66,7 @@ export function AffiliateContentCalendar({ sites, briefs: initialBriefs }: { sit
     }
     if (statusTab === "NEEDS_REFRESH") {
       result = result.filter(b => b.refreshDue);
-      result.sort((a, b) => (b.attributedMonthlyRevenue ?? 0) - (a.attributedMonthlyRevenue ?? 0));
+      result = [...result].sort((a, b) => (b.attributedMonthlyRevenue ?? 0) - (a.attributedMonthlyRevenue ?? 0));
     } else if (statusTab !== "All") {
       result = result.filter(b => b.status === statusTab);
     }

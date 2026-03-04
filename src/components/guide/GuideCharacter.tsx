@@ -69,7 +69,7 @@ export function GuideCharacter({ guideEnabled }: Props) {
   const lastPathnameRef = useRef<string | null>(null);
   const emptyStateObserverRef = useRef<MutationObserver | null>(null);
 
-  if (!guideEnabled) return null;
+  // NOTE: early return is AFTER all hooks to satisfy rules-of-hooks
 
   function showTip(route: string, trigger: TriggerType) {
     const key = tipKey(route, trigger);
@@ -94,6 +94,7 @@ export function GuideCharacter({ guideEnabled }: Props) {
 
   // Auto-dismiss after 8 seconds
   useEffect(() => {
+    if (!guideEnabled) return;
     if (!activeTip) {
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
       return;
@@ -111,7 +112,7 @@ export function GuideCharacter({ guideEnabled }: Props) {
 
   // Click anywhere to dismiss
   useEffect(() => {
-    if (!activeTip) return;
+    if (!guideEnabled || !activeTip) return;
 
     function onClick(e: MouseEvent) {
       const target = e.target as HTMLElement;
@@ -134,6 +135,7 @@ export function GuideCharacter({ guideEnabled }: Props) {
 
   // Handle route changes
   useEffect(() => {
+    if (!guideEnabled) return;
     // Normalize pathname
     let route = pathname || "/";
     if (route !== lastPathnameRef.current) {
@@ -183,8 +185,9 @@ export function GuideCharacter({ guideEnabled }: Props) {
     };
   }, [pathname]);
 
-  // Monitor for empty state
+  // Monitor for empty state (also guards guideEnabled for all effects)
   useEffect(() => {
+    if (!guideEnabled) return;
     if (emptyStateObserverRef.current) {
       emptyStateObserverRef.current.disconnect();
     }
@@ -208,6 +211,8 @@ export function GuideCharacter({ guideEnabled }: Props) {
 
     return () => observer.disconnect();
   }, [pathname]);
+
+  if (!guideEnabled) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
