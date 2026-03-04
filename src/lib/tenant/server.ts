@@ -9,6 +9,7 @@ import { headers } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { TENANT_HEADER, TENANT_REGISTRY } from "./index";
 import type { TenantConfig } from "./config";
+import { AFFILIATE_TERMINOLOGY } from "./config";
 import type { TenantProviderConfig } from "@/lib/providers/types";
 
 // ── In-memory tenant cache (slug → TenantConfig, 5-min TTL) ────────────────
@@ -48,6 +49,7 @@ async function getTenantBySlug(slug: string): Promise<{ config: TenantConfig; so
         primaryColor: row.primaryColor ?? undefined,
         aiContext: row.aiContext ?? undefined,
         providers: (row.providers as Partial<TenantProviderConfig>) ?? undefined,
+        verticalType: (row.verticalType as TenantConfig['verticalType']) ?? undefined,
         active: row.active,
       };
       _tenantCache.set(slug, { config, expiresAt: now + CACHE_TTL_MS });
@@ -153,4 +155,39 @@ export function getTenantPrismaClient(tenant: TenantConfig): PrismaClient {
     );
   }
   return _tenantClientCache.get(url)!;
+}
+
+// ── Terminology Resolver ──────────────────────────────────────────────────────
+
+/**
+ * Default SEO-agency terminology used by GHM and any tenant without a vertical override.
+ */
+const DEFAULT_TERMINOLOGY = {
+  client: 'Client',
+  clients: 'Clients',
+  clientSingular: 'client',
+  lead: 'Lead',
+  leads: 'Leads',
+  pipeline: 'Pipeline',
+  rep: 'Rep',
+  reps: 'Reps',
+  partner: 'Partner',
+  partners: 'Partners',
+  clientHealth: 'Client Health',
+  newClient: 'Add Client',
+  workOrder: 'Work Order',
+} as const;
+
+export type TenantTerminology = typeof DEFAULT_TERMINOLOGY | typeof AFFILIATE_TERMINOLOGY;
+
+/**
+ * Returns the terminology set for a given tenant config.
+ * Affiliate portfolio tenants get affiliate-specific labels.
+ * All other tenants (SEO agency, generic, undefined) get the default labels.
+ */
+export function getTenantTerminology(tenant: TenantConfig): TenantTerminology {
+  if (tenant.verticalType === 'affiliate_portfolio') {
+    return AFFILIATE_TERMINOLOGY;
+  }
+  return DEFAULT_TERMINOLOGY;
 }

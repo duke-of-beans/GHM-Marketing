@@ -11,6 +11,9 @@ export interface TenantConfig {
   companyName: string;    // Full legal entity: "GHM Digital Marketing Inc"
   companyTagline?: string; // Footer/subheading: "Digital Marketing Solutions"
 
+  // Vertical type — determines module set and terminology
+  verticalType?: 'seo_agency' | 'affiliate_portfolio' | 'generic';
+
   // Email
   fromEmail: string;      // Outbound from address: "noreply@ghmmarketing.com"
   fromName: string;       // From display name: "GHM Marketing"
@@ -137,3 +140,58 @@ export function getTenantFromHost(host: string): TenantConfig | null {
 
   return tenant;
 }
+
+// ── Affiliate Vertical Configuration ─────────────────────────────────────────
+
+/**
+ * Module toggle defaults for the affiliate_portfolio vertical.
+ * Core affiliate operations ON; SEO agency modules OFF.
+ */
+export const AFFILIATE_MODULE_DEFAULTS = {
+  // ON — core affiliate operations
+  sitePortfolio: true,
+  contentCalendar: true,
+  taskManagement: true,
+  acquisitionPipeline: true,
+  affiliateProgramRegistry: true,
+  displayAdNetworks: true,
+  revenueDashboard: true,
+  portfolioIntelligence: true,
+  siteValuation: true,
+  vault: true,
+  teamManagement: true,
+  reporting: true,
+  // OFF — SEO agency modules not needed for affiliate ops
+  waveBilling: false,
+  partnerManagement: false,
+  googleBusinessProfile: false,
+  googleAds: false,
+  workOrders: false,
+  proposals: false,
+  clientPortal: false,
+  territories: false,
+  timeTracking: false,
+  leadPipeline: false,
+} as const;
+
+/**
+ * Terminology overrides for the affiliate_portfolio vertical.
+ * Maps generic SEO-agency labels to affiliate-specific equivalents.
+ */
+export const AFFILIATE_TERMINOLOGY = {
+  client: 'Site',
+  clients: 'Sites',
+  clientSingular: 'site',
+  lead: 'Target',
+  leads: 'Targets',
+  pipeline: 'Acquisition Pipeline',
+  rep: 'Content Manager',
+  reps: 'Content Managers',
+  partner: 'Contractor',
+  partners: 'Contractors',
+  clientHealth: 'Site Health',
+  newClient: 'Add Site',
+  workOrder: null,
+} as const;
+
+export type AffiliateTerminology = typeof AFFILIATE_TERMINOLOGY;

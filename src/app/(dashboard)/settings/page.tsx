@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign, Database, Wallet } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign, Database, Wallet, Upload } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { CompensationTab } from "@/components/settings/CompensationTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
@@ -12,6 +12,7 @@ import { UserActivityTab } from "@/components/settings/UserActivityTab";
 import { WaveSettingsTab } from "@/components/settings/WaveSettingsTab";
 import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
 import { DataImportTab } from "@/components/settings/DataImportTab";
+import { RevenueImportTab } from "@/components/settings/RevenueImportTab";
 import { BrandingTab } from "@/components/settings/BrandingTab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -26,18 +27,27 @@ const TerritoriesContent = dynamic(
 );
 
 // "positions" and "permissions" are now sub-sections inside the "team" tab
-const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations", "data-import"];
+const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations", "data-import", "revenue-import"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const currentUserRole = (session?.user as any)?.role ?? "manager";
   const isAdmin = currentUserRole === "admin";
   const [activeTab, setActiveTab] = useState("general");
+  const [isAffiliate, setIsAffiliate] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
     if (tab && VALID_TABS.includes(tab)) setActiveTab(tab);
+  }, []);
+
+  // Detect affiliate vertical by probing the affiliate sites API
+  useEffect(() => {
+    fetch("/api/affiliate/sites")
+      .then(r => r.json())
+      .then(d => { if (d.success && Array.isArray(d.data)) setIsAffiliate(true); })
+      .catch(() => {});
   }, []);
 
   return (
@@ -95,6 +105,11 @@ export default function SettingsPage() {
           {isAdmin && (
             <TabsTrigger value="data-import" className="gap-1.5">
               <Database className="h-4 w-4" />Data Import
+            </TabsTrigger>
+          )}
+          {isAdmin && isAffiliate && (
+            <TabsTrigger value="revenue-import" className="gap-1.5">
+              <Upload className="h-4 w-4" />Revenue Import
             </TabsTrigger>
           )}
           {/* ── Integrations ── */}
@@ -185,6 +200,12 @@ export default function SettingsPage() {
         {isAdmin && (
           <TabsContent value="data-import">
             <DataImportTab />
+          </TabsContent>
+        )}
+
+        {isAdmin && isAffiliate && (
+          <TabsContent value="revenue-import">
+            <RevenueImportTab />
           </TabsContent>
         )}
       </Tabs>

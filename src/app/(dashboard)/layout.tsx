@@ -72,12 +72,16 @@ export default async function DashboardLayout({
   const tutorialRole: "sales" | "manager" | "owner" =
     session.user.role === "sales" ? "sales" : "manager";
 
+  // Resolve verticalType for nav switching (affiliate vs SEO)
+  const tenant = await getTenant();
+  const verticalType = (tenant as any)?.verticalType ?? null;
+
   return (
     <div className="h-screen flex flex-col md:flex-row overflow-hidden">
       <BugTrackingInit />
       <DensityProvider />
       <BrandThemeInjector colors={brandColors} />
-      <DashboardNav user={session.user} permissions={permissions} logoUrl={logoUrl} companyName={companyName} />
+      <DashboardNav user={session.user} permissions={permissions} logoUrl={logoUrl} companyName={companyName} verticalType={verticalType} />
       <DashboardLayoutClient
         users={teamUsers}
         isMaster={elevated}

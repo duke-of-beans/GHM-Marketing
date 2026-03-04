@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 3, 2026 — Sprint 37 shipped (Magic Moments + Platform Polish). Next: Sprint 34-OPS (David manual infrastructure inversion).
+**Last Updated:** March 4, 2026 — Sprints 38-40 shipped. Vertical 2 complete. Next: Sprint 34-OPS (David manual).
 
 **Owner:** David Kirsch
 
@@ -62,6 +62,9 @@ Foundation → out. Each sprint unblocks the next.
 | ~~34~~ | ~~GHM → Tenant Extraction~~ | ~~Remove GHM default privilege, meta-DB tenant registry, env var audit, third-party stubs~~ | ✅ SHIPPED | Platform identity gate complete |
 | ~~35~~ | ~~Tenant Visual Identity + Brand System~~ | ~~AI voice injection, TenantLogo, default layouts, brochure brand colors, demo/email extraction, LEGAL-001~~ | ✅ SHIPPED | Identity gate for second tenant |
 | 34-OPS | Manual Infrastructure Inversion | INFRA-001–005 + T-001–009 per THIRD_PARTY_MIGRATION.md | David manual sprint | Follows Sprint 34 code work |
+| ~~38~~ | ~~Affiliate Vertical Data Layer~~ | ~~6 new Prisma models, module toggle config, terminology config, full API routes~~ | ✅ SHIPPED 90fb3e4 | Vertical 2 foundation |
+| ~~39~~ | ~~Affiliate Vertical UI~~ | ~~7 surfaces: site portfolio, revenue dashboard, acquisition pipeline, content calendar, portfolio intelligence~~ | ✅ SHIPPED 90fb3e4 | Vertical 2 UI complete |
+| ~~40~~ | ~~Demo Tenant + Intelligence Layer~~ | ~~Ridgeline Media seed data, GSC/GA4 Site extension, CSV affiliate network import~~ | ✅ SHIPPED 90fb3e4 | Vertical 2 demo-ready |
 | ~~36~~ | ~~Communication Layer + Platform Hygiene~~ | ~~Email templates, toast audit, empty states, route audit, psych UX audit, security fixes~~ | ✅ SHIPPED | Demo-ready gate |
 | ~~37~~ | ~~Magic Moments + Platform Polish~~ | ~~PSYCH_UX_AUDIT.md implementation: AlertDialog migration (4), breadcrumb component, onboarding celebration, settings grouping, AI progress indicators~~ | ✅ SHIPPED | UX polish gate |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
@@ -90,6 +93,8 @@ All outbound emails (notifications, forgot password, work orders, partner emails
 ### I4 — Google Business Profile OAuth (external wait)
 GBP integration built. App in Testing mode. Gate: Google API Console approval for external app status.
 **Action:** Monitor → flip to Published → verify OAuth with real client listing. ~1 hr once approved.
+
+---
 
 ---
 

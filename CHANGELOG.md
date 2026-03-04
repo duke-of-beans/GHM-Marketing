@@ -1,7 +1,18 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 3, 2026 — Sprint 37 shipped: Magic Moments + Platform Polish.
+**Last Updated:** March 4, 2026 — Sprints 38-40 shipped: Affiliate Vertical Complete.
+
+
+## Sprints 38-40 — Affiliate Vertical Complete — March 4, 2026 — commit 90fb3e4
+Data layer: 7 new Prisma models + 8 enums. AFFILIATE_MODULE_DEFAULTS and AFFILIATE_TERMINOLOGY configs.
+30+ API routes under /api/affiliate/. CSV import with shareasale/amazon/cj/generic parsers + dedup.
+UI: /sites (portfolio list), /sites/[id] (6-tab detail), /revenue (dashboard), /acquisitions (kanban),
+content calendar affiliate mode, portfolio intelligence widgets (5), nav updates.
+Demo: Ridgeline Media LLC — 12 sites, 12mo revenue history, 38+ programs, 46 briefs, 6 targets, 2 valuations.
+Intelligence: GSC/GA4 extended to Site records. CSV import UI in Settings.
+TypeScript: zero new errors. GHM regression: clean.
+Vertical 2 demo-ready. Proper Sluice onboards via standard provisioning — no code changes required.
 
 
 ## Sprint 37 — Magic Moments + Platform Polish — March 3, 2026

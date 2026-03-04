@@ -14,6 +14,8 @@ import { MetricsRow } from "@/components/dashboard/MetricsRow";
 import { MasterDashboardGrid } from "@/components/dashboard/MasterDashboardGrid";
 import { MasterPageClient } from "@/components/dashboard/MasterPageClient";
 import { RefreshOnFocus } from "@/components/dashboard/refresh-on-focus";
+import { AffiliateWidgetPanel } from "@/components/dashboard/affiliate-widgets";
+import { requireTenant } from "@/lib/tenant/server";
 import type { ResponsiveLayouts } from "react-grid-layout";
 
 export default async function MasterDashboard() {
@@ -95,6 +97,36 @@ export default async function MasterDashboard() {
     </div>
   );
 
+  // Affiliate portfolio widgets (conditional)
+  let affiliateData: {
+    sites: any[]; revenueEntries: any[]; networks: any[]; briefs: any[]; valuations: any[];
+  } | null = null;
+
+  try {
+    const tenant = await requireTenant();
+    const verticalType = (tenant as any)?.verticalType ?? null;
+    if (verticalType === "affiliate_portfolio") {
+      const tenantRow = await prisma.tenant.findUnique({ where: { slug: tenant.slug } });
+      if (tenantRow) {
+        const tid = tenantRow.id;
+        const [afSites, afRevenue, afNetworks, afBriefs, afValuations] = await Promise.all([
+          prisma.site.findMany({ where: { tenantId: tid } }),
+          prisma.revenueEntry.findMany({ where: { tenantId: tid } }),
+          prisma.displayAdNetwork.findMany({ where: { tenantId: tid } }),
+          prisma.affiliateContentBrief.findMany({ where: { tenantId: tid } }),
+          prisma.siteValuation.findMany({ where: { tenantId: tid }, orderBy: { valuationDate: "desc" } }),
+        ]);
+        affiliateData = {
+          sites: JSON.parse(JSON.stringify(afSites)),
+          revenueEntries: JSON.parse(JSON.stringify(afRevenue)),
+          networks: JSON.parse(JSON.stringify(afNetworks)),
+          briefs: JSON.parse(JSON.stringify(afBriefs)),
+          valuations: JSON.parse(JSON.stringify(afValuations)),
+        };
+      }
+    }
+  } catch { /* Non-affiliate tenants or tenant resolution fails — skip */ }
+
   return (
     <MasterPageClient
       heading={
@@ -117,6 +149,12 @@ export default async function MasterDashboard() {
         </div>
       }
     >
+      {affiliateData && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-3">Portfolio Intelligence</h2>
+          <AffiliateWidgetPanel {...affiliateData} />
+        </div>
+      )}
       <MasterDashboardGrid
         savedLayout={savedLayout}
         showProfitability={isOwner}

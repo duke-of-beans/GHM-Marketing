@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 3, 2026 — Sprint 37 shipped (Magic Moments + Platform Polish). confirm() → AlertDialog migration (4 instances), breadcrumb component built + wired, onboarding completion celebration (CSS animation + auto-redirect), Settings tab grouping (4 sections), AIProgressIndicator component applied to 3 surfaces (blog gen, website audit, voice capture). TypeScript: zero new errors (12 pre-existing). Next: Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md).
+**Last Updated:** March 4, 2026 — Sprints 38-40 shipped 90fb3e4. Vertical 2 affiliate portfolio complete. ridgeline.covos.app demo-ready. Next: Sprint 34-OPS (David manual, THIRD_PARTY_MIGRATION.md). Proper Sluice onboards as real tenant via standard provisioning flow.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 

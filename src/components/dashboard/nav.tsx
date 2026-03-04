@@ -56,7 +56,37 @@ type NavGroup = {
 
 // ── Nav structure ──────────────────────────────────────────────────────────
 
-const NAV_GROUPS: NavGroup[] = [
+const AFFILIATE_NAV_GROUPS: NavGroup[] = [
+  {
+    id: "portfolio",
+    label: "Portfolio",
+    defaultExpanded: true,
+    links: [
+      { href: "/sites",          label: "Sites",                icon: <Globe className="h-4 w-4 shrink-0" />, permission: "view_all_clients" },
+      { href: "/acquisitions",   label: "Acquisition Pipeline", icon: <Search className="h-4 w-4 shrink-0" />, permission: "manage_leads" },
+      { href: "/revenue",        label: "Revenue",              icon: <TrendingUp className="h-4 w-4 shrink-0" />, permission: "view_all_clients" },
+    ],
+  },
+  {
+    id: "operations",
+    label: "Operations",
+    defaultExpanded: true,
+    links: [
+      { href: "/content-studio", label: "Content",    icon: <PenTool className="h-4 w-4 shrink-0" />, permission: "manage_clients" },
+      { href: "/tasks",          label: "Tasks",      icon: <CheckSquare className="h-4 w-4 shrink-0" /> },
+    ],
+  },
+  {
+    id: "team",
+    label: "Resources",
+    defaultExpanded: false,
+    links: [
+      { href: "/vault",    label: "Document Vault",  icon: <Archive className="h-4 w-4 shrink-0" /> },
+    ],
+  },
+];
+
+const SEO_NAV_GROUPS: NavGroup[] = [
   {
     id: "prospects",
     label: "Prospects",
@@ -105,6 +135,10 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
 ];
+
+function getNavGroups(verticalType: string | null): NavGroup[] {
+  return verticalType === "affiliate_portfolio" ? AFFILIATE_NAV_GROUPS : SEO_NAV_GROUPS;
+}
 
 // Bottom nav links (mobile) — flat, most important only
 const MOBILE_NAV_LINKS: NavLink[] = [
@@ -235,11 +269,13 @@ export function DashboardNav({
   permissions = {},
   logoUrl = null,
   companyName = null,
+  verticalType = null,
 }: {
   user: NavUser;
   permissions?: UserPermissions;
   logoUrl?: string | null;
   companyName?: string | null;
+  verticalType?: string | null;
 }) {
   const pathname = usePathname();
   const elevated = isElevated(user.role);
@@ -307,7 +343,7 @@ export function DashboardNav({
 
         {/* Grouped nav */}
         <nav className="flex-1 space-y-2 overflow-y-auto min-h-0">
-          {NAV_GROUPS.filter((g) => !g.elevatedOnly || elevated).map((group) => (
+          {getNavGroups(verticalType).filter((g) => !g.elevatedOnly || elevated).map((group) => (
             <NavGroupSection
               key={group.id}
               group={group}
