@@ -3,7 +3,7 @@
 // Run: npx tsx scripts/seed-ridgeline.ts
 // Idempotent — safe to re-run.
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type AcquisitionStage } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -22,13 +22,11 @@ async function main() {
   console.log("Seeding Ridgeline Media LLC...\n");
 
   // ── TENANT ──
-  const tenant = await prisma.tenant.upsert({
-    where: { slug: "ridgeline" },
-    update: { name: "Ridgeline Media LLC", companyName: "Ridgeline Media LLC", verticalType: "affiliate_portfolio", config: { verticalType: "affiliate_portfolio", timezone: "America/Denver" }, active: true },
-    create: { slug: "ridgeline", name: "Ridgeline Media LLC", companyName: "Ridgeline Media LLC", verticalType: "affiliate_portfolio", config: { verticalType: "affiliate_portfolio", timezone: "America/Denver" }, fromEmail: "noreply@ridgelinemedia.co", fromName: "Ridgeline Media", supportEmail: "hello@ridgelinemedia.co", dashboardUrl: "https://ridgeline.covos.app", active: true },
-  });
-  const tid = tenant.id;
-  console.log(`✅ Tenant: ridgeline (id=${tid})\n`);
+  // Ridgeline is registered in TENANT_REGISTRY (src/lib/tenant/config.ts).
+  // The Tenant DB table doesn't exist yet (Sprint 34-OPS infrastructure work).
+  // Using tenantId=3 (ghm=1, covosdemo=2, ridgeline=3).
+  const tid = 3;
+  console.log(`✅ Tenant: ridgeline (tenantId=${tid})\n`);
 
   // ── SITES ──
   const SITES = [
@@ -118,12 +116,12 @@ async function main() {
   }
 
   const NETWORKS = [
-    ["trailgearreviews", "Mediavine", { status: "APPROVED", monthlySessionsRequired: 50000, currentMonthlySessions: 68000, currentRPM: 28.40 }],
-    ["peakpackinglist", "Mediavine", { status: "APPROVED", monthlySessionsRequired: 50000, currentMonthlySessions: 41000, currentRPM: 24.80 }],
-    ["budgetbackpacker", "Ezoic", { status: "APPROVED", currentMonthlySessions: 22000, currentRPM: 11.20 }],
-    ["firsttimeinvestor", "Ezoic", { status: "APPROVED", currentMonthlySessions: 18000, currentRPM: 14.60 }],
-    ["mortgagecalchelp", "Ezoic", { status: "APPROVED", currentMonthlySessions: 15500, currentRPM: 13.80 }],
-    ["pawsandplans", "Ezoic", { status: "APPROVED", currentMonthlySessions: 24000, currentRPM: 12.40 }],
+    ["trailgearreviews", "Mediavine", { status: "ACTIVE", monthlySessionsRequired: 50000, currentMonthlySessions: 68000, currentRPM: 28.40 }],
+    ["peakpackinglist", "Mediavine", { status: "ACTIVE", monthlySessionsRequired: 50000, currentMonthlySessions: 41000, currentRPM: 24.80 }],
+    ["budgetbackpacker", "Ezoic", { status: "ACTIVE", currentMonthlySessions: 22000, currentRPM: 11.20 }],
+    ["firsttimeinvestor", "Ezoic", { status: "ACTIVE", currentMonthlySessions: 18000, currentRPM: 14.60 }],
+    ["mortgagecalchelp", "Ezoic", { status: "ACTIVE", currentMonthlySessions: 15500, currentRPM: 13.80 }],
+    ["pawsandplans", "Ezoic", { status: "ACTIVE", currentMonthlySessions: 24000, currentRPM: 12.40 }],
     ["weekendrenovator", "Mediavine", { status: "NOT_QUALIFIED", monthlySessionsRequired: 50000, currentMonthlySessions: 9200 }],
     ["seniorpetguide", "Mediavine", { status: "NOT_QUALIFIED", monthlySessionsRequired: 50000, currentMonthlySessions: 31000 }],
   ] as const;
@@ -230,7 +228,7 @@ async function main() {
   console.log(`✅ Revenue entries: ${counts.revenue}\n`);
 
   // ── ACQUISITION TARGETS ──
-  const TARGETS = [
+  const TARGETS: Array<{ domain: string; stage: AcquisitionStage; niche: string; currentMonthlyTraffic?: number; currentMonthlyRevenue?: number; domainAuthority?: number; domainAge?: number; source?: string; askingPrice?: number; offeredPrice?: number; broker?: string; dueDiligenceNotes?: string; decisionNotes?: string }> = [
     { domain: "hikingbootsexpert.com", stage: "RESEARCHING", niche: "Outdoor gear", currentMonthlyTraffic: 14000, currentMonthlyRevenue: 800, domainAuthority: 28, source: "Expired domain auction" },
     { domain: "campingchecklist.org", stage: "DUE_DILIGENCE", niche: "Outdoor gear", askingPrice: 28000, currentMonthlyTraffic: 22000, currentMonthlyRevenue: 1200, domainAuthority: 31, broker: "Motion Invest" },
     { domain: "budgetinvesting101.com", stage: "NEGOTIATING", niche: "Personal finance", askingPrice: 45000, offeredPrice: 38000, currentMonthlyTraffic: 19000, currentMonthlyRevenue: 1600, domainAuthority: 34, broker: "Empire Flippers" },
@@ -243,7 +241,8 @@ async function main() {
     await upsertSafe(`Target:${t.domain}`, async () => {
       const existing = await prisma.acquisitionTarget.findFirst({ where: { tenantId: tid, domain: t.domain } });
       if (existing) {
-        await prisma.acquisitionTarget.update({ where: { id: existing.id }, data: t });
+        const { domain: _d, ...updateData } = t;
+        await prisma.acquisitionTarget.update({ where: { id: existing.id }, data: updateData });
       } else {
         await prisma.acquisitionTarget.create({ data: { tenantId: tid, ...t } });
       }
@@ -276,8 +275,8 @@ async function main() {
     { siteSlug: "peakpackinglist", targetKeyword: "lightweight sleeping bag comparison", contentType: "COMPARISON", status: "PUBLISHED", currentRankingPosition: 5, peakRankingPosition: 5, currentMonthlyTraffic: 900, attributedMonthlyRevenue: 140, publishedDate: pubDate(75), publishedUrl: "https://peakpackinglist.com/lightweight-sleeping-bags/", wordCountTarget: 3000, assignedWriterName: "Maria Gutierrez" },
     { siteSlug: "budgetbackpacker", targetKeyword: "best budget backpacking tent", contentType: "LISTICLE", status: "PUBLISHED", currentRankingPosition: 6, peakRankingPosition: 4, currentMonthlyTraffic: 700, attributedMonthlyRevenue: 90, publishedDate: pubDate(100), publishedUrl: "https://budgetbackpacker.net/best-budget-tent/", wordCountTarget: 2500, assignedWriterName: "Jake Turner" },
     // OUTDOOR — Other statuses (5)
-    { siteSlug: "trailgearreviews", targetKeyword: "how to pack a backpacking pack", contentType: "HOW_TO", status: "REVIEW", wordCountTarget: 2000, assignedWriterName: "Maria Gutierrez" },
-    { siteSlug: "peakpackinglist", targetKeyword: "trekking pole height guide", contentType: "HOW_TO", status: "IN_PROGRESS", wordCountTarget: 1500, assignedWriterName: "Jake Turner" },
+    { siteSlug: "trailgearreviews", targetKeyword: "how to pack a backpacking pack", contentType: "ARTICLE", status: "REVIEW", wordCountTarget: 2000, assignedWriterName: "Maria Gutierrez" },
+    { siteSlug: "peakpackinglist", targetKeyword: "trekking pole height guide", contentType: "ARTICLE", status: "IN_PROGRESS", wordCountTarget: 1500, assignedWriterName: "Jake Turner" },
     { siteSlug: "trailgearreviews", targetKeyword: "best trail running shoes 2025", contentType: "LISTICLE", status: "BRIEFED", wordCountTarget: 3000 },
     { siteSlug: "budgetbackpacker", targetKeyword: "backpacking food ideas", contentType: "ARTICLE", status: "IN_PROGRESS", wordCountTarget: 2000, assignedWriterName: "Maria Gutierrez" },
     { siteSlug: "peakpackinglist", targetKeyword: "osprey aura review", contentType: "REVIEW", status: "REVIEW", wordCountTarget: 2500, assignedWriterName: "Jake Turner" },
@@ -289,16 +288,16 @@ async function main() {
     { siteSlug: "firsttimeinvestor", targetKeyword: "betterment vs wealthfront", contentType: "COMPARISON", status: "PUBLISHED", refreshDue: true, peakRankingPosition: 2, currentRankingPosition: 7, currentMonthlyTraffic: 1200, attributedMonthlyRevenue: 180, publishedDate: pubDate(200), publishedUrl: "https://firsttimeinvestor.io/betterment-vs-wealthfront/", wordCountTarget: 3500, assignedWriterName: "Sarah Chen" },
     { siteSlug: "firsttimeinvestor", targetKeyword: "roth ira income limits 2025", contentType: "ARTICLE", status: "PUBLISHED", refreshDue: true, peakRankingPosition: 3, currentRankingPosition: 10, currentMonthlyTraffic: 800, attributedMonthlyRevenue: 110, publishedDate: pubDate(240), publishedUrl: "https://firsttimeinvestor.io/roth-ira-income-limits/", wordCountTarget: 2000, assignedWriterName: "Sarah Chen" },
     // Published healthy (4)
-    { siteSlug: "firsttimeinvestor", targetKeyword: "how to start investing with $1000", contentType: "HOW_TO", status: "PUBLISHED", currentRankingPosition: 4, peakRankingPosition: 4, currentMonthlyTraffic: 2100, attributedMonthlyRevenue: 320, publishedDate: pubDate(45), publishedUrl: "https://firsttimeinvestor.io/start-investing-1000/", wordCountTarget: 3000, assignedWriterName: "Sarah Chen" },
+    { siteSlug: "firsttimeinvestor", targetKeyword: "how to start investing with $1000", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 4, peakRankingPosition: 4, currentMonthlyTraffic: 2100, attributedMonthlyRevenue: 320, publishedDate: pubDate(45), publishedUrl: "https://firsttimeinvestor.io/start-investing-1000/", wordCountTarget: 3000, assignedWriterName: "Sarah Chen" },
     { siteSlug: "firsttimeinvestor", targetKeyword: "index fund vs etf for beginners", contentType: "COMPARISON", status: "PUBLISHED", currentRankingPosition: 6, peakRankingPosition: 5, currentMonthlyTraffic: 1400, attributedMonthlyRevenue: 210, publishedDate: pubDate(80), publishedUrl: "https://firsttimeinvestor.io/index-fund-vs-etf/", wordCountTarget: 2800, assignedWriterName: "Sarah Chen" },
     { siteSlug: "simplesavingsguide", targetKeyword: "best high yield savings account 2025", contentType: "LISTICLE", status: "PUBLISHED", currentRankingPosition: 5, peakRankingPosition: 5, currentMonthlyTraffic: 900, attributedMonthlyRevenue: 130, publishedDate: pubDate(55), publishedUrl: "https://simplesavingsguide.com/best-hysa/", wordCountTarget: 2500, assignedWriterName: "Tom Bradley" },
-    { siteSlug: "mortgagecalchelp", targetKeyword: "how much house can i afford", contentType: "HOW_TO", status: "PUBLISHED", currentRankingPosition: 3, peakRankingPosition: 3, currentMonthlyTraffic: 1600, attributedMonthlyRevenue: 240, publishedDate: pubDate(40), publishedUrl: "https://mortgagecalchelp.net/how-much-house/", wordCountTarget: 3000, assignedWriterName: "Tom Bradley" },
+    { siteSlug: "mortgagecalchelp", targetKeyword: "how much house can i afford", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 3, peakRankingPosition: 3, currentMonthlyTraffic: 1600, attributedMonthlyRevenue: 240, publishedDate: pubDate(40), publishedUrl: "https://mortgagecalchelp.net/how-much-house/", wordCountTarget: 3000, assignedWriterName: "Tom Bradley" },
     // Other statuses (5)
     { siteSlug: "firsttimeinvestor", targetKeyword: "401k contribution limits 2025", contentType: "ARTICLE", status: "REVIEW", wordCountTarget: 1800, assignedWriterName: "Sarah Chen" },
     { siteSlug: "simplesavingsguide", targetKeyword: "what is a brokerage account", contentType: "ARTICLE", status: "IN_PROGRESS", wordCountTarget: 2000, assignedWriterName: "Tom Bradley" },
     { siteSlug: "firsttimeinvestor", targetKeyword: "best robo advisors", contentType: "LISTICLE", status: "BRIEFED", wordCountTarget: 3500 },
-    { siteSlug: "mortgagecalchelp", targetKeyword: "mortgage refinance calculator", contentType: "HOW_TO", status: "REVIEW", wordCountTarget: 2000, assignedWriterName: "Tom Bradley" },
-    { siteSlug: "simplesavingsguide", targetKeyword: "how to read a credit report", contentType: "HOW_TO", status: "BRIEFED", wordCountTarget: 2000 },
+    { siteSlug: "mortgagecalchelp", targetKeyword: "mortgage refinance calculator", contentType: "ARTICLE", status: "REVIEW", wordCountTarget: 2000, assignedWriterName: "Tom Bradley" },
+    { siteSlug: "simplesavingsguide", targetKeyword: "how to read a credit report", contentType: "ARTICLE", status: "BRIEFED", wordCountTarget: 2000 },
   ];
 
   // HOME IMPROVEMENT briefs
@@ -306,12 +305,12 @@ async function main() {
     // Published + refreshDue (1)
     { siteSlug: "tiledaddy", targetKeyword: "best tile saw for diy", contentType: "LISTICLE", status: "PUBLISHED", refreshDue: true, peakRankingPosition: 2, currentRankingPosition: 11, currentMonthlyTraffic: 400, attributedMonthlyRevenue: 40, publishedDate: pubDate(260), publishedUrl: "https://tiledaddy.com/best-tile-saw-diy/", wordCountTarget: 2500, assignedWriterName: "Mike Daniels" },
     // Published healthy (3)
-    { siteSlug: "tiledaddy", targetKeyword: "how to tile a bathroom floor", contentType: "HOW_TO", status: "PUBLISHED", currentRankingPosition: 4, peakRankingPosition: 4, currentMonthlyTraffic: 1100, attributedMonthlyRevenue: 90, publishedDate: pubDate(90), publishedUrl: "https://tiledaddy.com/tile-bathroom-floor/", wordCountTarget: 3000, assignedWriterName: "Mike Daniels" },
+    { siteSlug: "tiledaddy", targetKeyword: "how to tile a bathroom floor", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 4, peakRankingPosition: 4, currentMonthlyTraffic: 1100, attributedMonthlyRevenue: 90, publishedDate: pubDate(90), publishedUrl: "https://tiledaddy.com/tile-bathroom-floor/", wordCountTarget: 3000, assignedWriterName: "Mike Daniels" },
     { siteSlug: "weekendrenovator", targetKeyword: "weekend deck build cost", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 5, peakRankingPosition: 5, currentMonthlyTraffic: 800, attributedMonthlyRevenue: 70, publishedDate: pubDate(70), publishedUrl: "https://weekendrenovator.com/deck-build-cost/", wordCountTarget: 2000, assignedWriterName: "Mike Daniels" },
-    { siteSlug: "weekendrenovator", targetKeyword: "drywall patching guide", contentType: "HOW_TO", status: "PUBLISHED", currentRankingPosition: 7, peakRankingPosition: 6, currentMonthlyTraffic: 600, attributedMonthlyRevenue: 50, publishedDate: pubDate(110), publishedUrl: "https://weekendrenovator.com/drywall-patching/", wordCountTarget: 1800, assignedWriterName: "Mike Daniels" },
+    { siteSlug: "weekendrenovator", targetKeyword: "drywall patching guide", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 7, peakRankingPosition: 6, currentMonthlyTraffic: 600, attributedMonthlyRevenue: 50, publishedDate: pubDate(110), publishedUrl: "https://weekendrenovator.com/drywall-patching/", wordCountTarget: 1800, assignedWriterName: "Mike Daniels" },
     // Other statuses (3)
     { siteSlug: "tiledaddy", targetKeyword: "ceramic vs porcelain tile", contentType: "COMPARISON", status: "IN_PROGRESS", wordCountTarget: 2000, assignedWriterName: "Mike Daniels" },
-    { siteSlug: "tiledaddy", targetKeyword: "how to grout tile", contentType: "HOW_TO", status: "REVIEW", wordCountTarget: 1500, assignedWriterName: "Mike Daniels" },
+    { siteSlug: "tiledaddy", targetKeyword: "how to grout tile", contentType: "ARTICLE", status: "REVIEW", wordCountTarget: 1500, assignedWriterName: "Mike Daniels" },
     { siteSlug: "weekendrenovator", targetKeyword: "deck stain comparison", contentType: "COMPARISON", status: "BRIEFED", wordCountTarget: 2500 },
   ];
 
@@ -323,14 +322,14 @@ async function main() {
     { siteSlug: "seniorpetguide", targetKeyword: "how often to walk a 10 year old dog", contentType: "ARTICLE", status: "PUBLISHED", refreshDue: true, peakRankingPosition: 3, currentRankingPosition: 9, currentMonthlyTraffic: 700, attributedMonthlyRevenue: 90, publishedDate: pubDate(250), publishedUrl: "https://seniorpetguide.com/walking-senior-dog/", wordCountTarget: 1800, assignedWriterName: "Lisa Park" },
     // Published healthy (4)
     { siteSlug: "pawsandplans", targetKeyword: "small dog apartment guide", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 4, peakRankingPosition: 4, currentMonthlyTraffic: 1400, attributedMonthlyRevenue: 210, publishedDate: pubDate(50), publishedUrl: "https://pawsandplans.com/small-dog-apartment/", wordCountTarget: 2500, assignedWriterName: "Lisa Park" },
-    { siteSlug: "pawsandplans", targetKeyword: "puppy vs adult food transition", contentType: "HOW_TO", status: "PUBLISHED", currentRankingPosition: 6, peakRankingPosition: 6, currentMonthlyTraffic: 900, attributedMonthlyRevenue: 130, publishedDate: pubDate(85), publishedUrl: "https://pawsandplans.com/puppy-adult-food-transition/", wordCountTarget: 2000, assignedWriterName: "Lisa Park" },
+    { siteSlug: "pawsandplans", targetKeyword: "puppy vs adult food transition", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 6, peakRankingPosition: 6, currentMonthlyTraffic: 900, attributedMonthlyRevenue: 130, publishedDate: pubDate(85), publishedUrl: "https://pawsandplans.com/puppy-adult-food-transition/", wordCountTarget: 2000, assignedWriterName: "Lisa Park" },
     { siteSlug: "pawsandplans", targetKeyword: "best dog food for small breeds", contentType: "LISTICLE", status: "PUBLISHED", currentRankingPosition: 5, peakRankingPosition: 5, currentMonthlyTraffic: 1200, attributedMonthlyRevenue: 180, publishedDate: pubDate(65), publishedUrl: "https://pawsandplans.com/best-dog-food-small-breeds/", wordCountTarget: 3000, assignedWriterName: "Lisa Park" },
     { siteSlug: "seniorpetguide", targetKeyword: "dog supplements for joint health", contentType: "ARTICLE", status: "PUBLISHED", currentRankingPosition: 3, peakRankingPosition: 3, currentMonthlyTraffic: 800, attributedMonthlyRevenue: 120, publishedDate: pubDate(30), publishedUrl: "https://seniorpetguide.com/dog-supplements-joint-health/", wordCountTarget: 2500, assignedWriterName: "Lisa Park" },
     // Other statuses (5)
     { siteSlug: "pawsandplans", targetKeyword: "best dog leash for pulling", contentType: "LISTICLE", status: "REVIEW", wordCountTarget: 2000, assignedWriterName: "Lisa Park" },
-    { siteSlug: "pawsandplans", targetKeyword: "crate training guide", contentType: "HOW_TO", status: "IN_PROGRESS", wordCountTarget: 2500, assignedWriterName: "Lisa Park" },
+    { siteSlug: "pawsandplans", targetKeyword: "crate training guide", contentType: "ARTICLE", status: "IN_PROGRESS", wordCountTarget: 2500, assignedWriterName: "Lisa Park" },
     { siteSlug: "seniorpetguide", targetKeyword: "puppy vaccination schedule", contentType: "ARTICLE", status: "REVIEW", wordCountTarget: 1500, assignedWriterName: "Lisa Park" },
-    { siteSlug: "pawsandplans", targetKeyword: "how to introduce a new dog", contentType: "HOW_TO", status: "IN_PROGRESS", wordCountTarget: 2000, assignedWriterName: "Lisa Park" },
+    { siteSlug: "pawsandplans", targetKeyword: "how to introduce a new dog", contentType: "ARTICLE", status: "IN_PROGRESS", wordCountTarget: 2000, assignedWriterName: "Lisa Park" },
     { siteSlug: "seniorpetguide", targetKeyword: "senior dog diet guide", contentType: "ARTICLE", status: "BRIEFED", wordCountTarget: 3000 },
   ];
 

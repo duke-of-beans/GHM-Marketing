@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { prisma } from "@/lib/db";
+import type { RevenueSourceType } from "@prisma/client";
 
 async function getTenantId(slug: string): Promise<number | null> {
   const row = await prisma.tenant.findUnique({ where: { slug } });
@@ -40,7 +41,7 @@ function parseCSV(text: string): string[][] {
 type RevenueRow = {
   month: number;
   year: number;
-  sourceType: string;
+  sourceType: RevenueSourceType;
   sourceName: string;
   revenue: number;
   sessions?: number | null;
@@ -96,7 +97,7 @@ function parseShareASale(rows: string[][]): { entries: RevenueRow[]; errors: str
     entries.push({
       month: parseInt(monthStr, 10),
       year: parseInt(yearStr, 10),
-      sourceType: "AFFILIATE",
+      sourceType: "AFFILIATE" as RevenueSourceType,
       sourceName: merchantParts.join("-"),
       revenue,
     });
@@ -137,7 +138,7 @@ function parseAmazon(rows: string[][]): { entries: RevenueRow[]; errors: string[
     entries.push({
       month: parseInt(monthStr, 10),
       year: parseInt(yearStr, 10),
-      sourceType: "AFFILIATE",
+      sourceType: "AFFILIATE" as RevenueSourceType,
       sourceName: "Amazon Associates",
       revenue,
     });
@@ -181,7 +182,7 @@ function parseCJ(rows: string[][]): { entries: RevenueRow[]; errors: string[] } 
     entries.push({
       month: parseInt(monthStr, 10),
       year: parseInt(yearStr, 10),
-      sourceType: "AFFILIATE",
+      sourceType: "AFFILIATE" as RevenueSourceType,
       sourceName: advParts.join("-"),
       revenue,
     });
@@ -211,7 +212,7 @@ function parseGeneric(rows: string[][]): { entries: RevenueRow[]; errors: string
     const row = rows[i];
     const month = parseInt(row[monthIdx], 10);
     const year = parseInt(row[yearIdx], 10);
-    const sourceType = row[sourceTypeIdx];
+    const sourceType = row[sourceTypeIdx] as RevenueSourceType;
     const sourceName = row[sourceNameIdx];
     const revenue = parseFloat(row[revenueIdx]);
 

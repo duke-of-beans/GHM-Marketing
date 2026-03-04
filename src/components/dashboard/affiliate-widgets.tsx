@@ -64,7 +64,7 @@ export function TopEarnersWidget({ sites }: { sites: Site[] }) {
           <BarChart data={data} layout="vertical" margin={{ left: 80, right: 10, top: 0, bottom: 0 }}>
             <XAxis type="number" tickFormatter={(v) => `$${v}`} fontSize={11} />
             <YAxis type="category" dataKey="name" fontSize={11} width={80} />
-            <Tooltip formatter={(v: number) => formatCurrency(v)} />
+            <Tooltip formatter={(v: number | undefined) => formatCurrency(v ?? 0)} />
             <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>

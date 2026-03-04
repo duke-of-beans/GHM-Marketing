@@ -2,7 +2,7 @@
 // Affiliate Site Portfolio — list page
 // Sprint 38-40
 
-import { requirePermission } from "@/lib/auth/server-permissions";
+import { requirePermission } from "@/lib/auth/permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { prisma } from "@/lib/db";
 import { SitePortfolio } from "@/components/sites/portfolio";

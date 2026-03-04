@@ -668,7 +668,7 @@ function ContentTab({ siteId, briefs, onUpdate }: { siteId: number; briefs: Cont
 
   async function bulkAssign() {
     if (!bulkWriter.trim()) return;
-    for (const id of selected) {
+    for (const id of Array.from(selected)) {
       await fetch(`/api/affiliate/briefs/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ assignedWriterName: bulkWriter }) });
     }
     setSelected(new Set());

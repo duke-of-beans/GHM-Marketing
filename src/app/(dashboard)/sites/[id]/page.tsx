@@ -2,11 +2,11 @@
 // Affiliate Site Detail — server component wrapper
 // Sprint 38-40
 
-import { requirePermission } from "@/lib/auth/server-permissions";
+import { requirePermission } from "@/lib/auth/permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { prisma } from "@/lib/db";
 import { SiteDetail } from "@/components/sites/detail";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 async function getTenantId(slug: string): Promise<number | null> {
   const row = await prisma.tenant.findUnique({ where: { slug } });
@@ -46,13 +46,10 @@ export default async function SiteDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-4">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem><BreadcrumbLink href="/sites">Sites</BreadcrumbLink></BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem><BreadcrumbPage>{site.domain}</BreadcrumbPage></BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <Breadcrumb items={[
+        { label: "Sites", href: "/sites" },
+        { label: site.domain },
+      ]} />
       <SiteDetail site={serialized} />
     </div>
   );

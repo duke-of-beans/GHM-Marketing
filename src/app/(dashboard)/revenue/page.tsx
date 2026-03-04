@@ -17,7 +17,7 @@ export default async function RevenuePage() {
   const [sites, revenueEntries, networks] = await Promise.all([
     prisma.site.findMany({ where: { tenantId }, orderBy: { domain: "asc" } }),
     prisma.revenueEntry.findMany({ where: { tenantId }, orderBy: [{ year: "desc" }, { month: "desc" }] }),
-    prisma.displayAdNetwork.findMany({ where: { tenantId, status: "APPROVED" } }),
+    prisma.displayAdNetwork.findMany({ where: { tenantId, status: "ACTIVE" } }),
   ]);
 
   return (

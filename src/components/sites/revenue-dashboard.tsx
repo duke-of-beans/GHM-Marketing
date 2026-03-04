@@ -128,7 +128,7 @@ export function RevenueDashboard({ sites, revenueEntries, networks }: {
               <LineChart data={monthlyTrend}>
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Tooltip formatter={(v: number | undefined) => formatCurrency(v ?? 0)} />
                 <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -143,7 +143,7 @@ export function RevenueDashboard({ sites, revenueEntries, networks }: {
                   <Pie data={bySource} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={(e) => e.name}>
                     {bySource.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                  <Tooltip formatter={(v: number | undefined) => formatCurrency(v ?? 0)} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
