@@ -21,6 +21,7 @@ type Props = {
   userRole: "sales" | "manager" | "owner";
   userName: string;
   guideEnabled?: boolean;
+  verticalType?: string | null;
 };
 
 export function DashboardLayoutClient({
@@ -32,6 +33,7 @@ export function DashboardLayoutClient({
   userRole,
   userName,
   guideEnabled = true,
+  verticalType = null,
 }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -166,7 +168,7 @@ export function DashboardLayoutClient({
       />
 
       {/* Onboarding tutorial — mounted globally so Help menu restart works on any page */}
-      <OnboardingTutorial userRole={userRole} userName={userName} />
+      <OnboardingTutorial userRole={userRole} userName={userName} verticalType={verticalType} />
 
       {/* Push notification permission prompt — fires once on first visit */}
       <PushPermissionPrompt pushEnabled={pushEnabled} />

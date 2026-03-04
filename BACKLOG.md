@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 4, 2026 — Sprints 38-40 shipped. Vertical 2 complete. Next: Sprint 34-OPS (David manual).
+**Last Updated:** March 4, 2026 — Sprint 41 shipped. Affiliate dashboard polish complete. Next: Sprint 34-OPS (David manual).
 
 **Owner:** David Kirsch
 
@@ -67,6 +67,7 @@ Foundation → out. Each sprint unblocks the next.
 | ~~40~~ | ~~Demo Tenant + Intelligence Layer~~ | ~~Ridgeline Media seed data, GSC/GA4 Site extension, CSV affiliate network import~~ | ✅ SHIPPED 90fb3e4 | Vertical 2 demo-ready |
 | ~~36~~ | ~~Communication Layer + Platform Hygiene~~ | ~~Email templates, toast audit, empty states, route audit, psych UX audit, security fixes~~ | ✅ SHIPPED | Demo-ready gate |
 | ~~37~~ | ~~Magic Moments + Platform Polish~~ | ~~PSYCH_UX_AUDIT.md implementation: AlertDialog migration (4), breadcrumb component, onboarding celebration, settings grouping, AI progress indicators~~ | ✅ SHIPPED | UX polish gate |
+| ~~41~~ | ~~Affiliate Dashboard Polish~~ | ~~Vertical routing, affiliate /dashboard page, guide tips, onboarding tour, empty state copy, nav logo fallback~~ | ✅ SHIPPED | UI-CONST Groups 6–7 (affiliate) |
 | 🔧 OPS | Manual Ops Tasks | INFRA-001 (Resend DNS) + I4 (GBP OAuth) + W7 (Kill Gusto) | ⏸ WAITING | David manual — no Claude work needed |
 
 **Background (no code needed, external waits):**
@@ -268,5 +269,21 @@ Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant ad
 
 
 ## 🟡 WOULD — Additional Features & Polish
+
+### FEAT-029: Multi-Business Profile Switcher
+**Request:** Users who operate multiple businesses (e.g., an SEO agency + an affiliate portfolio company) should be able to switch between their COVOS business profiles without signing out and back in. Each business is a separate tenant with its own vertical, branding, nav, and data.
+
+**UX concept:** Profile switcher in the sidebar (near the tenant logo / user avatar area) — similar to Slack's workspace switcher or Notion's workspace selector. Clicking opens a dropdown or modal listing all tenants the authenticated user has access to, with one-click switching that re-scopes the session to the selected tenant.
+
+**Architecture notes:**
+- Requires a user↔tenant membership model (a user can belong to multiple tenants with a role per tenant)
+- Currently users are scoped to a single tenant implicitly via their account. Need a `UserTenantMembership` join table: `userId`, `tenantId`, `role`, `isDefault`
+- Session token would need to carry `activeTenantSlug` (switchable without full re-auth)
+- Middleware reads `activeTenantSlug` from session cookie rather than (or in addition to) subdomain
+- Switch action: updates `activeTenantSlug` in session, triggers full page reload to re-render correct vertical nav + widgets
+
+**Prerequisites:** ARCH-006 tenant extraction complete, meta-DB tenant registry live (Sprint 34-OPS).
+**Size:** ~1 sprint (data model + session plumbing + switcher UI).
+**Priority:** 🟡 Would — high value for operators running multiple COVOS-powered businesses (exact use case: David running GHM + Proper Sluice).
 
 

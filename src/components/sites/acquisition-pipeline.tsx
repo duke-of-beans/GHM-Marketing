@@ -100,6 +100,17 @@ export function AcquisitionPipeline({ targets, tenantId }: { targets: Target[]; 
       });
     }
   }
+  if (items.length === 0 && !addOpen) {
+    return (
+      <EmptyState
+        icon={Globe}
+        title="No acquisition targets yet"
+        description="Start tracking domains you're evaluating for purchase."
+        action={{ label: "Add Target", onClick: () => setAddOpen(true) }}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">

@@ -29,6 +29,7 @@ import type { UserRole } from "@prisma/client";
 import type { UserPermissions } from "@/lib/auth/permissions";
 import { isElevated } from "@/lib/auth/roles";
 import { HelpMenu } from "@/components/onboarding/help-menu";
+import { TenantLogo } from "@/components/ui/tenant-logo";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -291,7 +292,9 @@ export function DashboardNav({
       .catch(() => {}); // keep default on network error
   }, []);
 
-  const dashboardHref = elevated ? "/manager" : "/sales";
+  const dashboardHref = verticalType === "affiliate_portfolio"
+    ? "/dashboard"
+    : elevated ? "/manager" : "/sales";
 
   // Active path: exact match OR prefix match for nested routes (/clients/123)
   const isActivePath = useCallback(
@@ -314,12 +317,11 @@ export function DashboardNav({
       <aside className="hidden md:flex md:flex-col md:w-56 md:h-screen sidebar-bg p-4 overflow-hidden">
         {/* Logo + user */}
         <div className="mb-4 flex-shrink-0">
-          <Link href={dashboardHref}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={dynamicLogoUrl}
-              alt={companyName ?? "Company logo"}
-              className="mb-1 max-h-12 max-w-[180px] object-contain brightness-0 invert hover:opacity-80 transition-opacity"
+          <Link href={dashboardHref} className="block mb-1 hover:opacity-80 transition-opacity brightness-0 invert">
+            <TenantLogo
+              logoUrl={dynamicLogoUrl !== "/logo.png" ? dynamicLogoUrl : null}
+              companyName={companyName ?? "COVOS"}
+              size="md"
             />
           </Link>
           <p className="text-xs sidebar-text-muted">{user.name}</p>

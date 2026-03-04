@@ -17,6 +17,10 @@ import {
   LayoutDashboard,
   UserCog,
   BarChart3,
+  Globe,
+  HelpCircle,
+  PenTool,
+  Search,
 } from "lucide-react";
 
 type TutorialStep = {
@@ -269,21 +273,118 @@ const MASTER_TUTORIAL: TutorialStep[] = [
   },
 ];
 
+// ─── Affiliate Portfolio Tutorial ──────────────────────────────────────────────
+
+const AFFILIATE_TUTORIAL: TutorialStep[] = [
+  {
+    title: "Welcome to your portfolio command center.",
+    description:
+      "Everything about your sites, revenue, and content lives here. Four numbers at the top, five intelligence widgets below. If something's off, you'll see it here first.",
+    icon: <LayoutDashboard className="h-12 w-12 text-blue-600" />,
+    route: "/dashboard",
+    tips: [
+      "Relaunch this tour anytime from the Help menu in the sidebar",
+      "Press ESC or click outside to skip — you can always come back",
+    ],
+  },
+  {
+    title: "Your Sites",
+    description:
+      "The Sites list is the heart of the platform. Every affiliate property you own lives here with its revenue, traffic, and health status.",
+    icon: <Globe className="h-12 w-12 text-emerald-600" />,
+    route: "/sites",
+    tips: [
+      "Each site has its own detail view with revenue, content briefs, and affiliate programs",
+      "Status badges show ACTIVE, DORMANT, or FOR SALE at a glance",
+      "Sort by revenue to see where your money is actually coming from",
+    ],
+    action: "Click any site to see its full profile.",
+  },
+  {
+    title: "Revenue Tracking",
+    description:
+      "Track earnings across every site and every affiliate network in one place. The trends don't lie.",
+    icon: <TrendingUp className="h-12 w-12 text-status-success" />,
+    route: "/revenue",
+    tips: [
+      "Revenue entries break down by source: affiliate programs, display ads, sponsored content",
+      "Month-over-month trends show you what's growing and what's sliding",
+      "RPM and EPC metrics help you compare network performance apples-to-apples",
+    ],
+    action: "Check this weekly. Monthly is too late to catch problems.",
+  },
+  {
+    title: "Acquisition Pipeline",
+    description:
+      "Evaluating a new site to buy? Track your targets here from initial research through close.",
+    icon: <Search className="h-12 w-12 text-violet-600" />,
+    route: "/acquisitions",
+    tips: [
+      "Stages: Researching → Due Diligence → Negotiating → Closed",
+      "Track asking price, your offer, and final purchase price",
+      "Due diligence notes keep everything in one place — no more spreadsheets",
+    ],
+    action: "Add targets early, even at the research stage.",
+  },
+  {
+    title: "Content Studio",
+    description:
+      "Content is what drives rankings and revenue. Manage briefs from ideation through publication, and track what's actually earning.",
+    icon: <PenTool className="h-12 w-12 text-indigo-600" />,
+    route: "/content-studio",
+    tips: [
+      "Each brief tracks keyword, search volume, writer assignment, and publish date",
+      "'Refresh Due' flags content that's aging — Google notices before your traffic does",
+      "Attributed revenue shows which articles are pulling their weight",
+    ],
+    action: "Consistent publishing is the single biggest lever for affiliate revenue.",
+  },
+  {
+    title: "Top Earners Widget",
+    description:
+      "Your top 5 earning sites at a glance, right on the dashboard. If one drops off the list, you'll know immediately.",
+    icon: <BarChart3 className="h-12 w-12 text-amber-600" />,
+    route: "/dashboard",
+    tips: [
+      "Bar chart ranked by current monthly revenue",
+      "A sudden drop here means something changed — check the site detail",
+      "Portfolio Valuation widget below shows your total estimated value across all sites",
+    ],
+    action: "Protect your top earners. Everything else is negotiable.",
+  },
+  {
+    title: "That's the tour.",
+    description:
+      "You've got the full picture. Keep your content fresh, watch the revenue trends, and grow the portfolio.",
+    icon: <CheckCircle2 className="h-12 w-12 text-status-success" />,
+    route: "/dashboard",
+    tips: [
+      "Hover any ? icon for inline explanations throughout the app",
+      "Help menu in the sidebar lets you restart this tour, report bugs, or request features",
+      "The Guide character will drop tips on each page — some are even useful",
+    ],
+    action: "Your dashboard →",
+  },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 type OnboardingTutorialProps = {
   userRole: "sales" | "manager" | "owner";
   userName: string;
+  verticalType?: string | null;
 };
 
-export function OnboardingTutorial({ userRole, userName }: OnboardingTutorialProps) {
+export function OnboardingTutorial({ userRole, userName, verticalType }: OnboardingTutorialProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [hasSeenTutorial, setHasSeenTutorial] = useState(true);
   const [originPath, setOriginPath] = useState<string | null>(null);
 
-  const steps = userRole === "sales" ? SALES_REP_TUTORIAL : MASTER_TUTORIAL;
+  const steps = verticalType === "affiliate_portfolio"
+    ? AFFILIATE_TUTORIAL
+    : userRole === "sales" ? SALES_REP_TUTORIAL : MASTER_TUTORIAL;
   const step = steps[currentStep];
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;

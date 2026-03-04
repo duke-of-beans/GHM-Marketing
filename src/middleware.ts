@@ -31,14 +31,19 @@ export async function middleware(request: NextRequest) {
 
   // ── 1. TENANT DETECTION ──────────────────────────────────────────────────
 
+  // Dev override: set TENANT_DEV_OVERRIDE=ridgeline in .env.local to test a tenant locally
+  const devTenantOverride = process.env.TENANT_DEV_OVERRIDE;
+
   const isRootDomain =
     host === ROOT_DOMAIN ||
     host === `www.${ROOT_DOMAIN}` ||
-    host.startsWith("localhost") ||        // local dev without subdomain
+    (host.startsWith("localhost") && !devTenantOverride) ||
     host.startsWith("ghm-marketing");      // Vercel preview URLs
 
   if (!isRootDomain) {
-    const tenant = getTenantFromHost(host);
+    const tenant = devTenantOverride
+      ? (getTenantFromHost(`${devTenantOverride}.covos.app`) ?? getTenantFromHost(host))
+      : getTenantFromHost(host);
 
     if (!tenant) {
       // Unknown subdomain — redirect to root domain with a message

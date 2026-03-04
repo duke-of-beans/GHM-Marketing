@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 4, 2026 — Sprints 38-40 shipped 90fb3e4. Vertical 2 affiliate portfolio complete. ridgeline.covos.app demo-ready. Next: Sprint 34-OPS (David manual, THIRD_PARTY_MIGRATION.md). Proper Sluice onboards as real tenant via standard provisioning flow.
+**Last Updated:** March 4, 2026 — Sprint 41 shipped. Affiliate dashboard, vertical routing, guide tips, onboarding tour. Next: Sprint 34-OPS (David manual, THIRD_PARTY_MIGRATION.md).
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,6 +15,18 @@
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
 
+
+### SPRINT 41 — Affiliate Dashboard + Vertical Routing + UI Constitution Groups 6–7 (March 4, 2026) ✅ COMPLETE
+
+- [x] **Phase 1: Vertical redirect** — sales/page.tsx and manager/page.tsx detect affiliate_portfolio tenant and redirect to /dashboard. No changes to auth.config.ts.
+- [x] **Phase 2: Affiliate dashboard page** — New /dashboard route with AffiliateDashboardClient. 4-tile MetricsRow (Total Sites, Active Sites, Portfolio MRR, Portfolio Value) + AffiliateWidgetPanel (5 widgets). Header shows tenant.companyName subtitle.
+- [x] **Phase 3: Widget panel wire-up** — AffiliateWidgetPanel cleanly exported and accepts full WidgetProps. Wired into new dashboard page.
+- [x] **Phase 4: Nav logo fallback** — Replaced raw `<img>` with TenantLogo component. Text fallback renders when no logoUrl is set. Dashboard href routes affiliate tenants to /dashboard.
+- [x] **Phase 5: Manager page cleanup** — Removed AffiliateWidgetPanel conditional block from manager/page.tsx. Affiliate users redirect before reaching that code.
+- [x] **Phase 6: Guide character affiliate tips** — Added route tips for /dashboard, /sites, /sites/[id], /acquisitions, /revenue, /content-studio. Matches existing data structure.
+- [x] **Phase 7: Affiliate onboarding tour** — 7-step tutorial (Welcome, Sites, Revenue, Acquisition Pipeline, Content, Top Earners, Help menu). verticalType prop threaded through layout → DashboardLayoutClient → OnboardingTutorial.
+- [x] **Phase 8: Empty state copy audit** — Updated Sites ("Add your first affiliate property"), Revenue ("Connect your first affiliate program"), Acquisitions (new top-level empty state: "Start tracking domains you're evaluating").
+- [x] **TypeScript gate:** 10 pre-existing errors (basecamp-crawl, import-wave-history, team/presence/route, lead-filter-bar-advanced, basecamp/client). Zero new errors in Sprint 41 files.
 
 ### SPRINT 37 — Magic Moments + Platform Polish (March 3, 2026) ✅ COMPLETE
 

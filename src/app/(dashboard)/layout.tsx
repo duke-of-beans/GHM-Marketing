@@ -90,6 +90,7 @@ export default async function DashboardLayout({
         userRole={tutorialRole}
         userName={session.user.name ?? ""}
         guideEnabled={fullUser?.guideEnabled ?? true}
+        verticalType={verticalType}
       >
         {children}
       </DashboardLayoutClient>

@@ -1,0 +1,19 @@
+First, read D:\Work\SEO-Services\ghm-dashboard\docs\blueprints\SPRINT41_BLUEPRINT.md for full context and done criteria.
+
+Then read and execute Phase 1: Fix post-login redirect — read src\lib\auth\auth.config.ts and src\app\(dashboard)\sales\page.tsx and src\app\(dashboard)\manager\page.tsx. Add vertical redirect at the top of both dashboard pages: if tenant.verticalType === "affiliate_portfolio", redirect to /dashboard. Do NOT change auth.config.ts.
+
+Then read and execute Phase 2: Create src\app\(dashboard)\dashboard\page.tsx — the affiliate vertical home page. Fetch sites, revenueEntries, networks, briefs, valuations from Prisma for the current tenant. Render a MetricsRow with 4 tiles (Total Sites, Active Sites, Portfolio MRR, Portfolio Value) and the AffiliateWidgetPanel below. Create AffiliateDashboardClient.tsx as the client wrapper. Header shows "My Dashboard" with tenant.companyName as subtitle (read from requireTenant(), NOT GlobalSettings).
+
+Then read and execute Phase 3: Read src\components\dashboard\affiliate-widgets.tsx. Ensure AffiliateWidgetPanel is exported cleanly and accepts the full WidgetProps. Wire it into the new dashboard page.
+
+Then read and execute Phase 4: Fix the nav logo fallback — read src\components\dashboard\nav.tsx. Ensure the logo area uses TenantLogo component (already exists at src\components\ui\tenant-logo.tsx) so that when no logoUrl is set in GlobalSettings, the tenant name renders as text fallback instead of a broken image.
+
+Then read and execute Phase 5: Clean up manager/page.tsx — remove the AffiliateWidgetPanel conditional block that was previously wired in there (affiliate users now redirect to /dashboard before reaching that code).
+
+Then read and execute Phase 6: Read src\components\guide\guide-config.ts. Add affiliate route tips for: /dashboard, /sites, /sites/[id], /acquisitions, /revenue, /content-studio. Match the exact data structure and route-matching pattern already in the file.
+
+Then read and execute Phase 7: Read the onboarding tour implementation (find where Driver.js steps are defined — likely src\components\onboarding\onboarding-tutorial.tsx or similar). Add an affiliate-vertical tour with 7 steps (Welcome, Sites, Revenue, Acquisition Pipeline, Content, Top Earners widget, Help menu). Add vertical detection: if verticalType === "affiliate_portfolio", use affiliate steps. Read the blueprint for exact step copy.
+
+Then read and execute Phase 8: Audit empty state copy on affiliate routes. Read src\app\(dashboard)\sites\page.tsx, src\app\(dashboard)\acquisitions\page.tsx, src\app\(dashboard)\revenue\page.tsx. Update any generic or SEO-flavored EmptyState copy to affiliate-appropriate copy per the blueprint.
+
+Then read and execute Phase 9: Run npx tsc --noEmit from D:\Work\SEO-Services\ghm-dashboard. Fix any NEW errors in Sprint 41 files (pre-existing errors in basecamp-crawl, import-wave-history, team/presence/route, GuideCharacter, lead-filter-bar-advanced, basecamp/client, typing-store are acceptable). Then commit with message "feat: Sprint 41 — affiliate dashboard, vertical routing, guide tips, onboarding tour". Then update STATUS.md (Last Updated header + sprint entry) and BACKLOG.md (close Sprint 41). Then git push origin main.

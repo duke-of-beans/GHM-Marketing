@@ -1,8 +1,10 @@
 import { getCurrentUser, territoryFilter } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { requireTenant } from "@/lib/tenant/server";
 import { getFunnelStats } from "@/lib/db/leads";
-import { MetricCard, formatCurrency } from "@/components/dashboard/metric-card";
+import { MetricCard } from "@/components/dashboard/metric-card";
+import { formatCurrency } from "@/lib/format";
 import { PipelineFunnel } from "@/components/dashboard/pipeline-funnel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyEarningsWidget } from "@/components/payments/my-earnings-widget";
@@ -15,6 +17,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function SalesDashboard() {
+  // Affiliate vertical redirect — affiliate users land on /dashboard instead
+  try {
+    const tenant = await requireTenant();
+    if (tenant.verticalType === "affiliate_portfolio") redirect("/dashboard");
+  } catch { /* Non-tenant context — continue with SEO dashboard */ }
+
   const user = await getCurrentUser();
 
   // First-login redirect: sales reps who haven't completed onboarding go to setup wizard

@@ -105,6 +105,86 @@ export const GUIDE_CONFIG: Record<string, GuidePageConfig> = {
       },
     ],
   },
+  // ── Affiliate vertical routes ──────────────────────────────────────
+  "/dashboard": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "This is your portfolio command centre. Four numbers at the top, five widgets below. If something's off, you'll see it here first.",
+      },
+      {
+        trigger: "idle_60s",
+        message:
+          "The dashboard updates every page load. If the numbers look wrong, check your revenue entries — garbage in, garbage out.",
+      },
+    ],
+  },
+  "/sites": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "Every site in your portfolio lives here. Click one to see revenue, traffic, and content performance in detail.",
+      },
+      {
+        trigger: "idle_60s",
+        message:
+          "Sorting by revenue shows you where the money is. Sorting by traffic shows you where it could be.",
+      },
+    ],
+  },
+  "/sites/[id]": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "Site detail view. Revenue, ad networks, content briefs, and valuation — everything for this property in one place.",
+      },
+    ],
+  },
+  "/acquisitions": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "Acquisition pipeline. Track sites you're researching, negotiating, or closing. Move them through stages as deals progress.",
+      },
+      {
+        trigger: "empty_state",
+        message:
+          "No targets yet. Start by adding a site you've been eyeing — even if it's just research stage.",
+      },
+    ],
+  },
+  "/revenue": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "Portfolio-wide revenue view. Spot trends across all your sites. The best operators check this weekly.",
+      },
+      {
+        trigger: "idle_60s",
+        message:
+          "Revenue declining on a site? Check if content is stale or an ad network changed terms. The data tells you where to look.",
+      },
+    ],
+  },
+  "/content-studio": {
+    tips: [
+      {
+        trigger: "first_visit",
+        message:
+          "Content Studio. Track briefs from ideation to publication. Consistent publishing is the single biggest lever for affiliate revenue.",
+      },
+      {
+        trigger: "idle_60s",
+        message:
+          "Stale content loses rankings. If a brief shows 'refresh due', it means Google probably agrees.",
+      },
+    ],
+  },
   "__first_visit__": {
     tips: [
       {

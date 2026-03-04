@@ -94,7 +94,7 @@ export function RevenueDashboard({ sites, revenueEntries, networks }: {
     else { setSortKey(key); setSortDir("desc"); }
   }
   if (revenueEntries.length === 0) {
-    return <EmptyState icon={DollarSign} title="No revenue data yet" description="Add revenue entries to your sites to see portfolio performance here." />;
+    return <EmptyState icon={DollarSign} title="No revenue data yet" description="Connect your first affiliate program or add a manual entry to see portfolio performance here." />;
   }
 
   return (

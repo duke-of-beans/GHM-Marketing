@@ -64,7 +64,7 @@ export function SitePortfolio({ sites }: { sites: SiteItem[] }) {
         <EmptyState
           icon={Globe}
           title="No sites yet"
-          description="Add your first site to start tracking your portfolio."
+          description="Add your first affiliate property to get started."
           action={{ label: "Add Site", onClick: () => setAddOpen(true) }}
         />
         <AddSiteDialog open={addOpen} onOpenChange={setAddOpen} onSuccess={() => router.refresh()} />
