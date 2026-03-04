@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 4, 2026 — Sprint 41 shipped. Affiliate dashboard polish complete. Next: Sprint 34-OPS (David manual).
+**Last Updated:** March 3, 2026 — SEO vertical satellite cluster quality items added.
 
 **Owner:** David Kirsch
 
@@ -285,5 +285,66 @@ Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant ad
 **Prerequisites:** ARCH-006 tenant extraction complete, meta-DB tenant registry live (Sprint 34-OPS).
 **Size:** ~1 sprint (data model + session plumbing + switcher UI).
 **Priority:** 🟡 Would — high value for operators running multiple COVOS-powered businesses (exact use case: David running GHM + Proper Sluice).
+
+---
+
+## 📋 NOTES + BEST PRACTICES — March 4, 2026 Session
+
+### DEV-STANDARD-001: Universal Test Credentials
+**Decision (March 4, 2026):** Across all COVOS tenants and projects, the standard test account is `test@account.com` / `ChangeMe123!` (admin role). Script at `scripts/seed-test-user.ts` creates/resets this user via upsert. Re-run when any tenant DB is reset or provisioned. Never use personal accounts (`david@ghmmarketing.com`) for testing non-GHM contexts.
+**Action:** Add `seed-test-user.ts` execution to `TENANT_PROVISIONING.md` as a required provisioning step.
+
+---
+
+### DEV-STANDARD-002: Local Tenant Dev Override
+**Decision (March 4, 2026):** Middleware is subdomain-based and doesn't work on localhost. `TENANT_DEV_OVERRIDE` env var in `.env.local` bypasses this. Set to `ridgeline`, `ghm`, or `covosdemo` and restart dev server. Port allocation: GregLite owns 3000–3009, COVOS runs on port 3100 permanently (set in `package.json` dev script).
+**Implementation:** `src/middleware.ts` — when override is set and host is localhost, injects tenant header from `getTenantFromHost(`${slug}.covos.app`)`.
+**Action:** Document in `CLAUDE_INSTRUCTIONS.md` and `QUICK_REFERENCE.md`.
+
+---
+
+### FEAT-030: Satellite Website "Value Layer" Content Standard (SEO Vertical / Easter Agency)
+**Context (March 4, 2026):** GAD satellite cluster sites (Audi, BMW, Mercedes, VW, Porsche, Land Rover, European Auto — Simi Valley) were reviewed and assessed as **not PBNs** due to substantive model-specific content depth. The content quality (fault codes, part names, cost ranges, service intervals, diagnostic detail) is the primary protection against PBN classification — not the structure.
+
+**PBN risk factors to watch:**
+- Consistent layout/headline pattern across all satellites — not disqualifying alone, but content must compensate
+- One-directional links (all pointing to money site, no outbound citations) — mild PBN signal; fix by adding 2–4 outbound links per satellite to manufacturer TSBs, NHTSA, authoritative communities
+- No GBP tied to satellite domains — recommended addition for geo-targeted satellites
+- No local schema markup — should be added
+
+**COVOS Satellite Content Standard (for productization):** Each satellite must meet before going live:
+1. 500+ words of technically accurate, brand/topic-specific content per primary page (not templated copy)
+2. At least one "value layer" — something a visitor would use even without clicking through to the money site (auto: cost estimator, warning light lookup; legal: fee calculator; medical: symptom guide)
+3. Minimum 3 contextual outbound links to authoritative third-party sources per satellite
+4. Local schema markup
+5. GBP recommended for geo-targeted satellites
+
+**Easter Agency differentiator pitch:** "We don't build link satellites — we build micro-resources that rank independently."
+**Action:** Define content spec doc. Add quality gate to Website Studio cluster approval workflow (SCRVNR already exists in Sprint 4).
+**Priority:** 🟠 Should.
+
+---
+
+### FEAT-031: Citation Finder for Satellite Content (Website Studio)
+**Context:** Follows FEAT-030. Website Studio generates satellite content but doesn't enforce outbound citations. After content draft, run an AI "Citation Finder" pass: identify factual claims, suggest 3–5 authoritative outbound links per page, editor accepts/rejects, minimum count enforced in SCRVNR approval gate.
+**Size:** ~1 sprint. **Priority:** 🟡 Would.
+
+---
+
+### ARCH-NOTE-002: Vertical Routing Pattern (Established Sprint 41)
+**Decision:** Post-login routing stays role-based in `auth.config.ts` (edge-safe, no Prisma). Vertical routing happens inside server component dashboard pages. Pattern: `/manager` and `/sales` check `tenant.verticalType` at top — if `affiliate_portfolio`, redirect to `/dashboard`. New verticals follow same pattern: new route + redirect check in existing role pages. Auth config is never the right place for vertical logic.
+**Action:** Document as ARCH-007 in `docs/ARCH.md`.
+
+---
+
+### ARCH-NOTE-003: Tenant Display Name Hierarchy (Established Sprint 41)
+**Decision:** Page headers/subtitles use `tenant.companyName` from `TenantConfig` directly — NOT `GlobalSettings`. GlobalSettings may not be seeded for new tenants; TenantConfig is always populated at provisioning. Logo chain: `TenantLogo` component handles `GlobalSettings.logoUrl` → `tenant.name` text fallback. Never read `GlobalSettings` just for display name.
+**Action:** Audit existing pages using `GlobalSettings.companyName` for display; migrate to `tenant.companyName`.
+
+---
+
+### OPS-NOTE-001: GCP OAuth Submission — Time-Gated
+**Status:** INFRA-004 (GCP OAuth for GBP integration) requires 1–3 week Google review. Must be submitted before Vertical 1 go-live is possible. See THIRD_PARTY_MIGRATION.md.
+**Action:** David manual — confirm submission status.
 
 
