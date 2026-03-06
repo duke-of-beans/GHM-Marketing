@@ -1,8 +1,14 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 4, 2026 — Sprints 38-40 shipped: Affiliate Vertical Complete.
+**Last Updated:** March 6, 2026 — Sprint IE-02 shipped: Scan Engine + First Sensors operational.
 
+
+## Sprint IE-02 — Scan Engine + First Sensors — March 6, 2026
+
+Prisma: IntelScan + IntelSnapshot models live. Sensor interface with lazy registry. PageSpeed sensor (free, no creds): mobileScore, desktopScore, CWV (LCP/FID/CLS/INP), lab metrics, specificIssues. Ahrefs sensor: DR, backlinks, referringDomains, organicKeywords, estimatedTraffic, new/lost backlinks — skips gracefully with no credential. Scan orchestrator: per-entity sensor runs, snapshot persistence, asset lastScanAt/nextScanAt updates, never-throw design (partial on sensor fail, failed on orchestrator error). Delta engine: absolute + % change, velocity classification at ±5%, threshold alerts, first-scan null handling. Health score: normalized weighted composite 0–100, propagates to IntelAsset + IntelAssetGroup + ClientProfile + Site. API: POST/GET /api/intel/scans, GET /api/intel/scans/[scanId], GET /api/intel/assets/[id]/snapshots. Cron: daily 03:30 UTC, groups assets by (tenantId, assetGroupId), 2s stagger. TypeScript: 0 new errors.
+
+---
 
 ## Sprints 38-40 — Affiliate Vertical Complete — March 4, 2026 — commit 90fb3e4
 Data layer: 7 new Prisma models + 8 enums. AFFILIATE_MODULE_DEFAULTS and AFFILIATE_TERMINOLOGY configs.

@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 4, 2026 — Sprint 41 shipped. Affiliate dashboard, vertical routing, guide tips, onboarding tour. Next: Sprint 34-OPS (David manual, THIRD_PARTY_MIGRATION.md).
+**Last Updated:** March 6, 2026 — Sprint IE-02 shipped. Scan orchestration engine, PageSpeed + Ahrefs sensors, delta engine, health score calculator, scan API routes, cron scheduler. Intelligence engine now produces real scans with real data.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,6 +15,27 @@
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
 
+
+### SPRINT IE-02 — Scan Engine + First Sensors (March 6, 2026) ✅ COMPLETE
+
+**Goal:** Scan orchestration system operational. Intelligence engine now produces real scans with real data.
+
+- [x] **Prisma models** — `IntelScan` + `IntelSnapshot` added to schema. Back-relations added on `IntelAssetGroup`, `IntelAsset`, `IntelCompetitor`. `prisma db push` applied.
+- [x] **Sensor interface** — `src/lib/intel/sensors/sensor-interface.ts` — `SensorInterface` + `SensorResult` contracts, lazy-loaded sensor registry with `getSensor()` factory.
+- [x] **PageSpeed sensor** — `src/lib/intel/sensors/pagespeed.ts` — Calls PSI API v5 (free, no credentials). Returns mobileScore, desktopScore, LCP, FID, CLS, INP, FCP, SI, TBT, TTI, field CWV categories, specificIssues array. Mobile + desktop run in parallel.
+- [x] **Ahrefs sensor** — `src/lib/intel/sensors/ahrefs.ts` — Calls Ahrefs API v3. Returns domainRating, ahrefsRank, backlinks, referringDomains, organicKeywords, estimatedTraffic, newBacklinks, lostBacklinks, backlinkNetChange. Graceful skip (not fail) when no credential stored.
+- [x] **Scan orchestrator** — `src/lib/intel/scan-orchestrator.ts` — `executeScan(tenantId, assetGroupId?)` main entry point. Reads assets + competitors, fetches credentials, runs sensors per entity, stores `IntelSnapshot` per entity. Per-sensor error isolation (scan continues as `partial` on failure). Never throws — top-level catch marks scan as `failed`. Updates `lastScanAt` / `nextScanAt` on assets post-scan.
+- [x] **Delta engine** — `src/lib/intel/delta-engine.ts` — Metric-by-metric absolute + % change, velocity classification (improving/stable/declining at ±5% threshold), threshold alerts at both absolute and delta levels. First-scan null handling (no deltas, threshold alerts only).
+- [x] **Health score calculator** — `src/lib/intel/health-score.ts` — Weighted composite 0–100 from snapshot metrics. Normalizes all metrics to 0–1 before weighting. Persists to `IntelAsset.healthScore`, propagates to `IntelAssetGroup.healthScore`, backward-compat sync to `ClientProfile.healthScore` (SEO vertical) and `Site.domainRating` (affiliate vertical).
+- [x] **API routes** — `POST/GET /api/intel/scans`, `GET /api/intel/scans/[scanId]`, `GET /api/intel/assets/[id]/snapshots`. Snapshot history supports metric key projection (`?metrics=lcp,mobileScore`) and `?limit=` for chart windowing.
+- [x] **Cron scheduler** — `src/app/api/cron/intel-scan-scheduler/route.ts` — Daily at 03:30 UTC. Queries assets where `nextScanAt <= now()` or never scanned, groups by `(tenantId, assetGroupId)`, triggers scans with 2s staggering. Registered in `vercel.json`.
+- [x] **TypeScript gate** — Zero new errors. 10 pre-existing errors (basecamp-crawl, import-wave-history, team/presence/route ×3, lead-filter-bar ×2, basecamp/client ×3) — all pre-IE-02, unaffected.
+
+**New files:** `prisma/schema.prisma` (IntelScan + IntelSnapshot models + back-relations), `src/lib/intel/sensors/sensor-interface.ts`, `src/lib/intel/sensors/pagespeed.ts`, `src/lib/intel/sensors/ahrefs.ts`, `src/lib/intel/scan-orchestrator.ts`, `src/lib/intel/delta-engine.ts`, `src/lib/intel/health-score.ts`, `src/app/api/intel/scans/route.ts`, `src/app/api/intel/scans/[scanId]/route.ts`, `src/app/api/intel/assets/[id]/snapshots/route.ts`, `src/app/api/cron/intel-scan-scheduler/route.ts`, `vercel.json` (cron entry)
+
+**Next sprint:** IE-03 (Work Queue Generation) — threshold rule engine, task generator, scan→task pipeline, task context showing what triggered each task.
+
+---
 
 ### SPRINT 41 — Affiliate Dashboard + Vertical Routing + UI Constitution Groups 6–7 (March 4, 2026) ✅ COMPLETE
 

@@ -51,6 +51,10 @@
     {
       "path": "/api/cron/covos-telemetry",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/intel-scan-scheduler",
+      "schedule": "30 3 * * *"
     }
   ]
 }

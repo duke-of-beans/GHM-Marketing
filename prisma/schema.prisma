@@ -490,6 +490,9 @@ model ClientProfile {
   gbpSnapshots          GbpSnapshot[]
   websiteAudits         WebsiteAudit[]
 
+  // Intelligence Engine (Sprint IE-01)
+  intelAssetGroup     IntelAssetGroup?
+
   @@map("client_profiles")
 }
 
@@ -527,6 +530,9 @@ model ClientDomain {
   createdAt       DateTime      @default(now()) @map("created_at")
   client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
   siteHealthSnapshots SiteHealthSnapshot[]
+
+  // Intelligence Engine (Sprint IE-01)
+  intelAsset          IntelAsset?
 
   @@index([clientId])
   @@map("client_domains")
@@ -2365,6 +2371,9 @@ model Site {
   valuations        SiteValuation[]
   acquisitionTarget AcquisitionTarget?
 
+  // Intelligence Engine (Sprint IE-01)
+  intelAsset          IntelAsset?
+
   @@unique([tenantId, slug])
   @@index([tenantId])
 }
@@ -2512,4 +2521,176 @@ model SiteValuation {
   site                Site                   @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, siteId])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Intelligence Engine — Sprint IE-01: Unified Asset Layer + Sensor Foundation
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model IntelAssetGroup {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int       @map("tenant_id")
+  name            String
+  type            String    // "client" | "portfolio" | "niche_cluster"
+  healthScore     Int       @default(50) @map("health_score")
+  status          String    @default("active") // "active" | "onboarding" | "paused" | "churned"
+
+  // Link to existing models
+  clientProfileId Int?      @unique @map("client_profile_id") // FK -> ClientProfile (SEO vertical)
+
+  verticalMeta    Json?     @map("vertical_meta")
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id])
+  assets          IntelAsset[]
+  competitors     IntelCompetitor[]
+  scans           IntelScan[]
+
+  @@index([tenantId])
+  @@map("intel_asset_groups")
+}
+
+model IntelAsset {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int       @map("tenant_id")
+  assetGroupId    Int?      @map("asset_group_id")
+
+  domain          String
+  name            String
+  type            String    // "main_site" | "satellite" | "affiliate_domain" | "authority_site" | "landing_page"
+  ownershipModel  String    @default("managed") @map("ownership_model") // "tenant_owned" | "client_owned" | "managed"
+
+  status          String    @default("active") // "active" | "building" | "paused" | "decommissioned"
+  healthScore     Int       @default(50) @map("health_score")
+  lastScanAt      DateTime? @map("last_scan_at")
+  nextScanAt      DateTime? @map("next_scan_at")
+
+  // Links to existing vertical-specific models
+  clientDomainId  Int?      @unique @map("client_domain_id") // FK -> ClientDomain (SEO vertical)
+  siteId          Int?      @unique @map("site_id")          // FK -> Site (affiliate vertical)
+
+  verticalMeta    Json?     @map("vertical_meta")
+
+  // Fleet (IE-04 will add IntelFleet model)
+  fleetId         Int?      @map("fleet_id")
+  fleetRole       String?   @map("fleet_role") // "primary" | "satellite" | "standalone"
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
+  clientDomain    ClientDomain?    @relation(fields: [clientDomainId], references: [id])
+  site            Site?            @relation(fields: [siteId], references: [id])
+  competitors     IntelCompetitor[]
+  snapshots       IntelSnapshot[]
+
+  @@index([tenantId])
+  @@index([tenantId, type])
+  @@index([assetGroupId])
+  @@map("intel_assets")
+}
+
+model IntelCompetitor {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int       @map("tenant_id")
+  assetGroupId    Int?      @map("asset_group_id")
+  assetId         Int?      @map("asset_id")
+
+  name            String
+  domain          String?
+  googlePlaceId   String?   @map("google_place_id")
+
+  isActive        Boolean   @default(true) @map("is_active")
+  source          String    @default("manual") // "auto_detected" | "manual" | "scan_discovered"
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
+  asset           IntelAsset?      @relation(fields: [assetId], references: [id])
+  snapshots       IntelSnapshot[]
+
+  @@index([tenantId])
+  @@index([assetGroupId])
+  @@index([assetId])
+  @@map("intel_competitors")
+}
+
+model IntelSensorCredential {
+  id          Int       @id @default(autoincrement())
+  tenantId    Int       @map("tenant_id")
+  sensorId    String    @map("sensor_id") // "ahrefs" | "serpapi" | "gsc" | "ga4" | "outscraper" | "pagespeed"
+
+  credentials Json      // encrypted API keys, OAuth tokens, etc.
+  isActive    Boolean   @default(true) @map("is_active")
+  lastUsedAt  DateTime? @map("last_used_at")
+  status      String    @default("active") // "active" | "expired" | "rate_limited" | "error"
+  statusNote  String?   @map("status_note")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([tenantId, sensorId])
+  @@index([tenantId])
+  @@map("intel_sensor_credentials")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Intelligence Engine — Sprint IE-02: Scan Engine + First Sensors
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model IntelScan {
+  id              Int       @id @default(autoincrement())
+  tenantId        Int       @map("tenant_id")
+  assetGroupId    Int?      @map("asset_group_id")
+
+  scheduledAt     DateTime  @map("scheduled_at")
+  startedAt       DateTime? @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+
+  // "scheduled" | "running" | "complete" | "partial" | "failed"
+  status          String    @default("scheduled")
+
+  sensorsRun      Json?     @map("sensors_run")      // string[] of sensorIds that completed
+  sensorsFailed   Json?     @map("sensors_failed")   // { sensorId: errorMessage }
+
+  snapshotCount   Int       @default(0) @map("snapshot_count")
+  alertCount      Int       @default(0) @map("alert_count")
+  tasksGenerated  Int       @default(0) @map("tasks_generated")
+
+  apiCosts        Json?     @map("api_costs")         // { sensorId: cost }
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
+  snapshots       IntelSnapshot[]
+
+  @@index([tenantId, status])
+  @@index([assetGroupId])
+  @@map("intel_scans")
+}
+
+model IntelSnapshot {
+  id              Int       @id @default(autoincrement())
+  scanId          Int       @map("scan_id")
+  entityType      String    @map("entity_type")  // "asset" | "competitor"
+  assetId         Int?      @map("asset_id")
+  competitorId    Int?      @map("competitor_id")
+
+  metrics         Json      // all measured values from active sensors
+  deltas          Json?     // changes vs previous snapshot for this entity
+  velocity        Json?     // { metricKey: "improving" | "stable" | "declining" }
+  alerts          Json?     // threshold breaches array
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  scan            IntelScan        @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  asset           IntelAsset?      @relation(fields: [assetId], references: [id])
+  competitor      IntelCompetitor? @relation(fields: [competitorId], references: [id])
+
+  @@index([scanId])
+  @@index([assetId, createdAt(sort: Desc)])
+  @@index([competitorId, createdAt(sort: Desc)])
+  @@map("intel_snapshots")
 }
