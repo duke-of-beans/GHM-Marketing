@@ -9,118 +9,72 @@ datasource db {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
-  passwordHash   String           @map("password_hash")
-  name           String
-  role           UserRole         @default(sales)
-  
-  // Granular permission system
-  permissions        Json     @default("{}") // Feature flags (UserPermissions interface)
-  permissionPreset   String   @default("sales_basic") @map("permission_preset") // sales_basic, sales_advanced, master_lite, master_full, custom
-  
-  territoryId    Int?             @map("territory_id")
-  isActive       Boolean          @default(true) @map("is_active")
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @updatedAt @map("updated_at")
-  lastLogin      DateTime?        @map("last_login")
-  clientNotes    ClientNote[]
-  leadHistory    LeadHistory[]
-  assignedLeads  Lead[]           @relation("AssignedTo")
-  notes          Note[]
-  repPerformance RepPerformance[]
-  stageMetrics   StageMetrics[]
-  territory      Territory?       @relation(fields: [territoryId], references: [id])
-  workOrders     WorkOrder[]
-  
-  // Commission system relations
-  compensationConfig    UserCompensationConfig?
-  compensationOverrides ClientCompensationOverride[]
-  paymentTransactions   PaymentTransaction[]
-  salesRepClients       ClientProfile[] @relation("SalesRep")
-  masterClients         ClientProfile[] @relation("MasterManager")
-  passwordResetTokens   PasswordResetToken[]
-  
-  // Bug reporting relations
-  reportedBugs          BugReport[] @relation("BugReporter")
-  assignedBugs          BugReport[] @relation("BugAssignee")
-  resolvedBugs          BugReport[] @relation("BugResolver")
-  
-  // Contractor entity (for Wave AP payments — replaces waveVendorId)
-  contractorVendorId    String?   @map("contractor_vendor_id")    // Wave vendor ID for AP bills
-  contractorEntityName  String?   @map("contractor_entity_name")  // e.g. "Apex North"
-  contractorEmail       String?   @map("contractor_email")        // Wave vendor billing email
-
-  // Settings relations
-  settingsUpdates       GlobalSettings[] @relation("SettingsUpdater")
-  
-  // Audit logging
-  auditLogs             AuditLog[] @relation("AuditLogs")
-  
-  // Dashboard personalization
-  dashboardLayout       Json?      @map("dashboard_layout")  // react-grid-layout serialized state
-  
-  // Task Pipeline relations
-  assignedTasks         ClientTask[] @relation("TaskAssignee")
-  createdTasks          ClientTask[] @relation("TaskAssigner")
-
-  // Onboarding Portal
-  generatedOnboardingTokens OnboardingToken[] @relation("OnboardingTokenCreator")
-  
-  // Rep onboarding flow
-  repOnboardingCompletedAt  DateTime?  @map("rep_onboarding_completed_at")
-  repOnboardingStep         Int        @default(0) @map("rep_onboarding_step") // last completed step (0 = not started)
-
-  // Admin first-run wizard (9B / Sprint 17)
-  adminOnboardingCompletedAt DateTime? @map("admin_onboarding_completed_at")
-  adminOnboardingStep         Int       @default(0) @map("admin_onboarding_step") // last completed step index
-
-  // Document Vault
-  vaultUploads          VaultFile[]  @relation("VaultUploads")
-  vaultPrivateFiles     VaultFile[]  @relation("VaultOwned")
-  signatureEnvelopes    SignatureEnvelope[]
-
-  // Team messaging
-  sentMessages          TeamMessage[] @relation("MessageAuthor")
-  receivedMessages      TeamMessage[] @relation("MessageRecipient")
-  messageReads          TeamMessageRead[]
-  messageReactions      TeamMessageReaction[]
-  pushSubscriptions     PushSubscription[]
-
-  // Prospect history
-  generatedAudits       ProspectAudit[] @relation("AuditGenerator")
-  generatedDemos        ProspectDemo[]  @relation("DemoGenerator")
-
-  // Position (job function — separate from dashboard role)
-  positionId            Int?      @map("position_id")
-  position              Position? @relation(fields: [positionId], references: [id])
-
-  // Admin task queue
-  assignedAdminTasks    AdminTask[] @relation("AdminTaskAssignee")
-  createdAdminTasks     AdminTask[] @relation("AdminTaskCreator")
-
-  // Operations Layer
-  acknowledgedAlerts    AlertEvent[] @relation("AlertAcknowledger")
-  notifications         NotificationEvent[]
-
-  // Saved searches (Sprint 7A)
-  savedSearches         SavedSearch[]
-
-  // Dashboard usage events (FEAT-019)
-  dashboardEvents       DashboardEvent[]
-
-  // PM Import sessions (FEAT-014)
-  pmImportSessions      PmImportSession[]
-
-  // Guide Character (FEAT-039)
-  guideEnabled          Boolean   @default(true) @map("guide_enabled")
-
-  // 2FA / TOTP (admin + master accounts only)
-  // totpSecret is encrypted at rest — stored encrypted with server-side key
-  totpEnabled           Boolean   @default(false) @map("totp_enabled")
-  totpSecret            String?   @map("totp_secret")    // Encrypted TOTP secret
-  totpVerifiedAt        DateTime? @map("totp_verified_at") // When 2FA was first verified
-  totpBackupCodes       String?   @map("totp_backup_codes") // JSON array of hashed backup codes
+  id                         Int                          @id @default(autoincrement())
+  email                      String                       @unique
+  passwordHash               String                       @map("password_hash")
+  name                       String
+  role                       UserRole                     @default(sales)
+  territoryId                Int?                         @map("territory_id")
+  isActive                   Boolean                      @default(true) @map("is_active")
+  createdAt                  DateTime                     @default(now()) @map("created_at")
+  updatedAt                  DateTime                     @updatedAt @map("updated_at")
+  lastLogin                  DateTime?                    @map("last_login")
+  contractorEmail            String?                      @map("contractor_email")
+  contractorEntityName       String?                      @map("contractor_entity_name")
+  contractorVendorId         String?                      @map("contractor_vendor_id")
+  dashboardLayout            Json?                        @map("dashboard_layout")
+  permissionPreset           String                       @default("sales_basic") @map("permission_preset")
+  permissions                Json                         @default("{}")
+  positionId                 Int?                         @map("position_id")
+  repOnboardingCompletedAt   DateTime?                    @map("rep_onboarding_completed_at")
+  repOnboardingStep          Int                          @default(0) @map("rep_onboarding_step")
+  totpBackupCodes            String?                      @map("totp_backup_codes")
+  totpEnabled                Boolean                      @default(false) @map("totp_enabled")
+  totpSecret                 String?                      @map("totp_secret")
+  totpVerifiedAt             DateTime?                    @map("totp_verified_at")
+  adminOnboardingCompletedAt DateTime?                    @map("admin_onboarding_completed_at")
+  adminOnboardingStep        Int                          @default(0) @map("admin_onboarding_step")
+  guideEnabled               Boolean                      @default(true) @map("guide_enabled")
+  assignedAdminTasks         AdminTask[]                  @relation("AdminTaskAssignee")
+  createdAdminTasks          AdminTask[]                  @relation("AdminTaskCreator")
+  acknowledgedAlerts         AlertEvent[]                 @relation("AlertAcknowledger")
+  auditLogs                  AuditLog[]                   @relation("AuditLogs")
+  assignedBugs               BugReport[]                  @relation("BugAssignee")
+  resolvedBugs               BugReport[]                  @relation("BugResolver")
+  reportedBugs               BugReport[]                  @relation("BugReporter")
+  compensationOverrides      ClientCompensationOverride[]
+  clientNotes                ClientNote[]
+  masterClients              ClientProfile[]              @relation("MasterManager")
+  salesRepClients            ClientProfile[]              @relation("SalesRep")
+  createdTasks               ClientTask[]                 @relation("TaskAssigner")
+  assignedTasks              ClientTask[]                 @relation("TaskAssignee")
+  dashboardEvents            DashboardEvent[]
+  settingsUpdates            GlobalSettings[]             @relation("SettingsUpdater")
+  leadHistory                LeadHistory[]
+  assignedLeads              Lead[]                       @relation("AssignedTo")
+  notes                      Note[]
+  notifications              NotificationEvent[]
+  generatedOnboardingTokens  OnboardingToken[]            @relation("OnboardingTokenCreator")
+  passwordResetTokens        PasswordResetToken[]
+  paymentTransactions        PaymentTransaction[]
+  pmImportSessions           PmImportSession[]
+  generatedAudits            ProspectAudit[]              @relation("AuditGenerator")
+  generatedDemos             ProspectDemo[]               @relation("DemoGenerator")
+  pushSubscriptions          PushSubscription[]
+  repPerformance             RepPerformance[]
+  savedSearches              SavedSearch[]
+  signatureEnvelopes         SignatureEnvelope[]
+  stageMetrics               StageMetrics[]
+  messageReactions           TeamMessageReaction[]
+  messageReads               TeamMessageRead[]
+  sentMessages               TeamMessage[]                @relation("MessageAuthor")
+  receivedMessages           TeamMessage[]                @relation("MessageRecipient")
+  compensationConfig         UserCompensationConfig?
+  position                   Position?                    @relation(fields: [positionId], references: [id])
+  territory                  Territory?                   @relation(fields: [territoryId], references: [id])
+  vaultPrivateFiles          VaultFile[]                  @relation("VaultOwned")
+  vaultUploads               VaultFile[]                  @relation("VaultUploads")
+  workOrders                 WorkOrder[]
 
   @@index([territoryId])
   @@index([positionId])
@@ -128,18 +82,17 @@ model User {
 }
 
 model Position {
-  id                   Int       @id @default(autoincrement())
-  name                 String    @unique
-  type                 String    // "sales" | "management" | "operations" | "contractor"
-  compensationType     String    @map("compensation_type")  // "commission_residual" | "management_fee" | "flat_monthly" | "per_deliverable" | "manual"
-  defaultAmount        Decimal?  @map("default_amount") @db.Decimal(10, 2)
-  defaultFrequency     String?   @map("default_frequency") // "monthly" | "per_close" | "per_deliverable" | "manual"
-  dashboardAccessLevel String    @map("dashboard_access_level") // "admin" | "manager" | "sales" | "readonly"
-  isActive             Boolean   @default(true) @map("is_active")
+  id                   Int      @id @default(autoincrement())
+  name                 String   @unique
+  type                 String
+  compensationType     String   @map("compensation_type")
+  defaultAmount        Decimal? @map("default_amount") @db.Decimal(10, 2)
+  defaultFrequency     String?  @map("default_frequency")
+  dashboardAccessLevel String   @map("dashboard_access_level")
+  isActive             Boolean  @default(true) @map("is_active")
   notes                String?
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime  @updatedAt @map("updated_at")
-
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
   users                User[]
 
   @@map("positions")
@@ -173,58 +126,58 @@ model LeadSource {
 }
 
 model Lead {
-  id                Int               @id @default(autoincrement())
-  businessName      String            @map("business_name")
-  website           String?
-  phone             String
-  email             String?
-  address           String?
-  city              String
-  state             String
-  zipCode           String            @map("zip_code")
-  territoryId       Int?              @map("territory_id")
-  assignedTo        Int?              @map("assigned_to")
-  leadSourceId      Int?              @map("lead_source_id")
-  status            LeadStatus        @default(available)
-  statusChangedAt   DateTime          @default(now()) @map("status_changed_at")
-  domainRating      Int?              @map("domain_rating")
-  currentRank       Int?              @map("current_rank")
-  reviewCount       Int?              @map("review_count")
-  reviewAvg         Decimal?          @map("review_avg") @db.Decimal(3, 2)
-  intelLastUpdated  DateTime?         @map("intel_last_updated")
-  intelNeedsRefresh Boolean           @default(false) @map("intel_needs_refresh")
-  dealValueTotal    Decimal           @default(0) @map("deal_value_total") @db.Decimal(10, 2)
-  dealValueOneTime  Decimal           @default(0) @map("deal_value_one_time") @db.Decimal(10, 2)
-  dealValueMonthly  Decimal           @default(0) @map("deal_value_monthly") @db.Decimal(10, 2)
-  dealValueAnnual   Decimal           @default(0) @map("deal_value_annual") @db.Decimal(10, 2)
-  mrr               Decimal           @default(0) @db.Decimal(10, 2)
-  arr               Decimal           @default(0) @db.Decimal(10, 2)
-  ltvEstimated      Decimal           @default(0) @map("ltv_estimated") @db.Decimal(10, 2)
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
-  closeScore        Int?              @map("close_score")
-  distanceFromMetro Decimal?          @map("distance_from_metro") @db.Decimal(6, 1)
-  impactScore       Int?              @map("impact_score")
-  marketType        String?           @map("market_type")
-  pitchAngle        String?           @map("pitch_angle")
-  priorityTier      String?           @map("priority_tier")
-  suppressionSignal String?           @map("suppression_signal")
-  wealthScore       String?           @map("wealth_score")
-  clientProfile     ClientProfile?
-  competitiveIntel  CompetitiveIntel?
-  onboardingTokens  OnboardingToken[]
+  id                    Int                    @id @default(autoincrement())
+  businessName          String                 @map("business_name")
+  website               String?
+  phone                 String
+  email                 String?
+  address               String?
+  city                  String
+  state                 String
+  zipCode               String                 @map("zip_code")
+  territoryId           Int?                   @map("territory_id")
+  assignedTo            Int?                   @map("assigned_to")
+  leadSourceId          Int?                   @map("lead_source_id")
+  status                LeadStatus             @default(available)
+  statusChangedAt       DateTime               @default(now()) @map("status_changed_at")
+  domainRating          Int?                   @map("domain_rating")
+  currentRank           Int?                   @map("current_rank")
+  reviewCount           Int?                   @map("review_count")
+  reviewAvg             Decimal?               @map("review_avg") @db.Decimal(3, 2)
+  intelLastUpdated      DateTime?              @map("intel_last_updated")
+  intelNeedsRefresh     Boolean                @default(false) @map("intel_needs_refresh")
+  dealValueTotal        Decimal                @default(0) @map("deal_value_total") @db.Decimal(10, 2)
+  dealValueOneTime      Decimal                @default(0) @map("deal_value_one_time") @db.Decimal(10, 2)
+  dealValueMonthly      Decimal                @default(0) @map("deal_value_monthly") @db.Decimal(10, 2)
+  dealValueAnnual       Decimal                @default(0) @map("deal_value_annual") @db.Decimal(10, 2)
+  mrr                   Decimal                @default(0) @db.Decimal(10, 2)
+  arr                   Decimal                @default(0) @db.Decimal(10, 2)
+  ltvEstimated          Decimal                @default(0) @map("ltv_estimated") @db.Decimal(10, 2)
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  closeScore            Int?                   @map("close_score")
+  distanceFromMetro     Decimal?               @map("distance_from_metro") @db.Decimal(6, 1)
+  impactScore           Int?                   @map("impact_score")
+  marketType            String?                @map("market_type")
+  pitchAngle            String?                @map("pitch_angle")
+  priorityTier          String?                @map("priority_tier")
+  suppressionSignal     String?                @map("suppression_signal")
+  wealthScore           String?                @map("wealth_score")
+  clientProfile         ClientProfile?
+  competitiveIntel      CompetitiveIntel?
+  dealProducts          DealProduct[]
+  leadHistory           LeadHistory[]
+  assignedUser          User?                  @relation("AssignedTo", fields: [assignedTo], references: [id])
+  leadSource            LeadSource?            @relation(fields: [leadSourceId], references: [id])
+  territory             Territory?             @relation(fields: [territoryId], references: [id])
+  notes                 Note[]
   onboardingSubmissions OnboardingSubmission[]
-  dealProducts      DealProduct[]
-  leadHistory       LeadHistory[]
-  assignedUser      User?             @relation("AssignedTo", fields: [assignedTo], references: [id])
-  leadSource        LeadSource?       @relation(fields: [leadSourceId], references: [id])
-  territory         Territory?        @relation(fields: [territoryId], references: [id])
-  notes             Note[]
-  workOrders        WorkOrder[]
-  vaultFiles        VaultFile[]
-  signatures        SignatureEnvelope[]
-  prospectAudits    ProspectAudit[]
-  prospectDemos     ProspectDemo[]
+  onboardingTokens      OnboardingToken[]
+  prospectAudits        ProspectAudit[]
+  prospectDemos         ProspectDemo[]
+  signatures            SignatureEnvelope[]
+  vaultFiles            VaultFile[]
+  workOrders            WorkOrder[]
 
   @@index([territoryId])
   @@index([assignedTo])
@@ -299,17 +252,17 @@ model CompetitiveIntel {
 }
 
 model Product {
-  id                  Int                  @id @default(autoincrement())
+  id                  Int                 @id @default(autoincrement())
   name                String
   description         String?
-  sku                 String               @unique
+  sku                 String              @unique
   category            String?
-  price               Decimal              @db.Decimal(10, 2)
-  pricingModel        PricingModel         @map("pricing_model")
-  isActive            Boolean              @default(true) @map("is_active")
-  displayOrder        Int                  @default(0) @map("display_order")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
+  price               Decimal             @db.Decimal(10, 2)
+  pricingModel        PricingModel        @map("pricing_model")
+  isActive            Boolean             @default(true) @map("is_active")
+  displayOrder        Int                 @default(0) @map("display_order")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
   dealProducts        DealProduct[]
   upsellOpportunities UpsellOpportunity[]
 
@@ -409,89 +362,61 @@ model RepPerformance {
 }
 
 model ClientProfile {
-  id             Int                @id @default(autoincrement())
-  leadId         Int                @unique @map("lead_id")
-  businessName   String             @map("business_name")
-  retainerAmount      Decimal              @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
-  healthScore         Int                  @default(50) @map("health_score")
-  scanFrequency       String               @default("biweekly") @map("scan_frequency")
-  voiceProfileId      String?              @map("voice_profile_id")
-  status              String               @default("active")
-  onboardedAt         DateTime             @default(now()) @map("onboarded_at")
-  lastScanAt          DateTime?            @map("last_scan_at")
-  nextScanAt          DateTime?            @map("next_scan_at")
-  
-  // Commission system fields
-  salesRepId      Int?     @map("sales_rep_id")
-  masterManagerId Int?     @map("master_manager_id")
-  onboardedMonth  DateTime? @map("onboarded_month") @db.Date
-
-  // Phase A: Lock-at-close residual tracking
-  lockedResidualAmount  Decimal?  @map("locked_residual_amount") @db.Decimal(10, 2)
-  closedInMonth         DateTime? @map("closed_in_month") @db.Date
-
-  // Client Portal
-  portalToken           String?   @unique @map("portal_token")
-
-  // Reporting Schedule (Sprint 6)
-  reportDeliveryDay     Int?      @map("report_delivery_day")     // 1, 5, or 15 — day of month to deliver
-  reportDeliveryEmails  String[]  @map("report_delivery_emails")  // cc list, defaults to client lead email
-
-  // Churn tracking
-  churnedAt         DateTime? @map("churned_at")
-  churnReason       String?   @map("churn_reason") @db.Text
-
-  // Wave billing fields
-  waveCustomerId    String?   @map("wave_customer_id")
-  invoiceDay        Int       @default(1) @map("invoice_day")
-  paymentTermsDays  Int       @default(7) @map("payment_terms_days")
-  lastInvoiceDate   DateTime? @map("last_invoice_date")
-  lastPaymentDate   DateTime? @map("last_payment_date")
-  paymentStatus     String    @default("current") @map("payment_status")
-  // "current" | "grace" | "overdue" | "paused" | "collections" | "terminated"
-
-  invoiceRecords    InvoiceRecord[]
-  
-  competitors         ClientCompetitor[]
-  domains             ClientDomain[]
-  notes               ClientNote[]
-  lead                Lead                 @relation(fields: [leadId], references: [id])
-  reports             ClientReport[]
-  tasks               ClientTask[]
-  scans               CompetitiveScan[]
-  upsellOpportunities UpsellOpportunity[]
-  content             ClientContent[]
-  voiceProfile        VoiceProfile?
-  
-  // Commission system relations
-  salesRep             User?    @relation("SalesRep", fields: [salesRepId], references: [id])
-  masterManager        User?    @relation("MasterManager", fields: [masterManagerId], references: [id])
-  compensationOverrides ClientCompensationOverride[]
-  paymentTransactions   PaymentTransaction[]
-
-  // Website Studio
-  webProperties         WebProperty[]
-  // AI Cost Tracking
+  id                    Int                          @id @default(autoincrement())
+  leadId                Int                          @unique @map("lead_id")
+  businessName          String                       @map("business_name")
+  retainerAmount        Decimal                      @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
+  healthScore           Int                          @default(50) @map("health_score")
+  scanFrequency         String                       @default("biweekly") @map("scan_frequency")
+  voiceProfileId        String?                      @map("voice_profile_id")
+  status                String                       @default("active")
+  onboardedAt           DateTime                     @default(now()) @map("onboarded_at")
+  lastScanAt            DateTime?                    @map("last_scan_at")
+  nextScanAt            DateTime?                    @map("next_scan_at")
+  churnReason           String?                      @map("churn_reason")
+  churnedAt             DateTime?                    @map("churned_at")
+  closedInMonth         DateTime?                    @map("closed_in_month") @db.Date
+  invoiceDay            Int                          @default(1) @map("invoice_day")
+  lastInvoiceDate       DateTime?                    @map("last_invoice_date")
+  lastPaymentDate       DateTime?                    @map("last_payment_date")
+  lockedResidualAmount  Decimal?                     @map("locked_residual_amount") @db.Decimal(10, 2)
+  masterManagerId       Int?                         @map("master_manager_id")
+  onboardedMonth        DateTime?                    @map("onboarded_month") @db.Date
+  paymentStatus         String                       @default("current") @map("payment_status")
+  paymentTermsDays      Int                          @default(7) @map("payment_terms_days")
+  salesRepId            Int?                         @map("sales_rep_id")
+  waveCustomerId        String?                      @map("wave_customer_id")
+  portalToken           String?                      @unique @map("portal_token")
+  reportDeliveryDay     Int?                         @map("report_delivery_day")
+  reportDeliveryEmails  String[]                     @map("report_delivery_emails")
   aiCostLogs            AICostLog[]
-  // Rank tracking
-  keywordTrackers       KeywordTracker[]
-  // Citation scans
-  citationScans         CitationScan[]
-  // Google Business Profile
-  gbpConnection         GBPConnection?
-  googleAdsConnection   GoogleAdsConnection?
-  // Document Vault
-  vaultFiles            VaultFile[]
-
-  // Operations Layer
   alertEvents           AlertEvent[]
-  recurringTaskRules    RecurringTaskRule[] @relation("RecurringTaskRuleClient")
-  siteHealthSnapshots   SiteHealthSnapshot[]
+  citationScans         CitationScan[]
+  compensationOverrides ClientCompensationOverride[]
+  competitors           ClientCompetitor[]
+  content               ClientContent[]
+  domains               ClientDomain[]
+  notes                 ClientNote[]
+  lead                  Lead                         @relation(fields: [leadId], references: [id])
+  masterManager         User?                        @relation("MasterManager", fields: [masterManagerId], references: [id])
+  salesRep              User?                        @relation("SalesRep", fields: [salesRepId], references: [id])
+  reports               ClientReport[]
+  tasks                 ClientTask[]
+  scans                 CompetitiveScan[]
+  gbpConnection         GBPConnection?
   gbpSnapshots          GbpSnapshot[]
+  googleAdsConnection   GoogleAdsConnection?
+  intelAssetGroup       IntelAssetGroup?
+  invoiceRecords        InvoiceRecord[]
+  keywordTrackers       KeywordTracker[]
+  paymentTransactions   PaymentTransaction[]
+  recurringTaskRules    RecurringTaskRule[]          @relation("RecurringTaskRuleClient")
+  siteHealthSnapshots   SiteHealthSnapshot[]
+  upsellOpportunities   UpsellOpportunity[]
+  vaultFiles            VaultFile[]
+  voiceProfile          VoiceProfile?
+  webProperties         WebProperty[]
   websiteAudits         WebsiteAudit[]
-
-  // Intelligence Engine (Sprint IE-01)
-  intelAssetGroup     IntelAssetGroup?
 
   @@map("client_profiles")
 }
@@ -511,87 +436,78 @@ model ClientCompetitor {
 }
 
 model ClientDomain {
-  id              Int           @id @default(autoincrement())
-  clientId        Int           @map("client_id")
-  domain          String
-  type            String
-  hosting         String
-  wpUrl           String?       @map("wp_url")
-  wpUsername      String?       @map("wp_username")
-  wpAppPassword   String?       @map("wp_app_password")
-  vercelProjectId String?       @map("vercel_project_id")
-  githubRepo      String?       @map("github_repo")
-  templateUsed    String?       @map("template_used")
-  ownershipType   String        @default("ghm") @map("ownership_type")
-  dnsVerified     Boolean       @default(false) @map("dns_verified")
-  sslActive       Boolean       @default(false) @map("ssl_active")
-  contentCount    Int           @default(0) @map("content_count")
-  lastDeployedAt  DateTime?     @map("last_deployed_at")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  siteHealthSnapshots SiteHealthSnapshot[]
-
-  // Intelligence Engine (Sprint IE-01)
+  id                  Int                  @id @default(autoincrement())
+  clientId            Int                  @map("client_id")
+  domain              String
+  type                String
+  hosting             String
+  wpUrl               String?              @map("wp_url")
+  wpUsername          String?              @map("wp_username")
+  wpAppPassword       String?              @map("wp_app_password")
+  vercelProjectId     String?              @map("vercel_project_id")
+  githubRepo          String?              @map("github_repo")
+  templateUsed        String?              @map("template_used")
+  ownershipType       String               @default("ghm") @map("ownership_type")
+  dnsVerified         Boolean              @default(false) @map("dns_verified")
+  sslActive           Boolean              @default(false) @map("ssl_active")
+  contentCount        Int                  @default(0) @map("content_count")
+  lastDeployedAt      DateTime?            @map("last_deployed_at")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  client              ClientProfile        @relation(fields: [clientId], references: [id], onDelete: Cascade)
   intelAsset          IntelAsset?
+  siteHealthSnapshots SiteHealthSnapshot[]
 
   @@index([clientId])
   @@map("client_domains")
 }
 
 model ClientTask {
-  id              Int           @id @default(autoincrement())
-  clientId        Int           @map("client_id")
-  title           String
-  description     String?
-  category        String
-  priority        String        @default("P3")
-  status          String        @default("queued")
-  source          String        @default("manual")
-  assignedTo      String?       @map("assigned_to")          // DEPRECATED — use assignedToUserId
-  targetKeywords  Json?         @map("target_keywords")
-  competitorRef   String?       @map("competitor_ref")
-  contentBrief    Json?         @map("content_brief")
-  draftContent    String?       @map("draft_content")
-  approvedContent String?       @map("approved_content")
-  deployedUrl     String?       @map("deployed_url")
-  outcomeMetrics  Json?         @map("outcome_metrics")
-  dueDate         DateTime?     @map("due_date")
-  scanId          Int?          @map("scan_id")
-  domainId        Int?          @map("domain_id")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  deployedAt      DateTime?     @map("deployed_at")
-  measuredAt      DateTime?     @map("measured_at")
-  
-  // ── Task Pipeline additions ────────────────────────────────────────────────
-  assignedToUserId  Int?        @map("assigned_to_user_id")   // Proper FK — who owns this task right now
-  assignedByUserId  Int?        @map("assigned_by_user_id")   // Who created or assigned
-  startedAt         DateTime?   @map("started_at")            // When work actually began
-  completedAt       DateTime?   @map("completed_at")          // When finished (approved/deployed/done)
-  statusChangedAt   DateTime    @default(now()) @map("status_changed_at") // Last status transition
-  estimatedMinutes  Int?        @map("estimated_minutes")     // Time estimate for queue planning
-  sortOrder         Int         @default(0) @map("sort_order")// Manual queue ordering (lower = higher priority)
-  
-  // ── Operations Layer additions ───────────────────────────────────────────
-  recurringRuleId   Int?        @map("recurring_rule_id")   // FK to RecurringTaskRule
-  sourceAlertId     Int?        @map("source_alert_id")     // FK to AlertEvent (alert-originated tasks)
-  blockedReason     String?     @map("blocked_reason")       // Why task is blocked
-  checklistComplete Boolean     @default(false) @map("checklist_complete") // Quick filter for completed checklists
-
-  // ── Import tracking ──────────────────────────────────────────────────────
-  pmImportSessionId Int?        @map("pm_import_session_id")  // FK to PmImportSession (for rollback)
-  pmExternalId      String?     @map("pm_external_id")        // Original externalId from source platform
-
-  // Relations
+  id                Int                 @id @default(autoincrement())
+  clientId          Int                 @map("client_id")
+  title             String
+  description       String?
+  category          String
+  priority          String              @default("P3")
+  status            String              @default("queued")
+  source            String              @default("manual")
+  assignedTo        String?             @map("assigned_to")
+  targetKeywords    Json?               @map("target_keywords")
+  competitorRef     String?             @map("competitor_ref")
+  contentBrief      Json?               @map("content_brief")
+  draftContent      String?             @map("draft_content")
+  approvedContent   String?             @map("approved_content")
+  deployedUrl       String?             @map("deployed_url")
+  outcomeMetrics    Json?               @map("outcome_metrics")
+  dueDate           DateTime?           @map("due_date")
+  scanId            Int?                @map("scan_id")
+  intelScanId       Int?                @map("intel_scan_id")
+  domainId          Int?                @map("domain_id")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  deployedAt        DateTime?           @map("deployed_at")
+  measuredAt        DateTime?           @map("measured_at")
+  assignedByUserId  Int?                @map("assigned_by_user_id")
+  assignedToUserId  Int?                @map("assigned_to_user_id")
+  blockedReason     String?             @map("blocked_reason")
+  checklistComplete Boolean             @default(false) @map("checklist_complete")
+  completedAt       DateTime?           @map("completed_at")
+  estimatedMinutes  Int?                @map("estimated_minutes")
+  recurringRuleId   Int?                @map("recurring_rule_id")
+  sortOrder         Int                 @default(0) @map("sort_order")
+  sourceAlertId     Int?                @map("source_alert_id")
+  startedAt         DateTime?           @map("started_at")
+  statusChangedAt   DateTime            @default(now()) @map("status_changed_at")
+  pmExternalId      String?             @map("pm_external_id")
+  pmImportSessionId Int?                @map("pm_import_session_id")
   notes             ClientNote[]
-  transitions       TaskTransition[]
-  client            ClientProfile      @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  assignedToUser    User?              @relation("TaskAssignee", fields: [assignedToUserId], references: [id])
-  assignedByUser    User?              @relation("TaskAssigner", fields: [assignedByUserId], references: [id])
-  recurringRule     RecurringTaskRule? @relation(fields: [recurringRuleId], references: [id])
-  checklistItems    TaskChecklistItem[]
+  assignedByUser    User?               @relation("TaskAssigner", fields: [assignedByUserId], references: [id])
+  assignedToUser    User?               @relation("TaskAssignee", fields: [assignedToUserId], references: [id])
+  client            ClientProfile       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pmImportSession   PmImportSession?    @relation(fields: [pmImportSessionId], references: [id])
+  recurringRule     RecurringTaskRule?  @relation(fields: [recurringRuleId], references: [id])
   alertLinks        TaskAlertLink[]
-  pmImportSession   PmImportSession?   @relation(fields: [pmImportSessionId], references: [id])
+  checklistItems    TaskChecklistItem[]
+  transitions       TaskTransition[]
 
   @@index([clientId, status])
   @@index([clientId, category])
@@ -600,6 +516,8 @@ model ClientTask {
   @@index([assignedToUserId, priority])
   @@index([status, priority])
   @@index([dueDate])
+  @@index([intelScanId])
+  @@index([source])
   @@map("client_tasks")
 }
 
@@ -624,21 +542,16 @@ model ClientNote {
   @@map("client_notes")
 }
 
-// ============================================================================
-// TASK PIPELINE — STATUS TRANSITION HISTORY
-// ============================================================================
-
 model TaskTransition {
-  id          Int        @id @default(autoincrement())
-  taskId      Int        @map("task_id")
-  fromStatus  String?    @map("from_status")   // null for initial creation
-  toStatus    String     @map("to_status")
-  userId      Int?       @map("user_id")        // Who made the transition
-  comment     String?                           // Optional note (rejection reason, etc.)
-  createdAt   DateTime   @default(now()) @map("created_at")
-  
-  task        ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  
+  id         Int        @id @default(autoincrement())
+  taskId     Int        @map("task_id")
+  fromStatus String?    @map("from_status")
+  toStatus   String     @map("to_status")
+  userId     Int?       @map("user_id")
+  comment    String?
+  createdAt  DateTime   @default(now()) @map("created_at")
+  task       ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
   @@index([taskId])
   @@index([userId])
   @@index([createdAt])
@@ -646,17 +559,17 @@ model TaskTransition {
 }
 
 model CompetitiveScan {
-  id                  Int                  @id @default(autoincrement())
-  clientId            Int                  @map("client_id")
-  scanDate            DateTime             @default(now()) @map("scan_date")
-  clientData          Json                 @map("client_data")
+  id                  Int                 @id @default(autoincrement())
+  clientId            Int                 @map("client_id")
+  scanDate            DateTime            @default(now()) @map("scan_date")
+  clientData          Json                @map("client_data")
   competitors         Json
   deltas              Json
   alerts              Json
-  healthScore         Int                  @map("health_score")
-  apiCosts            Json?                @map("api_costs")
-  status              String               @default("complete")
-  client              ClientProfile        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  healthScore         Int                 @map("health_score")
+  apiCosts            Json?               @map("api_costs")
+  status              String              @default("complete")
+  client              ClientProfile       @relation(fields: [clientId], references: [id], onDelete: Cascade)
   upsellOpportunities UpsellOpportunity[]
 
   @@index([clientId, scanDate(sort: Desc)])
@@ -672,8 +585,8 @@ model ClientReport {
   content      Json
   pdfUrl       String?       @map("pdf_url")
   sentToClient Boolean       @default(false) @map("sent_to_client")
-  sentAt       DateTime?     @map("sent_at")        // When the report email was delivered
   createdAt    DateTime      @default(now()) @map("created_at")
+  sentAt       DateTime?     @map("sent_at")
   client       ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, type])
@@ -706,23 +619,23 @@ model LocationPreset {
 }
 
 model UpsellOpportunity {
-  id              Int           @id @default(autoincrement())
-  clientId        Int           @map("client_id")
-  productId       Int           @map("product_id")
-  scanId          Int?          @map("scan_id")
-  status          String        @default("detected")
-  opportunityScore Int          @map("opportunity_score")
-  gapCategory     String        @map("gap_category")
-  reasoning       String
-  projectedMrr    Decimal       @map("projected_mrr") @db.Decimal(10, 2)
-  projectedRoi    Decimal?      @map("projected_roi") @db.Decimal(5, 2)
-  presentedAt     DateTime?     @map("presented_at")
-  respondedAt     DateTime?     @map("responded_at")
-  response        String?
-  detectedAt      DateTime      @default(now()) @map("detected_at")
-  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  product         Product       @relation(fields: [productId], references: [id])
-  scan            CompetitiveScan? @relation(fields: [scanId], references: [id])
+  id               Int              @id @default(autoincrement())
+  clientId         Int              @map("client_id")
+  productId        Int              @map("product_id")
+  scanId           Int?             @map("scan_id")
+  status           String           @default("detected")
+  opportunityScore Int              @map("opportunity_score")
+  gapCategory      String           @map("gap_category")
+  reasoning        String
+  projectedMrr     Decimal          @map("projected_mrr") @db.Decimal(10, 2)
+  projectedRoi     Decimal?         @map("projected_roi") @db.Decimal(5, 2)
+  presentedAt      DateTime?        @map("presented_at")
+  respondedAt      DateTime?        @map("responded_at")
+  response         String?
+  detectedAt       DateTime         @default(now()) @map("detected_at")
+  client           ClientProfile    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  product          Product          @relation(fields: [productId], references: [id])
+  scan             CompetitiveScan? @relation(fields: [scanId], references: [id])
 
   @@index([clientId, status])
   @@index([status])
@@ -730,240 +643,158 @@ model UpsellOpportunity {
   @@map("upsell_opportunities")
 }
 
-// ============================================================================
-// COMMISSION SYSTEM TABLES
-// ============================================================================
-
 model UserCompensationConfig {
   id                 Int      @id @default(autoincrement())
   userId             Int      @unique @map("user_id")
-  
-  // Commission settings
   commissionEnabled  Boolean  @default(true) @map("commission_enabled")
   commissionAmount   Decimal  @default(1000) @map("commission_amount") @db.Decimal(10, 2)
-  
-  // Residual settings
   residualEnabled    Boolean  @default(true) @map("residual_enabled")
   residualAmount     Decimal  @default(200) @map("residual_amount") @db.Decimal(10, 2)
   residualStartMonth Int      @default(2) @map("residual_start_month")
-  
-  // Manager settings (for managers only)
   masterFeeEnabled   Boolean  @default(false) @map("master_fee_enabled")
   masterFeeAmount    Decimal  @default(240) @map("master_fee_amount") @db.Decimal(10, 2)
-  
   notes              String?
   createdAt          DateTime @default(now()) @map("created_at")
   updatedAt          DateTime @updatedAt @map("updated_at")
-  
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@map("user_compensation_config")
 }
 
 model ClientCompensationOverride {
-  id                Int      @id @default(autoincrement())
-  clientId          Int      @map("client_id")
-  userId            Int      @map("user_id")
-  
-  // Override settings (null = use user default)
-  commissionAmount  Decimal? @map("commission_amount") @db.Decimal(10, 2)
-  residualAmount    Decimal? @map("residual_amount") @db.Decimal(10, 2)
-  feeAmount         Decimal? @map("fee_amount") @db.Decimal(10, 2)
-  
-  reason            String?  // Why this client is different
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
-  client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id               Int           @id @default(autoincrement())
+  clientId         Int           @map("client_id")
+  userId           Int           @map("user_id")
+  commissionAmount Decimal?      @map("commission_amount") @db.Decimal(10, 2)
+  residualAmount   Decimal?      @map("residual_amount") @db.Decimal(10, 2)
+  feeAmount        Decimal?      @map("fee_amount") @db.Decimal(10, 2)
+  reason           String?
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  client           ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([clientId, userId])
   @@map("client_compensation_overrides")
 }
 
 model PaymentTransaction {
-  id              Int      @id @default(autoincrement())
-  clientId        Int      @map("client_id")
-  userId          Int      @map("user_id")
-  
-  type            String   // "commission" | "residual" | "master_fee"
-  amount          Decimal  @db.Decimal(10, 2)
-  month           DateTime @db.Date
-  
-  status          String   @default("pending") // "pending" | "paid" | "held" | "cancelled"
-  paidAt          DateTime? @map("paid_at")
-  notes           String?
+  id             Int           @id @default(autoincrement())
+  clientId       Int           @map("client_id")
+  userId         Int           @map("user_id")
+  type           String
+  amount         Decimal       @db.Decimal(10, 2)
+  month          DateTime      @db.Date
+  status         String        @default("pending")
+  paidAt         DateTime?     @map("paid_at")
+  notes          String?
+  waveInvoiceId  String?       @map("wave_invoice_id")
+  waveBillId     String?       @map("wave_bill_id")
+  waveCustomerId String?       @map("wave_customer_id")
+  wavePaymentId  String?       @map("wave_payment_id")
+  paymentMethod  String?       @map("payment_method")
+  processingFee  Decimal?      @map("processing_fee") @db.Decimal(10, 2)
+  sourceEventId  String?       @map("source_event_id")
+  isHistorical   Boolean       @default(false) @map("is_historical")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  client         ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Wave integration
-  waveInvoiceId   String?   @map("wave_invoice_id")
-  waveBillId      String?   @map("wave_bill_id")
-  waveCustomerId  String?   @map("wave_customer_id")
-  wavePaymentId   String?   @map("wave_payment_id")
-  paymentMethod   String?   @map("payment_method")   // "ach" | "credit_card" | "check" | "manual"
-  processingFee   Decimal?  @map("processing_fee") @db.Decimal(10, 2)
-  
-  // Idempotency — Wave invoice ID or cron run identifier (prevents double-pay on webhook retry)
-  sourceEventId   String?   @map("source_event_id")
-
-  // Historical import flag — true for records seeded from Wave history (pre-Jan 1 2026)
-  isHistorical    Boolean   @default(false) @map("is_historical")
-  
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  
-  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   @@index([userId, month])
   @@index([clientId, month])
   @@index([status])
   @@map("payment_transactions")
 }
 
-enum UserRole {
-  admin   // Super-admin: can manage admins + managers, full system access
-  manager // Manager-level: territory management, team ops
-  sales   // Sales rep: territory-scoped access
-}
-
-enum LeadStatus {
-  available
-  scheduled
-  contacted
-  follow_up
-  paperwork
-  won
-  lost_rejection
-  lost_deferred
-}
-
-enum PricingModel {
-  one_time
-  monthly
-  annual
-}
-
-// ============================================================================
-// CONTENT GENERATION SYSTEM
-// ============================================================================
-
 model ClientContent {
-  id           Int            @id @default(autoincrement())
-  clientId     Int            @map("client_id")
-  contentType  String         @map("content_type") // "blog", "social", "meta"
-  title        String?
-  content      String         @db.Text
-  keywords     String[]
-  status       String         @default("draft") // "draft", "review", "approved", "published", "scheduled"
-  scheduledFor DateTime?      @map("scheduled_for")
-  publishedAt  DateTime?      @map("published_at")
-  metadata     Json?          // Store AI generation parameters, platform-specific data
-  currentVersion Int         @default(1) @map("current_version")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  
-  client       ClientProfile  @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  versions     ContentVersion[]
-  
+  id             Int              @id @default(autoincrement())
+  clientId       Int              @map("client_id")
+  contentType    String           @map("content_type")
+  title          String?
+  content        String
+  keywords       String[]
+  status         String           @default("draft")
+  scheduledFor   DateTime?        @map("scheduled_for")
+  publishedAt    DateTime?        @map("published_at")
+  metadata       Json?
+  currentVersion Int              @default(1) @map("current_version")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  client         ClientProfile    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  versions       ContentVersion[]
+
   @@index([clientId, status])
   @@index([clientId, contentType])
   @@index([scheduledFor])
   @@map("client_content")
 }
 
-// ============================================================================
-// VOICE PROFILE SYSTEM (SCRVNR)
-// ============================================================================
-
 model VoiceProfile {
-  id                String   @id // voice_xxxxx_yyyyy format
-  clientId          Int      @unique @map("client_id")
-  tonality          String   @db.Text
-  vocabulary        String[] // Array of key terms
-  sentenceStructure String   @db.Text
-  formality         Int      // 1-10 scale
-  enthusiasm        Int      // 1-10 scale
-  technicality      Int      // 1-10 scale
-  brevity           Int      // 1-10 scale
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
+  id                String        @id
+  clientId          Int           @unique @map("client_id")
+  tonality          String
+  vocabulary        String[]
+  sentenceStructure String
+  formality         Int
+  enthusiasm        Int
+  technicality      Int
+  brevity           Int
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
   client            ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
+
   @@map("voice_profiles")
 }
 
-// ============================================================================
-// CONTENT VERSIONING SYSTEM
-// ============================================================================
-
 model ContentVersion {
-  id              Int      @id @default(autoincrement())
-  contentId       Int      @map("content_id")
-  versionNumber   Int      @map("version_number")
-  title           String?
-  content         String   @db.Text
-  keywords        String[]
-  metadata        Json?    // Store generation parameters
-  changeNote      String?  @map("change_note") @db.Text
-  createdAt       DateTime @default(now()) @map("created_at")
-  createdBy       Int      @map("created_by")
-  
-  clientContent   ClientContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  
+  id            Int           @id @default(autoincrement())
+  contentId     Int           @map("content_id")
+  versionNumber Int           @map("version_number")
+  title         String?
+  content       String
+  keywords      String[]
+  metadata      Json?
+  changeNote    String?       @map("change_note")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  createdBy     Int           @map("created_by")
+  clientContent ClientContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
   @@index([contentId, versionNumber])
   @@map("content_versions")
 }
 
-// ============================================================================
-// BUG REPORTING SYSTEM
-// ============================================================================
-
 model BugReport {
-  id                Int      @id @default(autoincrement())
-  
-  // Reporter info
-  userId            Int?     @map("user_id")
-  userEmail         String?  @map("user_email")
-  userName          String?  @map("user_name")
-  
-  // Bug details
-  type              String   @default("bug") // "bug" | "feature"
-  title             String
-  description       String   @db.Text
-  category          String   // "content", "compensation", "scans", "clients", "leads", "ui", "performance", "other"
-  severity          String   @default("medium") // "low", "medium", "high", "critical"
-  status            String   @default("new") // "new", "acknowledged", "in-progress", "resolved", "wont-fix"
-  
-  // Auto-captured metadata
-  pageUrl           String   @map("page_url")
-  userAgent         String   @map("user_agent")
-  screenResolution  String   @map("screen_resolution")
-  timestamp         DateTime @default(now())
-  
-  // Technical context
-  browserInfo       Json?    @map("browser_info")  // Browser name, version, OS
-  consoleErrors     Json?    @map("console_errors") // Last 10 console errors
-  networkErrors     Json?    @map("network_errors") // Failed requests
-  recentActions     Json?    @map("recent_actions") // User's last 5 actions
-  sessionData       Json?    @map("session_data")   // Relevant session state
-  
-  // Assignment
-  assignedTo        Int?     @map("assigned_to")    // Always David Kirsch initially
-  priority          String   @default("high")       // "low", "medium", "high", "top"
-  
-  // Resolution
-  resolvedAt        DateTime? @map("resolved_at")
-  resolvedBy        Int?      @map("resolved_by")
-  resolutionNotes   String?   @map("resolution_notes") @db.Text
-  
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  
-  user              User?     @relation("BugReporter", fields: [userId], references: [id])
-  assignee          User?     @relation("BugAssignee", fields: [assignedTo], references: [id])
-  resolver          User?     @relation("BugResolver", fields: [resolvedBy], references: [id])
-  
+  id               Int       @id @default(autoincrement())
+  userId           Int?      @map("user_id")
+  userEmail        String?   @map("user_email")
+  userName         String?   @map("user_name")
+  type             String    @default("bug")
+  title            String
+  description      String
+  category         String
+  severity         String    @default("medium")
+  status           String    @default("new")
+  pageUrl          String    @map("page_url")
+  userAgent        String    @map("user_agent")
+  screenResolution String    @map("screen_resolution")
+  timestamp        DateTime  @default(now())
+  browserInfo      Json?     @map("browser_info")
+  consoleErrors    Json?     @map("console_errors")
+  networkErrors    Json?     @map("network_errors")
+  recentActions    Json?     @map("recent_actions")
+  sessionData      Json?     @map("session_data")
+  assignedTo       Int?      @map("assigned_to")
+  priority         String    @default("high")
+  resolvedAt       DateTime? @map("resolved_at")
+  resolvedBy       Int?      @map("resolved_by")
+  resolutionNotes  String?   @map("resolution_notes")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  assignee         User?     @relation("BugAssignee", fields: [assignedTo], references: [id])
+  resolver         User?     @relation("BugResolver", fields: [resolvedBy], references: [id])
+  user             User?     @relation("BugReporter", fields: [userId], references: [id])
+
   @@index([status, priority])
   @@index([category])
   @@index([assignedTo])
@@ -971,145 +802,91 @@ model BugReport {
   @@map("bug_reports")
 }
 
-// ============================================================================
-// GLOBAL SETTINGS
-// ============================================================================
-
-// Password reset tokens — generated on forgot-password request, consumed on reset
 model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  token     String   @unique
-  expiresAt DateTime @map("expires_at")
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
 }
 
 model GlobalSettings {
-  id                    Int      @id @default(autoincrement())
-  
-  // Commission Defaults
-  defaultCommission     Float    @default(0.15) @map("default_commission")       // 15%
-  defaultResidual       Float    @default(0.05) @map("default_residual")         // 5%
-  masterManagerFee      Float    @default(240) @map("master_manager_fee")        // $240/mo
+  id                     Int      @id @default(autoincrement())
+  defaultCommission      Float    @default(0.15) @map("default_commission")
+  defaultResidual        Float    @default(0.05) @map("default_residual")
+  masterManagerFee       Float    @default(240) @map("master_manager_fee")
+  upsellCommissionRate   Float    @default(0.10) @map("upsell_commission_rate")
+  residualTier1Amount    Float    @default(200) @map("residual_tier1_amount")
+  residualTier2Amount    Float    @default(250) @map("residual_tier2_amount")
+  residualTier3Amount    Float    @default(300) @map("residual_tier3_amount")
+  residualTier2Threshold Float    @default(3000) @map("residual_tier2_threshold")
+  residualTier3Threshold Float    @default(4000) @map("residual_tier3_threshold")
+  contentStudioEnabled   Boolean  @default(true) @map("content_studio_enabled")
+  scanningEnabled        Boolean  @default(true) @map("scanning_enabled")
+  voiceCaptureEnabled    Boolean  @default(true) @map("voice_capture_enabled")
+  bugReportingEnabled    Boolean  @default(true) @map("bug_reporting_enabled")
+  scanFrequencyDays      Int      @default(30) @map("scan_frequency_days")
+  scanCostLimit          Float    @default(100) @map("scan_cost_limit")
+  emailNotifications     Boolean  @default(true) @map("email_notifications")
+  taskAssignmentAlerts   Boolean  @default(true) @map("task_assignment_alerts")
+  scanCompleteAlerts     Boolean  @default(true) @map("scan_complete_alerts")
+  pushMessagesEnabled    Boolean  @default(true) @map("push_messages_enabled")
+  pushTasksEnabled       Boolean  @default(true) @map("push_tasks_enabled")
+  openaiApiKey           String?  @map("openai_api_key")
+  googleApiKey           String?  @map("google_api_key")
+  semrushApiKey          String?  @map("semrush_api_key")
+  ahrefsApiKey           String?  @map("ahrefs_api_key")
+  defaultTheme           String   @default("light") @map("default_theme")
+  goalsEnabled           Boolean  @default(false) @map("goals_enabled")
+  monthlyDealTarget      Int?     @map("monthly_deal_target")
+  monthlyRevenueTarget   Float?   @map("monthly_revenue_target")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+  updatedBy              Int?     @map("updated_by")
+  brandColor             String?  @map("brand_color")
+  companyName            String?  @map("company_name")
+  companyTagline         String?  @map("company_tagline")
+  logoUrl                String?  @map("logo_url")
+  brandColorAccent       String?  @map("brand_color_accent")
+  brandColorSecondary    String?  @map("brand_color_secondary")
+  styleCornerRadius      String?  @map("style_corner_radius")
+  styleDensity           String?  @map("style_density")
+  styleFontBody          String?  @map("style_font_body")
+  styleFontHeading       String?  @map("style_font_heading")
+  voiceAntiKeywords      String?  @map("voice_anti_keywords")
+  voiceAudience          String?  @map("voice_audience")
+  voiceIndustry          String?  @map("voice_industry")
+  voiceKeywords          String?  @map("voice_keywords")
+  voiceSampleCopy        String?  @map("voice_sample_copy")
+  voiceTone              String?  @map("voice_tone")
+  updater                User?    @relation("SettingsUpdater", fields: [updatedBy], references: [id])
 
-  // Phase A: Upsell commission rate
-  upsellCommissionRate  Float    @default(0.10) @map("upsell_commission_rate")   // 10% of product price
-
-  // Phase A: Tiered residual thresholds (retainer amount → residual payout)
-  // Tier 1: retainer < tier2Threshold → residualTier1Amount
-  // Tier 2: retainer < tier3Threshold → residualTier2Amount
-  // Tier 3: retainer >= tier3Threshold → residualTier3Amount
-  residualTier1Amount   Float    @default(200) @map("residual_tier1_amount")     // $200/mo (base)
-  residualTier2Amount   Float    @default(250) @map("residual_tier2_amount")     // $250/mo
-  residualTier3Amount   Float    @default(300) @map("residual_tier3_amount")     // $300/mo
-  residualTier2Threshold Float   @default(3000) @map("residual_tier2_threshold") // retainer >= $3000 → tier 2
-  residualTier3Threshold Float   @default(4000) @map("residual_tier3_threshold") // retainer >= $4000 → tier 3
-
-  // Feature Toggles
-  contentStudioEnabled  Boolean  @default(true) @map("content_studio_enabled")
-  scanningEnabled       Boolean  @default(true) @map("scanning_enabled")
-  voiceCaptureEnabled   Boolean  @default(true) @map("voice_capture_enabled")
-  bugReportingEnabled   Boolean  @default(true) @map("bug_reporting_enabled")
-  
-  // Scan Settings
-  scanFrequencyDays     Int      @default(30) @map("scan_frequency_days")
-  scanCostLimit         Float    @default(100) @map("scan_cost_limit")          // $100/mo
-  
-  // Notification Settings
-  emailNotifications    Boolean  @default(true) @map("email_notifications")
-  taskAssignmentAlerts  Boolean  @default(true) @map("task_assignment_alerts")
-  scanCompleteAlerts    Boolean  @default(true) @map("scan_complete_alerts")
-  pushMessagesEnabled   Boolean  @default(true) @map("push_messages_enabled")
-  pushTasksEnabled      Boolean  @default(true) @map("push_tasks_enabled")
-  
-  // API Keys (encrypted)
-  openaiApiKey          String?  @map("openai_api_key")
-  googleApiKey          String?  @map("google_api_key")
-  semrushApiKey         String?  @map("semrush_api_key")
-  ahrefsApiKey          String?  @map("ahrefs_api_key")
-  
-  // Theme
-  defaultTheme          String   @default("light") @map("default_theme")         // "light" or "dark"
-  
-  // Monthly Goals (null = disabled/not set)
-  goalsEnabled          Boolean  @default(false) @map("goals_enabled")
-  monthlyDealTarget     Int?     @map("monthly_deal_target")
-  monthlyRevenueTarget  Float?   @map("monthly_revenue_target")
-
-  // Branding (9B/9C — admin first-run wizard)
-  companyName           String?  @map("company_name")
-  companyTagline        String?  @map("company_tagline")
-  logoUrl               String?  @map("logo_url")          // Vercel Blob URL
-  brandColor            String?  @map("brand_color")       // hex e.g. "#1a56db" — primary (CTAs)
-  brandColorSecondary   String?  @map("brand_color_secondary") // supporting UI elements
-  brandColorAccent      String?  @map("brand_color_accent")    // highlights / badges
-
-  // Voice Profile (FEAT-016)
-  voiceTone             String?  @map("voice_tone")             // e.g. "Confident, direct, professional"
-  voiceKeywords         String?  @map("voice_keywords")         // JSON string[] — preferred terms
-  voiceAntiKeywords     String?  @map("voice_anti_keywords")    // JSON string[] — terms to avoid
-  voiceSampleCopy       String?  @map("voice_sample_copy")      // Approved paragraph the tenant likes
-  voiceIndustry         String?  @map("voice_industry")         // e.g. "Digital marketing agency"
-  voiceAudience         String?  @map("voice_audience")         // e.g. "Local service businesses"
-
-  // Visual Style (FEAT-016)
-  styleFontHeading      String?  @map("style_font_heading")     // e.g. "Inter" — for generated docs
-  styleFontBody         String?  @map("style_font_body")        // e.g. "Inter" — for generated docs
-  styleCornerRadius     String?  @map("style_corner_radius")    // "sharp" | "rounded" | "pill"
-  styleDensity          String?  @map("style_density")          // "compact" | "comfortable" | "spacious"
-
-  // Metadata
-  updatedAt             DateTime @updatedAt @map("updated_at")
-  updatedBy             Int?     @map("updated_by")
-  
-  updater               User?    @relation("SettingsUpdater", fields: [updatedBy], references: [id])
-  
   @@map("global_settings")
 }
-// Add this to the end of your schema.prisma file
-
-// ============================================================================
-// AUDIT LOGGING
-// ============================================================================
 
 model AuditLog {
-  id                Int       @id @default(autoincrement())
-  
-  // Who
-  userId            Int       @map("user_id")
-  userName          String    @map("user_name")
-  userEmail         String    @map("user_email")
-  userRole          String    @map("user_role")
-  
-  // What
-  action            String                    // "page_access", "api_call", "permission_check", "data_export", etc.
-  resource          String?                   // "/master", "/api/leads", "lead:123", etc.
-  permission        String?                   // "view_analytics", "manage_leads", etc.
-  method            String?                   // "GET", "POST", "PUT", "DELETE"
-  
-  // When
-  timestamp         DateTime  @default(now())
-  
-  // Where
-  ipAddress         String?   @map("ip_address")
-  userAgent         String?   @map("user_agent")
-  
-  // Result
-  status            String                    // "success", "denied", "error"
-  statusCode        Int?      @map("status_code")         // HTTP status code
-  errorMessage      String?   @map("error_message")
-  
-  // Additional Context
-  metadata          Json?                     // Any additional data (request params, response data, etc.)
-  duration          Int?                      // Request duration in ms
-  
-  // Relations
-  user              User      @relation("AuditLogs", fields: [userId], references: [id])
-  
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  userName     String   @map("user_name")
+  userEmail    String   @map("user_email")
+  userRole     String   @map("user_role")
+  action       String
+  resource     String?
+  permission   String?
+  method       String?
+  timestamp    DateTime @default(now())
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  status       String
+  statusCode   Int?     @map("status_code")
+  errorMessage String?  @map("error_message")
+  metadata     Json?
+  duration     Int?
+  user         User     @relation("AuditLogs", fields: [userId], references: [id])
+
   @@index([userId])
   @@index([action])
   @@index([timestamp])
@@ -1118,92 +895,57 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-
-// TEAM MESSAGING
-// ============================================================================
-
-// ─── Website Audit (FEAT-024) ─────────────────────────────────────────────────
 model WebsiteAudit {
-  id          Int      @id @default(autoincrement())
-  clientId    Int      @map("client_id")
-  url         String   // audited URL
-  runAt       DateTime @default(now()) @map("run_at")
-
-  // Scores (0–100)
-  scorePerformance    Int? @map("score_performance")
-  scoreAccessibility  Int? @map("score_accessibility")
-  scoreSeo            Int? @map("score_seo")
-  scoreBestPractices  Int? @map("score_best_practices")
-
-  // Meta
-  metaTitle           String?  @map("meta_title")
-  metaDescription     String?  @map("meta_description")
-  h1                  String?
-  canonical           String?
-  hasSitemap          Boolean? @map("has_sitemap")
-  hasRobots           Boolean? @map("has_robots")
-  ssl                 Boolean?
-  mobile              Boolean?
-
-  // Full JSON payload from PageSpeed (for export/drill-down)
-  rawJson     Json?    @map("raw_json")
-
-  // Issues list: [{ category, severity, description }]
-  issues      Json?
-
-  client      ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id                 Int           @id @default(autoincrement())
+  clientId           Int           @map("client_id")
+  url                String
+  runAt              DateTime      @default(now()) @map("run_at")
+  scorePerformance   Int?          @map("score_performance")
+  scoreAccessibility Int?          @map("score_accessibility")
+  scoreSeo           Int?          @map("score_seo")
+  scoreBestPractices Int?          @map("score_best_practices")
+  metaTitle          String?       @map("meta_title")
+  metaDescription    String?       @map("meta_description")
+  h1                 String?
+  canonical          String?
+  hasSitemap         Boolean?      @map("has_sitemap")
+  hasRobots          Boolean?      @map("has_robots")
+  ssl                Boolean?
+  mobile             Boolean?
+  rawJson            Json?         @map("raw_json")
+  issues             Json?
+  client             ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, runAt(sort: Desc)])
   @@map("website_audits")
 }
 
 model TeamMessage {
-  id              Int      @id @default(autoincrement())
-  
-  content         String   @db.Text
-  
-  // Who sent it
-  authorId        Int      @map("author_id")
-  author          User     @relation("MessageAuthor", fields: [authorId], references: [id])
-  
-  // Who it's for: "all", "role:master", "role:sales", or specific userId
-  audienceType    String   @default("all") @map("audience_type")  // "all" | "role" | "user"
-  audienceValue   String?  @map("audience_value")                  // role name or user id string
-  
-  // For direct replies — parent message id
-  parentId        Int?     @map("parent_id")
-  parent          TeamMessage?  @relation("Replies", fields: [parentId], references: [id])
-  replies         TeamMessage[] @relation("Replies")
-  
-  // If direct message, who is the recipient (for notifications/unread count)
-  recipientId     Int?     @map("recipient_id")
-  recipient       User?    @relation("MessageRecipient", fields: [recipientId], references: [id])
-  
-  // Pinned messages stay at top of feed on dashboard
-  isPinned        Boolean  @default(false) @map("is_pinned")
-  
-  // Priority: "normal" | "important" | "urgent"
-  priority        String   @default("normal")
+  id                 Int                   @id @default(autoincrement())
+  content            String
+  authorId           Int                   @map("author_id")
+  audienceType       String                @default("all") @map("audience_type")
+  audienceValue      String?               @map("audience_value")
+  parentId           Int?                  @map("parent_id")
+  recipientId        Int?                  @map("recipient_id")
+  isPinned           Boolean               @default(false) @map("is_pinned")
+  priority           String                @default("normal")
+  attachmentUrl      String?               @map("attachment_url")
+  attachmentName     String?               @map("attachment_name")
+  attachmentSize     Int?                  @map("attachment_size")
+  attachmentMimeType String?               @map("attachment_mime_type")
+  attachmentVaultId  Int?                  @map("attachment_vault_id")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  editedAt           DateTime?             @map("edited_at")
+  mentions           Json?
+  reactions          TeamMessageReaction[]
+  reads              TeamMessageRead[]
+  author             User                  @relation("MessageAuthor", fields: [authorId], references: [id])
+  parent             TeamMessage?          @relation("Replies", fields: [parentId], references: [id])
+  replies            TeamMessage[]         @relation("Replies")
+  recipient          User?                 @relation("MessageRecipient", fields: [recipientId], references: [id])
 
-  // File attachments (stored in Vercel Blob, optionally promoted to Vault)
-  attachmentUrl      String?  @map("attachment_url")
-  attachmentName     String?  @map("attachment_name")
-  attachmentSize     Int?     @map("attachment_size")
-  attachmentMimeType String?  @map("attachment_mime_type")
-  attachmentVaultId  Int?     @map("attachment_vault_id")   // set if promoted to vault
-
-  // Edit tracking
-  editedAt        DateTime? @map("edited_at")              // null = never edited
-
-  // @mentions — [{ userId: number, name: string }]
-  mentions        Json?                                     // null = no mentions
-  
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-  
-  reads           TeamMessageRead[]
-  reactions       TeamMessageReaction[]
-  
   @@index([authorId])
   @@index([recipientId])
   @@index([parentId])
@@ -1212,12 +954,11 @@ model TeamMessage {
 }
 
 model TeamMessageReaction {
-  id        Int      @id @default(autoincrement())
-  messageId Int      @map("message_id")
-  userId    Int      @map("user_id")
-  emoji     String   // Unicode emoji e.g. "👍" "❤️" "😂"
-  createdAt DateTime @default(now()) @map("created_at")
-
+  id        Int         @id @default(autoincrement())
+  messageId Int         @map("message_id")
+  userId    Int         @map("user_id")
+  emoji     String
+  createdAt DateTime    @default(now()) @map("created_at")
   message   TeamMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1227,70 +968,54 @@ model TeamMessageReaction {
 }
 
 model TeamMessageRead {
-  id        Int      @id @default(autoincrement())
-  messageId Int      @map("message_id")
-  userId    Int      @map("user_id")
-  readAt    DateTime @default(now()) @map("read_at")
-  
+  id        Int         @id @default(autoincrement())
+  messageId Int         @map("message_id")
+  userId    Int         @map("user_id")
+  readAt    DateTime    @default(now()) @map("read_at")
   message   TeamMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([messageId, userId])
   @@index([userId])
   @@map("team_message_reads")
 }
 
-// ============================================================================
-// PUSH SUBSCRIPTIONS
-// ============================================================================
-
 model PushSubscription {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  endpoint    String   @db.Text
-  p256dh      String   @db.Text
-  auth        String   @db.Text
-  userAgent   String?  @map("user_agent")
-  createdAt   DateTime @default(now()) @map("created_at")
-  
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  endpoint  String
+  p256dh    String
+  auth      String
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, endpoint])
   @@index([userId])
   @@map("push_subscriptions")
 }
 
-// ============================================================================
-// PUSH NOTIFICATION SUBSCRIPTIONS
-// ============================================================================
-
-
-// ============================================================================
-// WEBSITE STUDIO
-// ============================================================================
-
 model WebProperty {
-  id                     Int       @id @default(autoincrement())
-  clientId               Int       @map("client_id")
-  slug                   String                        // e.g. "gad-bmw-t1"
-  tier                   String                        // "tier1" | "tier2" | "tier3"
-  brandSegment           String    @map("brand_segment")   // e.g. "BMW", "Audi"
-  targetUrl              String    @map("target_url")       // Final domain or subdomain
-  vercelProjectId        String?   @map("vercel_project_id")
-  voiceProfileSlug       String?   @map("voice_profile_slug") // Matches scrvnr/profiles/*.json stem
-  deployStatus           String    @default("scaffolded") @map("deploy_status")
-  lastDeployedAt         DateTime? @map("last_deployed_at")
-  dnsVerified            Boolean   @default(false) @map("dns_verified")
-  sslActive              Boolean   @default(false) @map("ssl_active")
-  sslExpiresAt           DateTime? @map("ssl_expires_at")
-  stalenessThresholdDays Int       @default(90) @map("staleness_threshold_days")
-  isArchived             Boolean   @default(false) @map("is_archived")
-  createdAt              DateTime  @default(now()) @map("created_at")
-  updatedAt              DateTime  @updatedAt @map("updated_at")
-
-  client      ClientProfile      @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  dnaCaptures DnaCapture[]
-  buildJobs   BuildJob[]
+  id                     Int           @id @default(autoincrement())
+  clientId               Int           @map("client_id")
+  slug                   String
+  tier                   String
+  brandSegment           String        @map("brand_segment")
+  targetUrl              String        @map("target_url")
+  vercelProjectId        String?       @map("vercel_project_id")
+  voiceProfileSlug       String?       @map("voice_profile_slug")
+  deployStatus           String        @default("scaffolded") @map("deploy_status")
+  lastDeployedAt         DateTime?     @map("last_deployed_at")
+  dnsVerified            Boolean       @default(false) @map("dns_verified")
+  sslActive              Boolean       @default(false) @map("ssl_active")
+  sslExpiresAt           DateTime?     @map("ssl_expires_at")
+  stalenessThresholdDays Int           @default(90) @map("staleness_threshold_days")
+  isArchived             Boolean       @default(false) @map("is_archived")
+  createdAt              DateTime      @default(now()) @map("created_at")
+  updatedAt              DateTime      @updatedAt @map("updated_at")
+  buildJobs              BuildJob[]
+  dnaCaptures            DnaCapture[]
+  client                 ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@unique([clientId, slug])
   @@index([clientId])
@@ -1300,17 +1025,16 @@ model WebProperty {
 }
 
 model DnaCapture {
-  id            Int       @id @default(autoincrement())
-  propertyId    Int       @map("property_id")
-  sourceUrl     String    @map("source_url")
-  capturedAt    DateTime  @default(now()) @map("captured_at")
-  capturedBy    String?   @map("captured_by")
-  tokenBlob     Json      @map("token_blob")   // Full DnaTokenBlob JSON
-  overrideCount Int       @default(0) @map("override_count")
-  isSuperseded  Boolean   @default(false) @map("is_superseded")
-
-  property  WebProperty       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  overrides DnaTokenOverride[]
+  id            Int                @id @default(autoincrement())
+  propertyId    Int                @map("property_id")
+  sourceUrl     String             @map("source_url")
+  capturedAt    DateTime           @default(now()) @map("captured_at")
+  capturedBy    String?            @map("captured_by")
+  tokenBlob     Json               @map("token_blob")
+  overrideCount Int                @default(0) @map("override_count")
+  isSuperseded  Boolean            @default(false) @map("is_superseded")
+  property      WebProperty        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  overrides     DnaTokenOverride[]
 
   @@index([propertyId])
   @@index([propertyId, isSuperseded])
@@ -1318,17 +1042,16 @@ model DnaCapture {
 }
 
 model DnaTokenOverride {
-  id             Int       @id @default(autoincrement())
-  captureId      Int       @map("capture_id")
-  tokenKey       String    @map("token_key")       // e.g. "colors.primary"
-  originalValue  String    @db.Text @map("original_value")  // JSON-serialized
-  overrideValue  String    @db.Text @map("override_value")  // JSON-serialized
-  note           String    @db.Text                // Required — operator explains the change
-  operatorName   String    @map("operator_name")
-  isLocked       Boolean   @default(false) @map("is_locked")
-  createdAt      DateTime  @default(now()) @map("created_at")
-
-  capture DnaCapture @relation(fields: [captureId], references: [id], onDelete: Cascade)
+  id            Int        @id @default(autoincrement())
+  captureId     Int        @map("capture_id")
+  tokenKey      String     @map("token_key")
+  originalValue String     @map("original_value")
+  overrideValue String     @map("override_value")
+  note          String
+  operatorName  String     @map("operator_name")
+  isLocked      Boolean    @default(false) @map("is_locked")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  capture       DnaCapture @relation(fields: [captureId], references: [id], onDelete: Cascade)
 
   @@index([captureId])
   @@index([captureId, tokenKey])
@@ -1336,21 +1059,20 @@ model DnaTokenOverride {
 }
 
 model BuildJob {
-  id               Int       @id @default(autoincrement())
-  propertyId       Int       @map("property_id")
-  stage            String    @default("scaffolded")  // BuildStage enum
-  assignedTo       String?   @map("assigned_to")
-  scaffoldManifest Json?     @map("scaffold_manifest")
-  pageCount        Int       @default(0) @map("page_count")
-  pagesCleared     Int       @default(0) @map("pages_cleared")
-  pagesApproved    Int       @default(0) @map("pages_approved")
-  deployAttempts   Int       @default(0) @map("deploy_attempts")
-  lastDeployError  String?   @db.Text @map("last_deploy_error")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  property WebProperty    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  pages    ComposerPage[]
+  id               Int            @id @default(autoincrement())
+  propertyId       Int            @map("property_id")
+  stage            String         @default("scaffolded")
+  assignedTo       String?        @map("assigned_to")
+  scaffoldManifest Json?          @map("scaffold_manifest")
+  pageCount        Int            @default(0) @map("page_count")
+  pagesCleared     Int            @default(0) @map("pages_cleared")
+  pagesApproved    Int            @default(0) @map("pages_approved")
+  deployAttempts   Int            @default(0) @map("deploy_attempts")
+  lastDeployError  String?        @map("last_deploy_error")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  property         WebProperty    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  pages            ComposerPage[]
 
   @@index([propertyId])
   @@index([propertyId, stage])
@@ -1358,22 +1080,21 @@ model BuildJob {
 }
 
 model ComposerPage {
-  id              Int       @id @default(autoincrement())
-  jobId           Int       @map("job_id")
-  slug            String                        // e.g. "common-problems"
-  title           String
-  filePath        String    @map("file_path")   // Relative to scaffold root
-  sections        Json      @default("{}")      // { sectionName: copyText }
-  scrvnrStatus    String    @default("unprocessed") @map("scrvnr_status")
-  lastScrvnrResult Json?    @map("last_scrvnr_result")  // ScrvnrResultSummary
-  reviewStatus    String    @default("pending") @map("review_status")
-  reviewNote      String?   @db.Text @map("review_note")
-  pageOrder       Int       @default(0) @map("page_order")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  job           BuildJob          @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  scrvnrResults ScrvnrGateResult[]
+  id               Int                @id @default(autoincrement())
+  jobId            Int                @map("job_id")
+  slug             String
+  title            String
+  filePath         String             @map("file_path")
+  sections         Json               @default("{}")
+  scrvnrStatus     String             @default("unprocessed") @map("scrvnr_status")
+  lastScrvnrResult Json?              @map("last_scrvnr_result")
+  reviewStatus     String             @default("pending") @map("review_status")
+  reviewNote       String?            @map("review_note")
+  pageOrder        Int                @default(0) @map("page_order")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  job              BuildJob           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  scrvnrResults    ScrvnrGateResult[]
 
   @@index([jobId])
   @@index([jobId, scrvnrStatus])
@@ -1382,62 +1103,47 @@ model ComposerPage {
 }
 
 model ScrvnrGateResult {
-  id                  Int       @id @default(autoincrement())
-  pageId              Int       @map("page_id")
-  propertySlug        String    @map("property_slug")
-  voiceProfileSlug    String?   @map("voice_profile_slug")
-  gateOpen            Boolean   @map("gate_open")
-  gateStatus          String    @map("gate_status")   // "PASS" | "FAIL" | "OVERRIDE" | "ERROR"
-  overrideApplied     Boolean   @default(false) @map("override_applied")
-  overrideNote        String?   @db.Text @map("override_note")
-  pass1Score          Float     @map("pass1_score")
-  pass1Pass           Boolean   @map("pass1_pass")
-  pass2Score          Float?    @map("pass2_score")
-  pass2Pass           Boolean?  @map("pass2_pass")
-  sectionsEvaluated   String[]  @map("sections_evaluated")
-  failedSections      String[]  @map("failed_sections")
-  rawResult           Json      @map("raw_result")    // Full adapter response
-  evaluatedAt         DateTime  @default(now()) @map("evaluated_at")
-
-  page ComposerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  id                Int          @id @default(autoincrement())
+  pageId            Int          @map("page_id")
+  propertySlug      String       @map("property_slug")
+  voiceProfileSlug  String?      @map("voice_profile_slug")
+  gateOpen          Boolean      @map("gate_open")
+  gateStatus        String       @map("gate_status")
+  overrideApplied   Boolean      @default(false) @map("override_applied")
+  overrideNote      String?      @map("override_note")
+  pass1Score        Float        @map("pass1_score")
+  pass1Pass         Boolean      @map("pass1_pass")
+  pass2Score        Float?       @map("pass2_score")
+  pass2Pass         Boolean?     @map("pass2_pass")
+  sectionsEvaluated String[]     @map("sections_evaluated")
+  failedSections    String[]     @map("failed_sections")
+  rawResult         Json         @map("raw_result")
+  evaluatedAt       DateTime     @default(now()) @map("evaluated_at")
+  page              ComposerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@index([pageId])
   @@index([pageId, evaluatedAt(sort: Desc)])
   @@map("scrvnr_gate_results")
 }
 
-
-// ── AI Cost Logging ────────────────────────────────────────────────────────────
-// Adapted from GREGORE metabolism engine — reshaped for USD/per-client tracking
-
-// ============================================================================
-// ONBOARDING PORTAL
-// ============================================================================
-
 model OnboardingToken {
-  id            Int       @id @default(autoincrement())
-  token         String    @unique                          // UUID v4, used in URL
-  leadId        Int       @map("lead_id")
-  generatedBy   Int       @map("generated_by")             // Partner user ID
-
-  status        String    @default("pending")              // "pending" | "in_progress" | "completed" | "expired"
-
-  currentStep   Int       @default(1) @map("current_step")
-  formData      Json?     @map("form_data")                // Partial saves between steps
-
-  completedAt   DateTime? @map("completed_at")
-  submittedData Json?     @map("submitted_data")           // Final submission snapshot
-
-  expiresAt     DateTime  @map("expires_at")               // 30 days from generation
-  lastAccessedAt DateTime? @map("last_accessed_at")
-  accessCount   Int       @default(0) @map("access_count")
-
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  lead          Lead      @relation(fields: [leadId], references: [id])
-  generatedByUser User    @relation("OnboardingTokenCreator", fields: [generatedBy], references: [id])
-  submission    OnboardingSubmission?
+  id              Int                   @id @default(autoincrement())
+  token           String                @unique
+  leadId          Int                   @map("lead_id")
+  generatedBy     Int                   @map("generated_by")
+  status          String                @default("pending")
+  currentStep     Int                   @default(1) @map("current_step")
+  formData        Json?                 @map("form_data")
+  completedAt     DateTime?             @map("completed_at")
+  submittedData   Json?                 @map("submitted_data")
+  expiresAt       DateTime              @map("expires_at")
+  lastAccessedAt  DateTime?             @map("last_accessed_at")
+  accessCount     Int                   @default(0) @map("access_count")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  submission      OnboardingSubmission?
+  generatedByUser User                  @relation("OnboardingTokenCreator", fields: [generatedBy], references: [id])
+  lead            Lead                  @relation(fields: [leadId], references: [id])
 
   @@index([token])
   @@index([leadId])
@@ -1446,73 +1152,57 @@ model OnboardingToken {
 }
 
 model OnboardingSubmission {
-  id              Int       @id @default(autoincrement())
-  tokenId         Int       @unique @map("token_id")
-  leadId          Int       @map("lead_id")
-
-  // Section 1: Business Identity
-  businessName    String    @map("business_name")
-  address         String
-  city            String
-  state           String
-  zipCode         String    @map("zip_code")
-  phone           String
-  website         String?
-  businessDescription String? @map("business_description")
-  primaryServices Json?     @map("primary_services")        // Array of strings
-  serviceAreas    String?   @map("service_areas")
-  multiLocation   Boolean   @default(false) @map("multi_location")
-  locationCount   Int?      @map("location_count")
-
-  // Section 2: Contacts
-  primaryContactName    String  @map("primary_contact_name")
-  primaryContactTitle   String? @map("primary_contact_title")
-  primaryContactEmail   String  @map("primary_contact_email")
-  primaryContactPhone   String  @map("primary_contact_phone")
-  preferredContactMethod String? @map("preferred_contact_method")
-
-  billingSameAsPrimary  Boolean @default(true) @map("billing_same_as_primary")
-  billingContactName    String? @map("billing_contact_name")
-  billingContactEmail   String? @map("billing_contact_email")
-  billingContactPhone   String? @map("billing_contact_phone")
-  paymentMethod         String? @map("payment_method")
-  requiresPO            Boolean @default(false) @map("requires_po")
-  poNumber              String? @map("po_number")
-
-  // Section 3: Technical Access (JSON blob)
-  technicalAccess Json     @map("technical_access")
-
-  // Section 4: Competitive Landscape + Content Prefs
-  competitors       Json?
-  competitorPains   Json?   @map("competitor_pains")
-  competitorNotes   String? @map("competitor_notes")
-  contentFocusTopics String? @map("content_focus_topics")
-  contentAvoidTopics String? @map("content_avoid_topics")
-  tonePreference    String? @map("tone_preference")
-  contentReviewPref String? @map("content_review_pref")
-
-  // Section 5: Brand + Online Presence
-  hasLogo           Boolean @default(false) @map("has_logo")
-  hasBrandGuidelines Boolean @default(false) @map("has_brand_guidelines")
-  hasPhotography    Boolean @default(false) @map("has_photography")
-  socialProfiles    Json?   @map("social_profiles")
-  directoryListings String? @map("directory_listings")
-  previousSEO       Boolean @default(false) @map("previous_seo")
-  previousSEONotes  String? @map("previous_seo_notes")
-
-  additionalNotes   String? @map("additional_notes")
-
-  // Ops tracking
-  opsChecklist      Json?   @map("ops_checklist")
-  onboardingComplete Boolean  @default(false) @map("onboarding_complete")
-  onboardedAt        DateTime? @map("onboarded_at")
-  onboardedBy        Int?      @map("onboarded_by")
-
-  submittedAt   DateTime  @default(now()) @map("submitted_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  token         OnboardingToken @relation(fields: [tokenId], references: [id])
-  lead          Lead            @relation(fields: [leadId], references: [id])
+  id                     Int             @id @default(autoincrement())
+  tokenId                Int             @unique @map("token_id")
+  leadId                 Int             @map("lead_id")
+  businessName           String          @map("business_name")
+  address                String
+  city                   String
+  state                  String
+  zipCode                String          @map("zip_code")
+  phone                  String
+  website                String?
+  businessDescription    String?         @map("business_description")
+  primaryServices        Json?           @map("primary_services")
+  serviceAreas           String?         @map("service_areas")
+  multiLocation          Boolean         @default(false) @map("multi_location")
+  locationCount          Int?            @map("location_count")
+  primaryContactName     String          @map("primary_contact_name")
+  primaryContactTitle    String?         @map("primary_contact_title")
+  primaryContactEmail    String          @map("primary_contact_email")
+  primaryContactPhone    String          @map("primary_contact_phone")
+  preferredContactMethod String?         @map("preferred_contact_method")
+  billingSameAsPrimary   Boolean         @default(true) @map("billing_same_as_primary")
+  billingContactName     String?         @map("billing_contact_name")
+  billingContactEmail    String?         @map("billing_contact_email")
+  billingContactPhone    String?         @map("billing_contact_phone")
+  paymentMethod          String?         @map("payment_method")
+  requiresPO             Boolean         @default(false) @map("requires_po")
+  poNumber               String?         @map("po_number")
+  technicalAccess        Json            @map("technical_access")
+  competitors            Json?
+  competitorPains        Json?           @map("competitor_pains")
+  competitorNotes        String?         @map("competitor_notes")
+  contentFocusTopics     String?         @map("content_focus_topics")
+  contentAvoidTopics     String?         @map("content_avoid_topics")
+  tonePreference         String?         @map("tone_preference")
+  contentReviewPref      String?         @map("content_review_pref")
+  hasLogo                Boolean         @default(false) @map("has_logo")
+  hasBrandGuidelines     Boolean         @default(false) @map("has_brand_guidelines")
+  hasPhotography         Boolean         @default(false) @map("has_photography")
+  socialProfiles         Json?           @map("social_profiles")
+  directoryListings      String?         @map("directory_listings")
+  previousSEO            Boolean         @default(false) @map("previous_seo")
+  previousSEONotes       String?         @map("previous_seo_notes")
+  additionalNotes        String?         @map("additional_notes")
+  opsChecklist           Json?           @map("ops_checklist")
+  onboardingComplete     Boolean         @default(false) @map("onboarding_complete")
+  onboardedAt            DateTime?       @map("onboarded_at")
+  onboardedBy            Int?            @map("onboarded_by")
+  submittedAt            DateTime        @default(now()) @map("submitted_at")
+  updatedAt              DateTime        @updatedAt @map("updated_at")
+  lead                   Lead            @relation(fields: [leadId], references: [id])
+  token                  OnboardingToken @relation(fields: [tokenId], references: [id])
 
   @@index([leadId])
   @@index([onboardingComplete])
@@ -1520,19 +1210,18 @@ model OnboardingSubmission {
 }
 
 model AICostLog {
-  id               Int      @id @default(autoincrement())
-  timestamp        DateTime @default(now())
-  feature          String   // AIFeature enum values
-  clientId         Int      @map("client_id")
-  modelId          String   @map("model_id")
-  inputTokens      Int      @map("input_tokens")
-  outputTokens     Int      @map("output_tokens")
-  costUSD          Float    @map("cost_usd")
-  estimatedCostUSD Float?   @map("estimated_cost_usd")  // For accuracy tracking
-  latencyMs        Int      @map("latency_ms")
-  qualityScore     Float?   @map("quality_score")       // Set retroactively (e.g., if SCRVNR passes)
-
-  client ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id               Int           @id @default(autoincrement())
+  timestamp        DateTime      @default(now())
+  feature          String
+  clientId         Int           @map("client_id")
+  modelId          String        @map("model_id")
+  inputTokens      Int           @map("input_tokens")
+  outputTokens     Int           @map("output_tokens")
+  costUSD          Float         @map("cost_usd")
+  estimatedCostUSD Float?        @map("estimated_cost_usd")
+  latencyMs        Int           @map("latency_ms")
+  qualityScore     Float?        @map("quality_score")
+  client           ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@index([feature])
@@ -1541,32 +1230,25 @@ model AICostLog {
   @@map("ai_cost_logs")
 }
 
-
-// ============================================================================
-// WAVE PAYMENTS — INVOICE MIRROR
-// ============================================================================
-
 model InvoiceRecord {
-  id              Int       @id @default(autoincrement())
-  clientId        Int       @map("client_id")
-  waveInvoiceId   String    @unique @map("wave_invoice_id")
-  invoiceNumber   String?   @map("invoice_number")
-  amount          Decimal   @db.Decimal(10, 2)
-  status          String    @default("draft")
-  // "draft" | "sent" | "viewed" | "paid" | "overdue" | "cancelled"
-  issuedDate      DateTime  @map("issued_date")
-  dueDate         DateTime  @map("due_date")
-  paidDate        DateTime? @map("paid_date")
-  paidAmount      Decimal?  @map("paid_amount") @db.Decimal(10, 2)
-  paymentMethod   String?   @map("payment_method")
-  waveViewUrl     String?   @map("wave_view_url")
-  lineItems       Json?     @map("line_items")
-  notes           String?
-  sourceTaskId    Int?      @map("source_task_id")   // set when auto-generated from a task deployment
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id            Int           @id @default(autoincrement())
+  clientId      Int           @map("client_id")
+  waveInvoiceId String        @unique @map("wave_invoice_id")
+  invoiceNumber String?       @map("invoice_number")
+  amount        Decimal       @db.Decimal(10, 2)
+  status        String        @default("draft")
+  issuedDate    DateTime      @map("issued_date")
+  dueDate       DateTime      @map("due_date")
+  paidDate      DateTime?     @map("paid_date")
+  paidAmount    Decimal?      @map("paid_amount") @db.Decimal(10, 2)
+  paymentMethod String?       @map("payment_method")
+  waveViewUrl   String?       @map("wave_view_url")
+  lineItems     Json?         @map("line_items")
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  sourceTaskId  Int?          @map("source_task_id")
+  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, status])
   @@index([dueDate])
@@ -1574,20 +1256,16 @@ model InvoiceRecord {
   @@map("invoice_records")
 }
 
-// ============================================================================
-// WEBHOOK EVENTS — Audit log for all inbound webhooks (Wave, etc.)
-// ============================================================================
-
 model WebhookEvent {
-  id           Int      @id @default(autoincrement())
-  source       String                         // "wave"
-  eventType    String   @map("event_type")    // "invoice.paid", "invoice.created", etc.
-  externalId   String   @map("external_id")  // Wave's event ID — dedup key
-  rawPayload   Json     @map("raw_payload")   // Full webhook body (for replay)
-  status       String   @default("received") // "received" | "processed" | "failed" | "replayed"
-  error        String?
-  processedAt  DateTime? @map("processed_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id          Int       @id @default(autoincrement())
+  source      String
+  eventType   String    @map("event_type")
+  externalId  String    @map("external_id")
+  rawPayload  Json      @map("raw_payload")
+  status      String    @default("received")
+  error       String?
+  processedAt DateTime? @map("processed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   @@unique([source, externalId])
   @@index([source, eventType])
@@ -1596,10 +1274,6 @@ model WebhookEvent {
   @@map("webhook_events")
 }
 
-// ============================================================================
-// APP SETTINGS — key/value store for runtime config
-// ============================================================================
-
 model AppSetting {
   key       String   @id
   value     String
@@ -1607,63 +1281,50 @@ model AppSetting {
 
   @@map("app_settings")
 }
-// ============================================================================
-// ENRICHMENT CACHE — shared TTL cache across all providers
-// ============================================================================
 
 model EnrichmentCache {
-  id          Int      @id @default(autoincrement())
-  provider    String
-  cacheKey    String   @map("cache_key")
-  data        Json
-  costUsd     Decimal? @map("cost_usd") @db.Decimal(10, 6)
-  fetchedAt   DateTime @default(now()) @map("fetched_at")
-  expiresAt   DateTime @map("expires_at")
+  id        Int      @id @default(autoincrement())
+  provider  String
+  cacheKey  String   @map("cache_key")
+  data      Json
+  costUsd   Decimal? @map("cost_usd") @db.Decimal(10, 6)
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+  expiresAt DateTime @map("expires_at")
 
   @@unique([provider, cacheKey])
   @@index([provider, expiresAt])
   @@map("enrichment_cache")
 }
 
-// ============================================================================
-// ENRICHMENT COST LOG — per-call cost tracking for all providers
-// ============================================================================
-
 model EnrichmentCostLog {
-  id          Int      @id @default(autoincrement())
-  provider    String
-  operation   String
-  clientId    Int?     @map("client_id")
-  cacheHit    Boolean  @default(false) @map("cache_hit")
-  costUsd     Decimal  @map("cost_usd") @db.Decimal(10, 6)
-  latencyMs   Int?     @map("latency_ms")
-  success     Boolean  @default(true)
-  errorMsg    String?  @map("error_msg")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id        Int      @id @default(autoincrement())
+  provider  String
+  operation String
+  clientId  Int?     @map("client_id")
+  cacheHit  Boolean  @default(false) @map("cache_hit")
+  costUsd   Decimal  @map("cost_usd") @db.Decimal(10, 6)
+  latencyMs Int?     @map("latency_ms")
+  success   Boolean  @default(true)
+  errorMsg  String?  @map("error_msg")
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@index([provider, createdAt])
   @@index([clientId, createdAt])
   @@map("enrichment_cost_logs")
 }
 
-
-// ============================================================================
-// RANK TRACKING — DataForSEO local SERP tracking
-// ============================================================================
-
 model KeywordTracker {
-  id            Int       @id @default(autoincrement())
-  clientId      Int       @map("client_id")
-  keyword       String
-  searchVolume  Int?      @map("search_volume")
-  difficulty    Int?
-  targetUrl     String?   @map("target_url")
-  category      String?
-  isActive      Boolean   @default(true) @map("is_active")
-  addedAt       DateTime  @default(now()) @map("added_at")
-
-  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  snapshots     RankSnapshot[]
+  id           Int            @id @default(autoincrement())
+  clientId     Int            @map("client_id")
+  keyword      String
+  searchVolume Int?           @map("search_volume")
+  difficulty   Int?
+  targetUrl    String?        @map("target_url")
+  category     String?
+  isActive     Boolean        @default(true) @map("is_active")
+  addedAt      DateTime       @default(now()) @map("added_at")
+  client       ClientProfile  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  snapshots    RankSnapshot[]
 
   @@unique([clientId, keyword])
   @@index([clientId, isActive])
@@ -1671,61 +1332,53 @@ model KeywordTracker {
 }
 
 model RankSnapshot {
-  id                  Int       @id @default(autoincrement())
-  keywordId           Int       @map("keyword_id")
-  clientId            Int       @map("client_id")
-  scanDate            DateTime  @default(now()) @map("scan_date")
-  organicPosition     Int?      @map("organic_position")
-  localPackPosition   Int?      @map("local_pack_position")
-  rankingUrl          String?   @map("ranking_url")
-  localPackBusiness   String?   @map("local_pack_business")
-  serpFeatures        Json?     @map("serp_features")
-  zipCode             String    @map("zip_code")
-  previousOrganic     Int?      @map("previous_organic")
-  previousLocalPack   Int?      @map("previous_local_pack")
-
-  keyword             KeywordTracker @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  id                Int            @id @default(autoincrement())
+  keywordId         Int            @map("keyword_id")
+  clientId          Int            @map("client_id")
+  scanDate          DateTime       @default(now()) @map("scan_date")
+  organicPosition   Int?           @map("organic_position")
+  localPackPosition Int?           @map("local_pack_position")
+  rankingUrl        String?        @map("ranking_url")
+  localPackBusiness String?        @map("local_pack_business")
+  serpFeatures      Json?          @map("serp_features")
+  zipCode           String         @map("zip_code")
+  previousOrganic   Int?           @map("previous_organic")
+  previousLocalPack Int?           @map("previous_local_pack")
+  keyword           KeywordTracker @relation(fields: [keywordId], references: [id], onDelete: Cascade)
 
   @@index([keywordId, scanDate(sort: Desc)])
   @@index([clientId, scanDate(sort: Desc)])
   @@map("rank_snapshots")
 }
 
-// Tracks pending DataForSEO task IDs waiting for results
 model PendingRankTask {
-  id          Int       @id @default(autoincrement())
-  taskId      String    @unique @map("task_id")   // DataForSEO task ID
-  clientId    Int       @map("client_id")
-  keywordId   Int       @map("keyword_id")
-  zipCode     String    @map("zip_code")
-  keyword     String
-  postedAt    DateTime  @default(now()) @map("posted_at")
-  resolvedAt  DateTime? @map("resolved_at")
+  id         Int       @id @default(autoincrement())
+  taskId     String    @unique @map("task_id")
+  clientId   Int       @map("client_id")
+  keywordId  Int       @map("keyword_id")
+  zipCode    String    @map("zip_code")
+  keyword    String
+  postedAt   DateTime  @default(now()) @map("posted_at")
+  resolvedAt DateTime? @map("resolved_at")
 
   @@index([resolvedAt])
   @@index([postedAt])
   @@map("pending_rank_tasks")
 }
 
-
-// ============================================================================
-// NAP CITATION SCRAPER — Directory consistency auditing
-// ============================================================================
-
 model CitationScan {
-  id            Int       @id @default(autoincrement())
-  clientId      Int       @map("client_id")
-  scanDate      DateTime  @default(now()) @map("scan_date")
-  totalChecked  Int       @map("total_checked")
-  matches       Int
-  mismatches    Int
-  missing       Int
-  errors        Int
-  healthScore   Int       @map("health_score")
-  results       Json                            // Per-directory detail array
-  createdAt     DateTime  @default(now()) @map("created_at")
-
-  client        ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  id           Int           @id @default(autoincrement())
+  clientId     Int           @map("client_id")
+  scanDate     DateTime      @default(now()) @map("scan_date")
+  totalChecked Int           @map("total_checked")
+  matches      Int
+  mismatches   Int
+  missing      Int
+  errors       Int
+  healthScore  Int           @map("health_score")
+  results      Json
+  createdAt    DateTime      @default(now()) @map("created_at")
+  client       ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, scanDate(sort: Desc)])
   @@map("citation_scans")
@@ -1744,89 +1397,66 @@ model DirectoryHealth {
   @@map("directory_health")
 }
 
-// ============================================================================
-// GOOGLE ADS — OAuth credentials + connection
-// ============================================================================
-
 model GoogleAdsConnection {
-  id              Int       @id @default(autoincrement())
-  clientId        Int       @unique @map("client_id")
-
-  // Encrypted OAuth tokens (AES-256-GCM)
-  accessTokenEnc  String    @map("access_token_enc")
-  refreshTokenEnc String    @map("refresh_token_enc")
-  expiresAt       DateTime  @map("expires_at")
-
-  // Google Ads resource identifiers
-  customerId      String    @map("customer_id")   // 10-digit, e.g. "1234567890"
-  accountName     String    @map("account_name")  // human-readable
-
-  // Connection metadata
-  googleEmail     String    @map("google_email")
-  connectedAt     DateTime  @default(now()) @map("connected_at")
-  lastSyncAt      DateTime? @map("last_sync_at")
-  isActive        Boolean   @default(true) @map("is_active")
-
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @unique @map("client_id")
+  accessTokenEnc  String        @map("access_token_enc")
+  refreshTokenEnc String        @map("refresh_token_enc")
+  expiresAt       DateTime      @map("expires_at")
+  customerId      String        @map("customer_id")
+  accountName     String        @map("account_name")
+  googleEmail     String        @map("google_email")
+  connectedAt     DateTime      @default(now()) @map("connected_at")
+  lastSyncAt      DateTime?     @map("last_sync_at")
+  isActive        Boolean       @default(true) @map("is_active")
   client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("google_ads_connections")
 }
 
-// GOOGLE BUSINESS PROFILE — OAuth credentials + connection
-// ============================================================================
-
 model GBPConnection {
-  id              Int       @id @default(autoincrement())
-  clientId        Int       @unique @map("client_id")
-  
-  // Encrypted OAuth tokens (AES-256-GCM)
-  accessTokenEnc  String    @map("access_token_enc")   // encrypted
-  refreshTokenEnc String    @map("refresh_token_enc")  // encrypted
-  expiresAt       DateTime  @map("expires_at")
-  
-  // GBP resource identifiers
-  accountId       String    @map("account_id")         // e.g. "accounts/123456"
-  locationId      String    @map("location_id")        // e.g. "locations/987654321" (numeric, for Performance API)
-  locationName    String    @map("location_name")      // human-readable name
-  
-  // Connection metadata
-  googleEmail     String    @map("google_email")       // which Google account authorized
-  connectedAt     DateTime  @default(now()) @map("connected_at")
-  lastSyncAt      DateTime? @map("last_sync_at")
-  isActive        Boolean   @default(true) @map("is_active")
-
+  id              Int           @id @default(autoincrement())
+  clientId        Int           @unique @map("client_id")
+  accessTokenEnc  String        @map("access_token_enc")
+  refreshTokenEnc String        @map("refresh_token_enc")
+  expiresAt       DateTime      @map("expires_at")
+  accountId       String        @map("account_id")
+  locationId      String        @map("location_id")
+  locationName    String        @map("location_name")
+  googleEmail     String        @map("google_email")
+  connectedAt     DateTime      @default(now()) @map("connected_at")
+  lastSyncAt      DateTime?     @map("last_sync_at")
+  isActive        Boolean       @default(true) @map("is_active")
   client          ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("gbp_connections")
 }
 
-// ─── Document Vault ──────────────────────────────────────────────────────────
-
 model VaultFile {
-  id           Int       @id @default(autoincrement())
+  id           Int                 @id @default(autoincrement())
   name         String
-  originalName String    @map("original_name")
-  displayName  String?   @map("display_name")
-  mimeType     String    @map("mime_type")
+  originalName String              @map("original_name")
+  mimeType     String              @map("mime_type")
   size         Int
-  blobUrl      String    @map("blob_url")
+  blobUrl      String              @map("blob_url")
   space        VaultSpace
   category     String?
-  uploadedBy   Int       @map("uploaded_by")
-  uploader     User      @relation("VaultUploads", fields: [uploadedBy], references: [id])
-  ownerId      Int?      @map("owner_id")
-  owner        User?     @relation("VaultOwned", fields: [ownerId], references: [id])
-  clientId     Int?      @map("client_id")
-  client       ClientProfile? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  leadId       Int?      @map("lead_id")
-  lead         Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  version      Int       @default(1)
-  isLatest     Boolean   @default(true) @map("is_latest")
-  supersededBy Int?      @map("superseded_by")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
+  uploadedBy   Int                 @map("uploaded_by")
+  ownerId      Int?                @map("owner_id")
+  clientId     Int?                @map("client_id")
+  leadId       Int?                @map("lead_id")
+  version      Int                 @default(1)
+  isLatest     Boolean             @default(true) @map("is_latest")
+  supersededBy Int?                @map("superseded_by")
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  deletedAt    DateTime?           @map("deleted_at")
+  displayName  String?             @map("display_name")
   signatures   SignatureEnvelope[]
+  client       ClientProfile?      @relation(fields: [clientId], references: [id])
+  lead         Lead?               @relation(fields: [leadId], references: [id])
+  owner        User?               @relation("VaultOwned", fields: [ownerId], references: [id])
+  uploader     User                @relation("VaultUploads", fields: [uploadedBy], references: [id])
 
   @@index([space, category])
   @@index([uploadedBy])
@@ -1836,26 +1466,17 @@ model VaultFile {
   @@map("vault_files")
 }
 
-enum VaultSpace {
-  shared
-  private
-  client_reports
-  signed_contracts
-}
-
-// ─── Prospect Audit + Demo History ───────────────────────────────────────────
-
 model ProspectAudit {
   id          Int      @id @default(autoincrement())
   leadId      Int      @map("lead_id")
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   generatedBy Int      @map("generated_by")
-  generator   User     @relation("AuditGenerator", fields: [generatedBy], references: [id])
   repName     String?  @map("rep_name")
   healthScore Int?     @map("health_score")
   gapCount    Int?     @map("gap_count")
   shareToken  String?  @unique @map("share_token")
   generatedAt DateTime @default(now()) @map("generated_at")
+  generator   User     @relation("AuditGenerator", fields: [generatedBy], references: [id])
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([leadId])
   @@map("prospect_audits")
@@ -1864,49 +1485,34 @@ model ProspectAudit {
 model ProspectDemo {
   id          Int      @id @default(autoincrement())
   leadId      Int      @map("lead_id")
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
   generatedBy Int      @map("generated_by")
-  generator   User     @relation("DemoGenerator", fields: [generatedBy], references: [id])
   repName     String?  @map("rep_name")
   generatedAt DateTime @default(now()) @map("generated_at")
+  generator   User     @relation("DemoGenerator", fields: [generatedBy], references: [id])
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([leadId])
   @@map("prospect_demos")
 }
 
-// ============================================================================
-// ADMIN TASK QUEUE
-// ============================================================================
-
 model AdminTask {
-  id              Int       @id @default(autoincrement())
-  title           String
-  description     String?
-  category        String    @default("onboarding")
-  // "onboarding" | "setup" | "billing" | "ops" | "followup" | "other"
-  priority        String    @default("P2")
-  // "P1" | "P2" | "P3" | "P4"
-  status          String    @default("open")
-  // "open" | "in_progress" | "done" | "cancelled"
-  
-  // Who owns it / who created it
-  assignedToId    Int?      @map("assigned_to_id")
-  createdById     Int?      @map("created_by_id")
-  
-  // Context link (optional — e.g. user this task is about)
-  subjectUserId   Int?      @map("subject_user_id")
-  // Could extend later: subjectClientId, subjectLeadId, etc.
-  
-  dueDate         DateTime? @map("due_date")
-  completedAt     DateTime? @map("completed_at")
-  notes           String?
-  
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  
-  assignedTo      User?     @relation("AdminTaskAssignee", fields: [assignedToId], references: [id])
-  createdBy       User?     @relation("AdminTaskCreator", fields: [createdById], references: [id])
-  
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String?
+  category      String    @default("onboarding")
+  priority      String    @default("P2")
+  status        String    @default("open")
+  assignedToId  Int?      @map("assigned_to_id")
+  createdById   Int?      @map("created_by_id")
+  subjectUserId Int?      @map("subject_user_id")
+  dueDate       DateTime? @map("due_date")
+  completedAt   DateTime? @map("completed_at")
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  assignedTo    User?     @relation("AdminTaskAssignee", fields: [assignedToId], references: [id])
+  createdBy     User?     @relation("AdminTaskCreator", fields: [createdById], references: [id])
+
   @@index([status, priority])
   @@index([assignedToId, status])
   @@index([category])
@@ -1914,28 +1520,22 @@ model AdminTask {
   @@map("admin_tasks")
 }
 
-
-// ============================================================================
-// OPERATIONS LAYER — SPRINT 0 FOUNDATION
-// ============================================================================
-
 model AlertRule {
-  id              Int       @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   name            String
   description     String?
-  sourceType      String    @map("source_type")   // "competitive_scan" | "payment" | "rank" | "nap" | "health"
-  conditionType   String    @map("condition_type") // "threshold" | "delta" | "status_change" | "missing_data"
-  conditionConfig Json      @map("condition_config") // { field, operator, value, window }
-  severity        String    @default("warning")
-  isActive        Boolean   @default(true) @map("is_active")
-  autoCreateTask  Boolean   @default(false) @map("auto_create_task")
-  taskTemplate    Json?     @map("task_template") // { title, category, priority, contentBrief }
-  notifyOnTrigger Boolean   @default(true) @map("notify_on_trigger")
-  cooldownMinutes Int       @default(1440) @map("cooldown_minutes") // 24h default
-  lastTriggeredAt DateTime? @map("last_triggered_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
+  sourceType      String       @map("source_type")
+  conditionType   String       @map("condition_type")
+  conditionConfig Json         @map("condition_config")
+  severity        String       @default("warning")
+  isActive        Boolean      @default(true) @map("is_active")
+  autoCreateTask  Boolean      @default(false) @map("auto_create_task")
+  taskTemplate    Json?        @map("task_template")
+  notifyOnTrigger Boolean      @default(true) @map("notify_on_trigger")
+  cooldownMinutes Int          @default(1440) @map("cooldown_minutes")
+  lastTriggeredAt DateTime?    @map("last_triggered_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
   alerts          AlertEvent[]
 
   @@index([sourceType, isActive])
@@ -1943,25 +1543,24 @@ model AlertRule {
 }
 
 model AlertEvent {
-  id              Int       @id @default(autoincrement())
-  type            String    // "scan_alert" | "payment_overdue" | "rank_change" | "health_degraded" | "custom"
-  severity        String    // "critical" | "warning" | "info"
-  clientId        Int?      @map("client_id")
+  id              Int             @id @default(autoincrement())
+  type            String
+  severity        String
+  clientId        Int?            @map("client_id")
   title           String
-  description     String?   @db.Text
-  sourceType      String    @map("source_type")  // "competitive_scan" | "payment_check" | "rank_tracking" | "nap_scan" | "manual"
-  sourceId        Int?      @map("source_id")    // FK to source record (scanId, invoiceId, etc.)
-  metadata        Json?     // Structured alert data
-  ruleId          Int?      @map("rule_id")
-  acknowledged    Boolean   @default(false)
-  acknowledgedBy  Int?      @map("acknowledged_by")
-  acknowledgedAt  DateTime? @map("acknowledged_at")
-  autoTaskCreated Boolean   @default(false) @map("auto_task_created")
-  createdAt       DateTime  @default(now()) @map("created_at")
-
+  description     String?
+  sourceType      String          @map("source_type")
+  sourceId        Int?            @map("source_id")
+  metadata        Json?
+  ruleId          Int?            @map("rule_id")
+  acknowledged    Boolean         @default(false)
+  acknowledgedBy  Int?            @map("acknowledged_by")
+  acknowledgedAt  DateTime?       @map("acknowledged_at")
+  autoTaskCreated Boolean         @default(false) @map("auto_task_created")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  acknowledger    User?           @relation("AlertAcknowledger", fields: [acknowledgedBy], references: [id])
   client          ClientProfile?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
   rule            AlertRule?      @relation(fields: [ruleId], references: [id])
-  acknowledger    User?           @relation("AlertAcknowledger", fields: [acknowledgedBy], references: [id])
   taskLinks       TaskAlertLink[]
 
   @@index([clientId, createdAt(sort: Desc)])
@@ -1974,18 +1573,17 @@ model AlertEvent {
 model NotificationEvent {
   id          Int       @id @default(autoincrement())
   userId      Int       @map("user_id")
-  type        String    // "alert" | "task_assigned" | "task_status" | "report_ready" | "system"
+  type        String
   title       String
   body        String?
-  href        String?   // Deep link to relevant page
+  href        String?
   alertId     Int?      @map("alert_id")
   read        Boolean   @default(false)
   readAt      DateTime? @map("read_at")
-  channel     String    @default("in_app") // "in_app" | "push" | "email" | "all"
+  channel     String    @default("in_app")
   delivered   Boolean   @default(false)
   deliveredAt DateTime? @map("delivered_at")
   createdAt   DateTime  @default(now()) @map("created_at")
-
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read, createdAt(sort: Desc)])
@@ -1994,13 +1592,12 @@ model NotificationEvent {
 }
 
 model TaskAlertLink {
-  id        Int       @id @default(autoincrement())
-  taskId    Int       @map("task_id")
-  alertId   Int       @map("alert_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-
-  task      ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id        Int        @id @default(autoincrement())
+  taskId    Int        @map("task_id")
+  alertId   Int        @map("alert_id")
+  createdAt DateTime   @default(now()) @map("created_at")
   alert     AlertEvent @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  task      ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, alertId])
   @@map("task_alert_links")
@@ -2009,31 +1606,28 @@ model TaskAlertLink {
 model DataSourceStatus {
   id                  Int       @id @default(autoincrement())
   provider            String    @unique
-  // "dataforseo" | "ahrefs" | "pagespeed" | "google_business" | "google_ads" | "wave" | "outscraper"
   displayName         String    @map("display_name")
   status              String    @default("unknown")
-  // "healthy" | "degraded" | "down" | "unknown"
   lastCheckAt         DateTime? @map("last_check_at")
   lastSuccessAt       DateTime? @map("last_success_at")
   lastFailureAt       DateTime? @map("last_failure_at")
   consecutiveFailures Int       @default(0) @map("consecutive_failures")
   avgLatencyMs        Int?      @map("avg_latency_ms")
   errorMessage        String?   @map("error_message")
-  metadata            Json?     // Provider-specific health data
+  metadata            Json?
   updatedAt           DateTime  @updatedAt @map("updated_at")
 
   @@map("data_source_status")
 }
 
 model TaskChecklistItem {
-  id          Int       @id @default(autoincrement())
-  taskId      Int       @map("task_id")
+  id          Int        @id @default(autoincrement())
+  taskId      Int        @map("task_id")
   label       String
-  isComplete  Boolean   @default(false) @map("is_complete")
-  completedAt DateTime? @map("completed_at")
-  sortOrder   Int       @default(0) @map("sort_order")
-  createdAt   DateTime  @default(now()) @map("created_at")
-
+  isComplete  Boolean    @default(false) @map("is_complete")
+  completedAt DateTime?  @map("completed_at")
+  sortOrder   Int        @default(0) @map("sort_order")
+  createdAt   DateTime   @default(now()) @map("created_at")
   task        ClientTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
@@ -2041,15 +1635,14 @@ model TaskChecklistItem {
 }
 
 model TaskChecklistTemplate {
-  id          Int      @id @default(autoincrement())
-  name        String
-  category    String?  // Matches ClientTask.category; null = universal
-  description String?
-  items       Json     // Array of { label, sortOrder }
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
+  id             Int                 @id @default(autoincrement())
+  name           String
+  category       String?
+  items          Json
+  isActive       Boolean             @default(true) @map("is_active")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  description    String?
   recurringRules RecurringTaskRule[] @relation("RecurringTaskRuleTemplate")
 
   @@index([category, isActive])
@@ -2057,49 +1650,47 @@ model TaskChecklistTemplate {
 }
 
 model RecurringTaskRule {
-  id                  Int       @id @default(autoincrement())
+  id                  Int                    @id @default(autoincrement())
   name                String
-  clientId            Int?      @map("client_id") // null = applies to all active clients
-  category            String    // ClientTask category
-  title               String    // Template title (supports {clientName} interpolation)
+  clientId            Int?                   @map("client_id")
+  category            String
+  title               String
   description         String?
-  priority            String    @default("P3")
-  checklistTemplateId Int?      @map("checklist_template_id")
-  cronExpression      String    @map("cron_expression") // e.g. "0 9 1 * *" = 1st of month at 9am
-  isActive            Boolean   @default(true) @map("is_active")
-  lastRunAt           DateTime? @map("last_run_at")
-  nextRunAt           DateTime? @map("next_run_at")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
-
+  priority            String                 @default("P3")
+  checklistTemplateId Int?                   @map("checklist_template_id")
+  cronExpression      String                 @map("cron_expression")
+  isActive            Boolean                @default(true) @map("is_active")
+  lastRunAt           DateTime?              @map("last_run_at")
+  nextRunAt           DateTime?              @map("next_run_at")
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @updatedAt @map("updated_at")
   tasks               ClientTask[]
-  client              ClientProfile?         @relation("RecurringTaskRuleClient", fields: [clientId], references: [id], onDelete: SetNull)
-  checklistTemplate   TaskChecklistTemplate? @relation("RecurringTaskRuleTemplate", fields: [checklistTemplateId], references: [id], onDelete: SetNull)
+  checklistTemplate   TaskChecklistTemplate? @relation("RecurringTaskRuleTemplate", fields: [checklistTemplateId], references: [id])
+  client              ClientProfile?         @relation("RecurringTaskRuleClient", fields: [clientId], references: [id])
 
   @@index([isActive, nextRunAt])
   @@map("recurring_task_rules")
 }
 
 model SiteHealthSnapshot {
-  id                   Int       @id @default(autoincrement())
-  clientId             Int       @map("client_id")
-  domainId             Int       @map("domain_id")
-  performanceMobile    Int?      @map("performance_mobile")    // 0-100
-  performanceDesktop   Int?      @map("performance_desktop")   // 0-100
-  lcp                  Float?    // Largest Contentful Paint (ms)
-  tbt                  Float?    // Total Blocking Time (ms) — replaces deprecated FID
-  cls                  Float?    // Cumulative Layout Shift
-  ttfb                 Float?    // Time to First Byte (ms) — from speed_index proxy; set if available
-  fcp                  Float?    // First Contentful Paint (ms)
-  seoScore             Int?      @map("seo_score")             // 0-100
-  accessibilityScore   Int?      @map("accessibility_score")   // 0-100
-  bestPracticesScore   Int?      @map("best_practices_score")  // 0-100
-  previousMobile       Int?      @map("previous_mobile")       // For delta calculation
-  previousDesktop      Int?      @map("previous_desktop")
-  scanDate             DateTime  @default(now()) @map("scan_date")
-
-  client               ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  domain               ClientDomain  @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  id                 Int           @id @default(autoincrement())
+  clientId           Int           @map("client_id")
+  domainId           Int           @map("domain_id")
+  performanceMobile  Int?          @map("performance_mobile")
+  performanceDesktop Int?          @map("performance_desktop")
+  lcp                Float?
+  tbt                Float?
+  cls                Float?
+  ttfb               Float?
+  fcp                Float?
+  seoScore           Int?          @map("seo_score")
+  accessibilityScore Int?          @map("accessibility_score")
+  bestPracticesScore Int?          @map("best_practices_score")
+  previousMobile     Int?          @map("previous_mobile")
+  previousDesktop    Int?          @map("previous_desktop")
+  scanDate           DateTime      @default(now()) @map("scan_date")
+  client             ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  domain             ClientDomain  @relation(fields: [domainId], references: [id], onDelete: Cascade)
 
   @@index([clientId, scanDate(sort: Desc)])
   @@index([domainId, scanDate(sort: Desc)])
@@ -2107,43 +1698,28 @@ model SiteHealthSnapshot {
 }
 
 model GbpSnapshot {
-  id                  Int       @id @default(autoincrement())
-  clientId            Int       @map("client_id")
-
-  // Aggregated insight totals for the period
-  searchViews         Int?      @map("search_views")
-  mapViews            Int?      @map("map_views")
-  websiteClicks       Int?      @map("website_clicks")
-  phoneClicks         Int?      @map("phone_clicks")
-  directionClicks     Int?      @map("direction_clicks")
-
-  // Review metrics
-  reviewCount         Int?      @map("review_count")
-  reviewAvg           Float?    @map("review_avg")
-  newReviews          Int?      @map("new_reviews")
-
-  // Content metrics
-  photosCount         Int?      @map("photos_count")
-  postsCount          Int?      @map("posts_count")
-
-  // Deltas vs previous snapshot (for trend display)
-  previousSearchViews Int?      @map("previous_search_views")
-  previousMapViews    Int?      @map("previous_map_views")
-
-  // Period the insight data covers
-  periodStart         DateTime  @map("period_start")
-  periodEnd           DateTime  @map("period_end")
-  scanDate            DateTime  @default(now()) @map("scan_date")
-
+  id                  Int           @id @default(autoincrement())
+  clientId            Int           @map("client_id")
+  searchViews         Int?          @map("search_views")
+  mapViews            Int?          @map("map_views")
+  websiteClicks       Int?          @map("website_clicks")
+  phoneClicks         Int?          @map("phone_clicks")
+  directionClicks     Int?          @map("direction_clicks")
+  reviewCount         Int?          @map("review_count")
+  reviewAvg           Float?        @map("review_avg")
+  newReviews          Int?          @map("new_reviews")
+  photosCount         Int?          @map("photos_count")
+  postsCount          Int?          @map("posts_count")
+  previousSearchViews Int?          @map("previous_search_views")
+  previousMapViews    Int?          @map("previous_map_views")
+  periodStart         DateTime      @map("period_start")
+  periodEnd           DateTime      @map("period_end")
+  scanDate            DateTime      @default(now()) @map("scan_date")
   client              ClientProfile @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId, scanDate(sort: Desc)])
   @@map("gbp_snapshots")
 }
-
-// ============================================================================
-// SAVED SEARCHES — Sprint 7A
-// ============================================================================
 
 model SavedSearch {
   id          Int      @id @default(autoincrement())
@@ -2151,28 +1727,21 @@ model SavedSearch {
   name        String
   filtersJson Json     @map("filters_json")
   createdAt   DateTime @default(now()) @map("created_at")
-
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("saved_searches")
 }
 
-// ============================================================================
-// DASHBOARD EVENTS — Sprint 18 / FEAT-019
-// Lightweight platform usage tracking. No PII beyond userId.
-// ============================================================================
-
 model DashboardEvent {
   id         Int      @id @default(autoincrement())
   userId     Int      @map("user_id")
-  eventType  String   @map("event_type")   // "page_view" | "feature_use" | "action"
-  page       String?                        // e.g. "/leads", "/clients/42"
-  feature    String?                        // e.g. "enrich_lead", "generate_report", "bulk_approve"
-  metadata   Json?                          // arbitrary key/value (no PII)
-  sessionId  String?  @map("session_id")   // random per-tab UUID, not persisted to DB
+  eventType  String   @map("event_type")
+  page       String?
+  feature    String?
+  metadata   Json?
+  sessionId  String?  @map("session_id")
   occurredAt DateTime @default(now()) @map("occurred_at")
-
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, occurredAt(sort: Desc)])
@@ -2181,170 +1750,82 @@ model DashboardEvent {
   @@map("dashboard_events")
 }
 
-// ============================================================================
-// PM IMPORT SESSIONS — FEAT-014
-// Tracks one-time data migration sessions from external PM platforms.
-// Stores scraped preview data server-side so the UI can paginate it
-// without re-fetching from the source platform.
-// ============================================================================
-
 model PmImportSession {
-  id            Int       @id @default(autoincrement())
-  userId        Int       @map("user_id")
-  platform      String    // "basecamp" | "asana" | "clickup" | "monday" | "trello" | "csv"
-  status        String    @default("connected") @map("status")
-  // "connected" | "previewing" | "preview_ready" | "importing" | "complete" | "error"
-
-  // Encrypted/stored credentials (cleared after import completes)
-  credentialsJson Json?   @map("credentials_json") // { apiKey, accountId, accessToken, ... }
-
-  // Preview payload — scraped data waiting for user review
-  previewJson   Json?     @map("preview_json")    // { tasks[], contacts[], projects[] }
-  previewStats  Json?     @map("preview_stats")   // { taskCount, contactCount, projectCount }
-
-  // Commit results
-  commitStats   Json?     @map("commit_stats")    // { tasksCreated, tasksSkipped, contactsCreated, errors[] }
-
-  // Error capture
-  errorMessage  String?   @map("error_message")
-
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  importedTasks ClientTask[]  // Tasks created from this import session (for rollback)
+  id              Int          @id @default(autoincrement())
+  userId          Int          @map("user_id")
+  platform        String
+  status          String       @default("connected") @map("status")
+  credentialsJson Json?        @map("credentials_json")
+  previewJson     Json?        @map("preview_json")
+  previewStats    Json?        @map("preview_stats")
+  commitStats     Json?        @map("commit_stats")
+  errorMessage    String?      @map("error_message")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  importedTasks   ClientTask[]
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([platform, status])
   @@map("pm_import_sessions")
 }
 
-// ─── DocuSign / Signature Envelopes ──────────────────────────────────────────
-
 model SignatureEnvelope {
-  id              Int       @id @default(autoincrement())
-  envelopeId      String?   @unique
-  documentName    String
-  documentUrl     String
-  recipientEmail  String
-  recipientName   String
-  status          String    @default("draft")
-  sentAt          DateTime?
-  viewedAt        DateTime?
-  completedAt     DateTime?
-  vaultFileId     Int?
-  clientId        Int?
-  createdById     Int
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  vaultFile       VaultFile?  @relation(fields: [vaultFileId], references: [id])
-  client          Lead?       @relation(fields: [clientId], references: [id])
-  createdBy       User        @relation(fields: [createdById], references: [id])
+  id             Int        @id @default(autoincrement())
+  envelopeId     String?    @unique
+  documentName   String
+  documentUrl    String
+  recipientEmail String
+  recipientName  String
+  status         String     @default("draft")
+  sentAt         DateTime?
+  viewedAt       DateTime?
+  completedAt    DateTime?
+  vaultFileId    Int?
+  clientId       Int?
+  createdById    Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  client         Lead?      @relation(fields: [clientId], references: [id])
+  createdBy      User       @relation(fields: [createdById], references: [id])
+  vaultFile      VaultFile? @relation(fields: [vaultFileId], references: [id])
 
   @@map("signature_envelopes")
 }
 
-// ─── Tenant Registry (Sprint 34 — GHM → Tenant Extraction) ─────────────────
-
 model Tenant {
   id             Int      @id @default(autoincrement())
-  slug           String   @unique                        // e.g. "ghm", "covosdemo"
-  name           String                                  // "GHM Digital Marketing"
-  companyName    String   @map("company_name")           // "GHM Digital Marketing Inc"
+  slug           String   @unique
+  name           String
+  companyName    String   @map("company_name")
   companyTagline String?  @map("company_tagline")
   fromEmail      String   @map("from_email")
   fromName       String   @map("from_name")
   supportEmail   String   @map("support_email")
   dashboardUrl   String   @map("dashboard_url")
-  databaseUrl    String?  @map("database_url")           // per-tenant Neon DB URL
+  databaseUrl    String?  @map("database_url")
   logoUrl        String?  @map("logo_url")
   primaryColor   String?  @map("primary_color")
   aiContext      String?  @map("ai_context")
-  providers      Json?                                    // Partial<TenantProviderConfig>
-  verticalType   String?  @map("vertical_type")                      // "seo_agency" | "affiliate_portfolio" | "generic"
-  securityTier   String   @default("standard") @map("security_tier") // "standard" | "vault"
+  providers      Json?
+  securityTier   String   @default("standard") @map("security_tier")
   active         Boolean  @default(true)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  verticalType   String?  @map("vertical_type")
 
   @@map("tenants")
 }
 
-// ============================================================================
-// AFFILIATE VERTICAL — Sprint 38-40
-// ============================================================================
-
-enum SiteStatus {
-  ACTIVE
-  DORMANT
-  FOR_SALE
-  SOLD
-}
-
-enum AffiliateProgramStatus {
-  NOT_APPLIED
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum AdNetworkStatus {
-  ACTIVE
-  PENDING
-  NOT_QUALIFIED
-  REJECTED
-}
-
-enum RevenueSourceType {
-  AFFILIATE
-  DISPLAY
-  SPONSORED
-  SALE
-  OTHER
-}
-
-enum AcquisitionStage {
-  RESEARCHING
-  DUE_DILIGENCE
-  NEGOTIATING
-  PURCHASED
-  PASSED
-}
-
-enum ContentType {
-  ARTICLE
-  REVIEW
-  COMPARISON
-  LISTICLE
-  LANDING
-  OTHER
-}
-
-enum BriefStatus {
-  BRIEFED
-  IN_PROGRESS
-  REVIEW
-  PUBLISHED
-  NEEDS_REFRESH
-}
-
-enum ValuationListingStatus {
-  NOT_LISTED
-  LISTED
-  UNDER_OFFER
-  SOLD
-}
-
 model Site {
-  id                    Int        @id @default(autoincrement())
+  id                    Int                     @id @default(autoincrement())
   tenantId              Int
   slug                  String
   domain                String
   displayName           String
   niche                 String?
   category              String?
-  status                SiteStatus @default(ACTIVE)
+  status                SiteStatus              @default(ACTIVE)
   launchDate            DateTime?
   acquisitionDate       DateTime?
   acquisitionCost       Float?
@@ -2355,24 +1836,21 @@ model Site {
   cms                   String?
   hostingProvider       String?
   hostingCostMonthly    Float?
-  monetizationMix       String     @default("both")
+  monetizationMix       String                  @default("both")
   gscPropertyId         String?
   ga4PropertyId         String?
   gscConnectedAt        DateTime?
   ga4ConnectedAt        DateTime?
   notes                 String?
-  createdAt             DateTime   @default(now())
-  updatedAt             DateTime   @updatedAt
-
-  affiliatePrograms AffiliateProgram[]
-  adNetworks        DisplayAdNetwork[]
-  revenueEntries    RevenueEntry[]
-  contentBriefs     AffiliateContentBrief[]
-  valuations        SiteValuation[]
-  acquisitionTarget AcquisitionTarget?
-
-  // Intelligence Engine (Sprint IE-01)
-  intelAsset          IntelAsset?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  acquisitionTarget     AcquisitionTarget?
+  contentBriefs         AffiliateContentBrief[]
+  affiliatePrograms     AffiliateProgram[]
+  adNetworks            DisplayAdNetwork[]
+  revenueEntries        RevenueEntry[]
+  valuations            SiteValuation[]
+  intelAsset            IntelAsset?
 
   @@unique([tenantId, slug])
   @@index([tenantId])
@@ -2523,27 +2001,18 @@ model SiteValuation {
   @@index([tenantId, siteId])
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Intelligence Engine — Sprint IE-01: Unified Asset Layer + Sensor Foundation
-// ═══════════════════════════════════════════════════════════════════════════════
-
 model IntelAssetGroup {
-  id              Int       @id @default(autoincrement())
-  tenantId        Int       @map("tenant_id")
+  id              Int               @id @default(autoincrement())
+  tenantId        Int               @map("tenant_id")
   name            String
-  type            String    // "client" | "portfolio" | "niche_cluster"
-  healthScore     Int       @default(50) @map("health_score")
-  status          String    @default("active") // "active" | "onboarding" | "paused" | "churned"
-
-  // Link to existing models
-  clientProfileId Int?      @unique @map("client_profile_id") // FK -> ClientProfile (SEO vertical)
-
-  verticalMeta    Json?     @map("vertical_meta")
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  clientProfile   ClientProfile? @relation(fields: [clientProfileId], references: [id])
+  type            String
+  healthScore     Int               @default(50) @map("health_score")
+  status          String            @default("active")
+  clientProfileId Int?              @unique @map("client_profile_id")
+  verticalMeta    Json?             @map("vertical_meta")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  clientProfile   ClientProfile?    @relation(fields: [clientProfileId], references: [id])
   assets          IntelAsset[]
   competitors     IntelCompetitor[]
   scans           IntelScan[]
@@ -2553,63 +2022,56 @@ model IntelAssetGroup {
 }
 
 model IntelAsset {
-  id              Int       @id @default(autoincrement())
-  tenantId        Int       @map("tenant_id")
-  assetGroupId    Int?      @map("asset_group_id")
-
-  domain          String
-  name            String
-  type            String    // "main_site" | "satellite" | "affiliate_domain" | "authority_site" | "landing_page"
-  ownershipModel  String    @default("managed") @map("ownership_model") // "tenant_owned" | "client_owned" | "managed"
-
-  status          String    @default("active") // "active" | "building" | "paused" | "decommissioned"
-  healthScore     Int       @default(50) @map("health_score")
-  lastScanAt      DateTime? @map("last_scan_at")
-  nextScanAt      DateTime? @map("next_scan_at")
-
-  // Links to existing vertical-specific models
-  clientDomainId  Int?      @unique @map("client_domain_id") // FK -> ClientDomain (SEO vertical)
-  siteId          Int?      @unique @map("site_id")          // FK -> Site (affiliate vertical)
-
-  verticalMeta    Json?     @map("vertical_meta")
-
-  // Fleet (IE-04 will add IntelFleet model)
-  fleetId         Int?      @map("fleet_id")
-  fleetRole       String?   @map("fleet_role") // "primary" | "satellite" | "standalone"
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
-  clientDomain    ClientDomain?    @relation(fields: [clientDomainId], references: [id])
-  site            Site?            @relation(fields: [siteId], references: [id])
-  competitors     IntelCompetitor[]
-  snapshots       IntelSnapshot[]
+  id             Int               @id @default(autoincrement())
+  tenantId       Int               @map("tenant_id")
+  assetGroupId   Int?              @map("asset_group_id")
+  domain         String
+  name           String
+  type           String
+  ownershipModel String            @default("managed") @map("ownership_model")
+  status         String            @default("active")
+  healthScore    Int               @default(50) @map("health_score")
+  lastScanAt     DateTime?         @map("last_scan_at")
+  nextScanAt     DateTime?         @map("next_scan_at")
+  clientDomainId Int?              @unique @map("client_domain_id")
+  siteId         Int?              @unique @map("site_id")
+  verticalMeta   Json?             @map("vertical_meta")
+  fleetId        Int?              @map("fleet_id")
+  fleetRole      String?           @map("fleet_role")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  assetGroup     IntelAssetGroup?  @relation(fields: [assetGroupId], references: [id])
+  clientDomain   ClientDomain?     @relation(fields: [clientDomainId], references: [id])
+  site           Site?             @relation(fields: [siteId], references: [id])
+  fleet          IntelFleet?       @relation(fields: [fleetId], references: [id])
+  fingerprint    IntelFingerprint?
+  competitors    IntelCompetitor[]
+  snapshots      IntelSnapshot[]
+  similarityScoresA IntelSimilarityScore[] @relation("SimilarityAssetA")
+  similarityScoresB IntelSimilarityScore[] @relation("SimilarityAssetB")
+  indexHealth       IntelIndexHealth[]
 
   @@index([tenantId])
   @@index([tenantId, type])
   @@index([assetGroupId])
+  @@index([fleetId])
   @@map("intel_assets")
 }
 
 model IntelCompetitor {
-  id              Int       @id @default(autoincrement())
-  tenantId        Int       @map("tenant_id")
-  assetGroupId    Int?      @map("asset_group_id")
-  assetId         Int?      @map("asset_id")
-
-  name            String
-  domain          String?
-  googlePlaceId   String?   @map("google_place_id")
-
-  isActive        Boolean   @default(true) @map("is_active")
-  source          String    @default("manual") // "auto_detected" | "manual" | "scan_discovered"
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-
-  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
-  asset           IntelAsset?      @relation(fields: [assetId], references: [id])
-  snapshots       IntelSnapshot[]
+  id            Int              @id @default(autoincrement())
+  tenantId      Int              @map("tenant_id")
+  assetGroupId  Int?             @map("asset_group_id")
+  assetId       Int?             @map("asset_id")
+  name          String
+  domain        String?
+  googlePlaceId String?          @map("google_place_id")
+  isActive      Boolean          @default(true) @map("is_active")
+  source        String           @default("manual")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  assetGroup    IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
+  asset         IntelAsset?      @relation(fields: [assetId], references: [id])
+  snapshots     IntelSnapshot[]
 
   @@index([tenantId])
   @@index([assetGroupId])
@@ -2620,14 +2082,12 @@ model IntelCompetitor {
 model IntelSensorCredential {
   id          Int       @id @default(autoincrement())
   tenantId    Int       @map("tenant_id")
-  sensorId    String    @map("sensor_id") // "ahrefs" | "serpapi" | "gsc" | "ga4" | "outscraper" | "pagespeed"
-
-  credentials Json      // encrypted API keys, OAuth tokens, etc.
+  sensorId    String    @map("sensor_id")
+  credentials Json
   isActive    Boolean   @default(true) @map("is_active")
   lastUsedAt  DateTime? @map("last_used_at")
-  status      String    @default("active") // "active" | "expired" | "rate_limited" | "error"
+  status      String    @default("active")
   statusNote  String?   @map("status_note")
-
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
@@ -2636,35 +2096,23 @@ model IntelSensorCredential {
   @@map("intel_sensor_credentials")
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// Intelligence Engine — Sprint IE-02: Scan Engine + First Sensors
-// ═══════════════════════════════════════════════════════════════════════════════
-
 model IntelScan {
-  id              Int       @id @default(autoincrement())
-  tenantId        Int       @map("tenant_id")
-  assetGroupId    Int?      @map("asset_group_id")
-
-  scheduledAt     DateTime  @map("scheduled_at")
-  startedAt       DateTime? @map("started_at")
-  completedAt     DateTime? @map("completed_at")
-
-  // "scheduled" | "running" | "complete" | "partial" | "failed"
-  status          String    @default("scheduled")
-
-  sensorsRun      Json?     @map("sensors_run")      // string[] of sensorIds that completed
-  sensorsFailed   Json?     @map("sensors_failed")   // { sensorId: errorMessage }
-
-  snapshotCount   Int       @default(0) @map("snapshot_count")
-  alertCount      Int       @default(0) @map("alert_count")
-  tasksGenerated  Int       @default(0) @map("tasks_generated")
-
-  apiCosts        Json?     @map("api_costs")         // { sensorId: cost }
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-
-  assetGroup      IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
-  snapshots       IntelSnapshot[]
+  id             Int              @id @default(autoincrement())
+  tenantId       Int              @map("tenant_id")
+  assetGroupId   Int?             @map("asset_group_id")
+  scheduledAt    DateTime         @map("scheduled_at")
+  startedAt      DateTime?        @map("started_at")
+  completedAt    DateTime?        @map("completed_at")
+  status         String           @default("scheduled")
+  sensorsRun     Json?            @map("sensors_run")
+  sensorsFailed  Json?            @map("sensors_failed")
+  snapshotCount  Int              @default(0) @map("snapshot_count")
+  alertCount     Int              @default(0) @map("alert_count")
+  tasksGenerated Int              @default(0) @map("tasks_generated")
+  apiCosts       Json?            @map("api_costs")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  assetGroup     IntelAssetGroup? @relation(fields: [assetGroupId], references: [id])
+  snapshots      IntelSnapshot[]
 
   @@index([tenantId, status])
   @@index([assetGroupId])
@@ -2672,25 +2120,275 @@ model IntelScan {
 }
 
 model IntelSnapshot {
-  id              Int       @id @default(autoincrement())
-  scanId          Int       @map("scan_id")
-  entityType      String    @map("entity_type")  // "asset" | "competitor"
-  assetId         Int?      @map("asset_id")
-  competitorId    Int?      @map("competitor_id")
-
-  metrics         Json      // all measured values from active sensors
-  deltas          Json?     // changes vs previous snapshot for this entity
-  velocity        Json?     // { metricKey: "improving" | "stable" | "declining" }
-  alerts          Json?     // threshold breaches array
-
-  createdAt       DateTime  @default(now()) @map("created_at")
-
-  scan            IntelScan        @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  asset           IntelAsset?      @relation(fields: [assetId], references: [id])
-  competitor      IntelCompetitor? @relation(fields: [competitorId], references: [id])
+  id           Int              @id @default(autoincrement())
+  scanId       Int              @map("scan_id")
+  entityType   String           @map("entity_type")
+  assetId      Int?             @map("asset_id")
+  competitorId Int?             @map("competitor_id")
+  metrics      Json
+  deltas       Json?
+  velocity     Json?
+  alerts       Json?
+  createdAt    DateTime         @default(now()) @map("created_at")
+  asset        IntelAsset?      @relation(fields: [assetId], references: [id])
+  competitor   IntelCompetitor? @relation(fields: [competitorId], references: [id])
+  scan         IntelScan        @relation(fields: [scanId], references: [id], onDelete: Cascade)
 
   @@index([scanId])
   @@index([assetId, createdAt(sort: Desc)])
   @@index([competitorId, createdAt(sort: Desc)])
   @@map("intel_snapshots")
+}
+
+// ─── IE-04: Fleet Diversity Engine ───────────────────────────────────────────
+
+model IntelFleet {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int       @map("tenant_id")
+  name           String
+  assetGroupId   Int?      @map("asset_group_id")
+
+  diversityScore Float     @default(1.0) @map("diversity_score")
+  lastAuditAt    DateTime? @map("last_audit_at")
+
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  assets           IntelAsset[]
+  fingerprints     IntelFingerprint[]
+  similarityScores IntelSimilarityScore[]
+
+  @@index([tenantId])
+  @@map("intel_fleets")
+}
+
+model IntelFingerprint {
+  id      Int @id @default(autoincrement())
+  assetId Int @unique @map("asset_id")
+  fleetId Int @map("fleet_id")
+
+  // Template architecture
+  navPattern          String? @map("nav_pattern")
+  contentHierarchy    String? @map("content_hierarchy")
+  urlStructure        String? @map("url_structure")
+  internalLinkPattern String? @map("internal_link_pattern")
+  footerStructure     String? @map("footer_structure")
+  ctaPattern          String? @map("cta_pattern")
+
+  // Visual identity
+  primaryFont      String? @map("primary_font")
+  secondaryFont    String? @map("secondary_font")
+  colorPalette     Json?   @map("color_palette")
+  componentLibrary String? @map("component_library")
+  imageTreatment   String? @map("image_treatment")
+  overallAesthetic String? @map("overall_aesthetic")
+
+  // Infrastructure
+  hostingProvider   String? @map("hosting_provider")
+  framework         String?
+  headTagOrder      Json?   @map("head_tag_order")
+  schemaMarkupTypes Json?   @map("schema_markup_types")
+  robotsTxtHash     String? @map("robots_txt_hash")
+  sitemapFormat     String? @map("sitemap_format")
+  sslProvider       String? @map("ssl_provider")
+
+  // Content signals
+  avgWordCount      Int?    @map("avg_word_count")
+  contentCadence    String? @map("content_cadence")
+  toneProfile       String? @map("tone_profile")
+  authorAttribution String? @map("author_attribution")
+  mediaUsage        String? @map("media_usage")
+
+  // Link topology
+  fleetCrossLinks        Int   @default(0) @map("fleet_cross_links")
+  anchorTextDistribution Json? @map("anchor_text_distribution")
+
+  // Registration
+  registrationDate DateTime? @map("registration_date")
+  registrar        String?
+
+  lastUpdatedAt DateTime @default(now()) @map("last_updated_at")
+
+  asset IntelAsset @relation(fields: [assetId], references: [id])
+  fleet IntelFleet @relation(fields: [fleetId], references: [id])
+
+  @@index([fleetId])
+  @@map("intel_fingerprints")
+}
+
+model IntelSimilarityScore {
+  id       Int @id @default(autoincrement())
+  fleetId  Int @map("fleet_id")
+  assetAId Int @map("asset_a_id")
+  assetBId Int @map("asset_b_id")
+
+  templateSimilarity       Float @map("template_similarity")
+  visualSimilarity         Float @map("visual_similarity")
+  infrastructureSimilarity Float @map("infrastructure_similarity")
+  contentSimilarity        Float @map("content_similarity")
+  linkSimilarity           Float @map("link_similarity")
+  compositeScore           Float @map("composite_score")
+
+  calculatedAt DateTime @default(now()) @map("calculated_at")
+
+  fleet  IntelFleet @relation(fields: [fleetId], references: [id])
+  assetA IntelAsset @relation("SimilarityAssetA", fields: [assetAId], references: [id])
+  assetB IntelAsset @relation("SimilarityAssetB", fields: [assetBId], references: [id])
+
+  @@index([fleetId])
+  @@index([assetAId])
+  @@index([assetBId])
+  @@map("intel_similarity_scores")
+}
+
+// Platform-wide pool — all tenants draw from the same options.
+// Fingerprints are entered manually during site builds (future: automated crawl).
+model IntelTemplatePool {
+  id        Int      @id @default(autoincrement())
+  dimension String   // "template" | "font_stack" | "color_palette" | "nav_pattern" | "url_structure" | "schema_types"
+  name      String   // human-readable label
+  value     Json     // the configuration/metadata for this pool entry
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([dimension, name])
+  @@map("intel_template_pool")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+
+// IE-05: Index Health - populated from GSC sensor data after each scan
+
+model IntelIndexHealth {
+  id              Int       @id @default(autoincrement())
+  assetId         Int       @map("asset_id")
+  scanId          Int?      @map("scan_id")
+
+  pagesSubmitted  Int?      @map("pages_submitted")
+  pagesIndexed    Int?      @map("pages_indexed")
+  indexRatio      Float?    @map("index_ratio")
+  crawlErrors     Json?     @map("crawl_errors")
+  indexVelocity   Float?    @map("index_velocity")
+  sitemapValid    Boolean?  @map("sitemap_valid")
+  manualActions   Json?     @map("manual_actions")
+
+  deltas          Json?
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  asset           IntelAsset @relation(fields: [assetId], references: [id])
+
+  @@index([assetId, createdAt(sort: Desc)])
+  @@map("intel_index_health")
+}
+
+enum UserRole {
+  manager
+  sales
+  admin
+}
+
+enum LeadStatus {
+  available
+  scheduled
+  contacted
+  follow_up
+  paperwork
+  won
+  lost_rejection
+  lost_deferred
+}
+
+enum PricingModel {
+  one_time
+  monthly
+  annual
+}
+
+enum VaultSpace {
+  shared
+  private
+  client_reports
+  signed_contracts
+}
+
+enum SiteStatus {
+  ACTIVE
+  DORMANT
+  FOR_SALE
+  SOLD
+}
+
+enum AffiliateProgramStatus {
+  NOT_APPLIED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AdNetworkStatus {
+  ACTIVE
+  PENDING
+  NOT_QUALIFIED
+  REJECTED
+}
+
+enum RevenueSourceType {
+  AFFILIATE
+  DISPLAY
+  SPONSORED
+  SALE
+  OTHER
+}
+
+enum AcquisitionStage {
+  RESEARCHING
+  DUE_DILIGENCE
+  NEGOTIATING
+  PURCHASED
+  PASSED
+}
+
+enum ContentType {
+  ARTICLE
+  REVIEW
+  COMPARISON
+  LISTICLE
+  LANDING
+  OTHER
+}
+
+enum BriefStatus {
+  BRIEFED
+  IN_PROGRESS
+  REVIEW
+  PUBLISHED
+  NEEDS_REFRESH
+}
+
+enum ValuationListingStatus {
+  NOT_LISTED
+  LISTED
+  UNDER_OFFER
+  SOLD
+}
+
+// ── IE-06: Dead Letter Queue ─────────────────────────────────────────────────
+// Tracks persistently failing sensor+domain combinations.
+// After DEAD_LETTER_THRESHOLD (5) failures, the pair is skipped on future scans.
+
+model IntelScanDeadLetter {
+  id            Int       @id @default(autoincrement())
+  tenantId      Int       @map("tenant_id")
+  sensorId      String    @map("sensor_id")
+  targetDomain  String    @map("target_domain")
+  errorMessage  String    @map("error_message")
+  attemptCount  Int       @default(1) @map("attempt_count")
+  firstFailedAt DateTime  @default(now()) @map("first_failed_at")
+  lastAttemptAt DateTime  @default(now()) @map("last_attempt_at")
+  resolvedAt    DateTime? @map("resolved_at")
+
+  @@index([tenantId, resolvedAt])
+  @@index([tenantId, sensorId])
+  @@map("intel_scan_dead_letters")
 }

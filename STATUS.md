@@ -1,7 +1,7 @@
 ﻿# GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 6, 2026 — Sprint IE-02 shipped. Scan orchestration engine, PageSpeed + Ahrefs sensors, delta engine, health score calculator, scan API routes, cron scheduler. Intelligence engine now produces real scans with real data.
+**Last Updated:** March 6, 2026 — Sprint IE-06 shipped. Advanced Intelligence patterns (seasonal, upsell, cannibalization, cross-client), production hardening (exponential backoff, timeouts, dead letter queue, token bucket rate limiting), cost attribution API, summary widget, P1 notifications. Intelligence engine fully production-hardened.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,6 +15,30 @@
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
 
+
+### SPRINT IE-06 — Advanced Intelligence + Production Hardening (March 6, 2026) ✅ COMPLETE
+
+**Goal:** Advanced pattern detection, production-grade resilience, and dashboard surface for the COVOS Intelligence Engine.
+
+- [x] **Seasonal Pattern Detection** — `src/lib/intel/patterns/seasonal.ts` — Requires 6+ months of scan history; gracefully returns `insufficient_data` below threshold. Detects calendar-month spikes ≥40% above annual mean. Generates pre-emptive content tasks 2–4 weeks ahead of historically competitive periods. Deduped by title+clientId.
+- [x] **Upsell Detection Engine** — `src/lib/intel/patterns/upsell.ts` — 4 rule types: competitor PPC launch, review surge, site redesign, keyword gap. Hard cap of 3 upsells/client/cycle (7-day dedup). Links to `UpsellOpportunity` model; falls back to `ClientTask` if no matching Product record. Global product lookup (no tenantId — Product is tenant-agnostic).
+- [x] **Keyword Cannibalization Detection** — `src/lib/intel/patterns/cannibalization.ts` — Compares `rankedKeywords` across assets in same group. Flags overlapping keywords where both assets rank top-50. Recommends consolidate/differentiate/deindex based on relative rank delta. Creates P2/P3 technical_seo tasks.
+- [x] **Cross-Client Insights** — `src/lib/intel/patterns/cross-client.ts` — Tenant-wide read-only aggregation: local pack loss streaks, recurring competitor dominance (3+ consecutive wins), scan failure spikes (≥40% failure rate), content approval rate (<70% threshold). Returns insights sorted critical → warning → info.
+- [x] **Production Hardening** — `src/lib/intel/scan-hardening.ts` — Exponential backoff with jitter (`min(base×2^n, 30s) × (1±0.15)`). Per-sensor 30s timeout via Promise.race. In-memory token bucket rate limiter (per-sensor RPM: ahrefs:30, serpapi:60, outscraper:20, ga4/gsc:40, pagespeed:25). DB-backed dead letter queue (`IntelScanDeadLetter` — suppresses after 5 consecutive failures). `resolveDeadLetter()` for manual recovery.
+- [x] **Dead Letter Queue schema** — `IntelScanDeadLetter` model added to `prisma/schema.prisma`. `prisma db push` applied — table live in Neon.
+- [x] **Cost Attribution API** — `GET /api/intel/costs` — Reports scan credits consumed by sensor, by scan (capped 100), and by asset group. Auth via `withPermission(req, "view_all_clients")`.
+- [x] **Summary Widget API** — `GET /api/intel/summary` — scansLast30d, tasksGeneratedLast30d, fleetHealthScore, nextScheduledScanAt, activeAssetGroups, activeAssets, deadLetterCount, recentScanStatus, topSensorsByUsage.
+- [x] **Cross-Client Insights API** — `GET /api/intel/insights` — Proxies `generateCrossClientInsights(tenantId)`. `Cache-Control: private, max-age=3600, stale-while-revalidate=300`.
+- [x] **P1 Notifications** — `src/lib/intel/notify-p1.ts` — Creates `NotificationEvent` per active manager/admin user for every P1 task generated in a scan cycle. Fire-and-forget; non-fatal.
+- [x] **Scan orchestrator hardened** — `scan-orchestrator.ts` updated: `runSensor()` checks dead letter queue, wraps in `withRetry()` + timeout. IE-06 patterns run post-threshold (seasonal, upsell, cannibalization — all non-fatal). P1 notifications fire-and-forget at end of cycle.
+- [x] **index.ts exports** — All IE-06 modules exported from `src/lib/intel/index.ts`.
+- [x] **TypeScript gate** — Zero new errors. 8 pre-existing errors (basecamp-crawl, import-wave-history, team/presence ×3, basecamp/client ×3) — all pre-IE-06, unaffected.
+
+**New files:** `src/lib/intel/patterns/seasonal.ts`, `src/lib/intel/patterns/upsell.ts`, `src/lib/intel/patterns/cannibalization.ts`, `src/lib/intel/patterns/cross-client.ts`, `src/lib/intel/scan-hardening.ts`, `src/lib/intel/notify-p1.ts`, `src/app/api/intel/costs/route.ts`, `src/app/api/intel/summary/route.ts`, `src/app/api/intel/insights/route.ts`
+
+**Modified files:** `prisma/schema.prisma` (IntelScanDeadLetter model), `src/lib/intel/scan-orchestrator.ts` (hardened runSensor, IE-06 pattern block, P1 notifications), `src/lib/intel/index.ts` (IE-06 exports)
+
+---
 
 ### SPRINT IE-02 — Scan Engine + First Sensors (March 6, 2026) ✅ COMPLETE
 

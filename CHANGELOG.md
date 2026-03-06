@@ -1,8 +1,14 @@
 ﻿# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 6, 2026 — Sprint IE-02 shipped: Scan Engine + First Sensors operational.
+**Last Updated:** March 6, 2026 — Sprint IE-06 shipped: Advanced Intelligence patterns + production hardening complete.
 
+
+## Sprint IE-06 — Advanced Intelligence + Production Hardening — March 6, 2026
+
+Seasonal pattern detection: 6+ months of scan history required; detects calendar-month spikes ≥40% above annual mean; generates pre-emptive content tasks 2–4 weeks ahead; graceful `insufficient_data` degradation. Upsell detection: 4 rule types (PPC launch, review surge, site redesign, keyword gap); 3 upsells/client/cycle hard cap; 7-day dedup; links UpsellOpportunity + ClientTask fallback. Keyword cannibalization: cross-asset ranked keyword overlap detection (top-50); consolidate/differentiate/deindex recommendations; P2/P3 technical_seo tasks. Cross-client insights: read-only tenant aggregation of local pack losses, recurring competitor dominance, scan failure spikes, content approval rates; sorted by severity. Production hardening: exponential backoff with jitter, per-sensor 30s timeout, in-memory token bucket rate limiter (per-sensor RPM), DB-backed dead letter queue (IntelScanDeadLetter — suppress after 5 failures). Cost attribution API: GET /api/intel/costs (by sensor, by scan, by group). Summary widget: GET /api/intel/summary (30d scans + tasks, fleet health, dead letter count, sensor usage). Insights API: GET /api/intel/insights with 1h cache. P1 notifications: NotificationEvent per active manager/admin on every P1 task generated. scan-orchestrator.ts hardened: DLQ check + withRetry + timeout per sensor; IE-06 pattern block post-threshold (all non-fatal); P1 fire-and-forget. TypeScript: 0 new errors.
+
+---
 
 ## Sprint IE-02 — Scan Engine + First Sensors — March 6, 2026
 
