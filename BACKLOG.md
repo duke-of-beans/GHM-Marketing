@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 3, 2026 — SEO vertical satellite cluster quality items added.
+**Last Updated:** March 6, 2026 — Intelligence Engine (IE-01–IE-06) shipped. Entry removed from backlog.
 
 **Owner:** David Kirsch
 
@@ -348,3 +348,20 @@ Self-serve agency onboarding, per-tenant branding, per-tenant billing, tenant ad
 **Action:** David manual — confirm submission status.
 
 
+
+
+---
+
+## CONTENT — Fleet Intelligence Features
+
+### CONTENT-010: Fleet Diversity Heatmap
+Visual matrix of pairwise similarity scores for all client satellite clusters. Pulls from IntelSimilarityScore table. Renders as an interactive colour-coded grid (green < 0.30, yellow 0.30–0.59, orange 0.60–0.69, red >= 0.70) with hover tooltips showing per-dimension breakdown. Accessible from Fleet detail page and from Intelligence Engine dashboard.
+**Priority:** WOULD.
+
+### CONTENT-011: Morpheme Build Wizard
+UI for building new satellites from morpheme recipes. Diversity recommender suggests morpheme assignments that maximise distance from existing fleet members — powered by IntelFingerprint comparison against fleet's existing records. Shows projected pairwise scores before committing. Integrated into Website Studio cluster creation flow.
+**Priority:** FUTURE.
+
+### CONTENT-012: Auto-Fingerprint Crawler
+Visits live satellite URLs, infers morpheme assignments from HTML structure (nav pattern, footer structure, CTA presence, schema markup types) for sites not built from the morpheme library. Populates IntelFingerprint records automatically. Enables fleet diversity auditing for legacy or third-party-built sites. Requires crawl scheduling + HTML parser sensor.
+**Priority:** FUTURE.

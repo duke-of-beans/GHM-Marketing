@@ -1,14 +1,36 @@
-﻿# GHM DASHBOARD — CHANGELOG
+# GHM DASHBOARD — CHANGELOG
 **Purpose:** Permanent record of every completed item. Items are moved here when shipped.
 **Never prune this file.** It is the audit trail.
-**Last Updated:** March 6, 2026 — Sprint IE-06 shipped: Advanced Intelligence patterns + production hardening complete.
+**Last Updated:** March 6, 2026 — Intelligence Engine complete (IE-01 through IE-06). All 6 sprints shipped.
 
+
+## Sprint MORPH-05 — GAD Fleet Registration + Diversity Audit — March 10, 2026
+
+GAD satellite cluster (7 sites) registered in COVOS Intelligence Engine. IntelFleet record created (fleetId=1, tenant GHM). 7 IntelAsset records created (asset IDs 13–19). 7 IntelFingerprint records populated from SITE_RECIPE.json morpheme selections — 8 dimensions mapped: navPattern, contentHierarchy, urlStructure, footerStructure, ctaPattern, primaryFont/secondaryFont (typography), headTagOrder (infra morpheme ID), schemaMarkupTypes. Pairwise similarity scoring: 21 pairs calculated with sprint weights (infra 0.35, typography 0.20, schema 0.10, nav/hierarchy/url/footer/cta 0.07 each). All 21 pairs PASS (< 0.60). Max composite: 0.49 (Audi/Porsche — shared infra_standard + nav_horizontal + cta_sticky_bar). Fleet diversity score: 0.51. 21 IntelSimilarityScore records written. Fleet approved: YES. FLEET_DIVERSITY_AUDIT.md written to satellites directory. BACKLOG.md: CONTENT-010/011/012 added. TypeScript: 0 new errors.
+
+---
 
 ## Sprint IE-06 — Advanced Intelligence + Production Hardening — March 6, 2026
 
 Seasonal pattern detection: 6+ months of scan history required; detects calendar-month spikes ≥40% above annual mean; generates pre-emptive content tasks 2–4 weeks ahead; graceful `insufficient_data` degradation. Upsell detection: 4 rule types (PPC launch, review surge, site redesign, keyword gap); 3 upsells/client/cycle hard cap; 7-day dedup; links UpsellOpportunity + ClientTask fallback. Keyword cannibalization: cross-asset ranked keyword overlap detection (top-50); consolidate/differentiate/deindex recommendations; P2/P3 technical_seo tasks. Cross-client insights: read-only tenant aggregation of local pack losses, recurring competitor dominance, scan failure spikes, content approval rates; sorted by severity. Production hardening: exponential backoff with jitter, per-sensor 30s timeout, in-memory token bucket rate limiter (per-sensor RPM), DB-backed dead letter queue (IntelScanDeadLetter — suppress after 5 failures). Cost attribution API: GET /api/intel/costs (by sensor, by scan, by group). Summary widget: GET /api/intel/summary (30d scans + tasks, fleet health, dead letter count, sensor usage). Insights API: GET /api/intel/insights with 1h cache. P1 notifications: NotificationEvent per active manager/admin on every P1 task generated. scan-orchestrator.ts hardened: DLQ check + withRetry + timeout per sensor; IE-06 pattern block post-threshold (all non-fatal); P1 fire-and-forget. TypeScript: 0 new errors.
 
 ---
+
+## Sprint IE-05 — Full Sensor Suite + Index Monitoring — March 6, 2026
+
+GSC sensor (Search Console API — index coverage, search performance, manual actions, sitemap status; reuses existing OAuth). GA4 sensor (Analytics 4 API — sessions, pageviews, bounce rate, conversions; reuses existing OAuth). Outscraper sensor (reviews, ratings, GBP data). SerpAPI sensor (local pack, organic rankings, SERP features). Affiliate revenue internal sensor (reads RevenueEntry, computes RPV/EPC trends). Ad revenue internal sensor (reads DisplayAdNetwork, computes RPM trends). IntelIndexHealth model added to schema (pagesSubmitted, pagesIndexed, indexRatio, crawlErrors, indexVelocity, sitemapValid, manualActions). Index anomalies generate P1 tasks. Sensor settings UI at settings/integrations/intel-sensors/ (per-sensor status, credential input, test connection). Sensor credential API routes (CRUD + test endpoint). TypeScript: 0 new errors.
+
+## Sprint IE-04 — Fleet Diversity Engine — March 6, 2026
+
+IntelFleet model (diversityScore 0–1, linked to asset group). IntelFingerprint model (6 dimensions: template architecture × 6 fields, visual identity × 6 fields, infrastructure × 7 fields, content × 5 fields, link topology × 2 fields, registration × 2 fields). IntelSimilarityScore model (pairwise per-dimension + composite). IntelTemplatePool model (platform-wide dimension × name pool). Template pool seed script (6+ templates, 8+ fonts, 8+ palettes, 5+ nav patterns, 4+ URL structures, 4+ schema approaches). Similarity calculator (per-dimension scoring, weights: infra 0.30, template 0.25, content 0.20, link 0.15, visual 0.10, missing field re-normalization). Fleet auditor (pairwise audit, diversity score calc, >0.7 P2, >0.85 P1). Diversity recommender (build-time recommendations with avoid list + projection). Fleet API (5 routes: list, detail, recommendations, heatmap, manual audit). TypeScript: 0 new errors.
+
+## Sprint IE-03 — Work Queue Generation — March 6, 2026
+
+Threshold rule engine (evaluates vertical profile rules against scan deltas, returns matched rules with entity context). SEO rules: competitor_content_surge, local_pack_loss, pagespeed_degraded, competitor_backlink_surge, index_coverage_drop, review_velocity_gap. Affiliate rules: traffic_decline, revenue_per_visitor_decline, content_staleness, competitor_new_entry, domain_valuation_shift. Task templates (pattern-based titles with variable interpolation, context fields, suggested actions, estimated effort). Task generator (creates ClientTask records, source=intelligence_engine, scanId linked, prioritization: asset value × velocity × compound risk, trigger context in description). Pipeline integration: scan → snapshots → deltas → threshold evaluation → task creation. Task API (filtered list + summary counts). TypeScript: 0 new errors.
+
+## Sprint IE-01 — Unified Asset Layer + Sensor Foundation — March 6, 2026
+
+IntelAsset model (unified web property with FKs to ClientDomain + Site, healthScore, fleet context). IntelAssetGroup model (logical groupings — clients for SEO, portfolios for affiliate, FK to ClientProfile). IntelCompetitor model (tracked entities scoped to group or asset). IntelSensorCredential model (per-tenant per-sensor API key storage, unique on [tenantId, sensorId]). TypeScript types for all intel entities + sensor configs + vertical profiles. Vertical profiles: seo-agency, affiliate, local-service (future V3 stub). Asset service CRUD (tenant-scoped). API routes: assets, asset-groups, competitors (list + create + individual CRUD). Migration bridge script: `scripts/intel-migration-bridge.ts` — bridges ClientProfile/ClientDomain/ClientCompetitor + Site into intel layer, idempotent, run with `npx tsx scripts/intel-migration-bridge.ts <tenantId>`. TypeScript: 0 new errors.
 
 ## Sprint IE-02 — Scan Engine + First Sensors — March 6, 2026
 
