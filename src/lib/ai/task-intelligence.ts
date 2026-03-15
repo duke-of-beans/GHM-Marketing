@@ -6,6 +6,7 @@
 import { callAI } from "@/lib/ai";
 import type { TenantConfig } from "@/lib/tenant";
 import type { TenantVoice } from "@/lib/ai/router/types";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function generateContentBrief(params: {
   title: string;
@@ -19,10 +20,17 @@ export async function generateContentBrief(params: {
 }): Promise<string> {
   const { title, description, clientName, category, competitorInfo, clientId, tenant, tenantVoice } = params;
 
+  // SEC-002: task title/description were created by users; competitorInfo contains
+  // user-entered competitor names and domains. Sanitize all before interpolation.
+  const safeTitle = sanitizePromptInput(title);
+  const safeDescription = sanitizePromptInput(description);
+  const safeClientName = sanitizePromptInput(clientName);
+  const safeCompetitorInfo = competitorInfo ? sanitizePromptInput(competitorInfo) : undefined;
+
   const prompt = `Task Category: ${category}
-Task Title: ${title}
-Gap/Issue: ${description}
-${competitorInfo ? `Competitor Context: ${competitorInfo}` : ""}
+Task Title: ${safeTitle}
+Gap/Issue: ${safeDescription}
+${safeCompetitorInfo ? `Competitor Context: ${safeCompetitorInfo}` : ""}
 
 Create a detailed, actionable content brief that includes:
 
@@ -41,7 +49,7 @@ Keep it practical, specific, and actionable. Format in markdown.`;
     context: {
       feature: "content_brief",
       clientId: clientId ?? 0,
-      clientName,
+      clientName: safeClientName,
       tenantVoice,
     },
     tenant,

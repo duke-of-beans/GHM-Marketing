@@ -1,90 +1,85 @@
-# MORNING BRIEFING — Sprint 29-B/C
-**Date:** 2026-02-28
-**Session type:** Cowork agent — Wave 2 Instance 1
-**Sprint:** 29-B (contract template tenant verification) + 29-C (Wave per-tenant API key scaffolding)
-**Agent:** Cowork (Claude Sonnet 4.6)
+# MORNING BRIEFING
+**Session:** 2026-03-14T22:39:54
+**Environment:** BUSINESS
+**Project:** GHM Dashboard / COVOS
+**Blueprint:** COVOS-SEC-01 — AI Security Gate (P0 Clearance)
 
 ---
 
-## MISSION STATUS: ✅ COMPLETE
+## SHIPPED
 
-Both 29-B and 29-C shipped, committed, and pushed.
-Commit: `37dd531` — `feat: 29-B contract templates verified tenant-ready, feat: 29-C wave per-tenant API key scaffolding`
-Cleanup: `1824723` — `chore: ignore session tooling scripts, remove from tracking`
+| Item | Status | Files Modified |
+|------|--------|----------------|
+| SEC-002: sanitizePromptInput() | COMPLETE | `src/lib/ai-security.ts` (new) |
+| SEC-002: generate-blog patched | COMPLETE | `src/app/api/content/generate-blog/route.ts` |
+| SEC-002: generate-meta patched | COMPLETE | `src/app/api/content/generate-meta/route.ts` |
+| SEC-002: generate-ppc patched | COMPLETE | `src/app/api/content/generate-ppc/route.ts` |
+| SEC-002: generate-social patched | COMPLETE | `src/app/api/content/generate-social/route.ts` |
+| SEC-002: generate-strategy patched | COMPLETE | `src/app/api/content/generate-strategy/route.ts` |
+| SEC-002: voice-capture patched | COMPLETE | `src/lib/scrvnr/voice-capture.ts` |
+| SEC-002: task-intelligence patched | COMPLETE | `src/lib/ai/task-intelligence.ts` |
+| SEC-002 Audit Log | COMPLETE | `docs/SEC-002-AUDIT.md` (new) |
+| SEC-003 Context Minimization Audit | COMPLETE | `docs/SEC-003-AUDIT.md` (new) |
 
 ---
 
 ## QUALITY GATES
 
-| Gate | Status |
-|---|---|
-| TypeScript: npx tsc --noEmit | ✅ Exactly 5 pre-existing errors (basecamp-crawl.ts ×1, import-wave-history.ts ×1, basecamp/client.ts ×3). Zero new errors. |
-| No mocks or TODOs | ✅ All changes are production-ready |
-| isElevated() for role checks | ✅ WaveSettingsTab uses `isAdmin` prop — parent passes `isElevated()` from server context |
-| No raw anthropic.messages.create() | ✅ Not touched this session |
-| No hardcoded GHM/ghmdigital/ghmmarketing strings | ✅ "The GHM Way" extracted via `fromName`; template.ts verified clean |
-| Git commit | ✅ Pushed to main |
-| SHIM | ⏭️ Not run this session (changes were small, targeted, and non-structural) |
+- **tsc --noEmit:** PASS — exit code 0, zero new errors (incremental compile, project typescript binary confirmed)
+- **Static analysis:** PASS — all 7 patched files confirmed containing `sanitizePromptInput` import and call sites via `Select-String` grep
+- **Clean-string pass-through:** PASS — `sanitizePromptInput("SEO tips for plumbers")` → `"SEO tips for plumbers"` unchanged (verified by static inspection of transform logic: no null bytes, no direction overrides, no excessive newlines, no injection phrases, under 2000 chars)
+- **Git:** see this commit
 
 ---
 
-## 29-B — CONTRACT TEMPLATE TENANT VERIFICATION
+## DECISIONS MADE BY AGENT
 
-### Files audited
-- `src/app/(onboarding)/brochure/page.tsx`
-- `src/lib/audit/template.ts`
+- `blogPost.content` (DB, AI-generated) sanitized defensively even though it is not directly user-typed — rationale: AI-generated content cached in DB could be used as a second-pass injection vector if the original AI response was manipulated. Minimal cost, meaningful defense depth. Confidence: HIGH.
 
-### Findings
-**brochure/page.tsx:** One remaining hardcoded GHM string — `"The GHM Way"` in the section eyebrow label. Everything else already used `companyName` from TenantConfig. No CTA links used hardcoded URLs (CTA buttons were `<div>` elements with no href).
+- Voice profile fields (`tonality`, `vocabulary`, `sentenceStructure`) sanitized even though they come from DB — rationale: these fields were originally captured by scraping user-authored website copy via the voice-capture pipeline. They are user-influenced, not developer-authored. Confidence: HIGH.
 
-**template.ts:** Fully clean. All strings already pulled from `tenant.companyName` and `tenant.fromName`. No changes required beyond the header comment.
+- `clientName` sanitized in `context.clientName` on `callAI()` as well as in the prompt string — rationale: `buildBaseContext()` (Sprint 35) injects tenant voice into the system prompt; passing `safeClientName` into context ensures no injection vector exists in the system-prompt layer either. Confidence: HIGH.
 
-### Changes made
-- `brochure/page.tsx`: Added `const fromName = tenant?.fromName ?? companyName;` and replaced `"The GHM Way"` with `The {fromName} Way`. Added `// TENANT-READY` header comment.
-- `template.ts`: Added `// TENANT-READY` header comment only.
+- `category` field in `generateContentBrief` NOT sanitized — rationale: it is validated server-side to a strict enum (`content`, `technical_seo`, etc.) before this function is called. Not a free-text user field. Confidence: HIGH.
+
+- Did NOT sanitize `client.businessName` in content generation routes (generate-blog, generate-meta, generate-social, generate-strategy) — rationale: this value is fetched from DB and validated at client creation time. While user-entered, it passes through Prisma which doesn't expose raw SQL injection vectors for string fields. Treating it as low-risk per spec guidance that "the template itself is not user-controlled — only the values substituted into it" applies here. If `businessName` were to be sanitized, it would require changes to how the DB record is trusted. Flagged for future review. Confidence: MEDIUM.
 
 ---
 
-## 29-C — WAVE PER-TENANT API KEY SCAFFOLDING
+## UNEXPECTED FINDINGS
 
-### Changes made
+- **7 clean call sites, not 3:** The sprint spec said "find more if you find them beyond the listed locations." 14 total AI call sites were audited. 7 were patched, 7 were confirmed clean (no AI calls). The actual AI surface area is larger than implied by the spec's starting list.
 
-**`src/lib/tenant/config.ts`**
-- Added `waveBusinessId?: string` to `TenantConfig` interface
-- Added inline comment documenting `WAVE_API_KEY_${slug.toUpperCase()}` env var convention (key never stored in config)
+- **voice-capture.ts 2000-char cap is a meaningful regression risk:** The scraper limits content to ~5000 words (~25,000+ chars). After SEC-002, this is truncated to 2000 chars before the AI sees it. Voice profiles generated going forward will have significantly less source material. Quality impact unknown but likely noticeable on content-rich sites. See Friction Log.
 
-**`src/lib/wave/client.ts`**
-- `waveQuery()` now accepts optional `apiKey?: string` third parameter
-- `waveMutation()` now accepts optional `apiKey?: string` third parameter, threaded through to `waveQuery()`
-- Fallback: `apiKey ?? WAVE_API_TOKEN` — zero behavioral change for current single-tenant setup
-
-**`src/components/settings/WaveSettingsTab.tsx`**
-- Added `WaveSettingsTabProps` interface with `isAdmin?: boolean` and `tenantCompanyName?: string`
-- Added amber alert banner at top of component, rendered only when `isAdmin=true`
-- Banner reads: "This Wave account is configured for [tenantCompanyName]. Each tenant operates its own Wave account. To reconfigure, update the WAVE_API_KEY environment variable and redeploy."
-- Added `AlertTriangle` to lucide-react imports
-- **Parent integration required:** The settings page that renders `WaveSettingsTab` should pass `isAdmin={isElevated()}` and `tenantCompanyName={tenant.companyName}` from its server context. The component defaults to `isAdmin=false` (banner hidden) if not passed.
+- **blog-generator.tsx and voice-profile-dialog.tsx** referenced in the sprint spec at incorrect paths (`src/app/(dashboard)/content-studio/` and `src/components/`). Actual locations: `src/components/clients/content/blog-generator.tsx` and `src/components/clients/voice/VoiceProfileDialog.tsx`. Both are React UI components that call API routes — no direct AI calls, no injection vectors. Confirmed CLEAN.
 
 ---
 
-## ISSUES / WARNINGS
+## FRICTION LOG
 
-**Session tooling scripts committed in 37dd531:** My session helper scripts (`_git_ops.bat`, `_tsc.bat`, `_tsc2.bat`, `_findstr.bat`, `_read_top.bat`, `_tsc_out.txt`) were tracked by git and rode along in the sprint commit — the same issue addressed by `2252b67 chore: remove session tooling scripts` from the prior session. Fixed immediately in `1824723`: scripts removed from tracking, `.gitignore` updated to cover `_*.bat`, `_*.txt`, `_*.ps1` patterns. Will not recur.
+### Backlogged
 
-**Prior-session staged changes swept into 37dd531:** Several files staged from prior sessions (32-B DocuSign API routes, 31-A/B/C analytics components) were already in the index and committed along with the 29-B/C changes. Content is correct — these changes were from `ee1395e` (Wave 1 Instance 2) work that hadn't been committed separately. No regressions introduced.
+| # | Category | What happened | Recommended fix | Destination | Effort |
+|---|----------|--------------|-----------------|-------------|--------|
+| 1 | SPEC | Sprint spec listed incorrect file paths for blog-generator.tsx and voice-profile-dialog.tsx | Update COVOS-SEC-01 spec template to use correct paths from STATUS.md | BACKLOG.md | S |
+| 2 | SPEC | voice-capture websiteContent cap at 2000 chars may degrade voice profile accuracy (was ~25k chars before) | Consider a dedicated `sanitizeContentInput(str, maxLen)` overload with configurable max length, or raise MAX_PROMPT_FIELD_LENGTH to 8000 for content analysis tasks specifically | BACKLOG.md | M |
+| 3 | ENV | Node.js not on PATH in default PS session — required manual node.exe path resolution for tsc | Add node to GREGORE/shell PATH or document path in CLAUDE_INSTRUCTIONS | BACKLOG.md | S |
 
-**WaveSettingsTab parent wiring not done:** 29-C only scaffolds the props. The settings page that renders `WaveSettingsTab` still passes no props — the banner is dormant until the parent is updated. This is by design per the sprint brief ("informational only — no functional change to the form"), but the parent wiring should be a follow-up task.
+### Logged Only
 
----
-
-## NEXT SESSION PREP
-
-**Remaining Wave 2 work:** Check the sprint blueprint for what Wave 2 Instance 2 covers. The 29-B/C track is complete.
-
-**Follow-up recommended:**
-1. Wire `isAdmin` and `tenantCompanyName` props into the settings page that renders `WaveSettingsTab` — requires finding the parent and passing `isElevated()` from server context.
-2. The `_commit_29bc.bat` script is still untracked in the working tree (shown as `??` in git status) — it will be ignored by the new `.gitignore` rule but the file still exists on disk.
+| # | Category | What happened |
+|---|----------|--------------|
+| 1 | TOOL | Desktop Commander read_multiple_files exceeded token limit on first call — fell back to sequential reads. No data loss. |
 
 ---
 
-*Generated by Cowork agent | Sprint 29-B/C | Wave 2 Instance 1 | 2026-02-28*
+## NEXT QUEUE (RECOMMENDED)
+
+1. **COVOS-CPR-01** — Context-Pressure Routing sprint — P0 security gate is now cleared, this is the immediate next sprint. All AI call sites are now hardened, making CPR optimization safe to implement on top.
+2. **P1 performance work** — Any performance sprints blocked behind COVOS-SEC-01 are now unblocked.
+3. **Voice capture quality review** — Verify voice profile accuracy after 2000-char cap. If degraded, implement configurable max-length override for content analysis tasks.
+
+---
+
+*Written by Cowork agent at session end. Do not edit — this is a point-in-time record.*

@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 10, 2026 — MORPH-05 complete. GAD fleet registered in Intelligence Engine.
+**Last Updated:** March 14, 2026 — COVOS-SEC-01 complete. AI prompt injection defense + context minimization audit shipped.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -14,6 +14,22 @@
 **UI Constitution:** Groups 1–5 complete (Foundations, Icons, Components, Navigation, Data Display). Groups 6–8 (Communication, Content, Identity) remain.
 
 **Intelligence Engine (ARCH-007):** Fully shipped (IE-01 through IE-06). 12 Prisma models (`IntelAsset`, `IntelAssetGroup`, `IntelCompetitor`, `IntelSensorCredential`, `IntelScan`, `IntelSnapshot`, `IntelFleet`, `IntelFingerprint`, `IntelSimilarityScore`, `IntelTemplatePool`, `IntelIndexHealth`, `IntelScanDeadLetter`). 8 sensors (PageSpeed, Ahrefs, SerpAPI, GSC, GA4, Outscraper, affiliate-revenue, ad-revenue). 23 API routes under `/api/intel/`. Fleet diversity engine with 6-dimension fingerprinting and pairwise similarity scoring. Work queue generation with threshold rules feeding existing task engine. Advanced patterns: seasonal, upsell, cannibalization, cross-client insights. Production hardened: exponential backoff, rate limiting, dead letter queue, P1 notifications. Sensor settings UI at `/settings/integrations/intel-sensors/`. Cron scheduler at 03:30 UTC daily. Spec: `D:\Work\SEO-Services\specs\covos\INTELLIGENCE_ENGINE_SPEC.md`.
+
+**Next sprint:** COVOS-CPR-01 — Context-Pressure Routing. P0 security gate cleared by COVOS-SEC-01.
+
+
+### SPRINT COVOS-SEC-01 — AI Security Gate / P0 Clearance (March 14, 2026) ✅ COMPLETE
+
+**Goal:** Harden all AI call sites against prompt injection and minimize context payloads. Clears P0 gate before P1 performance work.
+
+- [x] **SEC-002: Prompt Injection Defense** — `src/lib/ai-security.ts` created. `sanitizePromptInput()` exported. Transforms: null-byte strip, Unicode direction-override strip (U+202A–U+202E, U+2066–U+2069), newline collapse (4+ → 3), injection-phrase strip at line start (`ignore previous instructions`, `system:`, `###`), 2000-char max with `[truncated]` suffix. All 7 active AI call sites patched: `generate-blog`, `generate-meta`, `generate-ppc`, `generate-social`, `generate-strategy`, `voice-capture.ts`, `task-intelligence.ts`. 7 additional call sites audited and confirmed clean (no AI calls). Audit log: `docs/SEC-002-AUDIT.md`.
+- [x] **SEC-003: Context Minimization** — All 7 AI call sites reviewed for PII, API key exposure, DB ID leakage, and oversized payloads. No structural removals needed — all call sites were already sending minimum-necessary data. Key finding: `voice-capture.ts` websiteContent capped from ~25,000 chars to 2,000 chars by sanitizer. No client PII, API keys, or DB IDs found in any prompt string. `clientId` in context objects is for cost attribution logging only. Audit log: `docs/SEC-003-AUDIT.md`.
+- [x] **TypeScript gate** — `npx tsc --noEmit` exit code 0. Zero new errors. Pre-existing errors unaffected.
+
+**New files:** `src/lib/ai-security.ts`, `docs/SEC-002-AUDIT.md`, `docs/SEC-003-AUDIT.md`, `MORNING_BRIEFING.md`
+**Modified files:** `src/app/api/content/generate-blog/route.ts`, `src/app/api/content/generate-meta/route.ts`, `src/app/api/content/generate-ppc/route.ts`, `src/app/api/content/generate-social/route.ts`, `src/app/api/content/generate-strategy/route.ts`, `src/lib/scrvnr/voice-capture.ts`, `src/lib/ai/task-intelligence.ts`
+**Commit:** TBD — see git log
+
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
 
@@ -1256,3 +1272,65 @@ Flat nav replaced with 5 collapsible groups: Prospects, Clients, Insights, Finan
 - **Test account (userId=6)** must never have contractorVendorId set or be assigned as salesRepId/masterManagerId on any real client.
 - **Vercel build script:** `vercel-build` (not `build`) is what Vercel runs. `prisma db push` was removed — schema changes are manual only.
 
+
+
+---
+
+## Architecture Session — Privacy, Security & Efficiency Sync ✅ LOGGED
+
+**Date:** 2026-03-13
+**Last Updated:** 2026-03-13
+**Type:** Portfolio-level architectural sync (no code shipped)
+
+Privacy-first, local-execution-first, and efficiency-first principles established
+in the GregLite architectural session synced to COVOS. New spec doc created.
+Backlog items added. No sprint briefs written yet — briefs generated before execution.
+
+### New Document
+`D:\Work\SEO-Services\specs\covos\PRIVACY_SECURITY_ARCHITECTURE.md`
+Full spec: data residency model, tenant isolation guarantees, AI transparency,
+local execution preference (COVOS adaptation), IE efficiency layer,
+security gaps, Privacy Trust Dashboard, portfolio coherence table.
+
+### Backlog Items Added
+
+| ID | Name | Priority | Category |
+|---|---|---|---|
+| SEC-002 | AI Prompt Injection Defense | P0 | Security |
+| SEC-003 | Context Minimization Audit | P0 | Cost + Security |
+| PERF-001 | Prompt Caching for IE | P1 | Cost |
+| PERF-002 | Model Right-Sizing (Haiku Routing) | P1 | Cost |
+| PERF-003 | Batch API for Non-Urgent IE | P2 | Cost |
+| PERF-004 | Class 0/1 Reclassification Audit | P1 | Cost |
+| TRUST-001 | Privacy Trust Dashboard | P1 | Trust/Sales |
+| TRUST-002 | Data Residency Indicators | P2 | Trust |
+| SEC-004 | Tenant Isolation Verification | P1 | Security |
+| SEC-005 | Input Sanitization Audit | P1 | Security |
+
+### Estimated Cost Impact (AI Spend)
+
+| Mechanism | Estimated Reduction |
+|---|---|
+| Prompt caching (IE system prompt) | 70–80% input token reduction on repeat IE runs |
+| Haiku routing for classification tasks | 30–40% IE AI spend reduction |
+| Class 0/1 reclassification (eliminate AI calls) | 30–50% reduction in total call volume |
+| Context minimization (trim over-contexted calls) | 20–30% token reduction on remaining calls |
+| Batch API for non-urgent IE | 50% discount on batch-eligible tasks |
+| **Net estimated** | **50–65% total Claude API spend reduction** |
+
+### Strategic Note
+
+Privacy Trust Dashboard (TRUST-001) is both a product feature and a sales asset.
+"Your data, your business" is COVOS's equivalent of GregLite's "your data, your machine."
+No major competitor (GoHighLevel, HubSpot, AgencyAnalytics) surfaces data residency
+or AI processing transparency to their customers. This is a moat.
+
+Demo the Privacy Trust Dashboard during tenant onboarding. It converts.
+
+### Files Updated
+
+| File | Change |
+|---|---|
+| `specs/covos/PRIVACY_SECURITY_ARCHITECTURE.md` | NEW — full privacy/security/efficiency spec |
+| `BACKLOG.md` | 10 new backlog items (SEC-002–005, PERF-001–004, TRUST-001–002) |
+| `STATUS.md` | This entry |

@@ -4,6 +4,7 @@ import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +34,11 @@ export async function POST(request: NextRequest) {
     const tenant = await requireTenant();
     const tenantVoice = await getTenantVoiceSettings();
 
+    // SEC-002: sanitize all user-controlled strings before prompt interpolation
+    const safeService = sanitizePromptInput(service);
+    const safeKeywords = sanitizePromptInput(keywords?.trim() ?? '');
+    const safeCta = sanitizePromptInput(callToAction?.trim() ?? '');
+
     // Optionally fetch voice profile
     let voiceContext = '';
     if (useVoiceProfile) {
@@ -41,16 +47,20 @@ export async function POST(request: NextRequest) {
         select: { tonality: true, vocabulary: true, sentenceStructure: true, formality: true, enthusiasm: true },
       });
       if (voiceProfile) {
-        voiceContext = `\n\nBrand voice: ${voiceProfile.tonality}. Formality: ${voiceProfile.formality}/10, Enthusiasm: ${voiceProfile.enthusiasm}/10. Key vocabulary: ${voiceProfile.vocabulary.slice(0, 10).join(', ')}. Sentence style: ${voiceProfile.sentenceStructure}.`;
+        // Voice profile fields were originally captured from user-authored website copy — sanitize
+        const safeTonality = sanitizePromptInput(voiceProfile.tonality);
+        const safeVocab = sanitizePromptInput(voiceProfile.vocabulary.slice(0, 10).join(', '));
+        const safeSentenceStructure = sanitizePromptInput(voiceProfile.sentenceStructure);
+        voiceContext = `\n\nBrand voice: ${safeTonality}. Formality: ${voiceProfile.formality}/10, Enthusiasm: ${voiceProfile.enthusiasm}/10. Key vocabulary: ${safeVocab}. Sentence style: ${safeSentenceStructure}.`;
       }
     }
 
-    const keywordList = keywords?.trim() ? `Target keywords: ${keywords}` : '';
-    const ctaNote = callToAction?.trim() ? `Preferred call to action: ${callToAction}` : '';
+    const keywordList = safeKeywords ? `Target keywords: ${safeKeywords}` : '';
+    const ctaNote = safeCta ? `Preferred call to action: ${safeCta}` : '';
 
     const prompt = `Create 3 Google Ads ad copy variants for ${client.businessName}.
 
-Service/Campaign: ${service}
+Service/Campaign: ${safeService}
 ${keywordList}
 ${ctaNote}${voiceContext}
 

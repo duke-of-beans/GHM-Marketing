@@ -4,6 +4,7 @@ import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,12 +41,15 @@ export async function POST(request: NextRequest) {
     const tenant = await requireTenant();
     const tenantVoice = await getTenantVoiceSettings();
 
+    // SEC-002: input is directly user-supplied — sanitize before interpolation
+    const safeInput = sanitizePromptInput(input);
+
     let prompt = '';
 
     if (mode === 'topics') {
       prompt = `Generate 8 blog topic ideas for ${client.businessName}.
 
-Theme or niche: ${input}
+Theme or niche: ${safeInput}
 
 Requirements:
 - Each topic should be specific, search-intent driven, and realistic for a local/regional business
@@ -59,7 +63,7 @@ Return ONLY a JSON array of objects with no extra text or markdown. Format:
     } else {
       prompt = `Generate keyword suggestions for ${client.businessName}.
 
-Topic: ${input}
+Topic: ${safeInput}
 
 Requirements:
 - Include primary keywords (high volume, competitive) and long-tail keywords (lower volume, easier to rank)

@@ -2,6 +2,7 @@ import { callAI } from "@/lib/ai";
 import type { TenantConfig } from "@/lib/tenant";
 import type { TenantVoice } from "@/lib/ai/router/types";
 import * as cheerio from 'cheerio';
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export interface VoiceProfile {
   profileId: string;
@@ -128,9 +129,13 @@ export async function captureVoiceFromWebsite(
   console.log(`Scraped ${websiteContent.length} characters of content`);
   console.log('Sending content to Claude for voice analysis...');
 
+  // SEC-002: websiteContent is scraped from a user-supplied URL — adversarial
+  // sites could embed injection phrases. Sanitize before prompt interpolation.
+  const safeWebsiteContent = sanitizePromptInput(websiteContent);
+
   const result = await callAI({
     feature: "voice_capture",
-    prompt: `Analyze the writing style and brand voice from this website content:\n\n${websiteContent}`,
+    prompt: `Analyze the writing style and brand voice from this website content:\n\n${safeWebsiteContent}`,
     context: {
       feature: "voice_capture",
       clientId,

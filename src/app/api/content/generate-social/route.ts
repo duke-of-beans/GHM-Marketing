@@ -4,6 +4,7 @@ import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,10 +41,12 @@ export async function POST(request: NextRequest) {
       if (!blogPost) {
         return NextResponse.json({ error: 'Blog post not found' }, { status: 404 });
       }
-      sourceTitle = blogPost.title || '';
-      sourceContent = blogPost.content;
+      // Blog content is AI-generated but stored in DB — sanitize defensively
+      sourceTitle = sanitizePromptInput(blogPost.title || '');
+      sourceContent = sanitizePromptInput(blogPost.content);
     } else {
-      sourceContent = topic;
+      // SEC-002: topic is directly user-supplied
+      sourceContent = sanitizePromptInput(topic);
     }
 
     // Sprint 36 — FEAT-016b: tenant voice injection
@@ -51,7 +54,8 @@ export async function POST(request: NextRequest) {
     const tenantVoice = await getTenantVoiceSettings();
 
     const targetPlatforms = platforms || ['linkedin', 'facebook', 'twitter'];
-    const postTone = tone || 'professional';
+    // SEC-002: tone is user-supplied
+    const postTone = sanitizePromptInput(tone || 'professional');
 
     const prompt = `Create social media posts for ${client.businessName}.
 

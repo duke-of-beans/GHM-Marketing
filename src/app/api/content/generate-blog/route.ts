@@ -4,6 +4,7 @@ import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,9 +35,10 @@ export async function POST(request: NextRequest) {
     const tenantVoice = await getTenantVoiceSettings();
 
     const targetWordCount = wordCount || 1200;
-    const postTone = tone || 'professional';
-    const keywordList = Array.isArray(keywords) ? keywords.join(', ') : keywords;
-    const businessIndustry = industry || 'their industry';
+    // SEC-002: sanitize all user-controlled strings before prompt interpolation
+    const postTone = sanitizePromptInput(tone || 'professional');
+    const keywordList = sanitizePromptInput(Array.isArray(keywords) ? keywords.join(', ') : keywords);
+    const businessIndustry = sanitizePromptInput(industry || 'their industry');
 
     const prompt = `Write an SEO-optimized blog post for ${client.businessName}, a business in ${businessIndustry}.
 

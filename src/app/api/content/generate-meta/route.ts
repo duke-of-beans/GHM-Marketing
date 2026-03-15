@@ -4,6 +4,7 @@ import { callAI } from '@/lib/ai';
 import { withPermission } from "@/lib/auth/api-permissions";
 import { requireTenant } from "@/lib/tenant/server";
 import { getTenantVoiceSettings } from "@/lib/ai/voice-settings";
+import { sanitizePromptInput } from "@/lib/ai-security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,14 +34,17 @@ export async function POST(request: NextRequest) {
     const tenant = await requireTenant();
     const tenantVoice = await getTenantVoiceSettings();
 
-    const keywordList = keywords?.length > 0 ? `Target keywords: ${keywords.join(', ')}` : '';
+    // SEC-002: sanitize all user-controlled strings before prompt interpolation
+    const safePageContent = sanitizePromptInput(pageContent || '');
+    const safeUrl = sanitizePromptInput(url || '');
+    const keywordList = keywords?.length > 0 ? `Target keywords: ${sanitizePromptInput(keywords.join(', '))}` : '';
 
     const prompt = `Write a meta description for ${client.businessName}.
 
-${url ? `URL: ${url}` : ''}
+${safeUrl ? `URL: ${safeUrl}` : ''}
 
 Page content:
-${pageContent}
+${safePageContent}
 
 ${keywordList}
 
