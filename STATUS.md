@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 14, 2026 — COVOS-CPR-01 complete. IE reclassification audit + ai-client.ts infrastructure + MORPH-CPR-002 confirmation shipped.
+**Last Updated:** March 15, 2026 — COVOS-PERF-04 complete. callAI() prompt caching shipped — static system prompt prefix cached via Anthropic ephemeral cache_control across all 7 active AI call sites. Estimated 60–80% input token reduction on repeat calls.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,7 +15,7 @@
 
 **Intelligence Engine (ARCH-007):** Fully shipped (IE-01 through IE-06). 12 Prisma models (`IntelAsset`, `IntelAssetGroup`, `IntelCompetitor`, `IntelSensorCredential`, `IntelScan`, `IntelSnapshot`, `IntelFleet`, `IntelFingerprint`, `IntelSimilarityScore`, `IntelTemplatePool`, `IntelIndexHealth`, `IntelScanDeadLetter`). 8 sensors (PageSpeed, Ahrefs, SerpAPI, GSC, GA4, Outscraper, affiliate-revenue, ad-revenue). 23 API routes under `/api/intel/`. Fleet diversity engine with 6-dimension fingerprinting and pairwise similarity scoring. Work queue generation with threshold rules feeding existing task engine. Advanced patterns: seasonal, upsell, cannibalization, cross-client insights. Production hardened: exponential backoff, rate limiting, dead letter queue, P1 notifications. Sensor settings UI at `/settings/integrations/intel-sensors/`. Cron scheduler at 03:30 UTC daily. Spec: `D:\Work\SEO-Services\specs\covos\INTELLIGENCE_ENGINE_SPEC.md`.
 
-**Next sprint:** PERF-004 (Class 0/1 full audit of dashboard AI calls), TRUST-001 (Privacy Trust Dashboard), SEC-004 (Tenant Isolation Verification). COVOS-CPR-01 complete — see sprint record below.
+**Next sprint:** TRUST-001 (Privacy Trust Dashboard), SEC-004 (Tenant Isolation Verification), SEC-004-FRICTION (sanitizeContentInput configurable max-length). COVOS-PERF-04 complete — see sprint record below.
 
 
 ### SPRINT COVOS-CPR-01 — IE Reclassification + Performance Chain (March 14, 2026) ✅ COMPLETE
@@ -33,6 +33,21 @@
 **Commit:** `75525a3`
 
 **Unexpected finding:** The entire IE is AI-free by design. The dashboard's `callAI()` wrapper (`src/lib/ai/client.ts`) also has no prompt caching — 7 active content generation call sites with static-ish system prompts are candidates for PERF-004.
+
+
+### SPRINT COVOS-PERF-04 — callAI() Prompt Caching (March 15, 2026) ✅ COMPLETE
+
+**Goal:** Add Anthropic ephemeral prompt caching to all 7 active callAI() call sites. No behaviour changes, no new routes, no schema changes. Estimated 60–80% input token reduction on repeat calls to the same feature.
+
+- [x] **Task 1: System prompt audit** — Mapped assembly order in `buildSystemPrompt()`. Root cause: dynamic CLIENT CONTEXT block was first in `buildBaseContext()`, before static feature protocol and output contract — breaking cache on every new client.
+- [x] **Task 2: Prompt structure refactor** — `buildSystemPrompt()` now returns `{ static: string; dynamic: string }`. New private functions: `buildStaticPreamble()` (role + OPERATING CONSTRAINTS), `buildClientContext()` (clientName, industry, voice profile, tenantVoice, per-call task/page/competitor data). Feature sections stripped of all per-call ctx data; forward references added. All 7 active features produce functionally equivalent prompts.
+- [x] **Task 3: callModel() caching** — `callModel()` accepts `staticSystemPrompt` + `dynamicSystemPrompt` as separate params. `anthropic.messages.create()` sends `system` as a two-element array: first block `cache_control: { type: "ephemeral" }`, second block uncached. Beta header added: `anthropic-beta: prompt-caching-2024-07-31`.
+- [x] **Task 4: TypeScript types** — `SystemPromptParts` interface exported from `system-prompt-builder.ts` and re-exported from `src/lib/ai/index.ts`. Zero new tsc errors.
+- [x] **Task 5: intel/ai-client.ts consistency** — Confirmed consistent: same beta header, same `cache_control: { type: "ephemeral" } as any` pattern. IE caches entire system prompt as single static block (correct — no per-call client context in IE prompts).
+- [x] **Task 6: Quality gate** — `npx tsc --noEmit`: 0 new errors. Before/after static analysis confirmed all information preserved for voice_capture and content_brief.
+
+**Modified files:** `src/lib/ai/client.ts`, `src/lib/ai/context/system-prompt-builder.ts`, `src/lib/ai/index.ts`, `MORNING_BRIEFING.md`
+**Commit:** `5eecb65`
 
 
 ### SPRINT COVOS-SEC-01 — AI Security Gate / P0 Clearance (March 14, 2026) ✅ COMPLETE

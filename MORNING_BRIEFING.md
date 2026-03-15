@@ -19,7 +19,7 @@
 ## QUALITY GATES
 - **tsc --noEmit:** PASS — 0 new errors. 10 pre-existing errors in unrelated files (basecamp scripts, presence route, leads component) unchanged.
 - **SHIM:** Not run this session (no code quality issues detected — pure structural refactor).
-- **Git:** See commit hash in STATUS.md.
+- **Git:** `5eecb65`
 
 ---
 
