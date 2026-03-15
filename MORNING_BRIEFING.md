@@ -1,85 +1,81 @@
-# MORNING BRIEFING
-**Session:** 2026-03-14T22:39:54
-**Environment:** BUSINESS
-**Project:** GHM Dashboard / COVOS
-**Blueprint:** COVOS-SEC-01 — AI Security Gate (P0 Clearance)
+# MORNING BRIEFING — COVOS-CPR-01
+**Date:** 2026-03-14
+**Sprint:** COVOS-CPR-01 — IE Reclassification + Performance Chain
+**Preceded by:** COVOS-SEC-01 (AI security gate — cleared)
+**Status:** COMPLETE
 
 ---
 
 ## SHIPPED
 
-| Item | Status | Files Modified |
-|------|--------|----------------|
-| SEC-002: sanitizePromptInput() | COMPLETE | `src/lib/ai-security.ts` (new) |
-| SEC-002: generate-blog patched | COMPLETE | `src/app/api/content/generate-blog/route.ts` |
-| SEC-002: generate-meta patched | COMPLETE | `src/app/api/content/generate-meta/route.ts` |
-| SEC-002: generate-ppc patched | COMPLETE | `src/app/api/content/generate-ppc/route.ts` |
-| SEC-002: generate-social patched | COMPLETE | `src/app/api/content/generate-social/route.ts` |
-| SEC-002: generate-strategy patched | COMPLETE | `src/app/api/content/generate-strategy/route.ts` |
-| SEC-002: voice-capture patched | COMPLETE | `src/lib/scrvnr/voice-capture.ts` |
-| SEC-002: task-intelligence patched | COMPLETE | `src/lib/ai/task-intelligence.ts` |
-| SEC-002 Audit Log | COMPLETE | `docs/SEC-002-AUDIT.md` (new) |
-| SEC-003 Context Minimization Audit | COMPLETE | `docs/SEC-003-AUDIT.md` (new) |
+**CPR-IE-001 — IE Phase Reclassification Audit**
+Full audit of all AI call sites in the Intelligence Engine stack. Result: the entire IE — scan-orchestrator, task-generator, delta-engine, and all four pattern detectors (upsell, seasonal, cannibalization, cross-client) — contains zero AI calls. Every operation is Class 0: deterministic local computation, DB queries, and string template interpolation. IE AI cost today: $0.00. Deliverable: `docs/CPR-IE-001-CLASSIFICATION.md` (13 call sites classified, all Class 0).
+
+**PERF-001 — Prompt Caching Infrastructure**
+Created `src/lib/intel/ai-client.ts` — the canonical IE AI wrapper. Implements `cache_control: { type: "ephemeral" }` on static system prompt blocks, `anthropic-beta: prompt-caching-2024-07-31` header, model routing (sonnet/haiku), and token accounting including cache creation/read fields. This is forward infrastructure — zero current IE calls to patch, but every future IE AI call now has a standard harness to route through. Deliberately separate from `src/lib/ai/client.ts` (the dashboard content generation wrapper) — the IE wrapper is IE-scoped with IE-specific model selection logic.
+
+**PERF-002 — Haiku Routing**
+No Class 1 calls exist in the IE. Nothing re-routed. This is correct — zero downgrade risk. The IE wrapper accepts `model: "haiku"` for any future Class 1 IE calls introduced.
+
+**MORPH-CPR-002 — Morpheme Assembly Confirmed Local**
+Located morpheme system: `D:\Work\ContentStudio\morphemes\assemble.ps1`. Confirmed 100% local: pure PowerShell file concatenation with `{{VARIABLE}}` string replacement. Zero AI calls. The `@anthropic-ai` package in ContentStudio's node_modules is used by `generate.js` (the content generation pipeline — archetype classification, copy generation, critic pipeline), which is a separate system from morpheme assembly. MORPH-CPR-002 backlog item is invalid as written — no AI call present in the assembly step.
 
 ---
 
 ## QUALITY GATES
 
-- **tsc --noEmit:** PASS — exit code 0, zero new errors (incremental compile, project typescript binary confirmed)
-- **Static analysis:** PASS — all 7 patched files confirmed containing `sanitizePromptInput` import and call sites via `Select-String` grep
-- **Clean-string pass-through:** PASS — `sanitizePromptInput("SEO tips for plumbers")` → `"SEO tips for plumbers"` unchanged (verified by static inspection of transform logic: no null bytes, no direction overrides, no excessive newlines, no injection phrases, under 2000 chars)
-- **Git:** see this commit
+- `npx tsc --noEmit` — exit code 2, but **zero new errors**. All 10 errors are pre-existing in unrelated files (scripts/basecamp-crawl.ts, src/app/api/team/presence/route.ts, src/components/leads/lead-filter-bar-advanced.tsx, src/lib/basecamp/client.ts). No errors in any file I touched. Gate: **PASS**.
+- `ai-client.ts` TypeScript compilation — clean. No errors from `src/lib/intel/ai-client.ts`. Gate: **PASS**.
+- `@anthropic-ai/sdk` present in node_modules — confirmed. Import in `ai-client.ts` is valid.
+- CPR-IE-001-CLASSIFICATION.md exists with 13 rows — confirmed.
 
 ---
 
 ## DECISIONS MADE BY AGENT
 
-- `blogPost.content` (DB, AI-generated) sanitized defensively even though it is not directly user-typed — rationale: AI-generated content cached in DB could be used as a second-pass injection vector if the original AI response was manipulated. Minimal cost, meaningful defense depth. Confidence: HIGH.
+**Decision 1: IE is entirely Class 0 — PERF-001/PERF-002 ship as infrastructure-only.**
+The sprint assumed AI calls existed in the IE. They do not. Rather than treating this as a no-op, I created `ai-client.ts` as specified (it's in the acceptance criteria) and documented all call sites as Class 0. The IE's local-first posture is a strength, not a gap. Future IE AI integrations now have a compliant harness to route through.
 
-- Voice profile fields (`tonality`, `vocabulary`, `sentenceStructure`) sanitized even though they come from DB — rationale: these fields were originally captured by scraping user-authored website copy via the voice-capture pipeline. They are user-influenced, not developer-authored. Confidence: HIGH.
+**Decision 2: `ai-client.ts` is SDK-direct, not layered on `callAI()`.**
+The existing `callAI()` wrapper in `src/lib/ai/client.ts` is designed for dashboard content generation (blog posts, meta descriptions, etc.) with GREGORE model routing, cascade retry, and cost tracking tied to `AIFeature` types. IE calls have different characteristics — batch, background, scan-scoped. A separate IE-specific wrapper avoids coupling the IE to the dashboard content generation machinery. If IE AI calls are introduced in future sprints, they may warrant their own cost attribution, retry logic, and model defaults.
 
-- `clientName` sanitized in `context.clientName` on `callAI()` as well as in the prompt string — rationale: `buildBaseContext()` (Sprint 35) injects tenant voice into the system prompt; passing `safeClientName` into context ensures no injection vector exists in the system-prompt layer either. Confidence: HIGH.
-
-- `category` field in `generateContentBrief` NOT sanitized — rationale: it is validated server-side to a strict enum (`content`, `technical_seo`, etc.) before this function is called. Not a free-text user field. Confidence: HIGH.
-
-- Did NOT sanitize `client.businessName` in content generation routes (generate-blog, generate-meta, generate-social, generate-strategy) — rationale: this value is fetched from DB and validated at client creation time. While user-entered, it passes through Prisma which doesn't expose raw SQL injection vectors for string fields. Treating it as low-risk per spec guidance that "the template itself is not user-controlled — only the values substituted into it" applies here. If `businessName` were to be sanitized, it would require changes to how the DB record is trusted. Flagged for future review. Confidence: MEDIUM.
+**Decision 3: MORPH-CPR-002 documented as invalid backlog item, not silently dropped.**
+The morpheme assembly step is local. The sprint instructions explicitly say: "If the assembly step is already local, document it in MORNING_BRIEFING.md as 'MORPH-CPR-002: confirmed local — no AI call present, backlog item invalid.'" Done. ContentStudio's `generate.js` does use AI for content generation — that's a separate system and a separate future audit scope (PERF-CS series).
 
 ---
 
 ## UNEXPECTED FINDINGS
 
-- **7 clean call sites, not 3:** The sprint spec said "find more if you find them beyond the listed locations." 14 total AI call sites were audited. 7 were patched, 7 were confirmed clean (no AI calls). The actual AI surface area is larger than implied by the spec's starting list.
+**Finding 1: The entire IE is AI-free — by design.**
+Every IE function that produces text (upsell reasoning, seasonal task descriptions, cannibalization rationale) uses local string interpolation, not LLMs. This is architecturally sound. The IE operates in a background cron context (03:30 UTC daily) where latency and cost are constraints — LLM calls would add per-scan cost and latency with diminishing return over well-tuned rule-based logic. The classification audit confirms this was intentional.
 
-- **voice-capture.ts 2000-char cap is a meaningful regression risk:** The scraper limits content to ~5000 words (~25,000+ chars). After SEC-002, this is truncated to 2000 chars before the AI sees it. Voice profiles generated going forward will have significantly less source material. Quality impact unknown but likely noticeable on content-rich sites. See Friction Log.
+**Finding 2: ContentStudio's `generate.js` has significant AI usage not covered by this sprint.**
+`generate.js` makes AI calls in: archetype classification, SEO brief generation, copy generation, copy quality critic, structural coherence critic. None of these were in scope for COVOS-CPR-01 (which targeted the ghm-dashboard IE stack). A future PERF-CS sprint should audit these ContentStudio AI calls using the same CPR classification framework.
 
-- **blog-generator.tsx and voice-profile-dialog.tsx** referenced in the sprint spec at incorrect paths (`src/app/(dashboard)/content-studio/` and `src/components/`). Actual locations: `src/components/clients/content/blog-generator.tsx` and `src/components/clients/voice/VoiceProfileDialog.tsx`. Both are React UI components that call API routes — no direct AI calls, no injection vectors. Confirmed CLEAN.
+**Finding 3: `callAI()` wrapper has no prompt caching.**
+`src/lib/ai/client.ts` uses a plain string for the `system:` parameter — no `cache_control`, no beta header. The 7 active AI call sites (generate-blog, generate-meta, generate-ppc, generate-social, generate-strategy, voice-capture, task-intelligence) all use static-ish system prompts built by `buildSystemPrompt()`. Applying prompt caching to these would reduce costs on repeated calls. Recommend adding to PERF-004 scope.
 
 ---
 
 ## FRICTION LOG
 
-### Backlogged
-
-| # | Category | What happened | Recommended fix | Destination | Effort |
-|---|----------|--------------|-----------------|-------------|--------|
-| 1 | SPEC | Sprint spec listed incorrect file paths for blog-generator.tsx and voice-profile-dialog.tsx | Update COVOS-SEC-01 spec template to use correct paths from STATUS.md | BACKLOG.md | S |
-| 2 | SPEC | voice-capture websiteContent cap at 2000 chars may degrade voice profile accuracy (was ~25k chars before) | Consider a dedicated `sanitizeContentInput(str, maxLen)` overload with configurable max length, or raise MAX_PROMPT_FIELD_LENGTH to 8000 for content analysis tasks specifically | BACKLOG.md | M |
-| 3 | ENV | Node.js not on PATH in default PS session — required manual node.exe path resolution for tsc | Add node to GREGORE/shell PATH or document path in CLAUDE_INSTRUCTIONS | BACKLOG.md | S |
-
-### Logged Only
-
-| # | Category | What happened |
-|---|----------|--------------|
-| 1 | TOOL | Desktop Commander read_multiple_files exceeded token limit on first call — fell back to sequential reads. No data loss. |
+- `mcp__Desktop_Commander__read_file` returns only JSON metadata for markdown files when called individually — content only available via `read_multiple_files`. Workaround used throughout. LOG ONLY.
+- `ai-client.ts` uses `as any` cast for `cache_control` on `TextBlockParam` — the SDK type doesn't include this field because it requires the beta header. Minor friction, already commented in code. LOG ONLY.
+- Git path in PowerShell requires `& "path\git.exe"` syntax; cmd `&&` chaining works normally. Established pattern from prior sprints. LOG ONLY.
+- `MORNING_BRIEFING_SCHEMA.md` at `D:\Dev\TEMPLATES\MORNING_BRIEFING_SCHEMA.md` returned only metadata from `read_file`. Schema derived from sprint instructions directly. LOG ONLY.
 
 ---
 
-## NEXT QUEUE (RECOMMENDED)
+## NEXT QUEUE
 
-1. **COVOS-CPR-01** — Context-Pressure Routing sprint — P0 security gate is now cleared, this is the immediate next sprint. All AI call sites are now hardened, making CPR optimization safe to implement on top.
-2. **P1 performance work** — Any performance sprints blocked behind COVOS-SEC-01 are now unblocked.
-3. **Voice capture quality review** — Verify voice profile accuracy after 2000-char cap. If degraded, implement configurable max-length override for content analysis tasks.
+**PERF-004 — Class 0/1 Reclassification Full Audit**
+Extend the CPR classification pass to the 7 dashboard content generation call sites (generate-blog, generate-meta, generate-ppc, generate-social, generate-strategy, voice-capture, task-intelligence). Apply prompt caching to any static system prompts. Route any Class 1 calls to Haiku. Also: apply caching to `callAI()` wrapper at `src/lib/ai/client.ts` — the `buildSystemPrompt()` output is largely static per feature/tenant combination.
 
----
+**TRUST-001 — Privacy Trust Dashboard**
+Tenant-level privacy compliance surface. Per STATUS.md next queue.
 
-*Written by Cowork agent at session end. Do not edit — this is a point-in-time record.*
+**SEC-004 — Tenant Isolation Verification**
+Verify all data access paths enforce tenant isolation. Per STATUS.md next queue.
+
+**PERF-CS — ContentStudio AI Audit (new, surfaced this session)**
+Audit `generate.js` AI call pipeline in ContentStudio using CPR classification. Archetype classification and structural coherence critic are strong candidates for Haiku. SEO brief and copy generation likely remain Sonnet. Copy quality critic: evaluate Haiku at lower threshold.
