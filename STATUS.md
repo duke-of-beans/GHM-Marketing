@@ -37,7 +37,7 @@
 
 **New files:** `src/lib/tenant/cron-guard.ts`, `MORNING_BRIEFING.md`
 **Modified files:** `prisma/schema.prisma`, `src/lib/ops/recurring-tasks.ts`, `src/lib/competitive-scan/executor.ts`, `src/app/api/intel/insights/route.ts`, 9× `src/app/api/cron/*/route.ts`, `src/components/clients/voice/VoiceProfileDialog.tsx`, `src/components/content/ContentStrategyPanel.tsx`, `docs/SEC-004-AUDIT.md`, `BACKLOG.md`, `STATUS.md`
-**Commit:** pending
+**Commit:** `017c724`
 
 
 ### SPRINT COVOS-CPR-01 — IE Reclassification + Performance Chain (March 14, 2026) ✅ COMPLETE

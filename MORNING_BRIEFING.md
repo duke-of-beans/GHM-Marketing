@@ -21,7 +21,7 @@
 ## QUALITY GATES
 - **tsc --noEmit:** PASS — 0 new errors. 10 pre-existing errors in untouched files (`scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/app/api/team/presence/route.ts`, `src/components/leads/lead-filter-bar-advanced.tsx`, `src/lib/basecamp/client.ts`). Sprint requirement met.
 - **SHIM:** Not run this session.
-- **Git:** pending — see commit following this briefing.
+- **Git:** `017c724` — pushed to main.
 
 ---
 
