@@ -1,86 +1,142 @@
 /**
  * System Prompt Builder — GHM Dashboard
  *
- * NEW — no GREGORE equivalent.
+ * PERF-004: Assembly order refactored for Anthropic prompt caching.
+ * buildSystemPrompt() now returns { static, dynamic } instead of a plain string.
  *
- * This is the environment wrapper that replaces the Claude Desktop scaffolding
- * (bootstrap instructions, SCRVNR protocols, voice profile context) when calling
- * the Anthropic API from inside the dashboard.
+ * Static part  = role definition + feature protocol + output contract
+ *               → identical for all calls to the same feature+tenant combo
+ *               → sent with cache_control: { type: "ephemeral" }
  *
- * Every AI feature gets a purpose-built system prompt assembled from:
- * 1. Role definition + operating constraints for that feature
- * 2. Client context (name, industry, voice profile slug)
- * 3. Feature-specific protocol (SCRVNR gate rules, brief format spec, etc.)
- * 4. Output format contract (always JSON-shaped responses for machine consumption)
+ * Dynamic part = client context + voice profile + per-call task/page/competitor data
+ *               → changes per call, never cached
  *
- * Usage:
- *   const systemPrompt = buildSystemPrompt(featureContext);
- *   // Pass to Anthropic API messages[].system
+ * Assembly order (cache breakpoint between static and dynamic):
+ *   1. [STATIC]  buildStaticPreamble()  — role + OPERATING CONSTRAINTS
+ *   2. [STATIC]  buildFeatureSection()  — feature-specific protocol (no ctx data)
+ *   3. [STATIC]  buildOutputContract()  — output format contract (unchanged)
+ *   4. [DYNAMIC] buildClientContext()   — clientName, industry, voice, task/page data
+ *
+ * All 7 active features produce functionally equivalent prompts — same information,
+ * reordered so static content precedes dynamic client context.
  */
 
 import type { FeatureContext, AIFeature } from "../router/types";
 import type { TenantConfig } from "@/lib/tenant/config";
 
-// ── Main entry point ──────────────────────────────────────────────────────────
+// ── Return type ───────────────────────────────────────────────────────────────
 
-export function buildSystemPrompt(ctx: FeatureContext, tenant?: TenantConfig): string {
-  const base = buildBaseContext(ctx, tenant);
-  const feature = buildFeatureSection(ctx, tenant);
-  const outputContract = buildOutputContract(ctx.feature);
-  return [base, feature, outputContract].filter(Boolean).join("\n\n");
+export interface SystemPromptParts {
+  /** Static prefix — identical for all calls to the same feature+tenant combo.
+   *  Sent with cache_control: { type: "ephemeral" } to enable Anthropic prompt caching. */
+  static: string;
+  /** Dynamic suffix — client-specific data that changes per call. Never cached. */
+  dynamic: string;
 }
 
-// ── Base context (shared across all features) ─────────────────────────────────
+// ── Main entry point ──────────────────────────────────────────────────────────
 
-function buildBaseContext(ctx: FeatureContext, tenant?: TenantConfig): string {
+export function buildSystemPrompt(ctx: FeatureContext, tenant?: TenantConfig): SystemPromptParts {
+  const staticPart = [
+    buildStaticPreamble(ctx.feature, tenant),
+    buildFeatureSection(ctx.feature, tenant),
+    buildOutputContract(ctx.feature),
+  ].filter(Boolean).join("\n\n");
+
+  const dynamic = buildClientContext(ctx);
+  return { static: staticPart, dynamic };
+}
+
+// ── Static preamble (role + operating constraints — no client data) ───────────
+
+function buildStaticPreamble(_feature: AIFeature, tenant?: TenantConfig): string {
   const platformDescription = tenant
     ? `${tenant.name} Dashboard, a ${tenant.aiContext ?? "marketing platform"}`
     : "Marketing Dashboard";
 
-  let base = `You are an AI assistant embedded in the ${platformDescription}.
-
-CLIENT CONTEXT:
-- Client name: ${ctx.clientName}
-- Client ID: ${ctx.clientId}${ctx.industry ? `\n- Industry: ${ctx.industry}` : ""}${ctx.voiceProfileSlug ? `\n- Voice profile: ${ctx.voiceProfileSlug}` : ""}
+  return `You are an AI assistant embedded in the ${platformDescription}.
 
 OPERATING CONSTRAINTS:
 - You are generating content for a professional services context. Accuracy and brand alignment matter.
 - Do not fabricate statistics, citations, or competitor data.
 - If asked to produce copy, it must be original — not generic AI filler.
 - Always respond in the exact output format specified at the end of this prompt.`;
+}
+
+// ── Dynamic client context (per-call — client name, voice, task data) ─────────
+
+function buildClientContext(ctx: FeatureContext): string {
+  const lines: string[] = [];
+
+  lines.push("CLIENT CONTEXT:");
+  lines.push(`- Client name: ${ctx.clientName}`);
+  lines.push(`- Client ID: ${ctx.clientId}`);
+  if (ctx.industry)         lines.push(`- Industry: ${ctx.industry}`);
+  if (ctx.voiceProfileSlug) lines.push(`- Voice profile: ${ctx.voiceProfileSlug}`);
 
   // Inject tenant voice guidelines if configured (Sprint 35 / FEAT-016)
   if (ctx.tenantVoice) {
     const v = ctx.tenantVoice;
-    let voiceBlock = "\n\nBRAND VOICE GUIDELINES:";
-    if (v.tone) voiceBlock += `\n- Tone: ${v.tone}`;
-    if (v.keywords) voiceBlock += `\n- Preferred terms: ${v.keywords}`;
-    if (v.antiKeywords) voiceBlock += `\n- Terms to avoid: ${v.antiKeywords}`;
-    if (v.sampleCopy) voiceBlock += `\n- Match this voice: "${v.sampleCopy.slice(0, 500)}"`;
-    if (v.industry) voiceBlock += `\n- Industry context: ${v.industry}`;
-    if (v.audience) voiceBlock += `\n- Target audience: ${v.audience}`;
-    base += voiceBlock;
+    lines.push("\nBRAND VOICE GUIDELINES:");
+    if (v.tone)         lines.push(`- Tone: ${v.tone}`);
+    if (v.keywords)     lines.push(`- Preferred terms: ${v.keywords}`);
+    if (v.antiKeywords) lines.push(`- Terms to avoid: ${v.antiKeywords}`);
+    if (v.sampleCopy)   lines.push(`- Match this voice: "${v.sampleCopy.slice(0, 500)}"`);
+    if (v.industry)     lines.push(`- Industry context: ${v.industry}`);
+    if (v.audience)     lines.push(`- Target audience: ${v.audience}`);
   }
 
-  return base;
-}
-
-// ── Feature-specific protocol sections ───────────────────────────────────────
-
-function buildFeatureSection(ctx: FeatureContext, tenant?: TenantConfig): string {
+  // Feature-specific dynamic data (task/page/competitor context per call)
   switch (ctx.feature) {
     case "content_brief":
-      return buildContentBriefProtocol(ctx);
+      if (ctx.taskContext) {
+        const t = ctx.taskContext;
+        lines.push("\nTASK:");
+        lines.push(`- Title: ${t.title}`);
+        lines.push(`- Category: ${t.category}`);
+        if (t.targetKeywords?.length) lines.push(`- Target keywords: ${t.targetKeywords.join(", ")}`);
+      }
+      break;
+
     case "website_copy":
-      return buildWebsiteCopyProtocol(ctx, tenant);
-    case "scrvnr_gate":
-      return buildScrvnrProtocol(ctx);
+      if (ctx.propertyTier) {
+        const tierLabel: Record<string, string> = {
+          tier1: "Site Extension (tier1)",
+          tier2: "Branded Satellite (tier2)",
+          tier3: "Pure Satellite (tier3)",
+        };
+        lines.push(`\nSELECTED PROPERTY TIER: ${tierLabel[ctx.propertyTier] ?? ctx.propertyTier}`);
+      }
+      if (ctx.pageContext) {
+        const p = ctx.pageContext;
+        lines.push("\nPAGE CONTEXT:");
+        lines.push(`- Page: ${p.pageTitle}`);
+        lines.push(`- Section: ${p.sectionKey}`);
+        if (p.targetKeywords?.length) lines.push(`- Target keywords: ${p.targetKeywords.join(", ")}`);
+      }
+      break;
+
     case "competitive_scan":
-      return buildCompetitiveScanProtocol(ctx);
-    case "upsell_detection":
-      return buildUpsellProtocol(ctx, tenant);
-    case "voice_capture":
-      return buildVoiceCaptureProtocol(ctx);
+      if (ctx.competitors?.length) {
+        lines.push("\nKNOWN COMPETITORS:");
+        ctx.competitors.forEach((c) => lines.push(`- ${c}`));
+      }
+      break;
+  }
+
+  return lines.join("\n");
+}
+
+// ── Feature-specific protocol sections (static — no per-call ctx data) ────────
+
+function buildFeatureSection(feature: AIFeature, tenant?: TenantConfig): string {
+  switch (feature) {
+    case "content_brief":    return buildContentBriefProtocol();
+    case "website_copy":     return buildWebsiteCopyProtocol(tenant);
+    case "scrvnr_gate":      return buildScrvnrProtocol();
+    case "competitive_scan": return buildCompetitiveScanProtocol();
+    case "upsell_detection": return buildUpsellProtocol(tenant);
+    case "voice_capture":    return buildVoiceCaptureProtocol();
     case "report_narrative":
       return `FEATURE: Monthly Report Narrative Generation
 
@@ -109,15 +165,12 @@ REQUIREMENTS:
   }
 }
 
-function buildContentBriefProtocol(ctx: FeatureContext): string {
-  const task = ctx.taskContext;
+function buildContentBriefProtocol(): string {
   return `FEATURE: Content Brief Generation
 
 Your job is to produce a structured content brief that a writer can execute without further research.
 
-${task ? `TASK:
-- Title: ${task.title}
-- Category: ${task.category}${task.targetKeywords?.length ? `\n- Target keywords: ${task.targetKeywords.join(", ")}` : ""}` : ""}
+Task title, category, and target keywords (if provided) appear in the CLIENT CONTEXT section above.
 
 BRIEF REQUIREMENTS:
 - Primary objective (1-2 sentences: what this piece achieves for the client)
@@ -133,22 +186,14 @@ BRIEF REQUIREMENTS:
 Do not pad. Every section should be actionable.`;
 }
 
-function buildWebsiteCopyProtocol(ctx: FeatureContext, tenant?: TenantConfig): string {
+function buildWebsiteCopyProtocol(tenant?: TenantConfig): string {
   const tenantName = tenant?.name ?? "Platform";
-  const page = ctx.pageContext;
-  const tierGuidance: Record<string, string> = {
-    tier1: "This is a Site Extension — visual and voice DNA cloned from the client's primary site. Copy must feel like a natural part of that brand.",
-    tier2: "This is a Branded Satellite — same brand identity, separate domain. Strong brand signals, but slightly more independent voice.",
-    tier3: `This is a Pure Satellite — independent brand, ${tenantName}-owned. Establish credibility and trust from scratch.`,
-  };
-
   return `FEATURE: Website Copy Generation
 
-${ctx.propertyTier ? `PROPERTY TIER: ${tierGuidance[ctx.propertyTier] ?? ""}` : ""}
-
-${page ? `PAGE CONTEXT:
-- Page: ${page.pageTitle}
-- Section: ${page.sectionKey}${page.targetKeywords?.length ? `\n- Target keywords: ${page.targetKeywords.join(", ")}` : ""}` : ""}
+PROPERTY TIER GUIDANCE (selected tier is specified in CLIENT CONTEXT above):
+- Site Extension (tier1): Visual and voice DNA cloned from the client's primary site. Copy must feel like a natural part of that brand.
+- Branded Satellite (tier2): Same brand identity, separate domain. Strong brand signals, but slightly more independent voice.
+- Pure Satellite (tier3): Independent brand, ${tenantName}-owned. Establish credibility and trust from scratch.
 
 COPY STANDARDS:
 - Write for a real human reader first. SEO is secondary.
@@ -165,7 +210,7 @@ All copy you generate will be evaluated by the SCRVNR gate, which checks:
 Write as if SCRVNR will reject generic output. It will.`;
 }
 
-function buildScrvnrProtocol(_ctx: FeatureContext): string {
+function buildScrvnrProtocol(): string {
   return `FEATURE: SCRVNR Gate Evaluation
 
 You are evaluating website copy against two criteria. Respond with a structured verdict only — no conversational text.
@@ -191,10 +236,10 @@ Gate opens only if BOTH passes meet threshold.
 For each failed section, list specific failure reasons — actionable, not vague.`;
 }
 
-function buildCompetitiveScanProtocol(ctx: FeatureContext): string {
+function buildCompetitiveScanProtocol(): string {
   return `FEATURE: Competitive Analysis
 
-${ctx.competitors?.length ? `KNOWN COMPETITORS:\n${ctx.competitors.map((c) => `- ${c}`).join("\n")}` : ""}
+Known competitors (if any) are listed in the CLIENT CONTEXT section above.
 
 ANALYSIS REQUIREMENTS:
 - Identify positioning gaps (what competitors claim vs. what they can prove)
@@ -204,7 +249,7 @@ ANALYSIS REQUIREMENTS:
 - Cite your reasoning. Every claim should trace to observable evidence.`;
 }
 
-function buildUpsellProtocol(_ctx: FeatureContext, tenant?: TenantConfig): string {
+function buildUpsellProtocol(tenant?: TenantConfig): string {
   const tenantName = tenant?.name ?? "our platform";
   return `FEATURE: Upsell Opportunity Detection
 
@@ -218,10 +263,10 @@ Do not manufacture urgency. Do not recommend services that aren't warranted.
 For each opportunity: describe the gap, quantify the impact if possible, and name the service that addresses it.`;
 }
 
-function buildVoiceCaptureProtocol(ctx: FeatureContext): string {
+function buildVoiceCaptureProtocol(): string {
   return `FEATURE: Brand Voice Capture
 
-You are analyzing scraped website content to extract a precise, actionable brand voice profile for ${ctx.clientName}.
+You are analyzing scraped website content to extract a precise, actionable brand voice profile for the client identified in the CLIENT CONTEXT above.
 
 ANALYSIS OBJECTIVE:
 Extract the authentic brand voice so that AI-generated content written for this client sounds indistinguishable from their own writing. This profile will be used to tune all future content generation for this account.
@@ -241,7 +286,7 @@ QUALITY STANDARDS:
 - Every score must be defensible from the content provided. If the content is insufficient to determine a dimension, score it 5 (neutral) and note the uncertainty in tonality.`;
 }
 
-// ── Output format contracts ───────────────────────────────────────────────────
+// ── Output format contracts (static — unchanged from pre-PERF-004) ─────────────
 
 function buildOutputContract(feature: AIFeature): string {
   switch (feature) {

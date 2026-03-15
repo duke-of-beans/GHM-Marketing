@@ -27,7 +27,9 @@ export type {
 } from "./router/types";
 
 // System prompt builder — use if you need the prompt without calling the API
+// SystemPromptParts: { static: string; dynamic: string } — PERF-004
 export { buildSystemPrompt } from "./context/system-prompt-builder";
+export type { SystemPromptParts } from "./context/system-prompt-builder";
 
 // Cost analytics — use in dashboard admin views
 export {

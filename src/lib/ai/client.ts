@@ -95,6 +95,11 @@ const DEFAULT_MAX_TOKENS: Record<AIFeature, number> = {
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
+  defaultHeaders: {
+    // Required for cache_control blocks to be honoured by the Anthropic API.
+    // PERF-004: enables static system prompt caching across all callAI() call sites.
+    "anthropic-beta": "prompt-caching-2024-07-31",
+  },
 });
 
 const router = new ModelRouter();
@@ -118,12 +123,17 @@ export async function callAI(
     });
 
     const maxTokens = input.maxTokens ?? DEFAULT_MAX_TOKENS[input.feature];
-    const systemPrompt = buildSystemPrompt(input.context, input.tenant);
+
+    // PERF-004: buildSystemPrompt now returns { static, dynamic } for prompt caching.
+    // static = role + feature protocol + output contract (cache_control: ephemeral)
+    // dynamic = client context + voice profile + per-call task/page data (never cached)
+    const { static: staticPrompt, dynamic: dynamicPrompt } = buildSystemPrompt(input.context, input.tenant);
 
     // 3. First attempt
     let result = await callModel(
       routingResult.model.id,
-      systemPrompt,
+      staticPrompt,
+      dynamicPrompt,
       input.prompt,
       maxTokens
     );
@@ -137,7 +147,7 @@ export async function callAI(
       shouldEscalate(result, input.feature)
     ) {
       const opusModel = "claude-opus-4-6";
-      result = await callModel(opusModel, systemPrompt, input.prompt, maxTokens);
+      result = await callModel(opusModel, staticPrompt, dynamicPrompt, input.prompt, maxTokens);
       wasEscalated = true;
     }
 
@@ -178,14 +188,32 @@ export async function callAI(
 
 async function callModel(
   modelId: string,
-  systemPrompt: string,
+  staticSystemPrompt: string,
+  dynamicSystemPrompt: string,
   userPrompt: string,
   maxTokens: number
 ): Promise<{ content: string; inputTokens: number; outputTokens: number; costUSD: number }> {
+  // PERF-004: system is a two-block array. The static block (role + feature protocol +
+  // output contract) is marked cache_control: ephemeral — Anthropic caches everything
+  // up to and including this block. The dynamic block (client context, voice profile,
+  // task/page data) changes per call and is never cached.
   const response = await anthropic.messages.create({
     model: modelId,
     max_tokens: maxTokens,
-    system: systemPrompt,
+    system: [
+      {
+        type: "text",
+        text: staticSystemPrompt,
+        // cache_control is not in the SDK's TextBlockParam type but is accepted by the
+        // API when the anthropic-beta header is present. Consistent with intel/ai-client.ts.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cache_control: { type: "ephemeral" } as any,
+      },
+      {
+        type: "text",
+        text: dynamicSystemPrompt,
+      },
+    ],
     messages: [{ role: "user", content: userPrompt }],
   });
 
