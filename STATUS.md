@@ -28,7 +28,7 @@
 
 **New files:** `src/lib/ai-security.ts`, `docs/SEC-002-AUDIT.md`, `docs/SEC-003-AUDIT.md`, `MORNING_BRIEFING.md`
 **Modified files:** `src/app/api/content/generate-blog/route.ts`, `src/app/api/content/generate-meta/route.ts`, `src/app/api/content/generate-ppc/route.ts`, `src/app/api/content/generate-social/route.ts`, `src/app/api/content/generate-strategy/route.ts`, `src/lib/scrvnr/voice-capture.ts`, `src/lib/ai/task-intelligence.ts`
-**Commit:** TBD — see git log
+**Commit:** `3eb63ae`
 
 
 **Next sprint:** Sprint 34-OPS (David manual infrastructure inversion per THIRD_PARTY_MIGRATION.md). No Claude code work — David manual ops sprint.
