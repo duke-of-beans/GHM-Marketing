@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 14, 2026 — COVOS-SEC-01 complete. AI prompt injection defense + context minimization audit shipped.
+**Last Updated:** March 14, 2026 — COVOS-CPR-01 complete. IE reclassification audit + ai-client.ts infrastructure + MORPH-CPR-002 confirmation shipped.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,7 +15,24 @@
 
 **Intelligence Engine (ARCH-007):** Fully shipped (IE-01 through IE-06). 12 Prisma models (`IntelAsset`, `IntelAssetGroup`, `IntelCompetitor`, `IntelSensorCredential`, `IntelScan`, `IntelSnapshot`, `IntelFleet`, `IntelFingerprint`, `IntelSimilarityScore`, `IntelTemplatePool`, `IntelIndexHealth`, `IntelScanDeadLetter`). 8 sensors (PageSpeed, Ahrefs, SerpAPI, GSC, GA4, Outscraper, affiliate-revenue, ad-revenue). 23 API routes under `/api/intel/`. Fleet diversity engine with 6-dimension fingerprinting and pairwise similarity scoring. Work queue generation with threshold rules feeding existing task engine. Advanced patterns: seasonal, upsell, cannibalization, cross-client insights. Production hardened: exponential backoff, rate limiting, dead letter queue, P1 notifications. Sensor settings UI at `/settings/integrations/intel-sensors/`. Cron scheduler at 03:30 UTC daily. Spec: `D:\Work\SEO-Services\specs\covos\INTELLIGENCE_ENGINE_SPEC.md`.
 
-**Next sprint:** COVOS-CPR-01 — Context-Pressure Routing. P0 security gate cleared by COVOS-SEC-01.
+**Next sprint:** PERF-004 (Class 0/1 full audit of dashboard AI calls), TRUST-001 (Privacy Trust Dashboard), SEC-004 (Tenant Isolation Verification). COVOS-CPR-01 complete — see sprint record below.
+
+
+### SPRINT COVOS-CPR-01 — IE Reclassification + Performance Chain (March 14, 2026) ✅ COMPLETE
+
+**Goal:** Classify every AI call in the Intelligence Engine by CPR class. Apply prompt caching to Class 2/3 calls. Route Class 1 calls to Haiku. Confirm morpheme assembly is local.
+
+- [x] **CPR-IE-001: IE Phase Reclassification Audit** — `docs/CPR-IE-001-CLASSIFICATION.md` created. 13 IE call sites audited across scan-orchestrator, task-generator, delta-engine, patterns/upsell, patterns/seasonal, patterns/cannibalization, patterns/cross-client. Result: all 13 classified as **Class 0** — entirely local, deterministic, zero AI calls. IE AI cost: $0.00. The IE uses local rule evaluation, statistical analysis, and string template interpolation throughout.
+- [x] **PERF-001: Prompt Caching Infrastructure** — `src/lib/intel/ai-client.ts` created. Thin wrapper around `@anthropic-ai/sdk` with: static system prompt caching (`cache_control: { type: "ephemeral" }`, `anthropic-beta: prompt-caching-2024-07-31`), model routing (`model: "sonnet" | "haiku"`), token accounting including cache creation/read fields. Forward infrastructure — zero current IE call sites to patch, all future IE AI calls routed through here.
+- [x] **PERF-002: Haiku Routing** — Zero Class 1 calls exist in IE. Nothing re-routed. `ai-client.ts` accepts `model: "haiku"` for future Class 1 calls.
+- [x] **MORPH-CPR-002: Morpheme Assembly Confirmed Local** — `D:\Work\ContentStudio\morphemes\assemble.ps1` is 100% local PowerShell (file concatenation + `{{VAR}}` string replacement). Zero AI calls in morpheme assembly. ContentStudio's `generate.js` uses AI for content generation (separate system, future audit scope). Backlog item invalid as written.
+- [x] **TypeScript gate** — `npx tsc --noEmit` exit code 2 with 10 pre-existing errors. Zero new errors introduced. `src/lib/intel/ai-client.ts` compiles cleanly.
+
+**New files:** `src/lib/intel/ai-client.ts`, `docs/CPR-IE-001-CLASSIFICATION.md`, `MORNING_BRIEFING.md`
+**Modified files:** `STATUS.md`
+**Commit:** `75525a3`
+
+**Unexpected finding:** The entire IE is AI-free by design. The dashboard's `callAI()` wrapper (`src/lib/ai/client.ts`) also has no prompt caching — 7 active content generation call sites with static-ish system prompts are candidates for PERF-004.
 
 
 ### SPRINT COVOS-SEC-01 — AI Security Gate / P0 Clearance (March 14, 2026) ✅ COMPLETE
