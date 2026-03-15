@@ -46,7 +46,7 @@
 
 **New files:** `src/components/settings/privacy-dashboard-tab.tsx`, `docs/SEC-004-AUDIT.md`, `MORNING_BRIEFING.md`
 **Modified files:** `src/lib/ai-security.ts`, `src/lib/scrvnr/voice-capture.ts`, `src/app/(dashboard)/settings/page.tsx`, `BACKLOG.md`, `STATUS.md`
-**Commit:** pending
+**Commit:** `cac1391`
 
 ---
 
