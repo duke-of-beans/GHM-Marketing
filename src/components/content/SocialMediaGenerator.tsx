@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Loader2, Sparkles } from 'lucide-react'
+import { ResidencyBadge } from '@/components/ui/residency-badge'
 
 interface SocialMediaGeneratorProps {
   clientId: number
@@ -159,10 +160,13 @@ export function SocialMediaGenerator({ clientId, onSuccess }: SocialMediaGenerat
         </div>
       )}
 
-      <Button onClick={handleGenerate} disabled={loading} className="w-full">
-        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Generate Social Media Posts
-      </Button>
+      <div className="flex items-center gap-2 w-full">
+        <Button onClick={handleGenerate} disabled={loading} className="flex-1">
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Generate Social Media Posts
+        </Button>
+        <ResidencyBadge type="claude" size="sm" />
+      </div>
 
       {loading && (
         <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">

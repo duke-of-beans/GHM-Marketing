@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import type { AuditIssue } from "@/lib/website-audit/auditor";
 import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+import { ResidencyBadge } from "@/components/ui/residency-badge";
 
 const AUDIT_STEPS = [
   "Fetching page data...",
@@ -134,10 +135,13 @@ export function WebsiteAuditPanel({ clientId, websiteUrl }: { clientId: number; 
         <CardContent>
           <div className="flex gap-2">
             <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com" className="flex-1" onKeyDown={(e) => { if (e.key === "Enter") runAudit(); }} />
-            <Button onClick={runAudit} disabled={running} className="gap-1.5">
-              {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-              {running ? "Running…" : "Run Audit"}
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <Button onClick={runAudit} disabled={running} className="gap-1.5">
+                {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                {running ? "Running…" : "Run Audit"}
+              </Button>
+              <ResidencyBadge type="third-party" label="PageSpeed + Ahrefs" size="sm" />
+            </div>
           </div>
           {running && <AIProgressIndicator steps={AUDIT_STEPS} />}
         </CardContent>

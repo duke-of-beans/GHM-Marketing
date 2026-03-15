@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+import { ResidencyBadge } from "@/components/ui/residency-badge";
 
 const CONTENT_GEN_STEPS = [
   "Analyzing brief...",
@@ -195,6 +196,7 @@ export function BlogGenerator({ clientId, industry, onGenerated }: BlogGenerator
             </>
           )}
         </Button>
+        <ResidencyBadge type="claude" size="sm" />
 
         {generating && (
           <div className="p-4 bg-muted/50 rounded-lg border">

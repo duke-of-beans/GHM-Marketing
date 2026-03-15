@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ResidencyBadge } from "@/components/ui/residency-badge";
 
 interface AdVariant {
   variant: string;
@@ -155,6 +156,7 @@ export function PPCGenerator({ clientId }: PPCGeneratorProps) {
             </>
           )}
         </Button>
+        <ResidencyBadge type="claude" size="sm" />
       </div>
 
       {variants.length > 0 && (
