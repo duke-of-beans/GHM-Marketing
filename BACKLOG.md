@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 6, 2026 — Intelligence Engine (IE-01–IE-06) shipped. Entry removed from backlog.
+**Last Updated:** March 15, 2026 — COVOS-PERF-04 shipped. PERF-004 closed. callAI() now caches static system prompt prefix across all 7 active call sites. Next: TRUST-001 → SEC-004 → SEC-004-FRICTION.
 
 **Owner:** David Kirsch
 
@@ -365,3 +365,398 @@ UI for building new satellites from morpheme recipes. Diversity recommender sugg
 ### CONTENT-012: Auto-Fingerprint Crawler
 Visits live satellite URLs, infers morpheme assignments from HTML structure (nav pattern, footer structure, CTA presence, schema markup types) for sites not built from the morpheme library. Populates IntelFingerprint records automatically. Enables fleet diversity auditing for legacy or third-party-built sites. Requires crawl scheduling + HTML parser sensor.
 **Priority:** FUTURE.
+
+
+---
+
+## 🔐 PRIVACY, SECURITY & EFFICIENCY — PORTFOLIO DIRECTIVE
+**Added:** March 13, 2026
+**Source:** Portfolio-level architectural session (GregLite → COVOS sync)
+**Spec:** `D:\Work\SEO-Services\specs\covos\PRIVACY_SECURITY_ARCHITECTURE.md`
+
+These items carry the same strategic weight as the UI Constitution.
+Privacy-as-trust is a sales asset and competitive moat, not a compliance checkbox.
+
+---
+
+### SEC-002 — AI Prompt Injection Defense
+**Priority:** P0 — Security
+**Effort:** Small
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §7.3
+
+Any tenant-submitted or third-party-sourced content that feeds into a Claude API prompt
+is a prompt injection vector. Apply `[UNTRUSTED CONTENT — BEGIN]` / `[UNTRUSTED CONTENT — END]`
+boundary markers in all AI prompts where user or external data is included.
+
+Affected surfaces: IE pipeline inputs, content generation (client notes/goals),
+competitive audit (scraped competitor data), any field from tenant onboarding forms.
+
+---
+
+### SEC-003 — Context Minimization Audit
+**Priority:** P0 — Cost + Security
+**Effort:** Medium
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §4.2
+
+Audit every existing Claude API call in the codebase. For each call, verify:
+1. Only minimum required data fields are included in context
+2. Raw PII is excluded by default (names, addresses, contact info)
+3. Structured data (metrics, signals) is preferred over free-form text
+
+Expected result: 15–20 existing AI calls that are over-contexted get trimmed.
+Delivers cost reduction and tightens the data residency story.
+
+---
+
+### PERF-001 — Prompt Caching for Intelligence Engine
+**Priority:** P1 — Cost
+**Effort:** Small
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §6.1
+
+Intelligence Engine uses repeated system context per tenant (tenant config, vertical config,
+brand voice, module state). This is stable across IE runs.
+
+Apply Anthropic `cache_control` headers to the system prompt block on all IE API calls.
+First run pays full price. Subsequent runs for same tenant: 70–80% input token reduction.
+
+Already supported by the Anthropic SDK. Implementation: add `cache_control: {type: "ephemeral"}`
+to system message blocks in IE executor. No architectural change required.
+
+---
+
+### PERF-002 — Model Right-Sizing (Haiku Routing)
+**Priority:** P1 — Cost
+**Effort:** Small
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §6.3
+
+Several IE tasks currently use Sonnet but are classification/extraction tasks appropriate for Haiku.
+Haiku is ~20× cheaper than Sonnet for equivalent classification tasks.
+
+**Reroute to Haiku:**
+- Work queue priority classification
+- Trend signal extraction from raw data
+- Health score explanation prose (short, structured)
+- Alert threshold evaluation
+- Fleet diversity scoring
+
+**Keep on Sonnet:**
+- Content brief generation
+- Competitive narrative generation
+- Full audit prose generation
+
+Estimated impact: 30–40% IE AI spend reduction from model routing alone.
+
+---
+
+### PERF-003 — Batch API for Non-Urgent IE Tasks
+**Priority:** P2 — Cost
+**Effort:** Medium
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §6.2
+
+IE tasks split into urgent (real-time) and non-urgent (background).
+Non-urgent tasks route to Anthropic Batch API: 50% cost discount, async results.
+
+**Non-urgent IE tasks (batch-eligible):**
+- Background competitive scanning
+- Fleet diversity analysis
+- Long-term trend modeling
+- Portfolio health aggregation
+
+**Urgent IE tasks (keep real-time):**
+- Content calendar due items
+- Ranking alerts
+- Active client health score updates
+
+Implementation: add `batch: boolean` flag to IE task config.
+Batch results polled on schedule and written to IE result store.
+
+---
+
+### ~~PERF-004 — callAI() Prompt Caching (Content Pipeline — 7 Active Sites)~~ ✅ SHIPPED COVOS-PERF-04 (March 15, 2026)
+buildSystemPrompt() refactored to return { static, dynamic }. callModel() sends system as two-block array with cache_control: ephemeral on static prefix. Beta header on Anthropic singleton. intel/ai-client.ts pattern consistent. Commits: 5eecb65 + c272b61.
+**Priority:** P1 — Cost
+**Effort:** Medium
+**Source:** COVOS-CPR-01 side finding (March 14, 2026)
+
+The existing `callAI()` wrapper in `src/lib/ai/client.ts` has no prompt caching
+on any of its 7 active call sites. System prompts are built by `buildSystemPrompt()`
+and are static-ish (same structure, same instructions per call type) — prime
+candidates for Anthropic's ephemeral prompt caching.
+
+**Call sites:** generate-blog, generate-meta, generate-ppc, generate-social,
+generate-strategy, voice-capture.ts, task-intelligence.ts (same 7 patched in SEC-002).
+
+**Action:** Extend `callAI()` in `src/lib/ai/client.ts` to apply
+`cache_control: { type: "ephemeral" }` to the system prompt block and send
+the `anthropic-beta: prompt-caching-2024-07-31` header. The `ai-client.ts`
+wrapper built in COVOS-CPR-01 (`src/lib/intel/ai-client.ts`) already implements
+this pattern — replicate it here or consolidate both wrappers into one.
+
+**Note:** PERF-001 was validated to have no IE targets (IE is AI-free).
+This item captures the actual caching opportunity across the content pipeline.
+
+**Estimated impact:** Each content generation call repeats ~300-500 token
+system prompts. Caching eliminates those tokens on cache hits (~90% of calls
+after warmup). Material cost reduction across high-frequency content ops.
+**Priority:** P1 — Cost
+**Effort:** Medium
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §5
+
+Full audit of the COVOS codebase for AI calls that don't need to be AI calls.
+
+**Class 0 (replace with deterministic logic):**
+- Metric aggregation and rollup calculations
+- CSV parsing and schema validation
+- Report formatting and layout
+- Date range calculations
+- Duplicate detection across records
+
+**Class 1 (replace with local statistical logic):**
+- Client health score calculation (pure formula, no AI needed)
+- Trend detection from time-series data (statistical, not generative)
+- Threshold alerting (comparison logic)
+- Churn risk scoring from known signals (weighted formula)
+
+Expected result: 30–50% reduction in Claude API call volume.
+These are decisions, not just optimizations — the logic belongs in code, not prompts.
+
+---
+
+### TRUST-001 — Privacy Trust Dashboard (Tenant Settings)
+**Priority:** P1 — Trust/Sales
+**Effort:** Medium
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §8
+
+New Settings section: **Privacy & Data**
+
+Contents:
+- 30-day rolling data residency summary (% local / % Claude API / % third-party enrichment)
+- Feature-by-feature data declaration table (what data each feature sends, where, why)
+- AI Processing Log (searchable, exportable CSV)
+- Third-party data flow declarations (Ahrefs, DataForSEO, etc.)
+- Tenant exclusion controls (fields excluded from AI, modules with AI disabled)
+
+This panel is both a trust feature and a sales asset. Demo it during onboarding.
+"Here is exactly what COVOS does with your data" — no competitor can say this.
+
+---
+
+### TRUST-002 — Data Residency Indicators (Feature-Level)
+**Priority:** P2 — Trust
+**Effort:** Small
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §2
+
+Small residency indicators on AI-powered features:
+- 🟢 Processed locally (no external API)
+- 🔵 Claude API (tenant-visible, auditable)
+- 🟡 Third-party enrichment (Ahrefs/DataForSEO)
+
+Placement: tooltip or small badge on AI-powered UI surfaces.
+Low-friction implementation: icon + title attribute on existing AI action buttons.
+
+---
+
+### SEC-004 — Tenant Isolation Verification
+**Priority:** P1 — Security
+**Effort:** Large
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §7.2
+
+Formal verification that no application-layer cross-tenant data leaks exist.
+Neon per-tenant DB provides structural isolation — this audit verifies no
+application-layer bypass exists: shared caches, global queries without tenant
+scoping, session state that could bleed between tenants.
+
+Deliverable: audit checklist + remediation of any found issues.
+
+---
+
+### SEC-005 — Input Sanitization Audit
+**Priority:** P1 — Security
+**Effort:** Medium
+**Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §7.2
+
+Systematic review of all tenant-submitted content fields for XSS and injection vectors.
+Particularly: free-form notes, client names, content fields rendered as HTML downstream.
+
+Deliverable: audit results + sanitization applied where missing.
+
+
+---
+
+## ⚡ CONTEXT-PRESSURE-AWARE ROUTING (CPR)
+**Added:** March 13, 2026
+**Spec:** `D:\Work\SEO-Services\specs\covos\CPR_INTELLIGENCE_ENGINE_SPEC.md`
+**Depends on:** PERF-001–004 (from PRIVACY_SECURITY_ARCHITECTURE.md section)
+
+Session intelligence that shifts routing policy as work progresses.
+Early work = AI-appropriate. Mid/late work = local-preferred.
+The IE has a natural phase structure CPR exploits: scan and close are Class 0,
+analysis is Class 0/1, only generation is Class 3.
+
+---
+
+### SEC-004-FRICTION — sanitizeContentInput Configurable Max-Length Override
+**Priority:** P1 — Quality / Regression Risk
+**Effort:** Small
+**Source:** COVOS-SEC-01 friction log (March 14, 2026)
+
+The 2000-char hard cap in `sanitizePromptInput()` applied to `websiteContent`
+in `voice-capture.ts` is a regression risk for voice profile quality. Longer
+website content produces more accurate voice fingerprints — truncating at 2000
+chars meaningfully degrades output for larger client sites.
+
+**Action:** Add a second exported function to `src/lib/ai-security.ts`:
+`sanitizeContentInput(str: string, maxLen: number = 2000): string`
+Same sanitization logic as `sanitizePromptInput()` but with configurable
+max-length. Caller passes the appropriate limit based on context:
+- General prompt fields: 2000 (default)
+- Website content for voice capture: 8000 (or as tested)
+- Competitive analysis content: 4000
+
+Update `voice-capture.ts` to call `sanitizeContentInput(websiteContent, 8000)`
+instead of `sanitizePromptInput(websiteContent)`. Run a before/after quality
+comparison on a real client site to validate the limit.
+
+**Risk if not done:** Voice profiles for larger client sites will be built on
+truncated content — reducing fingerprint accuracy and increasing the chance of
+generic/off-brand voice outputs.
+
+---
+
+### ~~CPR-IE-001 — IE Phase Reclassification Audit~~ ✅ SHIPPED COVOS-CPR-01 (March 14, 2026)
+13 call sites audited, all Class 0 — IE is entirely AI-free. ai-client.ts harness built for future use. docs/CPR-IE-001-CLASSIFICATION.md written. Commits: 75525a3 + f50af62.
+**Priority:** P0 — Cost (immediate win, no new infrastructure)
+**Effort:** Medium
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §5
+
+Move the following from Sonnet API calls to deterministic local functions:
+Health score calculation, fleet similarity scoring, threshold evaluation,
+delta calculation, task priority calculation, competitor classification,
+standard alert generation, scan cost attribution.
+
+These are arithmetic and rule evaluation. They do not need a language model.
+Estimated: 40–60% reduction in IE API call volume from this audit alone.
+
+---
+
+### CPR-IE-002 — IE Generation Context Compression
+**Priority:** P1 — Cost
+**Effort:** Small
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §3
+
+Before each Class 3 IE generation call, compress input to minimum required.
+Send structured delta summary + threshold context, not raw scan snapshot.
+Target: 180 tokens input vs current ~2,400 tokens. 92% input reduction per call.
+
+---
+
+### CPR-IE-003 — IE Urgent vs Non-Urgent Split
+**Priority:** P1 — Cost
+**Effort:** Medium
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §3
+
+Split IE generation tasks into urgent (real-time Haiku/Sonnet) and
+non-urgent (Batch API, 50% cost discount). Queue management for batch results.
+Non-urgent: background competitive commentary, monthly report sections.
+Urgent: P1 threshold breaches, ranking alerts, health score drops.
+
+---
+
+## 🧬 MORPHEME-G CPR
+**Added:** March 13, 2026
+**Spec:** `D:\Work\SEO-Services\specs\covos\CPR_INTELLIGENCE_ENGINE_SPEC.md §7`
+
+The Morpheme assembly pipeline has a natural phase structure.
+Most of it is currently misclassified as AI work. It is not.
+
+---
+
+### MORPH-CPR-001 — Fleet Diversity Recommender → Local Optimizer
+**Priority:** P1 — Cost + Speed
+**Effort:** Medium
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §7
+
+Fleet diversity recommendation is combinatorial optimization, not language generation.
+Move from Sonnet to deterministic Python optimizer using OR-Tools constraint solver.
+Input: existing fleet recipes + available morpheme options.
+Output: optimal recipe that maximizes fleet distance.
+Estimated: 90% token reduction on all fleet recommendation calls.
+Side benefit: deterministic output = reproducible, testable results.
+
+---
+
+### ~~MORPH-CPR-002 — Morpheme Assembly → Local Script~~ ✅ SHIPPED COVOS-CPR-01 (March 14, 2026)
+assemble.ps1 confirmed 100% local PowerShell. AI calls in ContentStudio live in generate.js (content pipeline), not the assembler. No changes needed.
+**Priority:** P1 — Cost + Speed
+**Effort:** Small
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §7
+
+Template interpolation is string substitution. {{VARIABLE}} replacement.
+File concatenation. Not AI. Move MORPH_ASSEMBLE phase to local Python/Node script.
+Zero AI tokens for assembly. Significant speed improvement (local vs API round-trip).
+
+---
+
+### MORPH-CPR-003 — Morpheme Validation → Local Rule Engine
+**Priority:** P2 — Cost
+**Effort:** Small
+**Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §7
+
+Structural validation and anti-pattern detection are constraint checking.
+"NAV-B + CTA-C is an anti-pattern" is a boolean rule, not a reasoning task.
+Move MORPH_VALIDATE phase to local rule engine. Encode all anti-patterns
+from MORPHEME_LIBRARY_SPEC.md §4.3 as constraint rules.
+
+
+---
+
+## Security — SEC-004-FOLLOWUP Items
+*Added: 2026-03-15 | Sprint COVOS-TRUST-01 | Source: SEC-004 Tenant Isolation Audit*
+*All items are low risk on current deployment (GHM is sole tenant on primary DB). Must be resolved before a second tenant is onboarded onto the shared primary database.*
+
+---
+
+### [SEC-004-FOLLOWUP] Scope `processRecurringTasks()` by tenantId
+**Label:** SEC-004-FOLLOWUP
+**Priority:** P1 — Security (pre-onboarding blocker)
+**Effort:** Small
+**File:** `src/lib/ops/recurring-tasks.ts`
+
+`prisma.recurringTaskRule.findMany()` and `prisma.clientProfile.findMany()` both lack a `tenantId` WHERE clause. On a shared-DB deployment with 2+ active tenants, this cron would create tasks for clients from all tenants in one pass.
+
+Remediation: add `tenantId` field to `RecurringTaskRule` schema; filter both queries; cron caller should iterate known tenants or derive tenantId from a per-tenant runner context.
+
+---
+
+### [SEC-004-FOLLOWUP] Scope `executeBatchScan()` by tenantId
+**Label:** SEC-004-FOLLOWUP
+**Priority:** P1 — Security (pre-onboarding blocker)
+**Effort:** Small
+**File:** `src/lib/competitive-scan/executor.ts`
+
+`executeBatchScan({ includeDue: true })` queries `clientProfile` for all clients with `nextScanAt <= now` without a `tenantId` filter. On shared DB, runs scans for all tenants in one pass.
+
+Remediation: add `tenantId` parameter to `executeBatchScan`; filter `clientProfile` query; daily-scans cron should iterate per-tenant or pass tenantId from context.
+
+---
+
+### [SEC-004-FOLLOWUP] Validate tenantId scope in `/api/intel/insights`
+**Label:** SEC-004-FOLLOWUP
+**Priority:** P1 — Security (pre-onboarding blocker)
+**Effort:** Small
+**File:** `src/app/api/intel/insights/route.ts`
+
+Route accepts `tenantId` as a URL query parameter and passes it to `generateCrossClientInsights(tenantId)` without verifying the caller belongs to that tenant. An authenticated user with `view_all_clients` could read another tenant's cross-client intelligence if they know the integer tenantId.
+
+Remediation: resolve calling tenant from `x-tenant-slug` header via `getTenant()`; assert `tenantId` param matches or discard the param entirely and derive tenantId from request context.
+
+---
+
+### [SEC-004-FOLLOWUP] Full cron audit pass — remaining 11 routes
+**Label:** SEC-004-FOLLOWUP
+**Priority:** P2 — Security (pre-onboarding recommended)
+**Effort:** Medium
+**Files:** `src/app/api/cron/gbp-snapshot`, `deliver-reports`, `generate-payments`, `invoice-monthly`, `invoice-status-poll`, `nap-health-check`, `nap-scan`, `payment-check`, `rank-poll`, `rank-tracking`, `site-health`
+
+The 11 remaining cron routes were not individually audited for intra-tenant query scoping in this pass. All are gated by CRON_SECRET. Should be formally audited and tenant-scoped before second shared-DB tenant onboarding.
+

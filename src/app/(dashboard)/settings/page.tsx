@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign, Database, Wallet, Upload } from "lucide-react";
+import { Settings as SettingsIcon, Users, Sliders, Map, FileText, ArrowRight, Bug, Zap, Activity, Paintbrush, DollarSign, Database, Wallet, Upload, ShieldCheck } from "lucide-react";
 import { GeneralSettingsTab } from "@/components/settings/GeneralSettingsTab";
 import { CompensationTab } from "@/components/settings/CompensationTab";
 import { TeamManagementTab } from "@/components/settings/TeamManagementTab";
@@ -14,6 +14,7 @@ import { IntegrationsTab } from "@/components/settings/IntegrationsTab";
 import { DataImportTab } from "@/components/settings/DataImportTab";
 import { RevenueImportTab } from "@/components/settings/RevenueImportTab";
 import { BrandingTab } from "@/components/settings/BrandingTab";
+import { PrivacyDashboardTab } from "@/components/settings/privacy-dashboard-tab";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -27,7 +28,7 @@ const TerritoriesContent = dynamic(
 );
 
 // "positions" and "permissions" are now sub-sections inside the "team" tab
-const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations", "data-import", "revenue-import"];
+const VALID_TABS = ["general", "compensation", "branding", "team", "territories", "audit", "bugs", "activity", "wave", "integrations", "data-import", "revenue-import", "privacy"];
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -92,6 +93,11 @@ export default function SettingsPage() {
           <TabsTrigger value="audit" className="gap-1.5">
             <FileText className="h-4 w-4" />Audit Log
           </TabsTrigger>
+          {(isAdmin || currentUserRole === "manager") && (
+            <TabsTrigger value="privacy" className="gap-1.5">
+              <ShieldCheck className="h-4 w-4" />Privacy &amp; Data
+            </TabsTrigger>
+          )}
           {isAdmin && (
             <TabsTrigger value="bugs" className="gap-1.5">
               <Bug className="h-4 w-4" />Bug Reports
@@ -172,6 +178,12 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {(isAdmin || currentUserRole === "manager") && (
+          <TabsContent value="privacy">
+            <PrivacyDashboardTab />
+          </TabsContent>
+        )}
 
         {isAdmin && (
           <TabsContent value="bugs">

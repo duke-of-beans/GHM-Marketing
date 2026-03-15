@@ -2,7 +2,7 @@ import { callAI } from "@/lib/ai";
 import type { TenantConfig } from "@/lib/tenant";
 import type { TenantVoice } from "@/lib/ai/router/types";
 import * as cheerio from 'cheerio';
-import { sanitizePromptInput } from "@/lib/ai-security";
+import { sanitizeContentInput } from "@/lib/ai-security";
 
 export interface VoiceProfile {
   profileId: string;
@@ -131,7 +131,9 @@ export async function captureVoiceFromWebsite(
 
   // SEC-002: websiteContent is scraped from a user-supplied URL — adversarial
   // sites could embed injection phrases. Sanitize before prompt interpolation.
-  const safeWebsiteContent = sanitizePromptInput(websiteContent);
+  // SEC-004-FRICTION: use sanitizeContentInput with 8,000-char ceiling instead of
+  // sanitizePromptInput's 2,000-char cap — preserves full voice capture signal.
+  const safeWebsiteContent = sanitizeContentInput(websiteContent, 8000);
 
   const result = await callAI({
     feature: "voice_capture",

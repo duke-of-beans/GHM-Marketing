@@ -62,3 +62,46 @@ export function sanitizePromptInput(str: string): string {
 
   return s;
 }
+
+/**
+ * Sanitize a content-sized user-controlled string before prompt interpolation.
+ *
+ * Identical sanitization logic to sanitizePromptInput() but with a configurable
+ * max-length parameter instead of the hardcoded MAX_PROMPT_FIELD_LENGTH.
+ * Use this for large content payloads (e.g. scraped website content, page text)
+ * where the 2,000-char ceiling would truncate legitimate signal.
+ *
+ * SEC-004-FRICTION: voice-capture websiteContent was being capped at 2,000 chars,
+ * degrading voice profile quality. Pass maxLen=8000 to unlock full capture window
+ * while retaining all other injection defences.
+ *
+ * @param str     Raw content string (scraped text, page body, etc.)
+ * @param maxLen  Maximum characters before truncation (default: 2000 — same as sanitizePromptInput).
+ * @returns       Sanitized string safe for direct inclusion in a prompt template.
+ */
+export function sanitizeContentInput(str: string, maxLen: number = 2000): string {
+  if (typeof str !== "string" || str.length === 0) return str ?? "";
+
+  let s = str;
+
+  // 1. Strip null bytes
+  s = s.replace(NULL_BYTE_RE, "");
+
+  // 2. Strip Unicode direction-override characters
+  s = s.replace(DIRECTION_OVERRIDE_RE, "");
+
+  // 3. Collapse excessive newlines
+  s = s.replace(NEWLINE_COLLAPSE_RE, "\n\n\n");
+
+  // 4. Strip injection phrases at line start
+  for (const pattern of INJECTION_LINE_PATTERNS) {
+    s = s.replace(pattern, "");
+  }
+
+  // 5. Enforce caller-specified max length
+  if (s.length > maxLen) {
+    s = s.slice(0, maxLen) + TRUNCATION_SUFFIX;
+  }
+
+  return s;
+}

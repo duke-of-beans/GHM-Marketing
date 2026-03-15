@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 15, 2026 — COVOS-PERF-04 complete. callAI() prompt caching shipped — static system prompt prefix cached via Anthropic ephemeral cache_control across all 7 active AI call sites. Estimated 60–80% input token reduction on repeat calls.
+**Last Updated:** March 15, 2026 — COVOS-TRUST-01 complete. SEC-004-FRICTION shipped (sanitizeContentInput, voice-capture 8K window). SEC-004 tenant isolation audit complete — no FAILs, 4 NEEDS ATTENTION items in BACKLOG. TRUST-001 Privacy & Data Settings tab live.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -15,7 +15,7 @@
 
 **Intelligence Engine (ARCH-007):** Fully shipped (IE-01 through IE-06). 12 Prisma models (`IntelAsset`, `IntelAssetGroup`, `IntelCompetitor`, `IntelSensorCredential`, `IntelScan`, `IntelSnapshot`, `IntelFleet`, `IntelFingerprint`, `IntelSimilarityScore`, `IntelTemplatePool`, `IntelIndexHealth`, `IntelScanDeadLetter`). 8 sensors (PageSpeed, Ahrefs, SerpAPI, GSC, GA4, Outscraper, affiliate-revenue, ad-revenue). 23 API routes under `/api/intel/`. Fleet diversity engine with 6-dimension fingerprinting and pairwise similarity scoring. Work queue generation with threshold rules feeding existing task engine. Advanced patterns: seasonal, upsell, cannibalization, cross-client insights. Production hardened: exponential backoff, rate limiting, dead letter queue, P1 notifications. Sensor settings UI at `/settings/integrations/intel-sensors/`. Cron scheduler at 03:30 UTC daily. Spec: `D:\Work\SEO-Services\specs\covos\INTELLIGENCE_ENGINE_SPEC.md`.
 
-**Next sprint:** TRUST-001 (Privacy Trust Dashboard), SEC-004 (Tenant Isolation Verification), SEC-004-FRICTION (sanitizeContentInput configurable max-length). COVOS-PERF-04 complete — see sprint record below.
+**Next sprint:** SEC-005 (Input Sanitization Audit), TRUST-002 (Data Residency Indicators), MORPH-CPR-001 (Fleet Diversity Recommender → Local Optimizer).
 
 
 ### SPRINT COVOS-CPR-01 — IE Reclassification + Performance Chain (March 14, 2026) ✅ COMPLETE
@@ -34,6 +34,21 @@
 
 **Unexpected finding:** The entire IE is AI-free by design. The dashboard's `callAI()` wrapper (`src/lib/ai/client.ts`) also has no prompt caching — 7 active content generation call sites with static-ish system prompts are candidates for PERF-004.
 
+
+### SPRINT COVOS-TRUST-01 — Privacy Trust Dashboard + Tenant Isolation Audit + sanitizeContentInput (March 15, 2026) ✅ COMPLETE
+
+**Goal:** Three items: SEC-004-FRICTION (configurable max-length sanitizer), SEC-004 (formal tenant isolation audit), TRUST-001 (Privacy & Data Settings tab). Voice profiles no longer degraded by 2K truncation. Tenant isolation formally verified. Platform can surface exactly what COVOS does with tenant data.
+
+- [x] **SEC-004-FRICTION: sanitizeContentInput** — `src/lib/ai-security.ts` — New exported function `sanitizeContentInput(str, maxLen = 2000)` with identical sanitization logic to `sanitizePromptInput()` but configurable max-length. `src/lib/scrvnr/voice-capture.ts` updated to `sanitizeContentInput(websiteContent, 8000)` — voice capture window raised from 2,000 to 8,000 chars. All other sanitizePromptInput() call sites unchanged.
+- [x] **SEC-004: Tenant Isolation Verification** — `docs/SEC-004-AUDIT.md` — All 5 checklist items audited. Result: 0 FAILs, 4 NEEDS ATTENTION (processRecurringTasks unscoped queries, executeBatchScan unscoped queries, /api/intel/insights tenantId param not validated against caller, 11 cron routes pending full audit). All pre-onboarding risk — no active cross-tenant leak on current deployment. 4 SEC-004-FOLLOWUP items written to BACKLOG.md.
+- [x] **TRUST-001: Privacy & Data Settings tab** — `src/components/settings/privacy-dashboard-tab.tsx` (new), `src/app/(dashboard)/settings/page.tsx` (wired). Four sections: Data Residency Summary (green/blue/yellow badges), Feature Data Declaration table (10 rows), AI Processing Log stub (mailto export request), Data Controls stub (disabled toggle). Admin/manager only — sales role excluded.
+- [x] **TypeScript gate** — `npx tsc --noEmit`: 0 new errors. 10 pre-existing errors unchanged.
+
+**New files:** `src/components/settings/privacy-dashboard-tab.tsx`, `docs/SEC-004-AUDIT.md`, `MORNING_BRIEFING.md`
+**Modified files:** `src/lib/ai-security.ts`, `src/lib/scrvnr/voice-capture.ts`, `src/app/(dashboard)/settings/page.tsx`, `BACKLOG.md`, `STATUS.md`
+**Commit:** pending
+
+---
 
 ### SPRINT COVOS-PERF-04 — callAI() Prompt Caching (March 15, 2026) ✅ COMPLETE
 
