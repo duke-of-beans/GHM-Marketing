@@ -206,6 +206,9 @@ async function calculateNextScanDate(clientId: number): Promise<Date> {
 interface BatchScanParams {
   clientIds?: number[];
   includeDue?: boolean;
+  // SEC-004-FOLLOWUP: when provided, scopes the "includeDue" client query to this
+  // tenant's asset groups, preventing cross-tenant scan mixing on a shared primary DB.
+  tenantId?: number;
 }
 
 
@@ -222,7 +225,7 @@ interface BatchScanResult {
 }
 
 export async function executeBatchScan(params: BatchScanParams = {}): Promise<BatchScanResult> {
-  const { clientIds, includeDue = false } = params;
+  const { clientIds, includeDue = false, tenantId } = params;
   
   // Determine which clients to scan
   let targetClientIds: number[] = [];
@@ -231,18 +234,45 @@ export async function executeBatchScan(params: BatchScanParams = {}): Promise<Ba
     // Scan specific clients
     targetClientIds = clientIds;
   } else if (includeDue) {
-    // Scan all clients due for a scan
-    const dueClients = await prisma.clientProfile.findMany({
-      where: {
-        status: 'active',
-        OR: [
-          { nextScanAt: null },
-          { nextScanAt: { lte: new Date() } },
-        ],
-      },
-      select: { id: true },
-    });
-    targetClientIds = dueClients.map(c => c.id);
+    // SEC-004-FOLLOWUP: when tenantId is provided, scope the initial client query
+    // by deriving client IDs from the tenant's IntelAssetGroups (which carry tenantId)
+    // rather than fetching all assets and grouping after.
+    // Falls back to unscoped query on single-tenant primary DB deployments.
+    if (tenantId !== undefined) {
+      const assetGroups = await prisma.intelAssetGroup.findMany({
+        where: { tenantId },
+        select: { clientProfileId: true },
+      });
+      const tenantClientIds = assetGroups
+        .map((g) => g.clientProfileId)
+        .filter((id): id is number => id !== null);
+
+      const dueClients = await prisma.clientProfile.findMany({
+        where: {
+          id: { in: tenantClientIds },
+          status: 'active',
+          OR: [
+            { nextScanAt: null },
+            { nextScanAt: { lte: new Date() } },
+          ],
+        },
+        select: { id: true },
+      });
+      targetClientIds = dueClients.map(c => c.id);
+    } else {
+      // Unscoped: safe only when a single tenant uses the primary DB.
+      const dueClients = await prisma.clientProfile.findMany({
+        where: {
+          status: 'active',
+          OR: [
+            { nextScanAt: null },
+            { nextScanAt: { lte: new Date() } },
+          ],
+        },
+        select: { id: true },
+      });
+      targetClientIds = dueClients.map(c => c.id);
+    }
   } else {
     throw new Error('Must provide either clientIds or set includeDue=true');
   }

@@ -1,5 +1,5 @@
 # GHM DASHBOARD — PRODUCT BACKLOG
-**Last Updated:** March 15, 2026 — COVOS-PERF-04 shipped. PERF-004 closed. callAI() now caches static system prompt prefix across all 7 active call sites. Next: TRUST-001 → SEC-004 → SEC-004-FRICTION.
+**Last Updated:** March 15, 2026 — COVOS-SEC-02 shipped. SEC-005, TRUST-002, MORPH-CPR-001 closed. TRUST-002-EXTENDED logged (4 surfaces need trigger button exposure). Next: SEC-004-FOLLOWUP → PERF-003 → CPR-IE-002.
 
 **Owner:** David Kirsch
 
@@ -522,7 +522,8 @@ These are decisions, not just optimizations — the logic belongs in code, not p
 
 ---
 
-### TRUST-001 — Privacy Trust Dashboard (Tenant Settings)
+### ~~TRUST-001 — Privacy Trust Dashboard (Tenant Settings)~~ ✅ SHIPPED COVOS-TRUST-01 (March 15, 2026)
+PrivacyDashboardTab built and wired into settings. Admin/manager only, sales excluded. 4 sections: residency summary (green/blue/yellow badges), 10-row feature declaration table, AI processing log stub with mailto export, data controls stub. Commits: cac1391 + b99b04f.
 **Priority:** P1 — Trust/Sales
 **Effort:** Medium
 **Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §8
@@ -541,7 +542,8 @@ This panel is both a trust feature and a sales asset. Demo it during onboarding.
 
 ---
 
-### TRUST-002 — Data Residency Indicators (Feature-Level)
+### ~~TRUST-002 — Data Residency Indicators (Feature-Level)~~ ✅ SHIPPED COVOS-SEC-02 (March 15, 2026)
+residency-badge.tsx created (3 types, Radix tooltip, sm/md). Applied to 5 surfaces: BlogGenerator, PPCGenerator, MetaDescriptionGenerator, SocialMediaGenerator, WebsiteAuditPanel. 4 surfaces deferred — see TRUST-002-EXTENDED below. Commit: 03f22ca.
 **Priority:** P2 — Trust
 **Effort:** Small
 **Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §2
@@ -556,7 +558,8 @@ Low-friction implementation: icon + title attribute on existing AI action button
 
 ---
 
-### SEC-004 — Tenant Isolation Verification
+### ~~SEC-004 — Tenant Isolation Verification~~ ✅ SHIPPED COVOS-TRUST-01 (March 15, 2026)
+Zero FAILs. Structural isolation (separate Neon DBs + subdomain routing) holds. Four NEEDS ATTENTION items logged as SEC-004-FOLLOWUP below — all pre-onboarding risk, no active leaks. docs/SEC-004-AUDIT.md written. Commits: cac1391 + b99b04f.
 **Priority:** P1 — Security
 **Effort:** Large
 **Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §7.2
@@ -570,7 +573,51 @@ Deliverable: audit checklist + remediation of any found issues.
 
 ---
 
-### SEC-005 — Input Sanitization Audit
+### TRUST-002-EXTENDED — Residency Badges for Remaining 4 AI Surfaces
+**Priority:** P2 — Trust
+**Effort:** Small
+**Source:** COVOS-SEC-02 friction log (March 15, 2026)
+
+4 AI-powered surfaces not badged in COVOS-SEC-02 because their trigger buttons
+are not exposed as findable standalone elements in current component structure:
+- SEO Strategy generator
+- Voice Profile capture
+- Fleet Diversity recommendations panel
+- Intelligence Engine scan results UI
+
+**Action:** For each surface, either locate the existing trigger button and apply
+the badge inline, or expose a wrapper element that accepts the badge as a sibling.
+residency-badge.tsx is already built — this is placement work only.
+
+Types to apply:
+- SEO Strategy: Blue (Claude API)
+- Voice Capture: Blue (Claude API)
+- Fleet Diversity: Green (local — confirmed AI-free)
+- IE Scan Results: Green (local — confirmed AI-free)
+
+**Gate:** Recommend completing before second tenant onboarding — the trust story
+requires complete coverage across all AI-powered surfaces.
+
+---
+
+### SEC-004-FOLLOWUP — Pre-Onboarding Tenant Isolation Gaps
+**Priority:** P1 — Security (must resolve before second tenant on shared primary DB)
+**Effort:** Medium
+**Source:** SEC-004 audit (March 15, 2026) — docs/SEC-004-AUDIT.md
+
+Four NEEDS ATTENTION items identified. No active cross-tenant leaks at current single-primary-tenant deployment. All four become real risks when a second tenant shares the primary DB.
+
+1. **processRecurringTasks** — queries recurring tasks without tenantId scope on the initial fetch. Add `tenantId` WHERE clause before second tenant onboards.
+2. **executeBatchScan** — IE batch scan orchestrator queries assets cross-tenant on initial load, then groups by tenantId. Restructure to scope by tenantId from the outset.
+3. **/api/intel/insights tenantId param** — endpoint accepts tenantId as a query param rather than deriving it from the authenticated session. A tenant user could theoretically pass another tenant's ID. Derive tenantId from session only.
+4. **11 un-audited cron routes** — cron routes beyond the scheduler were not fully audited for tenantId scoping. Full audit required before second tenant.
+
+**Gate:** All four must be resolved before `TENANT_PROVISIONING.md` runbook is executed for a second production tenant.
+
+---
+
+### ~~SEC-005 — Input Sanitization Audit~~ ✅ SHIPPED COVOS-SEC-02 (March 15, 2026)
+28 fields audited. 15 SAFE, 4 XSS_RISK, 9 NEEDS_SANITIZATION. sanitizeHtmlInput() not added — correct call. XSS_RISK surfaces render AI-generated output, not raw user HTML. Defence is at the right layer: sanitizePromptInput() before Claude makes output deterministically safe. docs/SEC-005-AUDIT.md written. Commit: 03f22ca.
 **Priority:** P1 — Security
 **Effort:** Medium
 **Spec:** PRIVACY_SECURITY_ARCHITECTURE.md §7.2
@@ -595,7 +642,8 @@ analysis is Class 0/1, only generation is Class 3.
 
 ---
 
-### SEC-004-FRICTION — sanitizeContentInput Configurable Max-Length Override
+### ~~SEC-004-FRICTION — sanitizeContentInput Configurable Max-Length Override~~ ✅ SHIPPED COVOS-TRUST-01 (March 15, 2026)
+sanitizeContentInput(str, maxLen=2000) exported from ai-security.ts. voice-capture.ts updated to sanitizeContentInput(websiteContent, 8000). Commits: cac1391 + b99b04f.
 **Priority:** P1 — Quality / Regression Risk
 **Effort:** Small
 **Source:** COVOS-SEC-01 friction log (March 14, 2026)
@@ -671,7 +719,8 @@ Most of it is currently misclassified as AI work. It is not.
 
 ---
 
-### MORPH-CPR-001 — Fleet Diversity Recommender → Local Optimizer
+### ~~MORPH-CPR-001 — Fleet Diversity Recommender → Local Optimizer~~ ✅ CONFIRMED LOCAL COVOS-SEC-02 (March 15, 2026)
+diversity-recommender.ts, similarity-calculator.ts, fleet-auditor.ts — zero AI calls confirmed. All fleet intelligence is deterministic local logic. Backlog item was written assuming an AI call existed. Closed as confirmed-local. Commit: 03f22ca.
 **Priority:** P1 — Cost + Speed
 **Effort:** Medium
 **Spec:** CPR_INTELLIGENCE_ENGINE_SPEC.md §7
@@ -760,3 +809,27 @@ Remediation: resolve calling tenant from `x-tenant-slug` header via `getTenant()
 
 The 11 remaining cron routes were not individually audited for intra-tenant query scoping in this pass. All are gated by CRON_SECRET. Should be formally audited and tenant-scoped before second shared-DB tenant onboarding.
 
+
+---
+
+### [TRUST-002-STRUCTURAL] Fleet Diversity Panel — badge deferred, no UI trigger exposed
+**Label:** TRUST-002-STRUCTURAL
+**Sprint:** COVOS-OPS-01 (TRUST-002-EXTENDED)
+**Priority:** P3
+**File:** src/lib/intel/fleet/diversity-recommender.ts, src/app/api/intel/fleets/[fleetId]/recommendations/route.ts
+
+The Fleet Diversity panel is currently API-only — no dedicated frontend component exists that exposes a user-visible trigger button. The diversity recommendations (type="local", Green) cannot receive a ResidencyBadge without structural UI work to surface the panel.
+
+Action required: when the Fleet Diversity UI panel is built, add <ResidencyBadge type="local" /> adjacent to the "Get Recommendations" trigger. Processing is confirmed local (Class 0 per CPR-IE-001).
+
+---
+
+### [TRUST-002-STRUCTURAL] IE Scan Results UI — badge deferred, no dedicated results component
+**Label:** TRUST-002-STRUCTURAL
+**Sprint:** COVOS-OPS-01 (TRUST-002-EXTENDED)
+**Priority:** P3
+**File:** src/app/api/intel/scans/route.ts, src/app/api/intel/overview/route.ts
+
+The IE Scan Results surface has no dedicated frontend component. Scan results are served via API but no standalone results panel exists with a visible user trigger to badge.
+
+Action required: when the IE Scan Results UI is built, add <ResidencyBadge type="local" /> adjacent to the scan trigger. All IE processing is confirmed local (Class 0 per CPR-IE-001).

@@ -363,6 +363,7 @@ model RepPerformance {
 
 model ClientProfile {
   id                    Int                          @id @default(autoincrement())
+  tenantId              Int?                         @map("tenant_id")
   leadId                Int                          @unique @map("lead_id")
   businessName          String                       @map("business_name")
   retainerAmount        Decimal                      @default(2400) @map("retainer_amount") @db.Decimal(10, 2)
@@ -1652,6 +1653,7 @@ model TaskChecklistTemplate {
 model RecurringTaskRule {
   id                  Int                    @id @default(autoincrement())
   name                String
+  tenantId            Int?                   @map("tenant_id")
   clientId            Int?                   @map("client_id")
   category            String
   title               String

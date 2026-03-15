@@ -5,6 +5,7 @@ import { generateReportHTML } from "@/lib/reports/template";
 import { sendReportEmail } from "@/lib/email";
 import { TENANT_REGISTRY } from "@/lib/tenant/config";
 import { log } from "@/lib/logger";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 
 /**
  * POST /api/cron/deliver-reports
@@ -18,6 +19,11 @@ export async function POST(req: NextRequest) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  // Full fix: iterate TENANT_REGISTRY and use per-tenant prisma + config. See BACKLOG.md.
+  const guard = await assertSingleSharedDbTenant("deliver-reports");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   const today = new Date();
   const dayOfMonth = today.getDate();

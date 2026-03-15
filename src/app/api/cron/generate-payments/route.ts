@@ -20,6 +20,7 @@ import {
   calculateMasterFee,
   getFirstDayOfMonth,
 } from "@/lib/payments/calculations";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 
 export async function GET(req: NextRequest) {
   // Vercel Cron Authentication
@@ -29,6 +30,11 @@ export async function GET(req: NextRequest) {
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  // Full fix: iterate per-tenant prisma clients. See BACKLOG.md.
+  const guard = await assertSingleSharedDbTenant("generate-payments");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   try {
     log.info({ cron: 'generate-payments' }, 'Starting monthly payment generation');

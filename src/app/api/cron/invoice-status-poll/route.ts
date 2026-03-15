@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { log } from '@/lib/logger'
+import { assertSingleSharedDbTenant } from '@/lib/tenant/cron-guard'
 import { getInvoice } from '@/lib/wave/invoices'
 import { generateClientMonthlyPayments } from '@/lib/payments/calculations'
 import { startOfMonth } from 'date-fns'
@@ -21,6 +22,10 @@ export async function GET(req: NextRequest) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant('invoice-status-poll')
+  if (guard) return NextResponse.json(guard, { status: 503 })
 
   // Fetch all invoices that could still flip to paid
   const openInvoices = await prisma.invoiceRecord.findMany({

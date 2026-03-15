@@ -1,7 +1,7 @@
 # GHM DASHBOARD — MASTER STATUS
 **Single source of truth for build progress. All other status files are archived.**
 **Product vision and philosophy:** See `VISION.md` (updated February 21, 2026 — mandatory read for new instances).
-**Last Updated:** March 15, 2026 — COVOS-TRUST-01 complete. SEC-004-FRICTION shipped (sanitizeContentInput, voice-capture 8K window). SEC-004 tenant isolation audit complete — no FAILs, 4 NEEDS ATTENTION items in BACKLOG. TRUST-001 Privacy & Data Settings tab live.
+**Last Updated:** March 15, 2026 — COVOS-OPS-01 complete. SEC-004-FOLLOWUP all 4 isolation gaps resolved (schema additions, cron guard, insights route hardened, 9 cron routes guarded). CPR-IE-002/003 closed N/A (IE AI-free). TRUST-002-EXTENDED badges shipped to Voice Capture + SEO Strategy; Fleet Diversity + IE Scan Results logged as TRUST-002-STRUCTURAL. MORPH-CPR-003 confirmed local. tsc: 0 new errors.
 
 ### CURRENT PLATFORM STATE — March 2, 2026
 
@@ -16,6 +16,28 @@
 **Intelligence Engine (ARCH-007):** Fully shipped (IE-01 through IE-06). 12 Prisma models (`IntelAsset`, `IntelAssetGroup`, `IntelCompetitor`, `IntelSensorCredential`, `IntelScan`, `IntelSnapshot`, `IntelFleet`, `IntelFingerprint`, `IntelSimilarityScore`, `IntelTemplatePool`, `IntelIndexHealth`, `IntelScanDeadLetter`). 8 sensors (PageSpeed, Ahrefs, SerpAPI, GSC, GA4, Outscraper, affiliate-revenue, ad-revenue). 23 API routes under `/api/intel/`. Fleet diversity engine with 6-dimension fingerprinting and pairwise similarity scoring. Work queue generation with threshold rules feeding existing task engine. Advanced patterns: seasonal, upsell, cannibalization, cross-client insights. Production hardened: exponential backoff, rate limiting, dead letter queue, P1 notifications. Sensor settings UI at `/settings/integrations/intel-sensors/`. Cron scheduler at 03:30 UTC daily. Spec: `D:\Work\SEO-Services\specs\covos\INTELLIGENCE_ENGINE_SPEC.md`.
 
 **Next sprint:** SEC-005 (Input Sanitization Audit), TRUST-002 (Data Residency Indicators), MORPH-CPR-001 (Fleet Diversity Recommender → Local Optimizer).
+
+
+### SPRINT COVOS-OPS-01 — Security Followup + IE Cost Compression + Badge Completion + Morpheme Validation (March 15, 2026) ✅ COMPLETE
+
+**Goal:** Close 4 SEC-004-FOLLOWUP isolation gaps, confirm CPR-IE-002/003 as N/A, extend TRUST-002 ResidencyBadges to 4 deferred surfaces, and confirm MORPH-CPR-003 as local.
+
+- [x] **SEC-004-FOLLOWUP: processRecurringTasks scope** — `src/lib/ops/recurring-tasks.ts` — Added `tenantId?: number` param. Query scoped: `recurringTaskRule.findMany({ where: { ..., tenantId } })`. Global-rule client fetch also scoped: `clientProfile.findMany({ where: { status: "active", tenantId } })`.
+- [x] **SEC-004-FOLLOWUP: executeBatchScan scope** — `src/lib/competitive-scan/executor.ts` — Added `tenantId?: number` to `BatchScanParams`. When tenantId provided, bridges through `IntelAssetGroup.findMany({ where: { tenantId } })` to get clientProfileIds, then scopes `clientProfile` query to those IDs. Unscoped path preserved for single-tenant primary DB.
+- [x] **SEC-004-FOLLOWUP: /api/intel/insights tenantId from session** — `src/app/api/intel/insights/route.ts` — Removed query param `tenantId`. Now derives tenantId from `x-tenant-slug` header → `prisma.tenant.findUnique({ where: { slug } })`. Returns 400/404 if tenant context missing.
+- [x] **SEC-004-FOLLOWUP: 11 cron routes audited** — `src/lib/tenant/cron-guard.ts` (NEW) — `assertSingleSharedDbTenant()` guard halts cron with HTTP 503 if >1 active tenant shares the primary DB. Result: 3 PASS (covos-telemetry, invoice-monthly, nap-health-check), 9 FAIL → fixed inline (deliver-reports, gbp-snapshot, generate-payments, invoice-status-poll, nap-scan, payment-check, rank-poll, rank-tracking, site-health). Addendum appended to `docs/SEC-004-AUDIT.md`.
+- [x] **Schema additions** — `prisma/schema.prisma` — `RecurringTaskRule.tenantId Int? @map("tenant_id")` + `ClientProfile.tenantId Int? @map("tenant_id")` added. `prisma db push --accept-data-loss` applied. Prisma Client regenerated (v6.19.2).
+- [x] **CPR-IE-002: IE Generation Context Compression** — N/A. IE confirmed 100% AI-free per CPR-IE-001-CLASSIFICATION.md. No generation context to compress. Closed without implementation.
+- [x] **CPR-IE-003: IE Urgent vs Non-Urgent Task Split** — N/A. IE confirmed 100% AI-free per CPR-IE-001-CLASSIFICATION.md. No AI task split applies. Closed without implementation.
+- [x] **TRUST-002-EXTENDED: ResidencyBadge — Voice Capture** — `src/components/clients/voice/VoiceProfileDialog.tsx` — `<ResidencyBadge type="claude" />` added to idle state (pre-capture) and success state (recapture area).
+- [x] **TRUST-002-EXTENDED: ResidencyBadge — SEO Strategy** — `src/components/content/ContentStrategyPanel.tsx` — `<ResidencyBadge type="claude" />` added after topics generate button row and after keywords research button row.
+- [x] **TRUST-002-STRUCTURAL: Fleet Diversity + IE Scan Results** — `BACKLOG.md` — Both surfaces have no existing frontend panel components. Badge deferred to when panels are built (`type="local"` for both). Logged as TRUST-002-STRUCTURAL in BACKLOG.md.
+- [x] **MORPH-CPR-003: Morpheme validation confirmed local** — `D:\Work\ContentStudio\rebuild_audi.py`, `rebuild_bmw.py` — Morpheme = CSS template file copy via Python string replacement. Zero AI calls. Class 0. Closed as confirmed-local.
+- [x] **TypeScript gate** — `npx tsc --noEmit`: 0 new errors. 10 pre-existing errors in untouched files (basecamp-crawl, import-wave-history, team/presence, lead-filter-bar-advanced, basecamp/client). Sprint requirement met.
+
+**New files:** `src/lib/tenant/cron-guard.ts`, `MORNING_BRIEFING.md`
+**Modified files:** `prisma/schema.prisma`, `src/lib/ops/recurring-tasks.ts`, `src/lib/competitive-scan/executor.ts`, `src/app/api/intel/insights/route.ts`, 9× `src/app/api/cron/*/route.ts`, `src/components/clients/voice/VoiceProfileDialog.tsx`, `src/components/content/ContentStrategyPanel.tsx`, `docs/SEC-004-AUDIT.md`, `BACKLOG.md`, `STATUS.md`
+**Commit:** pending
 
 
 ### SPRINT COVOS-CPR-01 — IE Reclassification + Performance Chain (March 14, 2026) ✅ COMPLETE

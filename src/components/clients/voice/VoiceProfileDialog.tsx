@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Check, X, Sparkles, AlertCircle } from "lucide-react";
 import { AIProgressIndicator } from "@/components/ui/ai-progress-indicator";
+import { ResidencyBadge } from "@/components/ui/residency-badge";
 
 const VOICE_STEPS = [
   "Analyzing writing sample...",
@@ -273,6 +274,10 @@ export function VoiceProfileDialog({
                   Recapture
                 </Button>
               </div>
+              {/* TRUST-002-EXTENDED: Voice capture uses Claude API */}
+              <div className="flex justify-center pt-1">
+                <ResidencyBadge type="claude" />
+              </div>
 
               <p className="text-xs text-center text-muted-foreground">
                 This voice profile will be used as the default tone for all content generation
@@ -290,6 +295,8 @@ export function VoiceProfileDialog({
                 <Sparkles className="h-4 w-4 mr-2" />
                 Start Analysis
               </Button>
+              {/* TRUST-002-EXTENDED: Voice capture uses Claude API */}
+              <ResidencyBadge type="claude" />
             </div>
           )}
         </div>

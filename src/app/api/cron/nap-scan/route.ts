@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { log } from "@/lib/logger";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 import { runCitationScan } from "@/lib/enrichment/providers/nap-scraper/scanner";
 
 export const maxDuration = 300;
@@ -22,6 +23,10 @@ export async function GET(req: Request) {
   if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant("nap-scan");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   const clients = await prisma.clientProfile.findMany({
     where: { status: "active" },

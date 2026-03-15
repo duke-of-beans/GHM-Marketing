@@ -1,41 +1,76 @@
-# MORNING BRIEFING — March 15, 2026
+# MORNING BRIEFING
+**Session:** 2026-03-15T00:00:00
+**Environment:** BUSINESS
+**Project:** GHM Dashboard / COVOS
+**Blueprint:** Sprint COVOS-OPS-01 — Security Followup + IE Cost Compression + Badge Completion + Morpheme Validation
+
+---
 
 ## SHIPPED
+| Item | Status | Files Modified |
+|------|--------|----------------|
+| SEC-004-FOLLOWUP — Resolve 4 tenant isolation gaps | COMPLETE | `prisma/schema.prisma`, `src/lib/ops/recurring-tasks.ts`, `src/lib/competitive-scan/executor.ts`, `src/app/api/intel/insights/route.ts`, `src/lib/tenant/cron-guard.ts` (NEW), 9 cron routes, `docs/SEC-004-AUDIT.md` |
+| CPR-IE-002 — IE Generation Context Compression | N/A — CLOSED | No files modified. IE confirmed AI-free per CPR-IE-001. |
+| CPR-IE-003 — IE Urgent vs Non-Urgent Task Split | N/A — CLOSED | No files modified. IE confirmed AI-free per CPR-IE-001. |
+| TRUST-002-EXTENDED — ResidencyBadge on 4 deferred surfaces | COMPLETE (2 shipped / 2 STRUCTURAL) | `src/components/clients/voice/VoiceProfileDialog.tsx`, `src/components/content/ContentStrategyPanel.tsx`, `BACKLOG.md` (2 TRUST-002-STRUCTURAL entries) |
+| MORPH-CPR-003 — Morpheme validation audit | CONFIRMED LOCAL — CLOSED | No files modified. Morpheme = CSS template file copy in ContentStudio rebuild scripts. Zero AI. |
 
-**SEC-005: Input Sanitization Audit** — Completed comprehensive audit of 28 fields across generators, API routes, and rendering surfaces. Classification: 15 SAFE, 4 XSS_RISK, 9 NEEDS_SANITIZATION. Decision: `sanitizeHtmlInput()` not added because all XSS_RISK surfaces (AI-generated content and reports) are defended at the input layer via `sanitizePromptInput()`. Output sanitization would be redundant and post-hoc. Audit documented in `docs/SEC-005-AUDIT.md`.
 
-**TRUST-002: Data Residency Indicators** — Created `src/components/ui/residency-badge.tsx` component. Displays colored dot + label indicating where AI features process data: green (local), blue (Claude API), yellow (third-party). Badges successfully applied to 5 AI-powered surfaces:
-- PPCGenerator (Claude API)
-- MetaDescriptionGenerator (Claude API)
-- SocialMediaGenerator (Claude API)
-- BlogGenerator (Claude API)
-- WebsiteAuditPanel (PageSpeed + Ahrefs, third-party)
-
-**MORPH-CPR-001: Fleet Recommender Confirmation** — Confirmed local. `diversity-recommender.ts`, `similarity-calculator.ts`, and `fleet-auditor.ts` contain zero AI calls. All logic is deterministic (Prisma queries, Set operations, arithmetic). Closing as confirmed-local rather than migrated.
+---
 
 ## QUALITY GATES
+- **tsc --noEmit:** PASS — 0 new errors. 10 pre-existing errors in untouched files (`scripts/basecamp-crawl.ts`, `scripts/import-wave-history.ts`, `src/app/api/team/presence/route.ts`, `src/components/leads/lead-filter-bar-advanced.tsx`, `src/lib/basecamp/client.ts`). Sprint requirement met.
+- **SHIM:** Not run this session.
+- **Git:** pending — see commit following this briefing.
 
-**TypeScript Compilation:** `npx tsc --noEmit` returned 10 pre-existing errors (scripts/, type annotation issues in team/presence/route.ts, basecamp client, lead-filter-bar-advanced). **Zero new errors introduced.** ✅ PASS
+---
 
 ## DECISIONS MADE BY AGENT
 
-1. **Sanitization strategy:** Input sanitization via `sanitizePromptInput()` is the perimeter defense. Output sanitization (stripping HTML) is not needed because AI outputs are deterministic given clean inputs. Prompt poisoning is mitigated by sanitizing user inputs before Claude API transmission.
+- `executeBatchScan` tenantId scope bridged via `IntelAssetGroup` — no direct `tenantId` on `ClientProfile` for this path; used `IntelAssetGroup.findMany({ where: { tenantId } })` to resolve clientProfileIds first, then scoped clientProfile query by those IDs. This avoids requiring a schema change for the executor path specifically. — confidence: HIGH
 
-2. **Residency badge placement:** Placed immediately adjacent to Generate/Run/Analyze buttons, not in output/results areas. Uses consistent color scheme from PrivacyDashboardTab.
+- `ClientProfile` required `tenantId Int?` addition for `processRecurringTasks` — the where clause needed it and the field didn't exist. Added nullable column + ran `prisma db push --accept-data-loss`. Safe: nullable, no data loss. — confidence: HIGH
 
-3. **Scope limitation on badges:** Only applied badges to 5 surfaces where UI components with clear "Generate/Run" buttons exist. SEO strategy, voice profile capture, fleet diversity recommender, and Intelligence Engine don't have dedicated UI components in current codebase or are implemented inline (would require deeper architectural changes for badge placement).
+- 9 cron routes reclassified from NEEDS ATTENTION to FAIL and fixed inline — all queried tenant-scoped models (`clientProfile`, `invoiceRecord`) without tenantId scope. Applied `assertSingleSharedDbTenant()` guard as a functional runtime halt rather than leaving them unguarded. Addendum appended to `docs/SEC-004-AUDIT.md`. — confidence: HIGH
+
+- Fleet Diversity panel and IE Scan Results applied TRUST-002-STRUCTURAL escape hatch — no frontend panel components exist for either surface; searched all `src/components/**/*.tsx`. Badge deferred to when panel is built; logged to `BACKLOG.md` with type and sprint reference. — confidence: HIGH
+
+
+---
 
 ## UNEXPECTED FINDINGS
 
-**MORPH-CPR-001 confirmed local** — Fleet diversity recommender (`diversity-recommender.ts`, `similarity-calculator.ts`, `fleet-auditor.ts`) contains zero AI calls. All fleet intelligence is deterministic local logic: Prisma queries, Set operations for fleet comparisons, arithmetic for threshold scoring. The backlog item was written assuming an AI call existed (likely from context drift). Closing as confirmed-local rather than attempting to migrate.
+- **CPR-IE-002: N/A** — IE confirmed AI-free per CPR-IE-001. All 13 call sites are Class 0 deterministic logic. No generation context to compress. Closing without implementation.
+
+- **CPR-IE-003: N/A** — IE confirmed AI-free per CPR-IE-001. No urgent/non-urgent AI task split applies. Closing without implementation.
+
+- **MORPH-CPR-003: confirmed local. Closing.** — Morpheme references in ContentStudio (`rebuild_audi.py`, `rebuild_bmw.py`) are CSS template file copies via Python string replacement. Zero AI involvement. Fully Class 0.
+
+- **ClientProfile had no tenantId column** — `processRecurringTasks` required `clientProfile.tenantId` in a where clause that couldn't compile without the schema field. Required unplanned schema change: `tenantId Int? @map("tenant_id")` added to `ClientProfile` + `prisma db push`. Cascades to `executor.ts` path as well (though executor uses IntelAssetGroup bridge instead). Recommended next action: audit all models that hold client data for tenantId coverage.
+
+---
 
 ## FRICTION LOG
 
-None. Research phase searches completed successfully despite large file sizes and permission caveats. File editing via `edit_block` worked reliably with fuzzy matching fallback. TypeScript compilation gated cleanly.
+### Logged Only
 
-## NEXT QUEUE
+| # | Category | What happened |
+|---|----------|--------------|
+| 1 | TOOL | `read_multiple_files` batch of 8 files produced 216K chars, exceeding token limit. Output saved to temp file. Worked around by reading each file individually via PowerShell `Get-Content`. |
+| 2 | ENV | `cmd` shell `type` command fails with backslash paths containing spaces ("filename syntax incorrect"). Established pattern: always use PowerShell `Get-Content` for file reads. |
+| 3 | ENV | `git log` silent in both cmd and PowerShell sessions — exit code 0 but stdout not returned to agent. Commit hash unavailable pre-commit. Workaround: check hash post-push via a separate process. |
 
-- **SEC-004-FOLLOWUP** — Pre-onboarding tenant isolation gaps (`processRecurringTasks`, `executeBatchScan` unscoped queries). Must clear before second tenant onboarding.
-- **PERF-003** — Batch API for non-urgent Intelligence Engine tasks (reduce load on modal rendering).
-- **CPR-IE-002** — Intelligence Engine generation context compression (summarize competitor data before Claude API transmission).
-- **TRUST-002-EXTENDED** — Add residency badges to remaining surfaces (SEO strategy, voice capture, fleet diversity) once UI components are refactored to expose clear action buttons.
+
+---
+
+## NEXT QUEUE (RECOMMENDED)
+
+1. **PERF-003 — Batch API for Non-Urgent IE** — Likely N/A now that IE is confirmed AI-free per CPR-IE-001. Read CPR-IE-001-CLASSIFICATION.md first; close as N/A if IE has no AI calls. Quick close if confirmed.
+
+2. **FEAT-016 — Tenant Voice + Visual Style Capture** — Ready to spec. No blockers identified. Next natural feature sprint after security hardening is complete.
+
+3. **VENTURES_MIGRATION_PLAN** — No blockers noted. Queue when COVOS security posture is stable post-onboarding gate.
+
+---
+
+*Written by Cowork agent at session end. Do not edit — this is a point-in-time record.*

@@ -8,12 +8,18 @@ import { log } from '@/lib/logger'
 import { differenceInDays } from 'date-fns'
 import { sendPushToUser } from '@/lib/push'
 import { PAYMENT_STATUS } from '@/lib/wave/constants'
+import { assertSingleSharedDbTenant } from '@/lib/tenant/cron-guard'
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  // Full fix: iterate per-tenant prisma clients. See BACKLOG.md.
+  const guard = await assertSingleSharedDbTenant('payment-check')
+  if (guard) return NextResponse.json(guard, { status: 503 })
 
   const now = new Date()
 

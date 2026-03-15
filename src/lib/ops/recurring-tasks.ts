@@ -113,7 +113,11 @@ async function createTaskForRule(
 // Main runner — called by cron
 // ---------------------------------------------------------------------------
 
-export async function processRecurringTasks(): Promise<RecurringTaskRunResult> {
+// SEC-004-FOLLOWUP: accepts optional tenantId to scope the initial query.
+// When tenantId is provided, only rules belonging to that tenant are processed.
+// The cron route should iterate known tenants and call this once per tenant
+// before a second tenant is onboarded onto the shared primary DB.
+export async function processRecurringTasks(tenantId?: number): Promise<RecurringTaskRunResult> {
   const result: RecurringTaskRunResult = {
     rulesProcessed: 0,
     tasksCreated: [],
@@ -124,6 +128,7 @@ export async function processRecurringTasks(): Promise<RecurringTaskRunResult> {
     where: {
       isActive: true,
       nextRunAt: { lte: new Date() },
+      ...(tenantId !== undefined ? { tenantId } : {}),
     },
   });
 
@@ -136,8 +141,14 @@ export async function processRecurringTasks(): Promise<RecurringTaskRunResult> {
       if (rule.clientId) {
         clientIds = [rule.clientId];
       } else {
+        // SEC-004-FOLLOWUP: when tenantId is available, scope global-rule clients
+        // to that tenant's profiles (requires clientProfile.tenantId to be set on
+        // new tenant onboarding). Falls back to all active clients on single-tenant DB.
         const clients = await prisma.clientProfile.findMany({
-          where: { status: "active" },
+          where: {
+            status: "active",
+            ...(tenantId !== undefined ? { tenantId } : {}),
+          },
           select: { id: true, businessName: true },
         });
         clientIds = clients.map((c) => c.id);

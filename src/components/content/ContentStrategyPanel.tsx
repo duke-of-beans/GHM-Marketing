@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Lightbulb, Hash, Copy, ChevronRight } from "lucide-react";
+import { ResidencyBadge } from "@/components/ui/residency-badge";
 
 interface TopicResult {
   title: string;
@@ -136,6 +137,10 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
             )}
           </Button>
         </div>
+        {/* TRUST-002-EXTENDED: SEO Strategy generation uses Claude API */}
+        <div className="flex justify-end">
+          <ResidencyBadge type="claude" />
+        </div>
 
         {topics.length > 0 && (
           <div className="space-y-2">
@@ -190,6 +195,10 @@ export function ContentStrategyPanel({ clientId }: ContentStrategyPanelProps) {
               "Research"
             )}
           </Button>
+        </div>
+        {/* TRUST-002-EXTENDED: SEO keyword research uses Claude API */}
+        <div className="flex justify-end">
+          <ResidencyBadge type="claude" />
         </div>
 
         {keywords.length > 0 && (

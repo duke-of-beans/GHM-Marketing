@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { log } from "@/lib/logger";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 import { getSerpResults } from "@/lib/enrichment/providers/dataforseo";
 
 export const maxDuration = 120;
@@ -22,6 +23,10 @@ export async function GET(req: Request) {
   if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant("rank-poll");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   // Fetch pending tasks posted in the last 24 hours, not yet resolved
   const cutoff = new Date();

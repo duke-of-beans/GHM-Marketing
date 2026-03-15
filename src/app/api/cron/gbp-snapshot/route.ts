@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { assertSingleSharedDbTenant } from '@/lib/tenant/cron-guard'
 import { getGBPClient } from '@/lib/enrichment/providers/google-business/client'
 import { fetchInsights } from '@/lib/enrichment/providers/google-business/insights'
 import { listReviews } from '@/lib/enrichment/providers/google-business/reviews'
@@ -20,6 +21,10 @@ export async function POST(req: NextRequest) {
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant('gbp-snapshot')
+  if (guard) return NextResponse.json(guard, { status: 503 })
 
   const start = Date.now()
   let processed = 0

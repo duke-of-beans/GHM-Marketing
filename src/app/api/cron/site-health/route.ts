@@ -14,6 +14,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { log } from "@/lib/logger";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 import { fetchPageSpeedFull } from "@/lib/enrichment/providers/pagespeed";
 import { logProviderCall } from "@/lib/enrichment/cost-tracker";
 import { recordProviderSuccess, recordProviderFailure } from "@/lib/ops/data-source-monitor";
@@ -35,6 +36,10 @@ export async function GET(req: Request) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant("site-health");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   const started = Date.now();
   let processed = 0;

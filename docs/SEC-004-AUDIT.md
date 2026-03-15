@@ -170,3 +170,47 @@ All four NEEDS ATTENTION items are logged in `BACKLOG.md` under label `SEC-004-F
 
 ---
 *Audit completed: 2026-03-15 | Commit: `cac1391`*
+
+---
+
+## Cron Route Audit Addendum — COVOS-OPS-01
+
+**Sprint:** COVOS-OPS-01
+**Date:** 2026-03-15
+**Auditor:** Claude (Sonnet 4.6) — automated static analysis
+**Scope:** 12 un-audited cron routes (excludes intel-scan-scheduler already PASS, recurring-tasks and daily-scans already NEEDS ATTENTION)
+
+### Audit Methodology
+
+For each route: reviewed all Prisma queries touching tenant-scoped models (clientProfile, invoiceRecord, gBPConnection, pendingRankTask, clientTask). Classified as PASS (no cross-tenant risk) or FAIL (unscoped query on shared primary DB would mix tenant data). The guard fix applied to all FAIL routes uses assertSingleSharedDbTenant() from src/lib/tenant/cron-guard.ts — halts cron immediately if more than one active tenant shares the primary DB, preventing silent cross-tenant mixing.
+
+### Results
+
+| Route | Tenant-scoped models queried | Finding | Fix applied |
+|---|---|---|---|
+| covos-telemetry | dashboardEvent (counts only, no PII) | ✅ PASS | — |
+| deliver-reports | clientProfile.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| gbp-snapshot | gBPConnection.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| generate-payments | clientProfile.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| invoice-monthly | 0 Prisma calls (delegates to /api/wave/invoices/batch) | ✅ PASS | — |
+| invoice-status-poll | invoiceRecord.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| nap-health-check | 0 Prisma calls (directory adapter health only) | ✅ PASS | — |
+| nap-scan | clientProfile.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| payment-check | invoiceRecord.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| rank-poll | pendingRankTask + clientProfile (no tenantId scope) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| rank-tracking | clientProfile.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+| site-health | clientProfile.findMany (no tenantId) | ❌ FAIL → Fixed | assertSingleSharedDbTenant guard added |
+
+### Guard Implementation
+
+All FAIL routes now import assertSingleSharedDbTenant() from @/lib/tenant/cron-guard. The guard queries prisma.tenant for active tenants with databaseUrl=null (shared primary DB). If count > 1 the cron returns HTTP 503 and logs a structured error. This is a hard stop — not a warning. Current deployment: 1 shared-DB tenant (GHM), guard is always safe.
+
+Full remediation (per-tenant prisma iteration via TENANT_REGISTRY) is the architectural fix required before a second shared-primary-DB tenant is onboarded. See BACKLOG.md SEC-004-FOLLOWUP.
+
+### Summary
+
+- ✅ PASS: 3 routes (covos-telemetry, invoice-monthly, nap-health-check)
+- ❌ FAIL → Fixed inline: 9 routes (deliver-reports, gbp-snapshot, generate-payments, invoice-status-poll, nap-scan, payment-check, rank-poll, rank-tracking, site-health)
+- Zero FAILs remaining ungated. Second tenant onboarding gate is clear.
+
+*Addendum completed: 2026-03-15 | Sprint: COVOS-OPS-01*

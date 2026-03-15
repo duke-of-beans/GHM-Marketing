@@ -6,6 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { assertSingleSharedDbTenant } from "@/lib/tenant/cron-guard";
 import { postSerpTasks } from "@/lib/enrichment/providers/dataforseo";
 import { logProviderCall } from "@/lib/enrichment/cost-tracker";
 
@@ -22,6 +23,10 @@ export async function GET(req: Request) {
   if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // SEC-004-FOLLOWUP: halt if multiple tenants share the primary DB.
+  const guard = await assertSingleSharedDbTenant("rank-tracking");
+  if (guard) return NextResponse.json(guard, { status: 503 });
 
   // Only scan clients due for biweekly refresh (last scan >13 days ago or never)
   const cutoff = new Date();
